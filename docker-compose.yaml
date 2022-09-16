@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  backend:
+    environment:
+      OUGHT_INFERENCE_API_KEY: ${OUGHT_INFERENCE_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_ORG_ID: ${OPENAI_ORG_ID:-}
+      CODESPACE_NAME: ${CODESPACE_NAME:-}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${COMPOSE_BACKEND_IMAGE-ice-backend}
+    volumes:
+      # When mounting /code, don't clobber the .venv that's already in the container.
+      # https://stackoverflow.com/a/37898591
+      - /code/.venv/
+      - ./:/code
+    ports:
+      - "8000:8000"
+      - "9000:9000"

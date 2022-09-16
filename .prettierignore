@@ -1,0 +1,5 @@
+ui/.next
+ui/client.d.ts
+ui/public/openapi.json
+docs/_layouts/*.html
+docs/index.md

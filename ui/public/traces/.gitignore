@@ -1,0 +1,14 @@
+*.jsonl
+
+# example traces for deployed version:
+
+# - placebo classification + description
+!01GCZNZ1YC0XRE1QHSAV6MPWJD.jsonl
+# - adherence
+!01GBXP1B256Z9VRGPWC2JYT14H.jsonl
+# - experiments + arms
+!01GBXKV6EK63YW503VTMMSER3B.jsonl
+# - result evaluation
+!01GBXTYND8V67HH5H1GWZWJKGB.jsonl
+# - placebo description + evaluation
+!01GCB3AT0P2GQBBYXNBVP8VT1E.jsonl

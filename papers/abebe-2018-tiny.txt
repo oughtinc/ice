@@ -1,0 +1,29 @@
+Abstract
+
+We show that an easy-to-scale intervention that helps young job-seekers to signal their ability to employers can generate large improvements in labor market outcomes. We are also uniquely able to compare this intervention (the ‘job application workshop’) to a transport subsidy treatment designed to reduce search costs. We find that in the short-run both interventions have large positive effects on the probability of finding formal jobs. The workshop also helps young people access stable jobs with an open- ended contract. Four years later, the workshop has a large and significant impact on earnings, while the effects of the subsidy have dissipated. The results are driven largely by groups that are at the greatest disadvantage in the labor market, leading to strong equity gains. Our results show the crucial role that effective signalling of skills can play in supporting the inclusion of youth in the labor market.
+
+2.3 Treatment 1: The transport subsidy
+
+Individuals in this treatment group are offered a subsidy to cover the cost of traveling to the city centre. The subsidy takes the form of a cash transfer that is conditional on visiting a disbursement point, located in an office in the centre of Addis Ababa.12 Recipients are required to attend in person, and to show photographic ID on each visit. Each recipient can collect cash once a day, up to three times a week. The daily amount is sufficient to cover the cost of a return bus fare from the participant’s area of residence at baseline to the disbursement point.13 To access the subsidy, job-seekers need to have (or borrow) enough cash to make the first journey – which in our setting is almost always the case.14
+
+2.4 Treatment 2: The job application workshop
+
+The job application workshop is designed to improve job-seekers’ ability to present their skills accurately to potential employers, thus overcoming the challenge of anonymity that youths with limited work experience typically face. The intervention has two components: an orientation session and a certification session. The orientation session helps participants to make more effective use of their existing signals (job experience, education, etc.). In the certification session, we certify skills that are ‘hard to observe’ for employers, such as cognitive ability, and we provide participants with an instrument (the certificates) to signal those skills. The design aims to mimic the orientation services available to job-seekers in several countries.19
+
+3 Experimental design and estimation strategy 3.1 The sample
+
+To obtain our experimental sample, we began by drawing a random selection of geographic clusters from the list of Ethiopian Central Agency (CSA) enumeration areas.25 Given our interest in spatial constraints, we excluded all clusters within 2.5 km from the city centre and those outside the city boundaries. To minimise potential spillovers, we did not select any directly adjacent clusters.
+
+Within our selected clusters, we sought respondents of direct interest to active labour market policies. Specifically, we used door-to-door sampling to construct a list of all in- dividuals who: (i) were between 18 and 29 years of age; (ii) had completed high school; (iii) were available to start working in the next three months; and (iv) were not currently working in a permanent job or enrolled in full time education. We randomly sampled individuals from this list to be included in the study. Our lists included individuals with different levels of education. We sampled with higher frequency from the groups with higher education, to ensure that individuals with vocational training and university de- grees are well represented in the study; we estimate using appropriate sampling weights. In all, we interviewed 3,052 individuals who are included in our experimental study.26
+
+3.2 Data collection: Face-to-face and the phone survey
+
+We collected data on study participants through both face-to-face and phone interviews. We completed baseline face-to-face interviews between May and July 2014 and endline interviews between June and August 2015. Face-to-face interviews recorded information about the socio-demographic characteristics of study participants, their education, work history, finances, expectations and attitudes. We also collected an incentivised measure of present bias.28 We did not inform study participants at baseline that some of them would be offered job search assistance.
+
+3.3 Randomisation
+
+We randomly assigned geographic clusters to one of the treatment arms or the control group. To ensure balance, we created blocks of clusters with similar baseline observables and randomly assigned clusters within each block to the different treatment groups (Bruhn and McKenzie, 2009).30
+
+5.2 Who benefits the most from the workshop?
+
+We find that the effects of the workshop are significantly larger for the most disadvan- taged. In particular, we show in Table 5 that the least educated, the least experienced, and those with the lowest expected earnings benefit the most from the interventions. For other dimensions, we are unable to find significant differences in response to treatment.51 The size of the effects for the worst-off workers is substantial. For example, young people without tertiary education increase the earnings by almost 60 percent, while the low pre- dicted earnings group experiences a 50 percent increase. This causes a large reduction in earning inequality: the earning gap between the low and the high earnings group drops from 142 percent to 54 percent and, strikingly, the gap between experienced and inexpe- rienced workers is fully erased. Overall, these results illustrate the large equity gains that can be generated by helping young workers to access the labour market through improved signalling.

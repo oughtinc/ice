@@ -1,0 +1,12 @@
+secrets
+__pycache__
+.coverage*
+store/*
+.envrc
+.env
+**/.vscode/*
+data
+.pre-commit-home
+log*.txt
+.dmypy.json
+**/.DS_Store

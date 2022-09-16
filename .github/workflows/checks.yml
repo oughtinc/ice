@@ -1,0 +1,55 @@
+name: Checks
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Checks
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+
+      - name: Build backend
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/amd64
+          push: false
+          load: true
+          cache-from: |
+            type=gha, scope=dev
+          cache-to: |
+            type=gha, scope=dev
+          tags: |
+            ice-backend:latest
+
+      - name: Load cache
+        uses: actions/cache@v3
+        with:
+          key: checks-${{ github.ref }}-${{ github.run_id }}
+          path: |
+            .pre-commit-home/
+            .mypy_cache/
+          restore-keys: |
+            checks-${{ github.ref }}
+            checks-
+
+      - name: Run all checks
+        run: scripts/checks.sh
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: "1"
+          DOCKER_BUILDKIT: "1"
+          COMPOSE_BACKEND_IMAGE: ice-backend:latest
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ORG_ID: ${{ secrets.OPENAI_ORG_ID }}
+          OUGHT_INFERENCE_API_KEY: ${{ secrets.OUGHT_INFERENCE_API_KEY }}
+
+      - name: Chmod cached files so cache action can read them
+        run: |
+          sudo chmod -R a+r .pre-commit-home
+          sudo chmod -R a+r .mypy_cache

@@ -1,0 +1,123 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: label-studio
+  labels:
+    name: label-studio
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: label-studio
+  namespace: label-studio
+  labels:
+    name: label-studio
+spec:
+  ports:
+    - protocol: TCP
+      name: http-label-studio-service
+      port: 80
+      targetPort: http-ls
+  selector:
+    name: label-studio
+  type: NodePort
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: label-studio
+  name: label-studio
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:516490962685:certificate/24d1b9dd-3314-4ee5-a915-3fef92b7705a
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: label-studio
+                port:
+                  number: 80
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    name: label-studio
+  name: label-studio
+  namespace: label-studio
+spec:
+  serviceName: label-studio
+  replicas: 1
+  selector:
+    matchLabels:
+      name: label-studio
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: label-studio
+    spec:
+      containers:
+        - env:
+            - name: LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK
+              value: "true"
+            - name: LABEL_STUDIO_USERNAME
+              value: username
+            - name: LABEL_STUDIO_PASSWORD
+              value: changeme
+          image: heartexlabs/label-studio:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
+          name: label-studio
+          ports:
+            - containerPort: 8080
+              name: http-ls
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
+          resources: {}
+          securityContext: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - name: db
+              mountPath: /label-studio/data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      tolerations:
+        - effect: NoSchedule
+          key: workload
+          operator: Exists
+  volumeClaimTemplates:
+    - metadata:
+        name: db
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 8Gi
