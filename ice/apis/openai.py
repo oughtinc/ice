@@ -31,8 +31,9 @@ OPENAI_BASE_URL = "https://api.openai.com/v1"
 OPENAI_DEFAULT_HEADERS = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
-    "OpenAI-Organization": settings.OPENAI_ORG_ID,
 }
+if settings.OPENAI_ORG_ID:
+    OPENAI_DEFAULT_HEADERS["OpenAI-Organization"] = settings.OPENAI_ORG_ID
 
 
 def is_retryable_HttpError(e: BaseException) -> bool:
