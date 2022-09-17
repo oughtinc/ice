@@ -24,9 +24,26 @@ Question: Which of paragraphs A and B better answers the question '{question}'? 
 Answer: Paragraph""".strip()
 
 
+def make_compare_summaries_prompt(a: Paragraph, b: Paragraph) -> str:
+    return f"""
+Which of the following summaries is better?
+
+Paragraph A: {a}
+
+Paragraph B: {b}
+
+Question: Which of summaries A and B is more accurate and complete? Answer with "Paragraph A" or "Paragraph B".
+
+Answer: Paragraph""".strip()
+
+
 class RankParagraphs(Recipe):
     async def run(
-        self, paper: Paper, question: str = "What are the interventions?", n: int = 5
+        self, 
+        paper: Paper, 
+        question: str = "What are the interventions?", 
+        n: int = 5,
+        prompt_type = 'question'
     ) -> list[Paragraph]:
         """
         Rank the paragraphs by how well they answers the question
@@ -36,9 +53,15 @@ class RankParagraphs(Recipe):
 
         async def cmp(a: Paragraph, b: Paragraph) -> int:
             progress_bar.update(1)
+            if prompt_type == 'question':
+                prompt = make_compare_paragraphs_prompt(a, b, question)
+            elif prompt_type == 'summary':
+                prompt = make_compare_summaries_prompt(a, b)
+            else:
+                prompt = 'Not implemented yet. hah.'
             answer = (
                 await self.agent().answer(
-                    prompt=make_compare_paragraphs_prompt(a, b, question),
+                    prompt=prompt,
                     multiline=False,
                     max_tokens=1,
                 )
