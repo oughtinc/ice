@@ -28,6 +28,10 @@ MACHINE_AGENTS = {
         origin_model_name="bigscience/T0_3B",
         lora_weights_path="ice/nn/weights/adherence_tfew_multi_lite_3B.pt",
     ),
+    "Final-N-monoT5": lambda: TFew(
+        origin_model_name="castorini/monot5-base-msmarco-10k",
+        lora_weights_path="ice/nn/weights/Final-N-monoT5.pt",
+    ),
 }
 
 
