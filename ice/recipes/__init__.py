@@ -11,6 +11,7 @@ from .comparisons_qa import ComparisonsQA
 from .evaluate_result import EvaluateResult
 from .evaluate_results import EvaluateResults
 from .experiment_arms import ExperimentArms
+from .finalN import FinalN
 from .funnel_simple import FunnelSimple
 from .placebo_description import PlaceboDescriptionInstruct
 from .placebo_dialogs import PlaceboDialogs
@@ -50,4 +51,5 @@ def get_recipe_classes() -> list[Type[Recipe]]:
         PlaceboTree,
         QA,
         RankParagraphs,
+        FinalN,
     ]
