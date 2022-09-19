@@ -1,16 +1,19 @@
+import re
+
 from typing import Tuple
-from ice.apis.openai import openai_complete
-from ice.evaluation.evaluate_recipe_result import RecipeResult
-from ice.paper import Paper
-from ice.recipe import Recipe
-from ice.settings import settings
+
 from pydantic import BaseSettings
 from structlog import get_logger
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.models.gpt2.tokenization_gpt2_fast import GPT2TokenizerFast
+
+from ice.apis.openai import openai_complete
+from ice.evaluation.evaluate_recipe_result import RecipeResult
+from ice.paper import Paper
+from ice.recipe import Recipe
 from ice.utils import filter_async
-import re
-from ..trace import recorder, trace
+
+from ..trace import trace
 
 log = get_logger()
 
@@ -19,20 +22,56 @@ TFEW_SAMPLE_SIZE_ANSWER_CHOICES = ("false", "true")
 
 MAX_POPULATIONS = 2
 
-VAL_GS = ['agley-2021.pdf', 'bloom-2016.pdf', 'caturla-2011.pdf', 'choopanya-2013.pdf', 'fleming-1986.pdf', 'haugen-2014.pdf', 'howard-2020.pdf', 'sagara-2009.pdf', 'shen-2016.pdf', 'tergesen-2020.pdf', 'winskell-2018.pdf']
+VAL_GS = [
+    "agley-2021.pdf",
+    "bloom-2016.pdf",
+    "caturla-2011.pdf",
+    "choopanya-2013.pdf",
+    "fleming-1986.pdf",
+    "haugen-2014.pdf",
+    "howard-2020.pdf",
+    "sagara-2009.pdf",
+    "shen-2016.pdf",
+    "tergesen-2020.pdf",
+    "winskell-2018.pdf",
+]
 
-TEST_GS = ['arifeen-2012.pdf', 'bigira-2014.pdf', 'black-1990.pdf', 'boer-2004.pdf', 'bryant-2021.pdf', 'bures-2016.pdf', 'ebner-2016.pdf', 'fisker-2014.pdf', 'gosling-2009.pdf', 'grover-2020.pdf', 'himmelmann-1996.pdf', 'lauque-2000.pdf', 'liu-2013.pdf', 'matsumoto-2020.pdf', 'mullany-2006.pdf', 'ross-1993.pdf', 'sudhakar-2021.pdf', 'sullivan-2009.pdf', 'tricker-1996.pdf', 'wirz-2011.pdf']
+TEST_GS = [
+    "arifeen-2012.pdf",
+    "bigira-2014.pdf",
+    "black-1990.pdf",
+    "boer-2004.pdf",
+    "bryant-2021.pdf",
+    "bures-2016.pdf",
+    "ebner-2016.pdf",
+    "fisker-2014.pdf",
+    "gosling-2009.pdf",
+    "grover-2020.pdf",
+    "himmelmann-1996.pdf",
+    "lauque-2000.pdf",
+    "liu-2013.pdf",
+    "matsumoto-2020.pdf",
+    "mullany-2006.pdf",
+    "ross-1993.pdf",
+    "sudhakar-2021.pdf",
+    "sullivan-2009.pdf",
+    "tricker-1996.pdf",
+    "wirz-2011.pdf",
+]
 
 gpt2_tokenizer: GPT2TokenizerFast = AutoTokenizer.from_pretrained("gpt2")
+
 
 def n_tokens(prompt: str) -> int:
     tokenized = gpt2_tokenizer(prompt)
     return len(tokenized.input_ids)
 
+
 def make_prompt_monot5(paragraph: str) -> str:
     # Prompt for FTed mono-T5; do not change without retraining the model.
     prompt = f"""Query: What is the sample size of this study? Document: {paragraph} Relevant:"""
     return prompt
+
 
 def make_populations_prompt(abstract: str) -> str:
     return f"""Below is an abstract from a randomized control trial(RCT)
@@ -49,7 +88,7 @@ Abstract: Objective To assess the impact of increasing incentive size and remind
 
 List briefly the primary population(s) that were included in this study. ALL population(s) should be mutually exclusive and be the primary population(s) that were included in this study.
 
--Caregivers 
+-Caregivers
 
 Below is an abstract from a randomized control trial(RCT)
 
@@ -73,7 +112,7 @@ Abstract: Caloric restriction has consistently been shown to extend life span an
 
 List briefly the primary population(s) that were included in this study. ALL population(s) should be mutually exclusive and be the primary population(s) that were included in this study.
 
--Healthy individuals 
+-Healthy individuals
 
 Below is an abstract from a randomized control trial(RCT)
 
@@ -110,12 +149,15 @@ def extract_numbers(text: str) -> list[str]:
 
     return number_strings
 
-def answer_populations_question_with_reasoning(abstract: str, text: str, population: str) -> str:
+
+def answer_populations_question_with_reasoning(
+    abstract: str, text: str, population: str
+) -> str:
     population = population.lower()
-    population = population+" who participated in the study"
+    population = population + " who participated in the study"
     return f"""A user on Statistics Stack Exchange needs help with this problem:
 
-Use the excerpts from an academic paper to identify how many patients undergoing hemodialysis in an intervention completed the intervention and are included in the final analysis. Ignore irrelevant excerpts. 
+Use the excerpts from an academic paper to identify how many patients undergoing hemodialysis in an intervention completed the intervention and are included in the final analysis. Ignore irrelevant excerpts.
 
 Excerpts from paper: This randomized, placebo-controlled and double-blind trial was conducted on 151 patients on hemodialysis who were divided randomly by lottery method to three identical groups. In the intervention group, 250 mg of vitamin C was injected intravenously immediately at the end of each hemodialysis session three times a week for 8 weeks in a row. In the control group 1, same term of placebo saline was injected, and in the control group 2, no intervention was performed. Results: A total of 86 (61%) male and 55 female patients with mean hemodialysis duration of 39.74 ± 45.5 months, and a mean age of 61.36 ± 11.46 years-old, participated in this study. Hypertension and diabetes were the most common underlying diseases (79.4%). Median baseline CRP in the intervention, control 1 and control 2 groups were 16.8, 17.8, and 19.4 mg/L respectively. After 2 months, median CRP reduced significantly in the vitamin C group to 10.7 (P = 0.04) vs. 22.6, and 30.6 mg/L in control groups. Conclusions: Our findings demonstrated that vitamin C supplementation modifies the levels of CRP in patients on hemodialysis.
 Of 152 randomized patients, 10 were excluded from the study due to transmission to other dialysis centers, being infected by active infections, getting cancers, death, or their own refusal, and only 141 patients completed the study.
@@ -128,19 +170,19 @@ Final answer: ...
 
 The best response from Statistics Stack Exchange was the following:
 
-Reasoning: 
+Reasoning:
 
 Let’s think step by step.
 The number of patients undergoing hemodialysis in final analysis is the number of participants who were enrolled in the study after removing the patients who were excluded, dropped out, failed to adhere to the study or otherwise failed to complete the study.
-From "Of 152 randomized patients, 10 were excluded from the study due to transmission to other dialysis centers, being infected by active infections, getting cancers, death, or their own refusal, and only 141 patients completed the study." We know that there are 152 patients undergoing hemodialysis enrolled in the study. From the same excerpts, we know that 10 of them were excluded from the study. 
-So 152 - 10 = 142 patients undergoing hemodialysis remained in the study. From "Of 152 randomized patients, 10 were excluded from the study due to transmission to other dialysis centers, being infected by active infections, getting cancers, death, or their own refusal, and only 141 patients completed the study." We know that 141 patients undergoing hemodialysis the study. So the number included in the final analysis is 141. 
+From "Of 152 randomized patients, 10 were excluded from the study due to transmission to other dialysis centers, being infected by active infections, getting cancers, death, or their own refusal, and only 141 patients completed the study." We know that there are 152 patients undergoing hemodialysis enrolled in the study. From the same excerpts, we know that 10 of them were excluded from the study.
+So 152 - 10 = 142 patients undergoing hemodialysis remained in the study. From "Of 152 randomized patients, 10 were excluded from the study due to transmission to other dialysis centers, being infected by active infections, getting cancers, death, or their own refusal, and only 141 patients completed the study." We know that 141 patients undergoing hemodialysis the study. So the number included in the final analysis is 141.
 Sanity check: 141 is smaller than 152 and 142.
 
 Final answer: 141
 
 A user on Statistics Stack Exchange needs help with this problem:
 
-Use the excerpts from an academic paper to identify how many {population} in an intervention completed the intervention and are included in the final analysis. Ignore irrelevant excerpts. 
+Use the excerpts from an academic paper to identify how many {population} in an intervention completed the intervention and are included in the final analysis. Ignore irrelevant excerpts.
 
 For additional context, the abstract from the paper is: {abstract}
 Excerpts from paper: {text}
@@ -157,8 +199,11 @@ Reasoning:
 
 Let’s think step by step."""
 
+
 @trace
-async def answer_with_reasoning(prompt: str, cache_id: int, temp=0.4) -> Tuple[str, int]:
+async def answer_with_reasoning(
+    prompt: str, cache_id: int, temp=0.4
+) -> Tuple[str, int]:
     response = await openai_complete(
         prompt=prompt,
         temperature=temp,
@@ -170,9 +215,18 @@ async def answer_with_reasoning(prompt: str, cache_id: int, temp=0.4) -> Tuple[s
     )
     response_text = response["choices"][0]["text"]
     token_usage = response["usage"]["total_tokens"]
-    answer = response_text.split("Final answer:")[1].strip().strip("\n") if "Final answer:" in response_text else ""
-    log.info(f"GPT3 used {token_usage} tokens", final_answer=answer, full_response=response_text.strip())
+    answer = (
+        response_text.split("Final answer:")[1].strip().strip("\n")
+        if "Final answer:" in response_text
+        else ""
+    )
+    log.info(
+        f"GPT3 used {token_usage} tokens",
+        final_answer=answer,
+        full_response=response_text.strip(),
+    )
     return answer, token_usage
+
 
 @trace
 async def get_best_answer(abstract: str, text: str, population: str):
@@ -210,21 +264,25 @@ async def get_best_answer(abstract: str, text: str, population: str):
     answers = [a for a, _ in answers]
     return answers[0]
 
+
 def remove_citations(s: str) -> str:
     return re.sub(r"\s\([A-Z][a-z]+,\s[A-Z][a-z]?\.[^\)]*,\s\d{4}\)", "", s)
+
 
 def remove_worst_paragraph(relevant_paragraphs: list) -> list:
     scores = [p[1] for p in relevant_paragraphs]
     relevant_paragraphs = [p for p in relevant_paragraphs if p[1] != min(scores)]
     return relevant_paragraphs
 
+
 class FinalNSettings(BaseSettings):
     qa_model = "Final-N-monoT5"
     gpt_engine = "text-davinci-002"
 
+
 class FinalN(Recipe):
 
-    defaults = lambda self: FinalNSettings()
+    defaults = lambda self: FinalNSettings()  # noqa: E731
 
     @trace
     async def get_populations(self, abstract: str) -> list[str]:
@@ -261,9 +319,22 @@ class FinalN(Recipe):
     ) -> list[str]:
         log.info("Number of relevant paragraphs", n=len(relevant_paragraphs))
         text = "\n".join([p[0] for p in relevant_paragraphs])
-        while n_tokens(answer_populations_question_with_reasoning(abstract, text, "population")) > 3300:
+        while (
+            n_tokens(
+                answer_populations_question_with_reasoning(abstract, text, "population")
+            )
+            > 3300
+        ):
             relevant_paragraphs = remove_worst_paragraph(relevant_paragraphs)
-            log.info("Number of relevant paragraphs", n=len(relevant_paragraphs), tokens=n_tokens(answer_populations_question_with_reasoning(abstract, text, "population")))
+            log.info(
+                "Number of relevant paragraphs",
+                n=len(relevant_paragraphs),
+                tokens=n_tokens(
+                    answer_populations_question_with_reasoning(
+                        abstract, text, "population"
+                    )
+                ),
+            )
             text = "\n".join([p[0] for p in relevant_paragraphs])
         log.info("GPT3 text")
         results = []
@@ -277,7 +348,6 @@ class FinalN(Recipe):
         )
         return results
 
-    
     @trace
     def retrieve_abstract(self, paper: Paper):
         abstract = ""
@@ -289,7 +359,9 @@ class FinalN(Recipe):
         return abstract.strip()
 
     @trace
-    async def get_answer(self, paper:Paper, results: list[str], relevant_paragraphs: list[str]) -> RecipeResult:
+    async def get_answer(
+        self, paper: Paper, results: list[str], relevant_paragraphs: list[str]
+    ) -> RecipeResult:
         total_population_size: int = 0
         for result in results:
             number_strings: list[str] = extract_numbers(result.split(": ")[1])
@@ -304,19 +376,20 @@ class FinalN(Recipe):
             question_short_name="Final N",
             document_id=paper.document_id,
             result=("|".join(results)),
-            answer=total_population_size if total_population_size != 0 else "Answer not found.",
-            excerpts=relevant_paragraphs, 
+            answer=total_population_size
+            if total_population_size != 0
+            else "Answer not found.",
+            excerpts=relevant_paragraphs,
         )
-        
+
     async def run(self, paper: Paper):
         abstract = self.retrieve_abstract(paper)
         paragraphs = [str(p) for p in paper.paragraphs if str(p)]
         populations = await self.get_populations(abstract)
         relevant_paragraphs = await filter_async(paragraphs, self.score_paragraph)
-        results = await self.get_populations_numbers(relevant_paragraphs, populations, abstract)
+        results = await self.get_populations_numbers(
+            relevant_paragraphs, populations, abstract
+        )
         recipe_results = await self.get_answer(paper, results, relevant_paragraphs)
         self.maybe_add_to_results(results)
         return recipe_results
-
-
-            
