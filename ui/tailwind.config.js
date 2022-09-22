@@ -24,8 +24,8 @@ module.exports = {
       transparent: "transparent",
       current: "currentColor",
       white: "#ffffff",
-      blueGray: {
-        50: "#F8FAFC",
+      slate: {
+        50: "#F9FAFB",
         100: "#F1F5F9",
         200: "#E2E8F0",
         300: "#CBD5E1",
@@ -86,6 +86,12 @@ module.exports = {
         700: "#B91C1C",
         800: "#991B1B",
         900: "#7F1D1D",
+      },
+      lightBlue: {
+        600: "#0284C7",
+      },
+      indigo: {
+        600: "#4F46E5",
       },
     },
     borderRadius: {

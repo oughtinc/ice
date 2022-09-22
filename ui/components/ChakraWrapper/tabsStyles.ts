@@ -5,7 +5,7 @@ export const tabStyles = {
     line: (themingInfo: ThemingInfo) => ({
       tab: {
         paddingBottom: "8px",
-        color: "blueGray.400",
+        color: "slate.400",
         _selected: {
           color: `${themingInfo.colorScheme}.500`,
         },
@@ -14,7 +14,7 @@ export const tabStyles = {
         },
       },
       tablist: {
-        borderColor: "blueGray.100",
+        borderColor: "slate.100",
       },
     }),
   },

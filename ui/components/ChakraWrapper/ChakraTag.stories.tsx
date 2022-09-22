@@ -5,7 +5,7 @@ const story = { component: Tag };
 export default story;
 
 const VARIANTS = ["subtle"] as const;
-const COLOR_SCHEMES = ["blue", "red", "blueGray"] as const;
+const COLOR_SCHEMES = ["blue", "rose", "slate"] as const;
 const STATES = ["normal", "with-close"] as const;
 
 export const Default = () => (

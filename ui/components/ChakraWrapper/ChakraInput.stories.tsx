@@ -6,7 +6,7 @@ const story = { component: Input };
 export default story;
 
 const VARIANTS = ["outline"] as const;
-const COLOR_SCHEMES = ["blueGray"] as const;
+const COLOR_SCHEMES = ["slate"] as const;
 const STATES = ["empty", "with-input", "empty + with-icon", "with-input + with-icon"] as const;
 
 export const Default = () => (
@@ -30,8 +30,8 @@ export const Default = () => (
               );
               return state.includes("with-icon") ? (
                 <InputGroup key={key}>
-                  <InputLeftElement className="text-blueGray-400">
-                    <MagnifyingGlass className="ml-1" size={16} weight="bold" />
+                  <InputLeftElement className="text-slate-400">
+                    <MagnifyingGlass className="ml-1" size={16} />
                   </InputLeftElement>
                   {inputElement}
                 </InputGroup>

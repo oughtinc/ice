@@ -1,7 +1,7 @@
 // TODO (jason) share these with tailwind config
 export const COLORS = {
-  blueGray: {
-    50: "#F8FAFC",
+  slate: {
+    50: "#F9FAFB",
     100: "#F1F5F9",
     200: "#E2E8F0",
     300: "#CBD5E1",
