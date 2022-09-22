@@ -57,7 +57,7 @@ autoflake = "^1.4"
 flake8 = { version = "^4.0.1", optional = true }
 streamlit = "^1.10.0"
 scipy = "^1.8.1"
-pytest-mock = "^3.8.2."
+pytest-mock = "^3.8.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

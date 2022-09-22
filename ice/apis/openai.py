@@ -15,14 +15,24 @@ log = get_logger()
 
 
 class RateLimitError(Exception):
-    pass
+    def __init__(self, response: httpx.Response):
+        self.response = response
+        try:
+            message = response.json()["error"]["message"]
+        except Exception:
+            message = response.text[:100]
+        super().__init__(message)
 
 
 def log_attempt_number(retry_state):
     if retry_state.attempt_number > 1:
-        exception_name = retry_state.outcome.exception().__class__.__name__
+        exception = retry_state.outcome.exception()
+        exception_name = exception.__class__.__name__
+        exception_message = str(exception)
+        OPENAI_ORG_ID = settings.OPENAI_ORG_ID
         log.warning(
-            f"Retrying ({exception_name}): Attempt #{retry_state.attempt_number} ({settings.OPENAI_ORG_ID})..."
+            f"Retrying ({exception_name}: {exception_message}): "
+            f"Attempt #{retry_state.attempt_number} ({OPENAI_ORG_ID = })..."
         )
 
 
@@ -63,7 +73,7 @@ async def _post(endpoint: str, json: dict, timeout: float | None = None) -> dict
             timeout=timeout,
         )
         if response.status_code == 429:
-            raise RateLimitError
+            raise RateLimitError(response)
         response.raise_for_status()
         return response.json()
 
