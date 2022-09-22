@@ -38,7 +38,7 @@ const elicitStyle = {
   "hljs-plain": { color: "rgb(128, 128, 128)" }, // use a neutral gray for plain text
 };
 
-const elicitJSONTreeTheme = {
+const elicitJSONTreeTheme: JSONTree["props"]["theme"] = {
   tree: ({ style }) => ({
     style: { ...style, backgroundColor: undefined }, // remove default background
   }),
@@ -145,7 +145,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   const traceOffsetRef = useRef(0);
   const [calls, setCalls] = useState<Calls>({});
   const [selectedId, setSelectedId] = useState<string>();
-  const [rootId, setRootId] = useState<string>('');
+  const [rootId, setRootId] = useState<string>("");
   const [expandedById, setExpandedById] = useState<Record<string, boolean>>({});
   const [autoselected, setAutoselected] = useState(false);
 
@@ -154,7 +154,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       const firstRoot = Object.keys(calls[traceId]?.children ?? {})[0];
       if (firstRoot) {
         setRootId(firstRoot);
-        setExpandedById(current => ({...current, [firstRoot]: true}));
+        setExpandedById(current => ({ ...current, [firstRoot]: true }));
         const firstChild = Object.keys(calls[firstRoot]?.children ?? {})[0];
         if (firstChild) {
           setSelectedId(firstChild);
@@ -226,7 +226,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     ];
     const getFocussedIdsChildren = (nodeId: string): string[] => [
       nodeId,
-      ...(Object.keys(calls[nodeId]?.children ?? {}).flatMap(getFocussedIdsChildren)),
+      ...Object.keys(calls[nodeId]?.children ?? {}).flatMap(getFocussedIdsChildren),
     ];
     const focussedIds = [...getFocussedIds(selectedId), ...getFocussedIdsChildren(selectedId)];
     return (id: string) => focussedIds.includes(id);
@@ -242,8 +242,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         setSelectedId,
         getExpanded: (id: string) => expandedById[id] ?? false,
         setExpanded: (id: string, expanded: boolean) => {
-          if (id !== rootId)
-            setExpandedById(current => ({ ...current, [id]: expanded }))
+          if (id !== rootId) setExpandedById(current => ({ ...current, [id]: expanded }));
         },
         getFocussed,
       }}
@@ -326,10 +325,12 @@ const CallName = ({ className, id }: { className?: string; id: string }) => {
   const spacedName = displayName.replace(/_/g, " ");
   const capitalizedAndSpacedName = spacedName[0].toUpperCase() + spacedName.slice(1);
   const isModelCall = MODEL_CALL_NAMES.includes(name);
-  return <div className="flex items-center gap-1">
-    {isModelCall ? <ChatCenteredDots /> : undefined}
-    <span className={className}>{capitalizedAndSpacedName}</span>
-  </div>;
+  return (
+    <div className="flex items-center gap-1">
+      {isModelCall ? <ChatCenteredDots /> : undefined}
+      <span className={className}>{capitalizedAndSpacedName}</span>
+    </div>
+  );
 };
 
 function lineAnchorId(id: string) {
@@ -348,13 +349,15 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
 
   return (
     <div className="mt-2 flex-shrink-0">
-      <div className={classNames("flex flex-shrink-0 transition-opacity", {
-        // Not focused but is sibling with selected node has a higher opacity
-        // This assumes all calls are parallel; for sequential calls, we should
-        // make previous call siblings more visible than later siblings.
-        'opacity-30': !focussed && !isSiblingWithSelected,
-        'opacity-60': !focussed && isSiblingWithSelected,
-      })}>
+      <div
+        className={classNames("flex flex-shrink-0 transition-opacity", {
+          // Not focused but is sibling with selected node has a higher opacity
+          // This assumes all calls are parallel; for sequential calls, we should
+          // make previous call siblings more visible than later siblings.
+          "opacity-30": !focussed && !isSiblingWithSelected,
+          "opacity-60": !focussed && isSiblingWithSelected,
+        })}
+      >
         <Button
           className={classNames(
             "justify-start text-start items-start h-fit min-w-[300px] p-1.5 !shadow-none",
@@ -403,12 +406,16 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
           <div className="mx-2">
             <CallName className="text-base text-slate-700" id={id} />
             <div className="text-sm text-gray-600 flex items-center">
-              <span className="text-indigo-600" title={getString(args)}>{getShortString(args)}</span>
+              <span className="text-indigo-600" title={getString(args)}>
+                {getShortString(args)}
+              </span>
               <span className="px-2">→</span>
               {result === undefined ? (
                 <Spinner size="small" />
               ) : (
-                <span className="text-lightBlue-600" title={getString(result)}>{getShortString(result)}</span>
+                <span className="text-lightBlue-600" title={getString(result)}>
+                  {getShortString(result)}
+                </span>
               )}
             </div>
           </div>
@@ -463,9 +470,9 @@ const getString = (value: any): string => {
       }
     }
   }
-  
-  return `${getFirstDescendant(value) ?? "()"}`;;
-}
+
+  return `${getFirstDescendant(value) ?? "()"}`;
+};
 
 const getShortString = (value: any, maxLength: number = 35): string => {
   const string = getString(value);
@@ -646,22 +653,17 @@ const stripIndent = (source: string): string => {
     .join("\n");
 };
 
-const Trace = ({
-  traceId,
-}: {
-  traceId: string;
-}) => {
+const Trace = ({ traceId }: { traceId: string }) => {
   const { selectedId, rootId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
 
   const maybeSetSelectedId = useCallback(
     (update: (id: string) => string | undefined) => {
-  
       setSelectedId(id => {
-        const res = (update(id as any) || id);
+        const res = update(id as any) || id;
         console.log(res);
-        return id && res
-      })
+        return id && res;
+      });
     },
     [setSelectedId],
   );
@@ -692,15 +694,15 @@ const Trace = ({
                 }
               }),
             ArrowDown: () => {
-              console.log(rootId, selectedId)
-              maybeSetSelectedId(id => getExpandedChildren(id)[0] || nextFrom(id))
+              console.log(rootId, selectedId);
+              maybeSetSelectedId(id => getExpandedChildren(id)[0] || nextFrom(id));
             },
             ArrowLeft: () =>
               getExpandedChildren(selectedId).length
                 ? setExpanded(selectedId, false)
                 : maybeSetSelectedId(getParent),
             ArrowRight: () => getChildren(selectedId).length && setExpanded(selectedId, true),
-            Escape: () => maybeSetSelectedId(_ => rootId)
+            Escape: () => maybeSetSelectedId(_ => rootId),
           })
         : {}) as Bindings,
     [
@@ -785,10 +787,8 @@ export const TracePage = () => {
   const traceId = useTraceId();
 
   return !traceId ? null : (
-    
-      <TreeProvider key={traceId} traceId={traceId}>
-        <Trace traceId={traceId}  />
-      </TreeProvider>
-    
+    <TreeProvider key={traceId} traceId={traceId}>
+      <Trace traceId={traceId} />
+    </TreeProvider>
   );
 };
