@@ -1,16 +1,9 @@
-import { ChevronRightIcon } from "@chakra-ui/icons";
-import {
-  Button,
-  Collapse,
-  IconButton,
-  Skeleton,
-  useColorModeValue,
-  useToast,
-} from "@chakra-ui/react";
+import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
 import { isEmpty, last, omit, set } from "lodash";
 import { useRouter } from "next/router";
+import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
   createContext,
   Dispatch,
@@ -23,24 +16,92 @@ import {
   useRef,
   useState,
 } from "react";
+import { ArcherContainer, ArcherElement } from "react-archer";
+import { ArcherContainerHandle } from "react-archer/lib/ArcherContainer/ArcherContainer.types";
 import { JSONTree } from "react-json-tree";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import Separator from "./Separator";
 import Spinner from "./Spinner";
 
-const chalkLikeStyle = {
-  "hljs-keyword": { color: "rgb(45, 127, 232)" },
-  "hljs-operator": { color: "rgb(45, 127, 232)" },
-  "hljs-number": { color: "rgb(220, 50, 47)" },
-  "hljs-decorator": { color: "rgb(45, 127, 232)" },
-  "hljs-comment": { color: "rgb(133, 153, 0)" },
-  "hljs-string": { color: "rgb(44, 137, 87)" },
-  "hljs-built_in": { color: "rgb(220, 50, 47)" },
-  "hljs-class": { color: "rgb(220, 50, 47)" },
-  "hljs-module": { color: "rgb(220, 50, 47)" },
-  "hljs-punctuation": { color: "rgb(28, 88, 56)" },
-  "hljs-bracket": { color: "rgb(28, 88, 56)" },
-  "hljs-plain": { color: "rgb(128, 128, 128)" },
+const elicitStyle = {
+  "hljs-keyword": { color: "rgb(79, 70, 229)" }, // use primary color for keywords
+  "hljs-operator": { color: "rgb(79, 70, 229)" }, // use primary color for operators
+  "hljs-number": { color: "rgb(2, 132, 199)" }, // use secondary color for numbers
+  "hljs-decorator": { color: "rgb(79, 70, 229)" }, // use primary color for decorators
+  "hljs-comment": { color: "rgb(102, 153, 51)" }, // use a muted green for comments
+  "hljs-string": { color: "rgb(153, 102, 51)" }, // use a muted orange for strings
+  "hljs-built_in": { color: "rgb(2, 132, 199)" }, // use secondary color for built-ins
+  "hljs-class": { color: "rgb(2, 132, 199)" }, // use secondary color for classes
+  "hljs-module": { color: "rgb(2, 132, 199)" }, // use secondary color for modules
+  "hljs-punctuation": { color: "rgb(51, 102, 153)" }, // use a darker shade of the secondary color for punctuation
+  "hljs-bracket": { color: "rgb(51, 102, 153)" }, // use a darker shade of the secondary color for brackets
+  "hljs-plain": { color: "rgb(128, 128, 128)" }, // use a neutral gray for plain text
+};
+
+const elicitJSONTreeTheme = {
+  tree: ({ style }) => ({
+    style: { ...style, backgroundColor: undefined }, // remove default background
+  }),
+  value: ({ style }, nodeType, keyPath) => {
+    // use different colors for different node types
+    let color;
+    color = "rgb(2, 132, 199)";
+    /* switch (nodeType) {
+     *   case "Object":
+     *   case "Array":
+     *     color = "rgb(51, 102, 153)"; // use a darker shade of the secondary color for objects and arrays
+     *     break;
+     *   case "String":
+     *     color = "rgb(153, 102, 51)"; // use a muted orange for strings
+     *     break;
+     *   case "Number":
+     *     color = "rgb(2, 132, 199)"; // use secondary color for numbers
+     *     break;
+     *   case "Boolean":
+     *   case "Null":
+     *   case "Undefined":
+     *     color = "rgb(79, 70, 229)"; // use primary color for booleans, null, and undefined
+     *     break;
+     *   default:
+     *     color = "rgb(128, 128, 128)"; // use a neutral gray for other types
+     * } */
+    return {
+      style: { ...style, color },
+    };
+  },
+  label: ({ style }, nodeType, keyPath, node) => {
+    // use primary color for keys
+    return {
+      style: { ...style, color: "rgb(79, 70, 229)" },
+    };
+  },
+  nestedNode: ({ style }, keyPath, nodeType, expanded, expandable) => {
+    // use a lighter background for nested nodes
+    return {
+      style: {
+        ...style,
+        backgroundColor: expanded ? "rgb(245, 245, 245)" : undefined,
+      },
+    };
+  },
+  nestedNodeChildren: ({ style }, keyPath, nodeType, expanded, expandable) => {
+    // use a border for nested nodes
+    return {
+      style: {
+        ...style,
+        border: expanded ? "1px solid rgb(230, 230, 230)" : undefined,
+      },
+    };
+  },
+  arrow: ({ style }, nodeType, expanded) => {
+    // use primary color for arrows
+    return {
+      style: {
+        ...style,
+        color: "rgb(79, 70, 229)",
+      },
+    };
+  },
 };
 
 const getContentLength = async (path: string) => {
@@ -68,11 +129,13 @@ const MODEL_CALL_NAMES = ["relevance", "answer", "predict", "classify", "prompte
 
 const TreeContext = createContext<{
   traceId: string;
+  rootId: string;
   calls: Calls;
   selectedId: string | undefined;
   setSelectedId: Dispatch<SetStateAction<string | undefined>>;
   getExpanded: (id: string) => boolean;
   setExpanded: (id: string, expanded: boolean) => void;
+  getFocussed: (id: string) => boolean;
 } | null>(null);
 
 const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
@@ -82,6 +145,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   const traceOffsetRef = useRef(0);
   const [calls, setCalls] = useState<Calls>({});
   const [selectedId, setSelectedId] = useState<string>();
+  const [rootId, setRootId] = useState<string>('');
   const [expandedById, setExpandedById] = useState<Record<string, boolean>>({});
   const [autoselected, setAutoselected] = useState(false);
 
@@ -89,6 +153,8 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     if (!autoselected) {
       const firstRoot = Object.keys(calls[traceId]?.children ?? {})[0];
       if (firstRoot) {
+        setRootId(firstRoot);
+        setExpandedById(current => ({...current, [firstRoot]: true}));
         const firstChild = Object.keys(calls[firstRoot]?.children ?? {})[0];
         if (firstChild) {
           setSelectedId(firstChild);
@@ -148,16 +214,38 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     };
   }, [traceId]);
 
+  const getFocussed = useMemo(() => {
+    const selectedCall = selectedId !== undefined ? calls[selectedId] : undefined;
+    if (!selectedCall || !selectedId) {
+      return () => true;
+    }
+    // Subtree from the selected call
+    const getFocussedIds = (nodeId: string): string[] => [
+      nodeId,
+      ...(nodeId === rootId ? [] : getFocussedIds(calls[nodeId]?.parent)),
+    ];
+    const getFocussedIdsChildren = (nodeId: string): string[] => [
+      nodeId,
+      ...(Object.keys(calls[nodeId]?.children ?? {}).flatMap(getFocussedIdsChildren)),
+    ];
+    const focussedIds = [...getFocussedIds(selectedId), ...getFocussedIdsChildren(selectedId)];
+    return (id: string) => focussedIds.includes(id);
+  }, [selectedId, calls, rootId]);
+
   return (
     <TreeContext.Provider
       value={{
         traceId,
         calls,
+        rootId,
         selectedId,
         setSelectedId,
         getExpanded: (id: string) => expandedById[id] ?? false,
-        setExpanded: (id: string, expanded: boolean) =>
-          setExpandedById(current => ({ ...current, [id]: expanded })),
+        setExpanded: (id: string, expanded: boolean) => {
+          if (id !== rootId)
+            setExpandedById(current => ({ ...current, [id]: expanded }))
+        },
+        getFocussed,
       }}
     >
       {children}
@@ -172,8 +260,13 @@ const useTreeContext = () => {
 };
 
 const useCallInfo = (id: string) => {
-  const { calls, selectedId, setSelectedId } = useTreeContext();
-  return { ...calls[id], selected: selectedId === id, select: () => setSelectedId(id) };
+  const { calls, selectedId, setSelectedId, getFocussed } = useTreeContext();
+  return {
+    ...calls[id],
+    selected: selectedId === id,
+    focussed: getFocussed(id),
+    select: () => setSelectedId(id),
+  };
 };
 
 type SelectedCallInfo = {
@@ -225,80 +318,127 @@ const useLinks = () => {
   return { getParent, getChildren, getPrior: getSiblingAt(-1), getNext: getSiblingAt(1) };
 };
 
-const Name = ({ id }: { id: string }) => {
+const CallName = ({ className, id }: { className?: string; id: string }) => {
   const { name, args } = useCallInfo(id);
   const recipeClassName = (args as any).self?.class_name;
-  return (
-    <span>
-      {(name === "execute" || name === "run") && recipeClassName
-        ? "📋 " + recipeClassName
-        : MODEL_CALL_NAMES.includes(name)
-        ? "🕵 " + name
-        : "💻 " + name}
-    </span>
-  );
+  const displayName =
+    (name === "execute" || name === "run") && recipeClassName ? recipeClassName : name;
+  const spacedName = displayName.replace(/_/g, " ");
+  const capitalizedAndSpacedName = spacedName[0].toUpperCase() + spacedName.slice(1);
+  const isModelCall = MODEL_CALL_NAMES.includes(name);
+  return <div className="flex items-center gap-1">
+    {isModelCall ? <ChatCenteredDots /> : undefined}
+    <span className={className}>{capitalizedAndSpacedName}</span>
+  </div>;
 };
 
-const Call = ({ id }: { id: string }) => {
-  const { args, children = {}, result, select, selected } = useCallInfo(id);
+function lineAnchorId(id: string) {
+  return `line-anchor-${id}`;
+}
+
+const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
+  const { name, args, children = {}, result, select, selected, focussed } = useCallInfo(id);
+  const { selectedId } = useTreeContext();
+  const { getParent } = useLinks();
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
 
-  const selectedBg = useColorModeValue("gray.100", "gray.700");
-  const unselectedBg = useColorModeValue("transparent", "transparent");
+  const isModelCall = MODEL_CALL_NAMES.includes(name);
+  const isSiblingWithSelected = selectedId && getParent(id) === getParent(selectedId);
 
   return (
     <div className="mt-2 flex-shrink-0">
-      <div className="flex flex-shrink-0">
-        {childIds.length ? (
-          <IconButton
-            aria-label={expanded ? "Collapse" : "Expand"}
-            className="justify-center mx-1 flex-shrink-0 !shadow-none"
-            icon={<ChevronRightIcon className={classNames({ "rotate-90": expanded })} />}
-            size="s"
-            variant="ghost"
-            onClick={() => setExpanded(!expanded)}
-            w="8"
-          />
-        ) : (
-          <div className="mx-1 w-8" />
-        )}
+      <div className={classNames("flex flex-shrink-0 transition-opacity", {
+        // Not focused but is sibling with selected node has a higher opacity
+        // This assumes all calls are parallel; for sequential calls, we should
+        // make previous call siblings more visible than later siblings.
+        'opacity-30': !focussed && !isSiblingWithSelected,
+        'opacity-60': !focussed && isSiblingWithSelected,
+      })}>
         <Button
-          className="flex items-center flex-shrink-0 !shadow-none"
-          size="s"
+          className={classNames(
+            "justify-start text-start items-start h-fit min-w-[300px] p-1.5 !shadow-none",
+            childIds.length === 0 && "ml-5",
+          )}
           variant="ghost"
           onClick={select}
-          bg={selected ? selectedBg : unselectedBg}
-          px="2"
-          py="1"
+          isActive={selected}
         >
-          <Name id={id} />
-          <span className="pl-2 text-s text-gray-600 flex items-center">
-            <span className="text-green-700">{getShortString(args)}</span>
-            <span className="px-1">→</span>
-            {result === undefined ? (
-              <Spinner size="small" />
+          <ArcherElement
+            id={lineAnchorId(id)}
+            relations={
+              expanded
+                ? childIds.map(childId => ({
+                    targetId: lineAnchorId(childId),
+                    targetAnchor: "left",
+                    sourceAnchor: "bottom",
+                  }))
+                : []
+            }
+          >
+            {childIds.length > 0 ? (
+              <Button
+                aria-label={expanded ? "Collapse" : "Expand"}
+                className={classNames(
+                  "rounded-full p-1 h-fit mr-2 !shadow-none hover:bg-slate-200",
+                )}
+                leftIcon={isModelCall ? undefined : expanded ? <CaretDown /> : <CaretRight />}
+                size="md"
+                isActive={expanded}
+                variant="outline"
+                onClick={event => {
+                  setExpanded(!expanded);
+                  // Theres a hard to debug layout thing here, where sometimes
+                  // the arrows don't redraw properly when nodes are expanded.
+                  setTimeout(() => refreshArcherArrows(), 50);
+                  event.stopPropagation();
+                }}
+              >
+                {<span className={classNames(!isModelCall && "mr-1")}>{childIds.length}</span>}
+              </Button>
             ) : (
-              <span className="text-blue-600">{getShortString(result)}</span>
+              <div className="mt-3 -ml-1.5 mr-1.5" id={lineAnchorId(id)}></div>
             )}
-          </span>
+          </ArcherElement>
+          <div className="mx-2">
+            <CallName className="text-base text-slate-700" id={id} />
+            <div className="text-sm text-gray-600 flex items-center">
+              <span className="text-indigo-600" title={getString(args)}>{getShortString(args)}</span>
+              <span className="px-2">→</span>
+              {result === undefined ? (
+                <Spinner size="small" />
+              ) : (
+                <span className="text-lightBlue-600" title={getString(result)}>{getShortString(result)}</span>
+              )}
+            </div>
+          </div>
         </Button>
       </div>
-      <Collapse in={expanded} transition={{ enter: { duration: 0 } }}>
-        <div className="ml-6">{expanded && <CallChildren id={id} />}</div>
-      </Collapse>
+      {!isModelCall && (
+        <Collapse in={expanded} transition={{ enter: { duration: 0 } }}>
+          <div className="ml-12">
+            {expanded && <CallChildren id={id} refreshArcherArrows={refreshArcherArrows} />}
+          </div>
+        </Collapse>
+      )}
     </div>
   );
 };
 
-const CallChildren = ({ id }: { id: string }) => {
+const CallChildren = ({
+  id,
+  refreshArcherArrows,
+}: {
+  id: string;
+  refreshArcherArrows: () => void;
+}) => {
   const { children = {} } = useCallInfo(id) ?? {};
   const childIds = Object.keys(children);
 
   return (
     <div className="flex flex-col">
       {childIds.map(id => (
-        <Call key={id} id={id} />
+        <Call key={id} id={id} refreshArcherArrows={refreshArcherArrows} />
       ))}
     </div>
   );
@@ -310,7 +450,7 @@ const isObjectLike = (value: unknown): value is object =>
 const getFirstDescendant = (value: unknown): unknown =>
   isObjectLike(value) ? getFirstDescendant(Object.values(value)[0]) : value;
 
-const getShortString = (value: any, maxLength: number = 35): string => {
+const getString = (value: any): string => {
   if (isObjectLike(value)) {
     if ("value" in value) {
       value = (value as any).value;
@@ -323,8 +463,12 @@ const getShortString = (value: any, maxLength: number = 35): string => {
       }
     }
   }
+  
+  return `${getFirstDescendant(value) ?? "()"}`;;
+}
 
-  const string = `${getFirstDescendant(value) ?? "()"}`;
+const getShortString = (value: any, maxLength: number = 35): string => {
+  const string = getString(value);
   return string.length > maxLength ? string.slice(0, maxLength).trim() + "..." : string;
 };
 
@@ -339,15 +483,12 @@ const Json = ({ name, value }: { name: string; value: unknown }) => {
         <JSONTree
           data={value}
           hideRoot
-          theme={{
-            tree: ({ style }) => ({
-              style: { ...style, backgroundColor: undefined }, // remove default background
-            }),
-          }}
+          theme={elicitJSONTreeTheme}
           valueRenderer={(valueAsString: string, value: unknown) =>
             typeof value === "string" ? (
               <div
                 className="whitespace-pre-line break-normal select-none"
+                style={{ color: "rgb(2, 132, 199)" }}
                 onClick={() => {
                   navigator.clipboard.writeText(value);
                   toast({ title: "Copied to clipboard", duration: 1000 });
@@ -393,7 +534,7 @@ const DetailPaneContent = ({ info }: DetailPaneContentProps) => {
 const TabHeader = ({ id, doc }: { id: string; doc: string }) => (
   <div className="mb-4">
     <h3 className="text-lg font-semibold text-gray-800">
-      <Name id={id} />
+      <CallName id={id} />
     </h3>
     <p className="text-gray-600 text-sm">{doc}</p>
   </div>
@@ -470,7 +611,7 @@ const SourceContent = ({ source }: SourceContentProps) => {
     <SyntaxHighlighter
       language="python"
       className="bg-gray-100 p-4 rounded-md overflow-auto text-sm"
-      style={chalkLikeStyle}
+      style={elicitStyle}
       customStyle={{ backgroundColor: "transparent" }}
     >
       {strippedSource}
@@ -505,12 +646,23 @@ const stripIndent = (source: string): string => {
     .join("\n");
 };
 
-const Trace = ({ traceId }: { traceId: string }) => {
-  const { selectedId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
+const Trace = ({
+  traceId,
+}: {
+  traceId: string;
+}) => {
+  const { selectedId, rootId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
 
   const maybeSetSelectedId = useCallback(
-    (update: (id: string) => string | undefined) => setSelectedId(id => id && (update(id) || id)),
+    (update: (id: string) => string | undefined) => {
+  
+      setSelectedId(id => {
+        const res = (update(id as any) || id);
+        console.log(res);
+        return id && res
+      })
+    },
     [setSelectedId],
   );
 
@@ -539,12 +691,16 @@ const Trace = ({ traceId }: { traceId: string }) => {
                   lastDescendantOfPrior = lastChild;
                 }
               }),
-            ArrowDown: () => maybeSetSelectedId(id => getExpandedChildren(id)[0] || nextFrom(id)),
+            ArrowDown: () => {
+              console.log(rootId, selectedId)
+              maybeSetSelectedId(id => getExpandedChildren(id)[0] || nextFrom(id))
+            },
             ArrowLeft: () =>
               getExpandedChildren(selectedId).length
                 ? setExpanded(selectedId, false)
                 : maybeSetSelectedId(getParent),
             ArrowRight: () => getChildren(selectedId).length && setExpanded(selectedId, true),
+            Escape: () => maybeSetSelectedId(_ => rootId)
           })
         : {}) as Bindings,
     [
@@ -556,6 +712,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
       nextFrom,
       selectedId,
       setExpanded,
+      rootId,
     ],
   );
 
@@ -577,17 +734,31 @@ const Trace = ({ traceId }: { traceId: string }) => {
 
   const firstRoot = getChildren(traceId)[0];
 
+  const archerContainerRef = useRef<ArcherContainerHandle | null>(null);
+  const refreshArcherArrows = useCallback(() => {
+    archerContainerRef.current?.refreshScreen();
+  }, []);
+
   return (
-    <div className="flex flex-col h-full min-h-screen">
+    <div className="flex flex-col h-full min-h-screen max-h-screen">
       <div className="flex divide-x divide-gray-100 flex-1 overflow-clip">
         <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
-          {firstRoot ? (
-            <CallChildren id={firstRoot} />
-          ) : (
-            <div className="flex justify-center items-center h-full">
-              <Spinner size="medium" />
-            </div>
-          )}
+          <ArcherContainer
+            ref={archerContainerRef}
+            noCurves
+            strokeColor="#E2E8F0"
+            strokeWidth={1}
+            startMarker={false}
+            endMarker={false}
+          >
+            {firstRoot ? (
+              <CallChildren id={firstRoot} refreshArcherArrows={refreshArcherArrows} />
+            ) : (
+              <div className="flex justify-center items-center h-full">
+                <Spinner size="medium" />
+              </div>
+            )}
+          </ArcherContainer>
         </div>
 
         <Separator detailWidth={detailWidth} setDetailWidth={setDetailWidth} />
@@ -612,9 +783,12 @@ const useTraceId = () => {
 
 export const TracePage = () => {
   const traceId = useTraceId();
+
   return !traceId ? null : (
-    <TreeProvider key={traceId} traceId={traceId}>
-      <Trace traceId={traceId} />
-    </TreeProvider>
+    
+      <TreeProvider key={traceId} traceId={traceId}>
+        <Trace traceId={traceId}  />
+      </TreeProvider>
+    
   );
 };

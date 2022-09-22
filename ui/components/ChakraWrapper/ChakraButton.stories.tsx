@@ -1,55 +1,104 @@
 import { Button } from "@chakra-ui/react";
+import classNames from "classnames";
+import { CloudArrowUp, MagnifyingGlass } from "phosphor-react";
 import { Fragment } from "react";
+import { IconButton } from "./IconButton";
 
 const story = { component: Button };
 export default story;
 
-const VARIANTS = ["customVariant", "outlined", "ghost", "lightGhost"] as const;
-const COLOR_SCHEMES = ["blue", "red", "blueGray"] as const;
-const STATES = ["normal", "normal + hover", "active", "active + hover"] as const;
+const VARIANTS = ["solid", "rounded", "outline", "ghost"] as const;
+const STATES = ["default", "hover", "focus", "active", "disabled"] as const;
+const SIZES = ["xs", "sm", "md", "lg"] as const;
 
 const makeId = ({
   variant,
-  colorScheme,
+  size,
   state,
+  type,
 }: {
   variant: string;
-  colorScheme: string;
+  size: string;
   state: string;
-}) => `${variant}-${colorScheme}-${state}`;
+  type: "icon" | "text";
+}) => `${variant}-${state}-${size}-${type}`;
 
 export const Default = () => (
-  <>
-    {VARIANTS.map(variant => (
+  <table className="border-separate border-spacing-2">
+    <tr>
+      <td />
+      <td />
+      {[...SIZES, ...SIZES].map((size, i) => (
+        <td key={i} className="text-base font-semibold text-slate-500 align-top text-center">
+          {size}
+        </td>
+      ))}
+    </tr>
+    {VARIANTS.map((variant, variantIndex) => (
       <Fragment key={variant}>
-        <div className="capitalize mb-2 mt-4">{variant}</div>
-        <div className="grid grid-cols-4 gap-2">
-          {COLOR_SCHEMES.flatMap(colorScheme =>
-            STATES.map(state => (
-              <Button
-                key={`${colorScheme}-${state}`}
-                id={makeId({ variant, colorScheme, state })}
-                variant={variant}
-                colorScheme={colorScheme}
-                isActive={state.includes("active")}
+        {variantIndex !== 0 && <tr className="h-8" />}
+        {STATES.map((state, stateIndex) => (
+          <tr key={`${variant}--${state}`} className={classNames(stateIndex === 0 && "mt-6")}>
+            {stateIndex === 0 && (
+              <td
+                className="capitalize text-2xl font-semibold text-slate-700 align-top"
+                rowSpan={STATES.length}
               >
-                {state}
-              </Button>
-            )),
-          )}
-        </div>
+                {variant}
+              </td>
+            )}
+            <td className="capitalize text-base font-semibold text-slate-500 align-top">{state}</td>
+            {SIZES.map(size => (
+              <td key={`text-${size}`} className="align-top">
+                <Button
+                  variant={variant}
+                  size={size}
+                  id={makeId({ variant, size, state, type: "text" })}
+                  colorScheme={["solid", "rounded"].includes(variant) ? "blue" : "gray"}
+                  disabled={state === "disabled"}
+                  isActive={state === "active"}
+                  leftIcon={<MagnifyingGlass />}
+                  rightIcon={<CloudArrowUp />}
+                >
+                  Button
+                </Button>
+              </td>
+            ))}
+            {SIZES.map(size => (
+              <td key={`icon-${size}`} className="align-top">
+                <IconButton
+                  variant={variant}
+                  size={size}
+                  id={makeId({ variant, size, state, type: "icon" })}
+                  colorScheme={["solid", "rounded"].includes(variant) ? "blue" : "gray"}
+                  disabled={state === "disabled"}
+                  isActive={state === "active"}
+                  aria-label=""
+                >
+                  <CloudArrowUp />
+                </IconButton>
+              </td>
+            ))}
+          </tr>
+        ))}
       </Fragment>
     ))}
-  </>
+  </table>
+);
+const ALL_COMBINATIONS = VARIANTS.flatMap(variant =>
+  STATES.flatMap(state =>
+    SIZES.flatMap(size =>
+      (["text", "icon"] as const).map(type => ({ variant, state, size, type })),
+    ),
+  ),
 );
 Default.parameters = {
   pseudo: {
-    hover: VARIANTS.flatMap(variant =>
-      COLOR_SCHEMES.flatMap(colorScheme =>
-        STATES.filter(state => state.includes("hover")).map(
-          state => `#${makeId({ variant, colorScheme, state })}`,
-        ),
-      ),
+    hover: ALL_COMBINATIONS.filter(({ state }) => state === "hover").map(
+      combination => `#${makeId(combination)}`,
+    ),
+    focus: ALL_COMBINATIONS.filter(({ state }) => state === "focus").map(
+      combination => `#${makeId(combination)}`,
     ),
   },
 };
