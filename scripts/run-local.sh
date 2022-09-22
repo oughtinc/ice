@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-if docker help compose >/dev/null; then
+if docker help compose &>/dev/null; then
   docker="docker compose"
 else
   docker="docker-compose"
