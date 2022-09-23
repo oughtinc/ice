@@ -1,7 +1,7 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isArrayLike, isEmpty, last, omit, set } from "lodash";
+import { isEmpty, isString, last, omit, set } from "lodash";
 import { useRouter } from "next/router";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
@@ -463,20 +463,19 @@ const isObjectLike = (value: unknown): value is object =>
   value !== null && typeof value === "object";
 
 const isStringArray = (value: unknown): value is unknown[] =>
-  Array.isArray(value) && typeof value[0] === 'string';
+  Array.isArray(value) && isString(value[0]);
 
 const getFirstDescendant = (value: unknown): unknown => {
   if (isObjectLike(value) && !isStringArray(value)) {
     return getFirstDescendant(Object.values(value)[0])
-  } else if (isStringArray(value)) {
-    return value.filter(el => typeof el === 'string');
-  } else {
-    return value;
   }
+  if (isStringArray(value)) {
+    return value.filter(isString);
+  }
+  return value;
 }
 
 const getStrings = (value: any): string[] => {
-  console.log(value)
   if (isObjectLike(value)) {
     if ("value" in value) {
       value = (value as any).value;
