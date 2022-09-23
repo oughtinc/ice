@@ -1,7 +1,7 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isEmpty, last, omit, set } from "lodash";
+import { isArrayLike, isEmpty, last, omit, set } from "lodash";
 import { useRouter } from "next/router";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
@@ -406,16 +406,14 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
           <div className="mx-2">
             <CallName className="text-base text-slate-700" id={id} />
             <div className="text-sm text-gray-600 flex items-center">
-              <span className="text-indigo-600" title={getString(args)}>
-                {getShortString(args)}
+              <span className="text-indigo-600" title={JSON.stringify(getStrings(args), null, 4)}>
+                {getShortString(getStrings(args)?.[0] || '()')}
               </span>
               <span className="px-2">→</span>
               {result === undefined ? (
                 <Spinner size="small" />
               ) : (
-                <span className="text-lightBlue-600" title={getString(result)}>
-                  {getShortString(result)}
-                </span>
+                <ResultComponent value={result} />
               )}
             </div>
           </div>
@@ -454,10 +452,21 @@ const CallChildren = ({
 const isObjectLike = (value: unknown): value is object =>
   value !== null && typeof value === "object";
 
-const getFirstDescendant = (value: unknown): unknown =>
-  isObjectLike(value) ? getFirstDescendant(Object.values(value)[0]) : value;
+const isStringArray = (value: unknown): value is unknown[] =>
+  Array.isArray(value) && typeof value[0] === 'string';
 
-const getString = (value: any): string => {
+const getFirstDescendant = (value: unknown): unknown => {
+  if (isObjectLike(value) && !isStringArray(value)) {
+    return getFirstDescendant(Object.values(value)[0])
+  } else if (isStringArray(value)) {
+    return value.filter(el => typeof el === 'string');
+  } else {
+    return value;
+  }
+}
+
+const getStrings = (value: any): string[] => {
+  console.log(value)
   if (isObjectLike(value)) {
     if ("value" in value) {
       value = (value as any).value;
@@ -471,13 +480,30 @@ const getString = (value: any): string => {
     }
   }
 
-  return `${getFirstDescendant(value) ?? "()"}`;
+  const result = getFirstDescendant(value);
+  
+  return Array.isArray(result) ? result : [`${result ?? "()"}`];
 };
 
-const getShortString = (value: any, maxLength: number = 35): string => {
-  const string = getString(value);
+const getShortString = (string: any, maxLength: number = 35): string => {
   return string.length > maxLength ? string.slice(0, maxLength).trim() + "..." : string;
 };
+
+const ResultComponent = ({value}: {value: any}): JSX.Element => {
+  const strings = getStrings(value);
+
+  return (
+    <>
+      {
+        strings.map((string, idx) => (
+          <div className="px-[4px] py-[2px] mx-[3px] bg-lightBlue-50 text-lightBlue-600 rounded-4" key={idx} title={string}>
+            {getShortString(string)}
+          </div>
+        ))
+      }
+    </>
+  )
+}
 
 const Json = ({ name, value }: { name: string; value: unknown }) => {
   const toast = useToast();

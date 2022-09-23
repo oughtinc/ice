@@ -88,6 +88,7 @@ module.exports = {
         900: "#7F1D1D",
       },
       lightBlue: {
+        50: "#F0F9FF",
         600: "#0284C7",
       },
       indigo: {
