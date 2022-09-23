@@ -22,17 +22,18 @@ import { JSONTree } from "react-json-tree";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import Separator from "./Separator";
 import Spinner from "./Spinner";
+import { COLORS } from "/styles/colors";
 
 const elicitStyle = {
-  "hljs-keyword": { color: "rgb(79, 70, 229)" }, // use primary color for keywords
-  "hljs-operator": { color: "rgb(79, 70, 229)" }, // use primary color for operators
-  "hljs-number": { color: "rgb(2, 132, 199)" }, // use secondary color for numbers
-  "hljs-decorator": { color: "rgb(79, 70, 229)" }, // use primary color for decorators
-  "hljs-comment": { color: "rgb(102, 153, 51)" }, // use a muted green for comments
+  "hljs-keyword": { color: COLORS.indigo[600] }, // use primary color for keywords
+  "hljs-operator": { color: COLORS.indigo[600] }, // use primary color for operators
+  "hljs-number": { color: COLORS.lightBlue[600] }, // use secondary color for numbers
+  "hljs-decorator": { color: COLORS.indigo[600] }, // use primary color for decorators
+  "hljs-comment": { color: COLORS.green[700] }, // use a muted green for comments
   "hljs-string": { color: "rgb(153, 102, 51)" }, // use a muted orange for strings
-  "hljs-built_in": { color: "rgb(2, 132, 199)" }, // use secondary color for built-ins
-  "hljs-class": { color: "rgb(2, 132, 199)" }, // use secondary color for classes
-  "hljs-module": { color: "rgb(2, 132, 199)" }, // use secondary color for modules
+  "hljs-built_in": { color: COLORS.lightBlue[600] }, // use secondary color for built-ins
+  "hljs-class": { color: COLORS.lightBlue[600] }, // use secondary color for classes
+  "hljs-module": { color: COLORS.lightBlue[600] }, // use secondary color for modules
   "hljs-punctuation": { color: "rgb(51, 102, 153)" }, // use a darker shade of the secondary color for punctuation
   "hljs-bracket": { color: "rgb(51, 102, 153)" }, // use a darker shade of the secondary color for brackets
   "hljs-plain": { color: "rgb(128, 128, 128)" }, // use a neutral gray for plain text
@@ -45,7 +46,7 @@ const elicitJSONTreeTheme: JSONTree["props"]["theme"] = {
   value: ({ style }, nodeType, keyPath) => {
     // use different colors for different node types
     let color;
-    color = "rgb(2, 132, 199)";
+    color = COLORS.lightBlue[600];
     /* switch (nodeType) {
      *   case "Object":
      *   case "Array":
@@ -55,12 +56,12 @@ const elicitJSONTreeTheme: JSONTree["props"]["theme"] = {
      *     color = "rgb(153, 102, 51)"; // use a muted orange for strings
      *     break;
      *   case "Number":
-     *     color = "rgb(2, 132, 199)"; // use secondary color for numbers
+     *     color = COLORS.lightBlue[600]; // use secondary color for numbers
      *     break;
      *   case "Boolean":
      *   case "Null":
      *   case "Undefined":
-     *     color = "rgb(79, 70, 229)"; // use primary color for booleans, null, and undefined
+     *     color = COLORS.indigo[600]; // use primary color for booleans, null, and undefined
      *     break;
      *   default:
      *     color = "rgb(128, 128, 128)"; // use a neutral gray for other types
@@ -72,7 +73,7 @@ const elicitJSONTreeTheme: JSONTree["props"]["theme"] = {
   label: ({ style }, nodeType, keyPath, node) => {
     // use primary color for keys
     return {
-      style: { ...style, color: "rgb(79, 70, 229)" },
+      style: { ...style, color: COLORS.indigo[600] },
     };
   },
   nestedNode: ({ style }, keyPath, nodeType, expanded, expandable) => {
@@ -98,7 +99,16 @@ const elicitJSONTreeTheme: JSONTree["props"]["theme"] = {
     return {
       style: {
         ...style,
-        color: "rgb(79, 70, 229)",
+        color: COLORS.indigo[600],
+      },
+    };
+  },
+  nestedNodeItemString: ({ style }, nodeType, expanded) => {
+    // use primary color for arrows
+    return {
+      style: {
+        ...style,
+        color: COLORS.green[700],
       },
     };
   },
@@ -521,7 +531,7 @@ const Json = ({ name, value }: { name: string; value: unknown }) => {
             typeof value === "string" ? (
               <div
                 className="whitespace-pre-line break-normal select-none"
-                style={{ color: "rgb(2, 132, 199)" }}
+                style={{ color: COLORS.lightBlue[600] }}
                 onClick={() => {
                   navigator.clipboard.writeText(value);
                   toast({ title: "Copied to clipboard", duration: 1000 });
