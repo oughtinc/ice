@@ -458,14 +458,14 @@ const CallChildren = ({
 const isObjectLike = (value: unknown): value is object =>
   value !== null && typeof value === "object";
 
-const isStringArray = (value: unknown): value is unknown[] =>
+const isArrayWithString = (value: unknown): value is unknown[] =>
   Array.isArray(value) && isString(value[0]);
 
 const getFirstDescendant = (value: unknown): unknown => {
-  if (isObjectLike(value) && !isStringArray(value)) {
+  if (isObjectLike(value) && !isArrayWithString(value)) {
     return getFirstDescendant(Object.values(value)[0]);
   }
-  if (isStringArray(value)) {
+  if (isArrayWithString(value)) {
     return value.filter(isString);
   }
   return value;
