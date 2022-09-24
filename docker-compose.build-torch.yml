@@ -1,0 +1,11 @@
+services:
+  ice:
+    build:
+      context: .
+      dockerfile: torch.Dockerfile
+      x-bake:
+        platforms:
+          - linux/amd64
+        tags:
+          - docker.io/oughtinc/ice:0.1.0-torch
+    image: ${COMPOSE_IMAGE:-ice-torch}

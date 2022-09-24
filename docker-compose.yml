@@ -1,0 +1,19 @@
+services:
+  ice:
+    image: docker.io/oughtinc/ice:0.1.0
+    environment:
+      OUGHT_INFERENCE_API_KEY: ${OUGHT_INFERENCE_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_ORG_ID: ${OPENAI_ORG_ID:-}
+    restart: on-failure
+    volumes:
+      # When mounting /code, don't clobber generated directories.
+      # https://stackoverflow.com/a/37898591
+      - /code/.mypy_cache
+      - /code/.pre-commit-home
+      - /code/.venv/
+      - /code/ui/.next/
+      - /code/ui/node_modules/
+      - ./:/code
+    ports:
+      - "3000:3000"

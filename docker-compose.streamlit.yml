@@ -1,0 +1,5 @@
+services:
+  ice:
+    image: registry-1.docker.io/oughtinc/ice:0.1.0-streamlit
+    ports:
+      - "9000:9000"

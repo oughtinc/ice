@@ -1,0 +1,14 @@
+services:
+  ice:
+    build:
+      args:
+        poetry_install_args: "--extras streamlit"
+      context: .
+      dockerfile: Dockerfile
+      x-bake:
+        platforms:
+          - linux/amd64
+          - linux/arm64
+        tags:
+          - registry-1.docker.io/oughtinc/ice:0.1.0-streamlit
+    image: ${COMPOSE_IMAGE:-ice-streamlit}
