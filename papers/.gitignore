@@ -1,2 +1,6 @@
 *.pdf
 *.txt
+
+# For tests
+!keenan-2018-tiny.txt
+!keenan-2018.pdf
