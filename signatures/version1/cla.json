@@ -1,3 +1,20 @@
 {
-   "signedContributors": []
+  "signedContributors": [
+    {
+      "name": "lslunis",
+      "id": 64963307,
+      "comment_id": 1256982061,
+      "created_at": "2022-09-24T14:28:13Z",
+      "repoId": 537486497,
+      "pullRequestNo": 14
+    },
+    {
+      "name": "lslunis",
+      "id": 64963307,
+      "comment_id": 1256986404,
+      "created_at": "2022-09-24T14:44:41Z",
+      "repoId": 537486497,
+      "pullRequestNo": 14
+    }
+  ]
 }
