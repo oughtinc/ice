@@ -8,8 +8,13 @@ else
   docker="docker-compose"
 fi
 
-args=""
+detach=""
+files=""
 variant=""
+
+if [ -n "${DETACH:-}" ]; then
+  detach="-d"
+fi
 
 if [ -n "${STREAMLIT:-}" ]; then
   variant="streamlit"
@@ -24,16 +29,12 @@ if [ -n "${TORCH:-}" ]; then
 fi
 
 if [ -n "${variant}" ]; then
-  args="${args} -f docker-compose.${variant}.yml"
+  files="${files} -f docker-compose.${variant}.yml"
   if [ -n "${BUILD:-}" ]; then
-    args="${args} -f docker-compose.build-${variant}.yml"
+    files="${files} -f docker-compose.build-${variant}.yml"
   fi
 elif [ -n "${BUILD:-}" ]; then
-  args="${args} -f docker-compose.build.yml"
+  files="${files} -f docker-compose.build.yml"
 fi
 
-if [ -n "${DETACH:-}" ]; then
-  args="${args} -d"
-fi
-
-$docker -f docker-compose.yml $args up
+$docker -f docker-compose.yml $files up $detach

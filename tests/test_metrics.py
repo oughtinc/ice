@@ -69,6 +69,7 @@ async def test_rouge_multiple_hypotheses_and_references_matches_single_score_whe
     assert scores_single == scores_repeated
 
 
+@mark.skip(reason="Requires OUGHT_INFERENCE_API_KEY")
 @mark.slow
 @mark.anyio
 async def test_nubia():
