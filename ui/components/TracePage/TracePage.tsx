@@ -417,14 +417,10 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             <CallName className="text-base text-slate-700" id={id} />
             <div className="text-sm text-gray-600 flex items-center">
               <span className="text-indigo-600" title={JSON.stringify(getStrings(args), null, 4)}>
-                {getShortString(getStrings(args)?.[0] || '()')}
+                {getShortString(getStrings(args)?.[0] || "()")}
               </span>
               <span className="px-2">→</span>
-              {result === undefined ? (
-                <Spinner size="small" />
-              ) : (
-                <ResultComponent value={result} />
-              )}
+              {result === undefined ? <Spinner size="small" /> : <ResultComponent value={result} />}
             </div>
           </div>
         </Button>
@@ -467,13 +463,13 @@ const isStringArray = (value: unknown): value is unknown[] =>
 
 const getFirstDescendant = (value: unknown): unknown => {
   if (isObjectLike(value) && !isStringArray(value)) {
-    return getFirstDescendant(Object.values(value)[0])
+    return getFirstDescendant(Object.values(value)[0]);
   }
   if (isStringArray(value)) {
     return value.filter(isString);
   }
   return value;
-}
+};
 
 const getStrings = (value: any): string[] => {
   if (isObjectLike(value)) {
@@ -490,7 +486,7 @@ const getStrings = (value: any): string[] => {
   }
 
   const result = getFirstDescendant(value);
-  
+
   return Array.isArray(result) ? result : [`${result ?? "()"}`];
 };
 
@@ -498,21 +494,23 @@ const getShortString = (string: any, maxLength: number = 35): string => {
   return string.length > maxLength ? string.slice(0, maxLength).trim() + "..." : string;
 };
 
-const ResultComponent = ({value}: {value: any}): JSX.Element => {
+const ResultComponent = ({ value }: { value: any }): JSX.Element => {
   const strings = getStrings(value);
 
   return (
     <>
-      {
-        strings.map((string, idx) => (
-          <div className="px-[4px] py-[2px] mx-[3px] bg-lightBlue-50 text-lightBlue-600 rounded-4" key={idx} title={string}>
-            {getShortString(string)}
-          </div>
-        ))
-      }
+      {strings.map((string, idx) => (
+        <div
+          className="px-[4px] py-[2px] mx-[3px] bg-lightBlue-50 text-lightBlue-600 rounded-4"
+          key={idx}
+          title={string}
+        >
+          {getShortString(string)}
+        </div>
+      ))}
     </>
-  )
-}
+  );
+};
 
 const Json = ({ name, value }: { name: string; value: unknown }) => {
   const toast = useToast();
