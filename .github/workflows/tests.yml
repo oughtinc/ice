@@ -1,10 +1,10 @@
-name: Checks
+name: Tests
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Checks
+    name: Tests
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -31,16 +31,16 @@ jobs:
       - name: Load cache
         uses: actions/cache@v3
         with:
-          key: checks-${{ github.ref }}-${{ github.run_id }}
+          key: tests-${{ github.ref }}-${{ github.run_id }}
           path: |
             .pre-commit-home/
             .mypy_cache/
           restore-keys: |
-            checks-${{ github.ref }}
-            checks-
+            tests-${{ github.ref }}
+            tests-
 
-      - name: Run all checks
-        run: scripts/checks.sh
+      - name: Run all tests
+        run: scripts/run-tests-action.sh
         env:
           COMPOSE_DOCKER_CLI_BUILD: "1"
           DOCKER_BUILDKIT: "1"
