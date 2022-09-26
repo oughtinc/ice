@@ -144,7 +144,7 @@ To upgrade poetry to a new version:
 1. In the Dockerfile, temporarily change `pip install -r poetry-requirements.txt` to `pip install poetry==DESIRED_VERSION`
 2. Generate a new `poetry-requirements.txt`:
    ```sh
-   BUILD=1 DETACH=1 scripts/run-local.sh
+   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d
    docker compose exec ice bash -c 'pip freeze > poetry-requirements.txt'
    ```
 3. Revert the Dockerfile changes
