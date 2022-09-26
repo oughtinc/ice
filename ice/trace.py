@@ -68,15 +68,23 @@ def emit(value):
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
+        if isinstance(o, dict):
+            return {repr(k): v for k, v in o.items()}
         if hasattr(o, "dict") and callable(o.dict):
             return o.dict()
         if isfunction(o):
             return dict(class_name=o.__class__.__name__, name=o.__name__)
         try:
-            value = json.JSONEncoder.default(self, o)
+            return json.JSONEncoder.default(self, o)
         except TypeError:
-            value = repr(o)
-        return value
+            return repr(o)
+
+    def iterencode(self, o):
+        try:
+            return super().iterencode(o)
+        except TypeError:
+            return self.default(o)
+
 
 
 def compress_arg(k: str, v):
