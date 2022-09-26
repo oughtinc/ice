@@ -9,8 +9,6 @@ services:
     volumes:
       # When mounting /code, don't clobber generated directories.
       # https://stackoverflow.com/a/37898591
-      - /code/.mypy_cache
-      - /code/.pre-commit-home
       - /code/.venv/
       - /code/ui/.next/
       - /code/ui/node_modules/
