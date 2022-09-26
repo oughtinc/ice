@@ -78,7 +78,6 @@ class JSONEncoder(json.JSONEncoder):
             value = repr(o)
         return value
 
-
 def compress_arg(k: str, v):
     if k == "paper":
         return {"document_id": v.document_id}
