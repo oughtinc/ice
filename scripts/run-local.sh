@@ -10,6 +10,7 @@ fi
 
 files=""
 variant=""
+args=""
 
 if [ -n "${STREAMLIT:-}" ]; then
   variant="streamlit"
@@ -32,4 +33,8 @@ elif [ -n "${BUILD:-}" ]; then
   files="${files} -f docker-compose.build.yml"
 fi
 
-$docker -f docker-compose.yml $files up "$@"
+if [ -n "${BUILD:-}" ]; then
+  args="${args} --build"
+fi
+
+$docker -f docker-compose.yml $files up $args "$@"
