@@ -28,17 +28,6 @@ jobs:
           tags: |
             ice:latest
 
-      - name: Load cache
-        uses: actions/cache@v3
-        with:
-          key: tests-${{ github.ref }}-${{ github.run_id }}
-          path: |
-            .pre-commit-home/
-            .mypy_cache/
-          restore-keys: |
-            tests-${{ github.ref }}
-            tests-
-
       - name: Run all tests
         run: scripts/run-tests-action.sh
         env:
@@ -48,8 +37,3 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ORG_ID: ${{ secrets.OPENAI_ORG_ID }}
           OUGHT_INFERENCE_API_KEY: ${{ secrets.OUGHT_INFERENCE_API_KEY }}
-
-      - name: Chmod cached files so cache action can read them
-        run: |
-          sudo chmod -R a+r .pre-commit-home
-          sudo chmod -R a+r .mypy_cache
