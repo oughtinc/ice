@@ -1,4 +1,3 @@
-
 from ice.recipe import recipe
 
 
@@ -30,10 +29,12 @@ def eval_python(expression: str) -> str:
         result = f"Error: {e}"
     return str(result)
 
+
 async def choose_computation(question: str) -> str:
     prompt = make_computation_choice_prompt(question)
     answer = (await recipe.agent().answer(prompt=prompt)).strip('" ')
     return answer
+
 
 async def answer_by_computation(question: str):
     expression = await choose_computation(question)
@@ -41,5 +42,6 @@ async def answer_by_computation(question: str):
     prompt = make_compute_qa_prompt(question, expression, result)
     answer = (await recipe.agent().answer(prompt=prompt, multiline=False)).strip('" ')
     return answer
+
 
 recipe.main(answer_by_computation)

@@ -1,7 +1,7 @@
+from subquestions import ask_subquestions
 
 from ice.recipe import recipe
 from ice.utils import map_async
-from subquestions import ask_subquestions
 
 
 Question = str
@@ -24,15 +24,22 @@ Question: "{question}"
 Answer: "
 """.strip()
 
+
 async def get_subs(question: str, depth: int) -> Subs:
     subquestions = await ask_subquestions(question=question)
-    subanswers = await map_async(subquestions, lambda q: answer_by_amplification(question=q, depth=depth))
+    subanswers = await map_async(
+        subquestions, lambda q: answer_by_amplification(question=q, depth=depth)
+    )
     return list(zip(subquestions, subanswers))
 
-async def answer_by_amplification(question: str = "What is the effect of creatine on cognition?", depth: int = 1):
+
+async def answer_by_amplification(
+    question: str = "What is the effect of creatine on cognition?", depth: int = 1
+):
     subs = await get_subs(question, depth - 1) if depth > 0 else []
     prompt = make_qa_prompt(question, subs=subs)
     answer = (await recipe.agent().answer(prompt=prompt, multiline=False)).strip('" ')
     return answer
+
 
 recipe.main(answer_by_amplification)

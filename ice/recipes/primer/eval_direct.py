@@ -1,4 +1,3 @@
-
 from ice.recipe import recipe
 
 
@@ -9,7 +8,9 @@ def eval_python(expression: str) -> str:
         result = f"Error: {e}"
     return str(result)
 
+
 async def answer_by_computation(question: str):
     return eval_python(question)
+
 
 recipe.main(answer_by_computation)

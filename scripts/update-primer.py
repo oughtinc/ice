@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 root_dir = Path(__file__).parent.parent.parent
-primer_recipe_dir = root_dir /'ice'/ "ice" / "recipes" / "primer"
+primer_recipe_dir = root_dir / "ice" / "ice" / "recipes" / "primer"
 primer_dir = root_dir / "primer"
 
 pattern = re.compile(
@@ -23,7 +23,7 @@ pattern = re.compile(
 def update_ice():
     for md_path in primer_dir.glob("**/*.md"):
         for c in pattern.finditer(md_path.read_text()):
-            if ' ' in c["path"]:
+            if " " in c["path"]:
                 continue
             code_path = primer_recipe_dir / c["path"]
             code_path.parent.mkdir(parents=True, exist_ok=True)

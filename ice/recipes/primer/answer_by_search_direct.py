@@ -1,4 +1,3 @@
-
 import httpx
 
 from ice.recipe import recipe
@@ -17,14 +16,10 @@ Answer: "
 
 async def search(query: str) -> dict:
     async with httpx.AsyncClient() as client:
-        params = {
-        "q": query,
-        "hl": "en",
-        "gl": "us",
-        "api_key": "e29...b4c"
-        }
+        params = {"q": query, "hl": "en", "gl": "us", "api_key": "e29...b4c"}
         response = await client.get("https://serpapi.com/search", params=params)
         return response.json()
+
 
 def render_results(data: dict) -> str:
     if not data or not data.get("organic_results"):
@@ -41,6 +36,7 @@ def render_results(data: dict) -> str:
 
     return "\n".join(results)
 
+
 async def answer_by_search(
     question: str = "Who is the president of the United States?",
 ) -> str:
@@ -49,5 +45,6 @@ async def answer_by_search(
     prompt = make_search_result_prompt(results_str, question)
     answer = (await recipe.agent().answer(prompt=prompt, max_tokens=100)).strip('" ')
     return answer
+
 
 recipe.main(answer_by_search)

@@ -1,4 +1,3 @@
-
 import httpx
 
 from ice.recipe import recipe
@@ -20,17 +19,14 @@ def make_search_query_prompt(question: str) -> str:
 You're trying to answer the question {question}. You get to type in a search query to Google, and then you'll be shown the results. What query do you want to search for?
 
 Query: "
-""".strip('" ')
+""".strip(
+        '" '
+    )
 
 
 async def search(query: str) -> dict:
     async with httpx.AsyncClient() as client:
-        params = {
-        "q": query,
-        "hl": "en",
-        "gl": "us",
-        "api_key": "e29...7b4c"
-        }
+        params = {"q": query, "hl": "en", "gl": "us", "api_key": "e29...7b4c"}
         response = await client.get("https://serpapi.com/search", params=params)
         return response.json()
 

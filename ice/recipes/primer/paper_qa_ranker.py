@@ -1,6 +1,6 @@
-
+from ice.paper import Paper
+from ice.paper import Paragraph
 from ice.recipe import recipe
-from ice.paper import Paper, Paragraph
 from ice.utils import map_async
 
 
@@ -18,6 +18,7 @@ async def classify_paragraph(paragraph: Paragraph, question: str) -> float:
     )
     return choice_probs.get(" Yes")
 
+
 async def answer_for_paper(
     paper: Paper, question: str, top_n: int = 3
 ) -> list[Paragraph]:
@@ -28,5 +29,6 @@ async def answer_for_paper(
         zip(paper.paragraphs, probs), key=lambda x: x[1], reverse=True
     )
     return [par for par, prob in sorted_pairs[:top_n]]
+
 
 recipe.main(answer_for_paper)

@@ -1,4 +1,3 @@
-
 import httpx
 
 from ice.recipe import recipe
@@ -17,12 +16,7 @@ Answer: "
 
 async def search(query: str = "Who is the president of the United States?") -> dict:
     async with httpx.AsyncClient() as client:
-        params = {
-        "q": query,
-        "hl": "en",
-        "gl": "us",
-        "api_key": "e29...b4c"
-        }
+        params = {"q": query, "hl": "en", "gl": "us", "api_key": "e29...b4c"}
         response = await client.get("https://serpapi.com/search", params=params)
         return response.json()
 
