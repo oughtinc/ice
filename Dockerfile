@@ -40,4 +40,4 @@ RUN npm --prefix ui ci
 
 COPY . .
 
-CMD ["sleep", "infinity"]
+CMD ["npm", "--prefix", "ui", "run", "dev"]
