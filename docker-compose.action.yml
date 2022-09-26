@@ -1,0 +1,3 @@
+services:
+  ice:
+    command: ["sleep", "infinity"]
