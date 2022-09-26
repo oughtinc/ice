@@ -29,11 +29,13 @@ def update_ice():
             code_path.parent.mkdir(parents=True, exist_ok=True)
             code_path.write_text(c["content"])
 
+
 def updated_code_block(c):
     code_path = primer_recipe_dir / c["path"]
     if not code_path.exists():
         return c[0]
     return c["prefix"] + code_path.read_text() + c["suffix"]
+
 
 def update_primer():
     for md_path in primer_dir.glob("**/*.md"):
