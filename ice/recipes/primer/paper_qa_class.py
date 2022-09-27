@@ -19,9 +19,7 @@ async def classify_paragraph(paragraph: Paragraph, question: str) -> float:
     return choice_probs.get(" Yes", 0.0)
 
 
-async def answer_for_paper(
-    paper: Paper, question: str = "What was the study population?"
-):
+async def answer_for_paper(paper: Paper, question: str):
     paragraph = paper.paragraphs[0]
     return await classify_paragraph(paragraph, question)
 
