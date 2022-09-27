@@ -254,7 +254,9 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         setSelectedId,
         getExpanded: (id: string) => expandedById[id] ?? false,
         setExpanded: (id: string, expanded: boolean) => {
-          if (id !== rootId) setExpandedById(current => ({ ...current, [id]: expanded }));
+          const isModelCall = MODEL_CALL_NAMES.includes(calls[id]?.name);
+          if (id !== rootId && !isModelCall)
+            setExpandedById(current => ({ ...current, [id]: expanded }));
         },
         getFocussed,
       }}
@@ -340,6 +342,9 @@ const CallName = ({ className, id }: { className?: string; id: string }) => {
   return (
     <div className="flex items-center gap-1">
       {isModelCall ? <ChatCenteredDots /> : undefined}
+      {recipeClassName && recipeClassName !== displayName ? (
+        <span className={classNames(className, "text-gray-500")}>{recipeClassName}:</span>
+      ) : undefined}
       <span className={className}>{capitalizedAndSpacedName}</span>
     </div>
   );
@@ -376,7 +381,10 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             childIds.length === 0 && "ml-5",
           )}
           variant="ghost"
-          onClick={select}
+          onClick={ev => {
+            select();
+            ev.stopPropagation();
+          }}
           isActive={selected}
         >
           <ArcherElement
@@ -406,7 +414,6 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
                   // Theres a hard to debug layout thing here, where sometimes
                   // the arrows don't redraw properly when nodes are expanded.
                   setTimeout(() => refreshArcherArrows(), 50);
-                  event.stopPropagation();
                 }}
               >
                 {<span className={classNames(!isModelCall && "mr-1")}>{childIds.length}</span>}
