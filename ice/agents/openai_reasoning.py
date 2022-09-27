@@ -122,7 +122,7 @@ class OpenAIReasoningAgent(Agent):
 
             # Parse the answer and the reasoning from the response
             answer, reasoning = self._parse_answer_and_reasoning(
-                response_text, answer_prefix
+                response_text, answer_prefix, multiline=multiline
             )
 
             # Update the answer counts and the reasoning list
@@ -144,7 +144,7 @@ class OpenAIReasoningAgent(Agent):
         # Request a single completion from the API
         followup_response = await openai_complete(
             followup_prompt,
-            stop="\n\n" if multiline else "\n",
+            stop=None,
             model=self.model,
             temperature=self.temperature,
             top_p=self.top_p,
@@ -152,15 +152,21 @@ class OpenAIReasoningAgent(Agent):
         )
 
         # Extract the follow-up response text
-        followup_response_text = followup_response["choices"][0]["text"]
+        followup_response_text = self._enforce_stop(
+            followup_response["choices"][0]["text"], multiline
+        )
 
         # Append the follow-up response text to the original response text
         response_text += f"\n\n{answer_prefix}{followup_response_text}"
 
         return response_text
 
+    def _enforce_stop(self, response_text: str, multiline: bool) -> str:
+        stop = "\n\n" if multiline else "\n"
+        return response_text.strip().split(stop)[0]
+
     def _parse_answer_and_reasoning(
-        self, response_text: str, answer_prefix: str
+        self, response_text: str, answer_prefix: str, multiline: bool = True
     ) -> tuple[str, str]:
         # Split the response text by the answer prefix
         response_parts = response_text.split(answer_prefix, maxsplit=1)
@@ -176,6 +182,8 @@ class OpenAIReasoningAgent(Agent):
         # Check that the reasoning and the answer are not empty
         if not reasoning or not answer:
             log.warning(f"Empty reasoning or answer: {response_text}")
+
+        answer = self._enforce_stop(answer, multiline)
 
         return answer, reasoning
 
