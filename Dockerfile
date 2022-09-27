@@ -9,6 +9,7 @@ ENV \
   POETRY_VIRTUALENVS_IN_PROJECT=true \
   PRE_COMMIT_HOME=.pre-commit-home \
   PYTHONFAULTHANDLER=1 \
+  PYTHONPATH=/code \
   PYTHONUNBUFFERED=1
 
 COPY nodesource.gpg ./
