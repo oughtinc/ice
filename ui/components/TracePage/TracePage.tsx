@@ -22,8 +22,8 @@ import { JSONTree } from "react-json-tree";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import Separator from "./Separator";
 import Spinner from "./Spinner";
-import { COLORS } from "/styles/colors";
 import { recipes } from "/helpers/recipes";
+import { COLORS } from "/styles/colors";
 
 const elicitStyle = {
   "hljs-keyword": { color: COLORS.indigo[600] }, // use primary color for keywords
@@ -254,8 +254,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         setSelectedId,
         getExpanded: (id: string) => expandedById[id] ?? false,
         setExpanded: (id: string, expanded: boolean) => {
-          const isModelCall = MODEL_CALL_NAMES.includes(calls[id]?.name);
-          if (id !== rootId && !isModelCall)
+          if (id !== rootId && !isModelCall(calls[id]))
             setExpandedById(current => ({ ...current, [id]: expanded }));
         },
         getFocussed,
@@ -331,6 +330,11 @@ const useLinks = () => {
   return { getParent, getChildren, getPrior: getSiblingAt(-1), getNext: getSiblingAt(1) };
 };
 
+const isModelCall = ({ name, args }: CallInfo) =>
+  MODEL_CALL_NAMES.includes(name) &&
+  (args as any).self?.class_name &&
+  (args as any).self.class_name.includes("Agent");
+
 const getFormattedName = (snakeCasedName: string) => {
   const spacedName = snakeCasedName.replace(/_/g, " ");
   const capitalizedAndSpacedName = spacedName[0].toUpperCase() + spacedName.slice(1);
@@ -342,10 +346,9 @@ const CallName = ({ className, id }: { className?: string; id: string }) => {
   const recipeClassName = (args as any).self?.class_name;
   const displayName =
     (name === "execute" || name === "run") && recipeClassName ? recipeClassName : name;
-  const isModelCall = MODEL_CALL_NAMES.includes(name);
+  const modelCall = isModelCall({ name, args });
   return (
     <div className="flex items-center gap-1">
-      {isModelCall ? <ChatCenteredDots /> : undefined}
       {recipeClassName && recipeClassName !== displayName ? (
         <span className={classNames(className, "text-gray-500")}>
           {getFormattedName(recipeClassName)}:
@@ -367,7 +370,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
 
-  const isModelCall = MODEL_CALL_NAMES.includes(name);
+  const modelCall = isModelCall({ name, args });
   const isSiblingWithSelected = selectedId && getParent(id) === getParent(selectedId);
 
   return (
@@ -384,7 +387,6 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
         <Button
           className={classNames(
             "justify-start text-start items-start h-fit min-w-[300px] p-1.5 !shadow-none",
-            childIds.length === 0 && "ml-5",
           )}
           variant="ghost"
           onClick={ev => {
@@ -409,9 +411,9 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
               <Button
                 aria-label={expanded ? "Collapse" : "Expand"}
                 className={classNames(
-                  "rounded-full p-1 h-fit mr-2 !shadow-none hover:bg-slate-200",
+                  "rounded-full p-1 h-fit mr-2 !shadow-none hover:bg-slate-200 w-12",
                 )}
-                leftIcon={isModelCall ? undefined : expanded ? <CaretDown /> : <CaretRight />}
+                leftIcon={modelCall ? undefined : expanded ? <CaretDown /> : <CaretRight />}
                 size="md"
                 isActive={expanded}
                 variant="outline"
@@ -422,10 +424,18 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
                   setTimeout(() => refreshArcherArrows(), 50);
                 }}
               >
-                {<span className={classNames(!isModelCall && "mr-1")}>{childIds.length}</span>}
+                <span className={"mr-1"}>{modelCall ? <ChatCenteredDots /> : childIds.length}</span>
               </Button>
             ) : (
-              <div className="mt-3 -ml-1.5 mr-1.5" id={lineAnchorId(id)}></div>
+              <Button
+                className={classNames(
+                  "rounded-full p-1 h-fit mr-2 !shadow-none hover:bg-slate-200 w-12",
+                )}
+                size="md"
+                variant="outline"
+              >
+                <span>f</span>
+              </Button>
             )}
           </ArcherElement>
           <div className="mx-2">
@@ -440,7 +450,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
           </div>
         </Button>
       </div>
-      {!isModelCall && (
+      {!modelCall && (
         <Collapse in={expanded} transition={{ enter: { duration: 0 } }}>
           <div className="ml-12">
             {expanded && <CallChildren id={id} refreshArcherArrows={refreshArcherArrows} />}
