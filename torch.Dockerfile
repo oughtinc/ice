@@ -10,6 +10,7 @@ ENV \
   PRE_COMMIT_HOME=.pre-commit-home \
   PYENV_ROOT=/root/.pyenv \
   PYTHONFAULTHANDLER=1 \
+  PYTHONPATH=/code \
   PYTHONUNBUFFERED=1
 
 COPY nodesource.gpg ./
