@@ -254,7 +254,9 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         setSelectedId,
         getExpanded: (id: string) => expandedById[id] ?? false,
         setExpanded: (id: string, expanded: boolean) => {
-          if (id !== rootId) setExpandedById(current => ({ ...current, [id]: expanded }));
+          const isModelCall = MODEL_CALL_NAMES.includes(calls[id]?.name);
+          if (id !== rootId && !isModelCall)
+            setExpandedById(current => ({ ...current, [id]: expanded }));
         },
         getFocussed,
       }}
@@ -329,18 +331,27 @@ const useLinks = () => {
   return { getParent, getChildren, getPrior: getSiblingAt(-1), getNext: getSiblingAt(1) };
 };
 
+const getFormattedName = (snakeCasedName: string) => {
+  const spacedName = snakeCasedName.replace(/_/g, " ");
+  const capitalizedAndSpacedName = spacedName[0].toUpperCase() + spacedName.slice(1);
+  return capitalizedAndSpacedName;
+};
+
 const CallName = ({ className, id }: { className?: string; id: string }) => {
   const { name, args } = useCallInfo(id);
   const recipeClassName = (args as any).self?.class_name;
   const displayName =
     (name === "execute" || name === "run") && recipeClassName ? recipeClassName : name;
-  const spacedName = displayName.replace(/_/g, " ");
-  const capitalizedAndSpacedName = spacedName[0].toUpperCase() + spacedName.slice(1);
   const isModelCall = MODEL_CALL_NAMES.includes(name);
   return (
     <div className="flex items-center gap-1">
       {isModelCall ? <ChatCenteredDots /> : undefined}
-      <span className={className}>{capitalizedAndSpacedName}</span>
+      {recipeClassName && recipeClassName !== displayName ? (
+        <span className={classNames(className, "text-gray-500")}>
+          {getFormattedName(recipeClassName)}:
+        </span>
+      ) : undefined}
+      <span className={className}>{getFormattedName(displayName)}</span>
     </div>
   );
 };
@@ -376,7 +387,10 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             childIds.length === 0 && "ml-5",
           )}
           variant="ghost"
-          onClick={select}
+          onClick={ev => {
+            select();
+            ev.stopPropagation();
+          }}
           isActive={selected}
         >
           <ArcherElement
@@ -406,7 +420,6 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
                   // Theres a hard to debug layout thing here, where sometimes
                   // the arrows don't redraw properly when nodes are expanded.
                   setTimeout(() => refreshArcherArrows(), 50);
-                  event.stopPropagation();
                 }}
               >
                 {<span className={classNames(!isModelCall && "mr-1")}>{childIds.length}</span>}
