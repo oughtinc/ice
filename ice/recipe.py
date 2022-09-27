@@ -2,6 +2,7 @@ import asyncio
 import sys
 
 from abc import abstractmethod
+from collections.abc import Awaitable
 from collections.abc import Callable
 from functools import wraps
 from inspect import iscoroutinefunction
@@ -90,11 +91,15 @@ class Recipe(TracedABC, Generic[RecipeSettings]):
         return self.__class__.__name__
 
 
+FunctionBasedRecipe = Callable[..., Awaitable]
+
+
 class RecipeHelper:
     def __init__(self):
         self._mode: Mode | None = "machine"
+        self.all_recipes: list[FunctionBasedRecipe] = []
 
-    def main(self, main):
+    def main(self, main: FunctionBasedRecipe):
         if not iscoroutinefunction(main):
             raise TypeError("recipe.main must be given an async function")
 
@@ -103,6 +108,9 @@ class RecipeHelper:
         for name, value in g.items():
             if getattr(value, "__module__", None) == main.__module__:
                 g[name] = trace(value)
+
+        traced_main = trace(main)
+        self.all_recipes.append(traced_main)
 
         if main.__module__ != "__main__":
             return
@@ -113,7 +121,7 @@ class RecipeHelper:
         @wraps(main)
         async def hidden_wrapper(*args, **kwargs):
             try:
-                result = await trace(main)(*args, **kwargs)
+                result = await traced_main(*args, **kwargs)
             except NameError:
                 print_exc()
                 print(
