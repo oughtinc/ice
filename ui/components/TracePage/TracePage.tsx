@@ -434,7 +434,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
                 size="md"
                 variant="outline"
               >
-                <span>f</span>
+                <span>𝑓</span>
               </Button>
             )}
           </ArcherElement>
