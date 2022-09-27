@@ -331,21 +331,27 @@ const useLinks = () => {
   return { getParent, getChildren, getPrior: getSiblingAt(-1), getNext: getSiblingAt(1) };
 };
 
+const getFormattedName = (snakeCasedName: string) => {
+  const spacedName = snakeCasedName.replace(/_/g, " ");
+  const capitalizedAndSpacedName = spacedName[0].toUpperCase() + spacedName.slice(1);
+  return capitalizedAndSpacedName;
+};
+
 const CallName = ({ className, id }: { className?: string; id: string }) => {
   const { name, args } = useCallInfo(id);
   const recipeClassName = (args as any).self?.class_name;
   const displayName =
     (name === "execute" || name === "run") && recipeClassName ? recipeClassName : name;
-  const spacedName = displayName.replace(/_/g, " ");
-  const capitalizedAndSpacedName = spacedName[0].toUpperCase() + spacedName.slice(1);
   const isModelCall = MODEL_CALL_NAMES.includes(name);
   return (
     <div className="flex items-center gap-1">
       {isModelCall ? <ChatCenteredDots /> : undefined}
       {recipeClassName && recipeClassName !== displayName ? (
-        <span className={classNames(className, "text-gray-500")}>{recipeClassName}:</span>
+        <span className={classNames(className, "text-gray-500")}>
+          {getFormattedName(recipeClassName)}:
+        </span>
       ) : undefined}
-      <span className={className}>{capitalizedAndSpacedName}</span>
+      <span className={className}>{getFormattedName(displayName)}</span>
     </div>
   );
 };
