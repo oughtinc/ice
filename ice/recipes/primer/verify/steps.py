@@ -1,14 +1,8 @@
+from ice.recipe import recipe
+from ice.recipes.primer.verify.last import check_step
 from ice.recipes.primer.verify.utils import *
+from ice.utils import map_async
 
-async def check_step(question: str, steps: list[str]) -> float:
-    """
-    Return the probability that the step is correct
-    """
-    prompt = make_verification_prompt(question=question, steps=steps)
-    answer_probs, _ = await recipe.agent().classify(
-        prompt=prompt, choices=[" Yes", " No"]
-    )
-    return answer_probs.get(" Yes", 0.0)
 
 async def verify_answer(
     question: str = DEFAULT_QUESTION, steps: list[str] = DEFAULT_STEPS
@@ -22,5 +16,6 @@ async def verify_answer(
         lambda index: check_step(question=question, steps=steps[:index]),
     )
     return list(zip(step_probs, steps))
+
 
 recipe.main(verify_answer)

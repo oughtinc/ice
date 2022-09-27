@@ -1,4 +1,4 @@
 [flake8]
-ignore = E203,W503,E501,E712,E211
+ignore = E203,W503,E501,E712,E211,F403,F405
 max-line-length = 120
 exclude = __pycache__,node_modules

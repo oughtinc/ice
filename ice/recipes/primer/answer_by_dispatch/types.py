@@ -1,12 +1,9 @@
-
 from dataclasses import dataclass
-
 from typing import Protocol
 
-from ice.recipe import recipe
-from ice.recipes.primer.answer_by_search import answer_by_search
-from ice.recipes.primer.answer_by_reasoning import answer_by_reasoning
 from ice.recipes.primer.answer_by_computation import answer_by_computation
+from ice.recipes.primer.answer_by_reasoning import answer_by_reasoning
+from ice.recipes.primer.answer_by_search import answer_by_search
 
 
 class QuestionRecipe(Protocol):

@@ -1,6 +1,3 @@
-from ice.recipe import recipe
-from ice.utils import map_async
-
 DEFAULT_QUESTION = "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?"
 
 DEFAULT_STEPS = [

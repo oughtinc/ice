@@ -1,7 +1,13 @@
 from ice.recipes.primer.answer_by_dispatch.types import *
 
+
 def make_action_selection_prompt(question: str) -> str:
-    action_types_str = "\n".join([f"{i+1}. {action_type.description}" for i, action_type in enumerate(action_types)])
+    action_types_str = "\n".join(
+        [
+            f"{i+1}. {action_type.description}"
+            for i, action_type in enumerate(action_types)
+        ]
+    )
 
     return f"""You want to answer the question "{question}".
 
