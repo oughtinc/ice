@@ -10,7 +10,12 @@ ENV \
   PRE_COMMIT_HOME=.pre-commit-home \
   PYTHONFAULTHANDLER=1 \
   PYTHONPATH=/code \
-  PYTHONUNBUFFERED=1
+  PYTHONUNBUFFERED=1 \
+  # Suppress this warning:
+  #   None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available
+  #   and only tokenizers, configuration and file/data utilities can be used.
+  # TODO: Suppress only this warning instead of all warnings.
+  TRANSFORMERS_VERBOSITY=error
 
 COPY nodesource.gpg ./
 RUN \
