@@ -1,8 +1,7 @@
-from qa import answer
-
 from ice.paper import Paper
 from ice.paper import Paragraph
 from ice.recipe import recipe
+from ice.recipes.primer.qa import answer
 from ice.utils import map_async
 
 
