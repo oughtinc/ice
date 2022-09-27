@@ -16,7 +16,7 @@ async def classify_paragraph(paragraph: Paragraph, question: str) -> float:
         prompt=make_classification_prompt(paragraph, question),
         choices=(" Yes", " No"),
     )
-    return choice_probs.get(" Yes")
+    return choice_probs.get(" Yes", 0)
 
 
 async def answer_for_paper(
