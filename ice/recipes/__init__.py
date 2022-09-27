@@ -19,11 +19,6 @@ from .placebo_simple import PlaceboSimpleInstruct
 from .placebo_tree import PlaceboTree
 from .rank_paragraphs import RankParagraphs
 from .subrecipe_example import ExampleMetaRecipe
-from .tutorial_amplification import AmplifiedQA
-from .tutorial_debate import DebateRecipe
-from .tutorial_hello import HelloWorld
-from .tutorial_paperqa import PaperQA
-from .tutorial_qa import QA
 
 
 def get_recipe_classes() -> list[Type[Recipe]]:
@@ -32,22 +27,17 @@ def get_recipe_classes() -> list[Type[Recipe]]:
         AdherenceParagraphTfew,
         AdherenceSimpleInstruct,
         AllQuotesRecipe,
-        AmplifiedQA,
         BlindingDynamic,
         ComparisonsQA,
-        DebateRecipe,
         EvaluateResult,
         EvaluateResults,
         ExampleMetaRecipe,
         ExperimentArms,
         FunnelSimple,
-        HelloWorld,
-        PaperQA,
         PlaceboDescriptionInstruct,
         PlaceboDialogs,
         PlaceboKeywordBaseline,
         PlaceboSimpleInstruct,
         PlaceboTree,
-        QA,
         RankParagraphs,
     ]

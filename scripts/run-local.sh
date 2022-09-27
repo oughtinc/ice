@@ -8,13 +8,9 @@ else
   docker="docker-compose"
 fi
 
-detach=""
 files=""
 variant=""
-
-if [ -n "${DETACH:-}" ]; then
-  detach="-d"
-fi
+args=""
 
 if [ -n "${STREAMLIT:-}" ]; then
   variant="streamlit"
@@ -37,4 +33,8 @@ elif [ -n "${BUILD:-}" ]; then
   files="${files} -f docker-compose.build.yml"
 fi
 
-$docker -f docker-compose.yml $files up $detach
+if [ -n "${BUILD:-}" ]; then
+  args="${args} --build"
+fi
+
+$docker -f docker-compose.yml $files up $args "$@"

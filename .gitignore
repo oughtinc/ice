@@ -6,6 +6,7 @@ store/*
 .env
 **/.vscode/*
 data
+.mypy_cache
 .pre-commit-home
 log*.txt
 .dmypy.json

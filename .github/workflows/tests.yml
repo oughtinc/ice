@@ -1,10 +1,10 @@
-name: Checks
+name: Tests
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Checks
+    name: Tests
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -28,19 +28,8 @@ jobs:
           tags: |
             ice:latest
 
-      - name: Load cache
-        uses: actions/cache@v3
-        with:
-          key: checks-${{ github.ref }}-${{ github.run_id }}
-          path: |
-            .pre-commit-home/
-            .mypy_cache/
-          restore-keys: |
-            checks-${{ github.ref }}
-            checks-
-
-      - name: Run all checks
-        run: scripts/checks.sh
+      - name: Run all tests
+        run: scripts/run-tests-action.sh
         env:
           COMPOSE_DOCKER_CLI_BUILD: "1"
           DOCKER_BUILDKIT: "1"
@@ -48,8 +37,3 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ORG_ID: ${{ secrets.OPENAI_ORG_ID }}
           OUGHT_INFERENCE_API_KEY: ${{ secrets.OUGHT_INFERENCE_API_KEY }}
-
-      - name: Chmod cached files so cache action can read them
-        run: |
-          sudo chmod -R a+r .pre-commit-home
-          sudo chmod -R a+r .mypy_cache

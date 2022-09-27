@@ -15,13 +15,16 @@ class OpenAIReasoningAgent(Agent):
         temperature: float = 0.0,
         top_p: float = 1.0,
         num_workers: int = 1,
+        reasoning_prefix: str = "Reasoning: ",
     ):
         self.model = model
         self.temperature = temperature
         self.top_p = top_p
         self.num_workers = num_workers
-        self.answer_prefix = "Answer:"
-        self.reasoning_prefix = "Reasoning:"
+        self.reasoning_prefix = reasoning_prefix
+
+    def _answer_prefix(self, prompt: str) -> str:
+        return prompt.split("\n")[-1]
 
     async def answer(
         self,
@@ -32,11 +35,23 @@ class OpenAIReasoningAgent(Agent):
         default: str = "",
         max_tokens: int = 256,
     ) -> str:
-        # TODO: implement this method
-        raise NotImplementedError
+        answer_prefix = self._answer_prefix(prompt)
+
+        # Generate the prompt for the reasoning task
+        reasoning_prompt = self._generate_reasoning_prompt(prompt)
+
+        # Request multiple completions from the API
+        response = await self._request_completions(reasoning_prompt)
+
+        # Parse the responses and aggregate the answers and reasonings
+        answers, reasonings = await self._parse_and_aggregate_responses(
+            reasoning_prompt, response, answer_prefix, multiline=multiline
+        )
+
+        # Return the most common answer (TODO: Smarter aggregation)
+        return answers.most_common(1)[0][0]
 
     async def predict(self, *, context, default="", verbose=False) -> dict[str, float]:
-        # TODO: implement this method
         raise NotImplementedError
 
     async def classify(
@@ -48,6 +63,7 @@ class OpenAIReasoningAgent(Agent):
         verbose: bool = False,
     ) -> tuple[dict[str, float], str | None]:
         # Generate the prompt for the reasoning task
+        answer_prefix = self._answer_prefix(prompt)
         reasoning_prompt = self._generate_reasoning_prompt(prompt)
 
         # Request multiple completions from the API
@@ -55,21 +71,17 @@ class OpenAIReasoningAgent(Agent):
 
         # Parse the responses and aggregate the answers and reasonings
         answers, reasonings = await self._parse_and_aggregate_responses(
-            reasoning_prompt, response
+            reasoning_prompt, response, answer_prefix
         )
 
         # Return a dict [str, float] and the joined reasonings
         return self._format_result(answers, reasonings)
 
     def _generate_reasoning_prompt(self, prompt: str) -> str:
-        # Check that the prompt ends with the answer prefix
-        if not prompt.endswith(self.answer_prefix):
-            msg = f"Prompt doesn't end with {self.answer_prefix}"
-            log.warning(msg, prompt=prompt)
-            raise ValueError(msg)
+        answer_prefix = self._answer_prefix(prompt)
 
         # Replace the answer prefix with the reasoning prefix
-        prompt = prompt[: -len(self.answer_prefix)] + self.reasoning_prefix
+        prompt = prompt[: -len(answer_prefix)] + self.reasoning_prefix
         return prompt
 
     async def _request_completions(self, prompt: str) -> dict:
@@ -92,7 +104,7 @@ class OpenAIReasoningAgent(Agent):
         return response
 
     async def _parse_and_aggregate_responses(
-        self, prompt: str, response: dict
+        self, prompt: str, response: dict, answer_prefix: str, multiline: bool = False
     ) -> tuple[Counter[str], list[str]]:
         # Extract the response texts
         response_texts = [choice["text"] for choice in response["choices"]]
@@ -102,14 +114,16 @@ class OpenAIReasoningAgent(Agent):
         reasonings: list[str] = []
         for (i, response_text) in enumerate(response_texts):
             # Check if the response contains the answer prefix
-            if self.answer_prefix not in response_text:
+            if answer_prefix not in response_text:
                 # If not, request an explicit answer from the API
                 response_text = await self._request_explicit_answer(
-                    prompt, response_text
+                    prompt, response_text, answer_prefix, multiline=multiline
                 )
 
             # Parse the answer and the reasoning from the response
-            answer, reasoning = self._parse_answer_and_reasoning(response_text)
+            answer, reasoning = self._parse_answer_and_reasoning(
+                response_text, answer_prefix, multiline=multiline
+            )
 
             # Update the answer counts and the reasoning list
             answers[answer] += 1
@@ -117,9 +131,15 @@ class OpenAIReasoningAgent(Agent):
 
         return answers, reasonings
 
-    async def _request_explicit_answer(self, prompt: str, response_text: str) -> str:
+    async def _request_explicit_answer(
+        self,
+        prompt: str,
+        response_text: str,
+        answer_prefix: str,
+        multiline: bool = True,
+    ) -> str:
         # Generate a follow-up prompt with the answer prefix
-        followup_prompt = f"{prompt}{response_text}\n\n{self.answer_prefix}"
+        followup_prompt = f"{prompt}{response_text}\n\n{answer_prefix}"
 
         # Request a single completion from the API
         followup_response = await openai_complete(
@@ -132,16 +152,24 @@ class OpenAIReasoningAgent(Agent):
         )
 
         # Extract the follow-up response text
-        followup_response_text = followup_response["choices"][0]["text"]
+        followup_response_text = self._enforce_stop(
+            followup_response["choices"][0]["text"], multiline
+        )
 
         # Append the follow-up response text to the original response text
-        response_text += f"\n\n{self.answer_prefix}{followup_response_text}"
+        response_text += f"\n\n{answer_prefix}{followup_response_text}"
 
         return response_text
 
-    def _parse_answer_and_reasoning(self, response_text: str) -> tuple[str, str]:
+    def _enforce_stop(self, response_text: str, multiline: bool) -> str:
+        stop = "\n\n" if multiline else "\n"
+        return response_text.strip().split(stop)[0]
+
+    def _parse_answer_and_reasoning(
+        self, response_text: str, answer_prefix: str, multiline: bool = True
+    ) -> tuple[str, str]:
         # Split the response text by the answer prefix
-        response_parts = response_text.split(self.answer_prefix, maxsplit=1)
+        response_parts = response_text.split(answer_prefix, maxsplit=1)
 
         # Check that the response has two parts
         if len(response_parts) != 2:
@@ -154,6 +182,8 @@ class OpenAIReasoningAgent(Agent):
         # Check that the reasoning and the answer are not empty
         if not reasoning or not answer:
             log.warning(f"Empty reasoning or answer: {response_text}")
+
+        answer = self._enforce_stop(answer, multiline)
 
         return answer, reasoning
 
