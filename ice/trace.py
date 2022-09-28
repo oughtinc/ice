@@ -33,7 +33,7 @@ parent_id_var: ContextVar[str] = ContextVar("id", default=trace_id)
 
 
 trace_dir = Path(__file__).parent.parent / "ui" / "public" / "traces"
-trace_dir.mkdir(exist_ok=True)
+trace_dir.mkdir(parents=True, exist_ok=True)
 trace_file: IO[str] | None = None
 
 
