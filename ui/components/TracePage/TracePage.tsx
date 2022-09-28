@@ -330,7 +330,7 @@ const useLinks = () => {
   return { getParent, getChildren, getPrior: getSiblingAt(-1), getNext: getSiblingAt(1) };
 };
 
-const isModelCall = ({ name, args }: CallInfo) =>
+const isModelCall = ({ name, args }: { name: string; args: Record<string, unknown> }) =>
   MODEL_CALL_NAMES.includes(name) &&
   (args as any).self?.class_name &&
   (args as any).self.class_name.includes("Agent");
