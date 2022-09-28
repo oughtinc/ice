@@ -5,7 +5,7 @@ ICE is a component library and execution trace visualizer for compositional lang
 ## Screenshot
 
 <p align="center">
-  <img width="1079" alt="ice-screenshot" src="https://user-images.githubusercontent.com/382515/192579519-d2a99a80-73f7-40dc-bcde-f1d6023f0dfc.png"><br/>
+  <img alt="ice-screenshot" src="https://user-images.githubusercontent.com/382515/192681645-6ed87072-2dc6-4982-92d1-8de209bc3ef6.png" />
   Execution trace visualized in ICE
 </p>
 
