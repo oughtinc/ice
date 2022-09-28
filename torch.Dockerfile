@@ -59,6 +59,7 @@ ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 RUN python -c "import nltk; nltk.download('punkt')"
 
 COPY ui/package.json ui/package-lock.json ui/
+COPY ui/patches/*.patch ui/patches/
 RUN npm --prefix ui ci
 
 COPY . .
