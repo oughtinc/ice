@@ -1,6 +1,6 @@
 # Interactive Composition Explorer 🧊
 
-ICE is a component library and execution trace visualizer for compositional language model programs.
+ICE is a component library and trace visualizer for language model programs.
 
 ## Screenshot
 
