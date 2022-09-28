@@ -51,11 +51,6 @@ def enable_trace():
     print(f"Trace: {_url_prefix()}/traces/{trace_id}")
 
 
-trace_dir = Path(__file__).parent.parent / "ui" / "public" / "traces"
-trace_dir.mkdir(exist_ok=True)
-trace_file = None
-
-
 def trace_enabled():
     return trace_file is not None
 
