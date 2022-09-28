@@ -45,7 +45,7 @@ ICE is a component library and trace visualizer for language model programs.
 
 ## Contributions
 
-ICE is a project by [Ought](https://ought.org/). We're an applied ML lab building the AI research assistant [Elicit](https://elicit.org/).
+ICE is an [open-source](https://github.com/oughtinc/ice/blob/main/LICENSE.md) project by [Ought](https://ought.org/). We're an applied ML lab building the AI research assistant [Elicit](https://elicit.org/).
 
 We welcome community contributions:
 
