@@ -1,4 +1,4 @@
-export const recipes: Record<string, { title: string; description: string }> = {
+export const recipes: Record<string, { title: string; description?: string; hidden?: boolean }> = {
   "01GCZNZ1YC0XRE1QHSAV6MPWJD": {
     title: "Placebo classification and description",
     description: "Did this paper use a placebo? If so, what was it?",
