@@ -589,7 +589,7 @@ const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
       </div>
     );
   }
-  const value = view.value?.toString();
+  const value = `${view.value}`;
   return value ? (
     <span
       className="inline whitespace-pre-wrap"
