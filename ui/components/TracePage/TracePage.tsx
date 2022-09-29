@@ -1,7 +1,7 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isEmpty, isString, last, omit, set } from "lodash";
+import { isArray, isEmpty, isString, last, omit, set, values } from "lodash";
 import { useRouter } from "next/router";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
@@ -537,35 +537,104 @@ const ResultComponent = ({ value }: { value: any }): JSX.Element => {
   );
 };
 
+type JsonChild =
+  | { type: "array"; values: unknown[] }
+  | { type: "object"; values: [string, unknown][] }
+  | { type: "value"; value: unknown };
+
+const getStructuralType = (data: unknown) => {
+  if (typeof data === "object" && data && !Array.isArray(data)) return "object";
+  if (Array.isArray(data)) return "array";
+  return "value";
+};
+
+const TypeIdentifiers = {
+  object: <span className="shrink-0 font-mono mr-[8px]">{"{}"}</span>,
+  array: <span className="shrink-0 font-mono mr-[8px]">{"[]"}</span>,
+  value: null,
+};
+
+const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
+  const toast = useToast();
+  const view: JsonChild = useMemo(() => {
+    if (typeof data === "object" && data) {
+      // Array or Object
+      if (Array.isArray(data)) return { type: "array", values: data };
+      else return { type: "object", values: Object.entries(data) };
+    }
+    return { type: "value", value: data };
+  }, [data]);
+
+  if (view.type === "array" || view.type === "object") {
+    return (
+      <div className={classNames("flex", root ? undefined : "ml-4")}>
+        <div>
+          {view.type === "array"
+            ? view.values.map((el, index) => (
+                <div key={index} className="mb-1">
+                  <span className="text-gray-600">{`${index + 1}. `}</span>
+                  {TypeIdentifiers[getStructuralType(el)]}
+                  <DetailRenderer data={el} />
+                </div>
+              ))
+            : view.values.map((el, index) => (
+                <div key={index} className="mb-1">
+                  <span className="text-gray-600">{`${getFormattedName(el[0])}: `}</span>
+                  {TypeIdentifiers[getStructuralType(el[1])]}
+                  <DetailRenderer data={el[1]} />
+                </div>
+              ))}
+          {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
+        </div>
+      </div>
+    );
+  }
+  const value = view.value?.toString();
+  return value ? (
+    <span
+      className="inline whitespace-pre-wrap"
+      onClick={() => {
+        navigator.clipboard.writeText(value);
+        toast({ title: "Copied to clipboard", duration: 1000 });
+      }}
+    >
+      {value}
+    </span>
+  ) : (
+    <span className="text-gray-600">empty</span>
+  );
+};
+
 const Json = ({ name, value }: { name: string; value: unknown }) => {
   const toast = useToast();
   return (
     <div>
-      <div>{name}</div>
+      <div className="mb-2 font-medium">{name}</div>
       {value === undefined ? (
         <Skeleton className="mt-4 h-4" />
       ) : (
-        <JSONTree
-          data={value}
-          hideRoot
-          theme={elicitJSONTreeTheme}
-          valueRenderer={(valueAsString: string, value: unknown) =>
-            typeof value === "string" ? (
-              <div
-                className="whitespace-pre-line break-normal select-none"
-                style={{ color: COLORS.lightBlue[600] }}
-                onClick={() => {
-                  navigator.clipboard.writeText(value);
-                  toast({ title: "Copied to clipboard", duration: 1000 });
-                }}
-              >
-                {value}
-              </div>
-            ) : (
-              valueAsString
-            )
-          }
-        />
+        // <JSONTree
+        //   data={value}
+        //   hideRoot
+        //   theme={elicitJSONTreeTheme}
+        //   valueRenderer={(valueAsString: string, value: unknown) =>
+        //     typeof value === "string" ? (
+        //       <div
+        //         className="whitespace-pre-line break-normal select-none"
+        //         style={{ color: COLORS.lightBlue[600] }}
+        //         onClick={() => {
+        //           navigator.clipboard.writeText(value);
+        //           toast({ title: "Copied to clipboard", duration: 1000 });
+        //         }}
+        //       >
+        //         {value}
+        //       </div>
+        //     ) : (
+        //       valueAsString
+        //     )
+        //   }
+        // />
+        <DetailRenderer data={value} root />
       )}
     </div>
   );
@@ -654,9 +723,16 @@ type InputOutputContentProps = {
   result: any;
 };
 
+const excludeMetadata = (source: Record<string, unknown> | undefined) => {
+  if (source === undefined) return undefined;
+  return Object.fromEntries(
+    Object.entries(source).filter(([key, value]) => !["self", "paper"].includes(key)),
+  );
+};
+
 const InputOutputContent = ({ args, records, result }: InputOutputContentProps) => (
   <>
-    <Json name="Inputs" value={args} />
+    <Json name="Inputs" value={excludeMetadata(args)} />
     {!isEmpty(records) && <Json name="Records" value={Object.values(records)} />}
     <Json name="Outputs" value={result} />
   </>
