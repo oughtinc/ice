@@ -1,7 +1,7 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isArray, isEmpty, isString, last, omit, set, values } from "lodash";
+import { isEmpty, isString, last, omit, set } from "lodash";
 import { useRouter } from "next/router";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
@@ -18,7 +18,6 @@ import {
 } from "react";
 import { ArcherContainer, ArcherElement } from "react-archer";
 import { ArcherContainerHandle } from "react-archer/lib/ArcherContainer/ArcherContainer.types";
-import { JSONTree } from "react-json-tree";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import Separator from "./Separator";
 import Spinner from "./Spinner";
@@ -38,81 +37,6 @@ const elicitStyle = {
   "hljs-punctuation": { color: "rgb(51, 102, 153)" }, // use a darker shade of the secondary color for punctuation
   "hljs-bracket": { color: "rgb(51, 102, 153)" }, // use a darker shade of the secondary color for brackets
   "hljs-plain": { color: "rgb(128, 128, 128)" }, // use a neutral gray for plain text
-};
-
-const elicitJSONTreeTheme: JSONTree["props"]["theme"] = {
-  tree: ({ style }) => ({
-    style: { ...style, backgroundColor: undefined }, // remove default background
-  }),
-  value: ({ style }, nodeType, keyPath) => {
-    // use different colors for different node types
-    let color;
-    color = COLORS.lightBlue[600];
-    /* switch (nodeType) {
-     *   case "Object":
-     *   case "Array":
-     *     color = "rgb(51, 102, 153)"; // use a darker shade of the secondary color for objects and arrays
-     *     break;
-     *   case "String":
-     *     color = "rgb(153, 102, 51)"; // use a muted orange for strings
-     *     break;
-     *   case "Number":
-     *     color = COLORS.lightBlue[600]; // use secondary color for numbers
-     *     break;
-     *   case "Boolean":
-     *   case "Null":
-     *   case "Undefined":
-     *     color = COLORS.indigo[600]; // use primary color for booleans, null, and undefined
-     *     break;
-     *   default:
-     *     color = "rgb(128, 128, 128)"; // use a neutral gray for other types
-     * } */
-    return {
-      style: { ...style, color },
-    };
-  },
-  label: ({ style }, nodeType, keyPath, node) => {
-    // use primary color for keys
-    return {
-      style: { ...style, color: COLORS.indigo[600] },
-    };
-  },
-  nestedNode: ({ style }, keyPath, nodeType, expanded, expandable) => {
-    // use a lighter background for nested nodes
-    return {
-      style: {
-        ...style,
-        backgroundColor: expanded ? "rgb(245, 245, 245)" : undefined,
-      },
-    };
-  },
-  nestedNodeChildren: ({ style }, keyPath, nodeType, expanded, expandable) => {
-    // use a border for nested nodes
-    return {
-      style: {
-        ...style,
-        border: expanded ? "1px solid rgb(230, 230, 230)" : undefined,
-      },
-    };
-  },
-  arrow: ({ style }, nodeType, expanded) => {
-    // use primary color for arrows
-    return {
-      style: {
-        ...style,
-        color: COLORS.indigo[600],
-      },
-    };
-  },
-  nestedNodeItemString: ({ style }, nodeType, expanded) => {
-    // use primary color for arrows
-    return {
-      style: {
-        ...style,
-        color: COLORS.green[700],
-      },
-    };
-  },
 };
 
 const getContentLength = async (url: string) => {
@@ -577,11 +501,11 @@ const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
                   <DetailRenderer data={el} />
                 </div>
               ))
-            : view.values.map((el, index) => (
+            : view.values.map(([key, value], index) => (
                 <div key={index} className="mb-1">
-                  <span className="text-gray-600">{`${getFormattedName(el[0])}: `}</span>
-                  {TypeIdentifiers[getStructuralType(el[1])]}
-                  <DetailRenderer data={el[1]} />
+                  <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
+                  {TypeIdentifiers[getStructuralType(value)]}
+                  <DetailRenderer data={value} />
                 </div>
               ))}
           {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
@@ -606,34 +530,12 @@ const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
 };
 
 const Json = ({ name, value }: { name: string; value: unknown }) => {
-  const toast = useToast();
   return (
     <div>
       <div className="mb-2 font-medium">{name}</div>
       {value === undefined ? (
         <Skeleton className="mt-4 h-4" />
       ) : (
-        // <JSONTree
-        //   data={value}
-        //   hideRoot
-        //   theme={elicitJSONTreeTheme}
-        //   valueRenderer={(valueAsString: string, value: unknown) =>
-        //     typeof value === "string" ? (
-        //       <div
-        //         className="whitespace-pre-line break-normal select-none"
-        //         style={{ color: COLORS.lightBlue[600] }}
-        //         onClick={() => {
-        //           navigator.clipboard.writeText(value);
-        //           toast({ title: "Copied to clipboard", duration: 1000 });
-        //         }}
-        //       >
-        //         {value}
-        //       </div>
-        //     ) : (
-        //       valueAsString
-        //     )
-        //   }
-        // />
         <DetailRenderer data={value} root />
       )}
     </div>
