@@ -8,12 +8,12 @@ else
   docker="docker-compose"
 fi
 
-detach=""
 files=""
 variant=""
+args=""
 
-if [ -n "${DETACH:-}" ]; then
-  detach="-d"
+if [ -z "${BUILD:-}" ] && git diff --name-only 0.1.0 | egrep '^((.+\.)?Dockerfile|nodesource\.gpg|poetry-requirements\.txt|poetry\.lock|pyproject\.toml|ui/package.json|ui/package-lock.json|ui/patches/.*)$' >/dev/null; then
+  BUILD=1
 fi
 
 if [ -n "${STREAMLIT:-}" ]; then
@@ -37,4 +37,8 @@ elif [ -n "${BUILD:-}" ]; then
   files="${files} -f docker-compose.build.yml"
 fi
 
-$docker -f docker-compose.yml $files up $detach
+if [ -n "${BUILD:-}" ]; then
+  args="${args} --build"
+fi
+
+$docker -f docker-compose.yml $files up $args "$@"

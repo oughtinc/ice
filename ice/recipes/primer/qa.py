@@ -1,4 +1,4 @@
-from ice.recipe import Recipe
+from ice.recipe import recipe
 
 
 DEFAULT_CONTEXT = "We're running a hackathon on 9/9/2022 to decompose complex reasoning tasks into subtasks that are easier to automate & evaluate with language models. Our team is currently breaking down reasoning about the quality of evidence in randomized controlled trials into smaller tasks e.g. placebo, intervention adherence rate, blinding procedure, etc."
@@ -17,10 +17,12 @@ Answer: "
 """.strip()
 
 
-class QA(Recipe):
-    async def run(
-        self, context: str = DEFAULT_CONTEXT, question: str = DEFAULT_QUESTION
-    ) -> str:
-        prompt = make_qa_prompt(context, question)
-        answer = (await self.agent().answer(prompt=prompt)).strip('" ')
-        return answer
+async def answer(
+    context: str = DEFAULT_CONTEXT, question: str = DEFAULT_QUESTION
+) -> str:
+    prompt = make_qa_prompt(context, question)
+    answer = (await recipe.agent().answer(prompt=prompt)).strip('" ')
+    return answer
+
+
+recipe.main(answer)

@@ -10,6 +10,7 @@ ENV \
   PRE_COMMIT_HOME=.pre-commit-home \
   PYENV_ROOT=/root/.pyenv \
   PYTHONFAULTHANDLER=1 \
+  PYTHONPATH=/code \
   PYTHONUNBUFFERED=1
 
 COPY nodesource.gpg ./
@@ -57,7 +58,7 @@ ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
 RUN python -c "import nltk; nltk.download('punkt')"
 
-COPY ui/package*.json ui/
+COPY ui/package.json ui/package-lock.json ui/
 RUN npm --prefix ui ci
 
 COPY . .
