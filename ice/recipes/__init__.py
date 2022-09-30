@@ -7,6 +7,8 @@ from .adherence_simple import AdherenceSimpleInstruct
 from .adherence_tfew_paragraph import AdherenceParagraphTfew
 from .all_quotes import AllQuotesRecipe
 from .blinding_dynamic import BlindingDynamic
+from .experiments_and_arms.recipes.name_experiments import NameExperiments
+from .experiments_and_arms.recipes.experiments_and_arms import ExperimentsAndArms
 from .comparisons_qa import ComparisonsQA
 from .evaluate_result import EvaluateResult
 from .evaluate_results import EvaluateResults
@@ -36,6 +38,8 @@ def get_recipe_classes() -> list[Type[Recipe]]:
         BlindingDynamic,
         ComparisonsQA,
         DebateRecipe,
+        NameExperiments,
+        ExperimentsAndArms,
         EvaluateResult,
         EvaluateResults,
         ExampleMetaRecipe,

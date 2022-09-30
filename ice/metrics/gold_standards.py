@@ -1,18 +1,29 @@
 from collections.abc import Sequence
 from functools import cache
+from functools import cached_property
+from typing import Any
+from typing import Generic
+from typing import overload
+from typing import Type
+from typing import TypeVar
 
 import pandas as pd
 
 from pydantic import BaseModel
+from pydantic.generics import GenericModel
 from structlog.stdlib import get_logger
+from yaml import CLoader as Loader
+from yaml import load
 
 from ice.settings import settings
 
 log = get_logger()
 
+ModelType = TypeVar("ModelType", bound=BaseModel)
+
 
 # TODO: merge with RecipeResult
-class GoldStandard(BaseModel):
+class GoldStandard(GenericModel, Generic[ModelType]):
     document_id: str
     question_short_name: str
     experiment: str
@@ -20,6 +31,24 @@ class GoldStandard(BaseModel):
     classifications: Sequence[str | None] = []
     quotes: list[str]
     split: str | None = None
+    answer_model: Type[ModelType] | None = None
+
+    @cached_property
+    def parsed_answer(self) -> ModelType | None:
+        return (
+            _parse_answer(self.answer, self.answer_model)
+            if self.answer_model is not None
+            else None
+        )
+
+    class Config:
+        keep_untouched = (cached_property,)
+        fields = dict(answer_model=dict(exclude=True))
+
+
+def _parse_answer(_answer: str, model: Type[ModelType]) -> ModelType:
+    data = load(_answer, Loader=Loader)
+    return model.parse_obj(data)
 
 
 @cache
@@ -60,8 +89,13 @@ def add_classifications_column(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def standards_df_to_gold_standards(df: pd.DataFrame) -> list[GoldStandard]:
-    return [GoldStandard.parse_obj(record) for record in df.to_dict("records")]
+def _standards_df_to_gold_standards(
+    df: pd.DataFrame, answer_model: Type[ModelType] | None
+) -> list[GoldStandard[ModelType]]:
+    return [
+        GoldStandard.parse_obj(record | dict(answer_model=answer_model))
+        for record in df.to_dict("records")
+    ]
 
 
 def list_experiments(
@@ -91,12 +125,35 @@ def select_column_values(
     return df.loc[mask]
 
 
+@overload
 def get_gold_standards(
     *,
     document_id: str | None = None,
     question_short_name: str | None = None,
     experiment: str | None = None,
-) -> list[GoldStandard]:
+    model_type: None = None,
+) -> list[GoldStandard[Any]]:
+    ...
+
+
+@overload
+def get_gold_standards(
+    *,
+    model_type: Type[ModelType],
+    document_id: str | None = None,
+    question_short_name: str | None = None,
+    experiment: str | None = None,
+) -> list[GoldStandard[ModelType]]:
+    ...
+
+
+def get_gold_standards(
+    *,
+    document_id: str | None = None,
+    question_short_name: str | None = None,
+    experiment: str | None = None,
+    model_type: Type[ModelType] | None = None,
+) -> list[GoldStandard[ModelType]]:
     df = retrieve_gold_standards_df()
 
     filters = dict(
@@ -107,7 +164,29 @@ def get_gold_standards(
 
     df = select_column_values(df, filters)
 
-    return standards_df_to_gold_standards(df)
+    return _standards_df_to_gold_standards(df, model_type)
+
+
+@overload
+def get_gold_standard(
+    *,
+    document_id: str | None = None,
+    question_short_name: str | None = None,
+    experiment: str | None = None,
+    model_type: None = None,
+) -> GoldStandard[Any] | None:
+    ...
+
+
+@overload
+def get_gold_standard(
+    *,
+    model_type: Type[ModelType],
+    document_id: str | None = None,
+    question_short_name: str | None = None,
+    experiment: str | None = None,
+) -> GoldStandard[ModelType] | None:
+    ...
 
 
 def get_gold_standard(
@@ -115,11 +194,13 @@ def get_gold_standard(
     document_id: str | None = None,
     question_short_name: str | None = None,
     experiment: str | None = None,
-) -> GoldStandard | None:
+    model_type: Type[ModelType] | None = None,
+) -> GoldStandard[ModelType] | None:
     gold_standards = get_gold_standards(
         document_id=document_id,
         question_short_name=question_short_name,
         experiment=experiment,
+        model_type=model_type,
     )
 
     if len(gold_standards) == 0:

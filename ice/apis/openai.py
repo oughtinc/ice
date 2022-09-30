@@ -1,5 +1,6 @@
 import httpx
 
+from httpx import Response
 from httpx import TimeoutException
 from structlog.stdlib import get_logger
 from tenacity import retry
@@ -10,6 +11,7 @@ from tenacity.wait import wait_random_exponential
 
 from ice.cache import diskcache
 from ice.settings import settings
+from ice.trace import trace
 
 log = get_logger()
 
@@ -53,6 +55,37 @@ def is_retryable_HttpError(e: BaseException) -> bool:
     )
 
 
+class TooLongRequestError(ValueError):
+    def __init__(self, *, prompt: str, detail: str):
+        self.prompt = prompt
+        self.detail = detail
+        super().__init__(self.detail)
+
+
+def raise_if_too_long_error(prompt: object, response: Response) -> None:
+    # Raise something more specific than
+    # a generic status error if we have exceeded
+    # an OpenAI model's context window
+    if not isinstance(prompt, str) or response.status_code != 400:
+        return None
+    try:
+        body = response.json()
+    except Exception:
+        return None
+    if not isinstance(body, dict):
+        return None
+    message = body.get("error", dict).get("message", "")
+    if not isinstance(message, str):
+        return None
+    # This is a bit fragile, but since OpenAI can
+    # return 400s for other reasons, checking
+    # the message seems like the only real
+    # way to tell.
+    if "maximum context length" not in message:
+        return None
+    raise TooLongRequestError(prompt=prompt, detail=message)
+
+
 @retry(
     retry=retry_any(
         retry_if_exception(is_retryable_HttpError),
@@ -74,10 +107,12 @@ async def _post(endpoint: str, json: dict, timeout: float | None = None) -> dict
         )
         if response.status_code == 429:
             raise RateLimitError(response)
+        raise_if_too_long_error(prompt=json.get("prompt"), response=response)
         response.raise_for_status()
         return response.json()
 
 
+@trace
 @diskcache()
 async def openai_complete(
     prompt: str,
