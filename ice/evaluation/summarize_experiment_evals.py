@@ -13,16 +13,17 @@ from ice.evaluation.evaluation_report import EvaluationReport
 from ice.evaluation.utils import start_time
 from ice.utils import map_async
 
-CSVS_PATH = Path(__file__).parent / "data" / "evaluation_csvs"
+CSVS_PATH = Path(__file__).parent / "../../" / "data" / "evaluation_csvs"
 
 
 async def summarize_experiment_evals(results_file: str):
     data_df = pd.read_csv(results_file)
 
-    technique_dfs = [df for _, df in data_df.groupby(by="technique")]
+    eval_dfs = [df for _, df in data_df.groupby(["technique", "elicit_commit"], dropna=False)]
     dashboard_row_dfs = []
+    experiment_evaluations_dfs = []
 
-    for technique_df in technique_dfs:
+    for technique_df in eval_dfs:
         recipe_results_for_evaluation = [
             RecipeResult(
                 question_short_name=row.question_short_name,
@@ -56,15 +57,21 @@ async def summarize_experiment_evals(results_file: str):
             str(evaluation_report), format_markdown=True, wait_for_confirmation=True
         )
 
-        evaluation_report.make_experiments_evaluation_csv()
-        dashboard_row_dfs.append(evaluation_report.make_dashboard_row())
+        experiment_evaluations_dfs.append(evaluation_report.make_experiments_evaluation_df())
+        dashboard_row_dfs.append(evaluation_report.make_dashboard_row_df())
 
-    if len(technique_dfs) > 1:
+    if len(eval_dfs) > 1:
         dashboard_rows_df = pd.concat(dashboard_row_dfs)
         techniques_str = " ".join(data_df.technique.unique())
         dashboard_rows_df.to_csv(
             CSVS_PATH / f"dashboard_rows {techniques_str} {start_time}.csv"
         )
+
+        experiment_evaluations_df = pd.concat(experiment_evaluations_dfs)
+        experiment_evaluations_df.to_csv(
+            CSVS_PATH / f"experiment_evaluations {techniques_str} {start_time}.csv"
+        )
+
 
 
 if __name__ == "__main__":

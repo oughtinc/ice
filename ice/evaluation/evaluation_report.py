@@ -341,7 +341,7 @@ class EvaluationReport(BaseModel):
     def __str__(self) -> str:
         return "\n".join(str(e) for e in self.to_rich_elements())
 
-    def make_dashboard_row(self):
+    def make_dashboard_row_df(self):
         CSVS_PATH.mkdir(parents=True, exist_ok=True)
 
         questions = self.questions_str()
@@ -399,7 +399,7 @@ class EvaluationReport(BaseModel):
         )
         return df
 
-    def make_experiments_evaluation_csv(self):
+    def make_experiments_evaluation_df(self):
         CSVS_PATH.mkdir(parents=True, exist_ok=True)
 
         rows = []

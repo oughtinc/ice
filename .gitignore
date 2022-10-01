@@ -18,3 +18,4 @@
 /ui/.next/
 /ui/node_modules
 /ui/public/traces/*.jsonl
+data/
