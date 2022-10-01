@@ -84,7 +84,7 @@ export const recipes: Record<string, { title: string; description?: string; hidd
     hidden: true,
   },
   "01GE0WHGQ89V3QC0DHNAE06JPQ": {
-    title: "Verify reasoning setps",
+    title: "Verify reasoning steps",
     description: "Check reasoning steps for a math problem",
   },
   "01GE0WVSS2622HPERJ6FC7MQXY": {
