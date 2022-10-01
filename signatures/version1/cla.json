@@ -39,6 +39,14 @@
       "created_at": "2022-09-27T01:25:05Z",
       "repoId": 537486497,
       "pullRequestNo": 23
+    },
+    {
+      "name": "barnes-b",
+      "id": 13219333,
+      "comment_id": 1264448411,
+      "created_at": "2022-10-01T18:37:45Z",
+      "repoId": 537486497,
+      "pullRequestNo": 40
     }
   ]
 }
