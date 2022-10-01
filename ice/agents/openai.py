@@ -31,13 +31,14 @@ class OpenAIAgent(Agent):
         prompt: str,
         multiline: bool = True,
         verbose: bool = False,
-        default: str = "",
         max_tokens: int = 256,
+        stop: list[str] = None,
     ) -> str:
-        """Generate an answer to a question given some context."""
+        """Generate a completion given some prompt."""
         if verbose:
             self._print_markdown(prompt)
-        stop = None if multiline else "\n"
+        if stop is None and not multiline:
+            stop = "\n"
         response = await self._complete(prompt, stop=stop, max_tokens=max_tokens)
         answer = self._extract_answer(response)
         if verbose:
