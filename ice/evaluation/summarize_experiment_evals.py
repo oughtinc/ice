@@ -19,7 +19,9 @@ CSVS_PATH = Path(__file__).parent / "../../" / "data" / "evaluation_csvs"
 async def summarize_experiment_evals(results_file: str):
     data_df = pd.read_csv(results_file)
 
-    eval_dfs = [df for _, df in data_df.groupby(["technique", "elicit_commit"], dropna=False)]
+    eval_dfs = [
+        df for _, df in data_df.groupby(["technique", "elicit_commit"], dropna=False)
+    ]
     dashboard_row_dfs = []
     experiment_evaluations_dfs = []
 
@@ -57,7 +59,9 @@ async def summarize_experiment_evals(results_file: str):
             str(evaluation_report), format_markdown=True, wait_for_confirmation=True
         )
 
-        experiment_evaluations_dfs.append(evaluation_report.make_experiments_evaluation_df())
+        experiment_evaluations_dfs.append(
+            evaluation_report.make_experiments_evaluation_df()
+        )
         dashboard_row_dfs.append(evaluation_report.make_dashboard_row_df())
 
     if len(eval_dfs) > 1:
@@ -71,7 +75,6 @@ async def summarize_experiment_evals(results_file: str):
         experiment_evaluations_df.to_csv(
             CSVS_PATH / f"experiment_evaluations {techniques_str} {start_time}.csv"
         )
-
 
 
 if __name__ == "__main__":

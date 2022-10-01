@@ -59,7 +59,7 @@ class EvaluatedExcerpts(BaseModel):
 
         if excerpt_count == 0:
             return "The recipe didn't find any excerpts. This usually means that the recipe didn't try to find excerpts and instead answered by reading the whole paper."
-        
+
         found_count = len(
             [
                 gold_standard
@@ -81,7 +81,9 @@ class EvaluatedExcerpts(BaseModel):
 
     def excerpts_str(self) -> str:
         if len(self.excerpts) > 0:
-            return "\n\nRecipe excerpts:\n\n" + "\n".join(f"{i+1}. {excerpt}" for i, excerpt in enumerate(self.excerpts))
+            return "\n\nRecipe excerpts:\n\n" + "\n".join(
+                f"{i+1}. {excerpt}" for i, excerpt in enumerate(self.excerpts)
+            )
         return ""
 
     def __str__(self) -> str:
