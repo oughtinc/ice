@@ -422,7 +422,7 @@ class EvaluationReport(BaseModel):
                 ),
                 "gs_quotes_found": result.evaluated_excerpts.num_gold_standards_found,
                 "proportion_gs_quotes_found": result.evaluated_excerpts.proportion_gold_standards_found,
-                "evaluted_excerpts": str(result.evaluated_excerpts),
+                "evaluated_excerpts": str(result.evaluated_excerpts),
                 "excerpts": result.evaluated_excerpts.excerpts,
                 "gs_quotes": result.evaluated_excerpts.gold_standards_str(),
                 "answer": result.answer,
