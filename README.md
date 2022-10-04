@@ -1,11 +1,11 @@
 # Interactive Composition Explorer 🧊
 
-ICE is a component library and execution trace visualizer for compositional language model programs.
+ICE is a Python library and trace visualizer for language model programs.
 
 ## Screenshot
 
 <p align="center">
-  <img width="1079" alt="ice-screenshot" src="https://user-images.githubusercontent.com/382515/192579519-d2a99a80-73f7-40dc-bcde-f1d6023f0dfc.png"><br/>
+  <img alt="ice-screenshot" src="https://user-images.githubusercontent.com/382515/192681645-6ed87072-2dc6-4982-92d1-8de209bc3ef6.png" />
   Execution trace visualized in ICE
 </p>
 
@@ -16,6 +16,10 @@ ICE is a component library and execution trace visualizer for compositional lang
 - Define and use new language model agents, e.g. chain-of-thought agents
 - Run recipes quickly by parallelizing language model calls
 - Reuse component recipes such as question-answering, ranking, and verification
+
+## ICE is pre-1.0
+
+:warning: **The ICE API may change at any point.** The ICE interface is being actively developed and we may change the API at any point, including removing functionality, renaming methods, splitting ICE into multiple projects, and other similarly disruptive changes. Use at your own risk.
 
 ## Getting started
 
@@ -45,7 +49,7 @@ ICE is a component library and execution trace visualizer for compositional lang
 
 ## Contributions
 
-ICE is a project by [Ought](https://ought.org/). We're an applied ML lab building the AI research assistant [Elicit](https://elicit.org/).
+ICE is an [open-source](https://github.com/oughtinc/ice/blob/main/LICENSE.md) project by [Ought](https://ought.org/). We're an applied ML lab building the AI research assistant [Elicit](https://elicit.org/).
 
 We welcome community contributions:
 
