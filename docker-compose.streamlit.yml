@@ -1,5 +1,5 @@
 services:
   ice:
-    image: registry-1.docker.io/oughtinc/ice:0.1.0-streamlit
+    image: registry-1.docker.io/oughtinc/ice:0.1.1-streamlit
     ports:
       - "9000:9000"
