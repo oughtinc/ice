@@ -7,5 +7,5 @@ services:
         platforms:
           - linux/amd64
         tags:
-          - docker.io/oughtinc/ice:0.1.0-torch
+          - docker.io/oughtinc/ice:0.1.1-torch
     image: ${COMPOSE_IMAGE:-ice-torch}
