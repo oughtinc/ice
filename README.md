@@ -17,6 +17,10 @@ ICE is a Python library and trace visualizer for language model programs.
 - Run recipes quickly by parallelizing language model calls
 - Reuse component recipes such as question-answering, ranking, and verification
 
+## ICE is pre-1.0
+
+:warning: **The ICE API may change at any point.** The ICE interface is being actively developed and we may change the API at any point, including removing functionality, renaming methods, splitting ICE into multiple projects, and other similarly disruptive changes. Use at your own risk.
+
 ## Getting started
 
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
