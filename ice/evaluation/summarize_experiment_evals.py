@@ -13,7 +13,7 @@ from ice.evaluation.evaluation_report import EvaluationReport
 from ice.evaluation.utils import start_time
 from ice.utils import map_async
 
-CSVS_PATH = Path(__file__).parent / "../../" / "data" / "evaluation_csvs"
+CSVS_PATH = Path(__file__).parent.parent.parent / "data" / "evaluation_csvs"
 
 
 async def summarize_experiment_evals(results_file: str):

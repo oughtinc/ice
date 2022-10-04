@@ -55,7 +55,7 @@ class EvaluatedExcerpts(BaseModel):
         )
 
     def summary_stats_str(self) -> str:
-        if len(self.excerpts) == 0:
+        if not self.excerpts:
             return "The recipe didn't find any excerpts. This usually means that the recipe didn't try to find excerpts and instead answered by reading the whole paper."
 
         found_count = len(
@@ -78,9 +78,9 @@ class EvaluatedExcerpts(BaseModel):
         )
 
     def excerpts_str(self) -> str:
-        if len(self.excerpts) > 0:
+        if self.excerpts:
             return "\n\nRecipe excerpts:\n\n" + "\n".join(
-                f"{i+1}. {excerpt}" for i, excerpt in enumerate(self.excerpts)
+                f"{i}. {excerpt}" for i, excerpt in enumerate(self.excerpts, 1)
             )
         return ""
 
