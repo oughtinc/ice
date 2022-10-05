@@ -10,6 +10,7 @@ defopt = "^6.3.0"
 questionary = "^1.10.0"
 rich = "^12.4.1"
 numpy = "^1.22.3"
+numerizer = "0.2.1"  # Simple regex-ing module with no transitive dependencies, let's pin it hard
 rouge-metric = "^1.0.1"
 ulid-py = "^1.1.0"
 pydantic = "^1.9.1"
