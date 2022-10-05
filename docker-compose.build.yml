@@ -8,5 +8,5 @@ services:
           - linux/amd64
           - linux/arm64
         tags:
-          - registry-1.docker.io/oughtinc/ice:0.1.0
+          - registry-1.docker.io/oughtinc/ice:0.1.1
     image: ${COMPOSE_IMAGE:-ice}

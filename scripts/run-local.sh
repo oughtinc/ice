@@ -12,7 +12,7 @@ files=""
 variant=""
 args=""
 
-if [ -z "${BUILD:-}" ] && git diff --name-only 0.1.0 | egrep '^((.+\.)?Dockerfile|nodesource\.gpg|poetry-requirements\.txt|poetry\.lock|pyproject\.toml|ui/package.json|ui/package-lock.json|ui/patches/.*)$' >/dev/null; then
+if [ -z "${BUILD:-}" ] && git diff --name-only 0.1.1 | egrep '^((.+\.)?Dockerfile|nodesource\.gpg|poetry-requirements\.txt|poetry\.lock|pyproject\.toml|ui/package.json|ui/package-lock.json|ui/patches/[^/]+\.patch)$' >/dev/null; then
   BUILD=1
 fi
 
