@@ -1,4 +1,5 @@
-from typing import runtime_checkable, Protocol
+from ast import Mult
+from typing import Callable, runtime_checkable, Protocol
 from ice.formatter.transform.positional import PositionalTransform, OrdinalWord
 from ice.formatter.transform.dependent import (
     DependentTransform,
@@ -129,30 +130,32 @@ def can_we_name_experiments_stop_seq(reasoning: str | None) -> Sequence[str]:
 
 def make_can_we_name_experiments_prompt(
     num_experiments: int,
-) -> MultipartReasoningPrompt:
-    def can_we_name_experiments_prompt(
-        paragraphs: Sequence[str],
-        helpfulness: str | None = None,
-        reasoning: str | None = None,
-    ) -> str:
-        last_example: dict[
-            str, ValueTransform[Sequence[str]] | str | StopSentinel | int
-        ] = start_last_example(
-            helpfulness=helpfulness, reasoning=reasoning, pre_final="Excerpt 1"
-        ) | dict(
-            paragraphs=numbered_list(paragraphs),
-            experiments_count=num_experiments,
-        )
-        shots = format_multi(
-            CAN_WE_NAME_EXPERIMENTS_TEMPLATE,
-            CAN_WE_NAME_EXPERIMENTS_EXAMPLES + [last_example],
-            SHARED_CAN_WE_NAME_EXPERIMENTS_ARGS,
-        )
-        instructions = """The following excerpts are from a research papers that conducted different numbers of experiments. Experiments are separate studies on distinct populations. Each experiment may have multiple trial arms, which describe the different treatment or control conditions participants were in. Do the following excerpts describe what this experiment was? Don't confuse describing the experiment with describing trial arms in a single experiment."""
-        parts = [instructions] + list(shots)
-        return "\n\n".join(parts)
+) -> Callable[[int], MultipartReasoningPrompt]:
+    def from_num_shot(num_shots: int):
+        def can_we_name_experiments_prompt(
+            paragraphs: Sequence[str],
+            helpfulness: str | None = None,
+            reasoning: str | None = None,
+        ) -> str:
+            last_example: dict[
+                str, ValueTransform[Sequence[str]] | str | StopSentinel | int
+            ] = start_last_example(
+                helpfulness=helpfulness, reasoning=reasoning, pre_final="Excerpt 1"
+            ) | dict(
+                paragraphs=numbered_list(paragraphs),
+                experiments_count=num_experiments,
+            )
+            shots = format_multi(
+                CAN_WE_NAME_EXPERIMENTS_TEMPLATE,
+                CAN_WE_NAME_EXPERIMENTS_EXAMPLES[:num_shots] + [last_example],
+                SHARED_CAN_WE_NAME_EXPERIMENTS_ARGS,
+            )
+            instructions = """The following excerpts are from a research papers that conducted different numbers of experiments. Experiments are separate studies on distinct populations. Each experiment may have multiple trial arms, which describe the different treatment or control conditions participants were in. Do the following excerpts describe what this experiment was? Don't confuse describing the experiment with describing trial arms in a single experiment."""
+            parts = [instructions] + list(shots)
+            return "\n\n".join(parts)
+        return can_we_name_experiments_prompt
 
-    return can_we_name_experiments_prompt
+    return from_num_shot
 
 
 CAN_WE_NAME_EXPERIMENTS_CHOICES = [" Yes", " No", " Unsure"]

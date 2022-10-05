@@ -15,47 +15,55 @@ from ice.recipe import recipe
 log = get_logger()
 
 
-def make_helpfulness_prompt(prefix: str, helpful_line: str) -> str:
-    TEMPLATE = """{helpful_line}
+def make_helpfulness_prompt(prefix: str, helpful_line: str, num_excerpts: int) -> str:
+    TEMPLATE = """Number of excerpts: {num_excerpts}
 
-List them here: {translation}""".strip()
+{helpful_line}
 
-    helpfulness_cases: list[dict[str, str | StopSentinel]] = [
-        dict(helpful_line="None of the excerpts were helpful", translation="None"),
+List the helpful excerpts here: {translation}""".strip()
+
+    helpfulness_cases: list[dict[str, int | str | StopSentinel]] = [
+        dict(num_excerpts=4, helpful_line="None of the excerpts were helpful", translation="None"),
         dict(
+            num_excerpts=4,
             helpful_line="Excerpt 3 was helpful. Excerpts 1, 2, and 4 were not helpful",
             translation="3",
         ),
         dict(
+            num_excerpts=4,
             helpful_line="Excerpts 1 and 2 were helpful, and excerpt 3 was somewhat helpful. Excerpt 4 was not helpful.",
             translation="1, 2, 3",
         ),
         dict(
-            helpful_line="Excerpts 3 and 4 were somewhat helpful. Excerpts 1 and 2 were not helpful.",
-            translation="3, 4",
+            num_excerpts=5,
+            helpful_line="Excerpts 1, 2, and 3 were not helpful, but the rest were helpful.",
+            translation="4, 5",
         ),
+        dict(
+            num_excerpts=3,
+            helpful_line="All of the excerpts were helpful.",
+            translation="1, 2, 3"
+        )
     ]
     for example in helpfulness_cases:
-        example["helpful_line"] = prefix + example["helpful_line"]
-    helpfulness_cases.append(dict(helpful_line=helpful_line, translation=stop("")))
+        example["helpful_line"] = prefix + cast(str, example["helpful_line"])
+    helpfulness_cases.append(dict(num_excerpts=num_excerpts, helpful_line=helpful_line, translation=stop("")))
 
     filled = format_multi(TEMPLATE, helpfulness_cases)
     return "\n\n".join(filled)
 
 
-HELPFULNESS_TEMPLATE = "Which excerpts, if any, were helpful in understanding {thing_to_understand}? {helpful_line}"
-
 HELPFULNESS_SHARED = dict(
     thing_to_understand="how many experiments were conducted in the study"
 )
 
-HELPFULNESS_PREFIX = "Which excerpts, if any were helpful in understanding how many experiments were conducted in the study?"
+HELPFULNESS_PREFIX = "Which excerpts, if any were helpful?"
 
 
 async def _which_paras_were_helpful(
-    helpfulness_prefix: str, helpful_line: str
+    helpfulness_prefix: str, helpful_line: str, num_excerpts: int
 ) -> list[int]:
-    prompt = make_helpfulness_prompt(helpfulness_prefix, helpful_line)
+    prompt = make_helpfulness_prompt(helpfulness_prefix, helpful_line, num_excerpts)
     completion = await recipe.agent().answer(prompt=prompt, multiline=False)
     return [num - 1 for num in extract_nums(completion)]
 
@@ -80,7 +88,7 @@ def extract_helpful_line(reasoning: str) -> str | None:
 async def helpful_paragraphs(
     helpful_line: str, paragraphs: Sequence[str]
 ) -> Sequence[str]:
-    idxs = await _which_paras_were_helpful(HELPFULNESS_PREFIX, helpful_line)
+    idxs = await _which_paras_were_helpful(HELPFULNESS_PREFIX, helpful_line, len(paragraphs))
     return [paragraphs[idx] for idx in idxs if idx < len(paragraphs)]
 
 

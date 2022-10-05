@@ -2,6 +2,7 @@ import re
 from typing import cast
 from numpy import extract
 from structlog.stdlib import get_logger
+from typing import Sequence
 from numerizer import numerize
 
 log = get_logger()

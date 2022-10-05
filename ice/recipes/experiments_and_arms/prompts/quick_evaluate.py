@@ -125,21 +125,44 @@ HAUGEN: dict[str, ExperimentsArms] = {
 
 
 def to_exps(result: ExperimentsArms) -> Sequence[str]:
-    return [exp.name for exp in result.experiments]
+    ret_val: list[str] = []
+    for exp in result.experiments:
+        if exp.description:
+            ret_val.append(f"{exp.name}: {exp.description}")
+        else:
+            ret_val.append(exp.name)
+    return ret_val
+
+def display_result(result: ExperimentsArms, as_gs: bool) -> str:
+    lines: list[str] = []
+    for exp in result.experiments:
+        lines.append("Experiment:")
+        lines.append(f"{exp.name}: {exp.description}" if as_gs else exp.name)
+        for arm in exp.arms:
+            lines.append("Arms for this experiment:")
+            lines.append(f"\t{arm.name}: {exp.description}" if as_gs else arm.name)
+        lines.append("\n")
+    return "\n".join(lines).strip()
+
+
 
 
 EXAMPLES = [
     dict(
         gs_exps=numbered_list(to_exps(SCHRIER["gold_standard"])),
         gen_exps=numbered_list(to_exps(SCHRIER["computed"])),
-        differences="The generated answer and the gold standard both have two experiments, so they agree on the number. They disagree pretty substantially on what those are, with SALT-1 and SALT-2 not being very similar to the generated experiment descriptions.",
-        grade="D",
+        gs_exps_and_arms=display_result(SCHRIER["gold_standard"], as_gs=True),
+        gen_exps_and_arms=display_result(SCHRIER["computed"], as_gs=False),
+        differences="The generated answer and the gold standard both have two experiments, so they agree on the number. The model identified that one of these experiments studied tolvaptan, which is correct, but it identified the other experiment as studying 'discontinuation' of the drug, which does not appear on the gold standard. The model did correctly identify that each of the experiments had a placebo arm and a treatment arm.",
+        grade="C",
     ),
     dict(
         gs_exps=numbered_list(to_exps(HAUGEN["gold_standard"])),
         gen_exps=numbered_list(to_exps(HAUGEN["computed"])),
-        differences="The generated answer and the gold standard both have one experiment. While the gold standard spells out the abbrevation, the generated answer does not. This is an extremely minor difference, and the generated answer is substantially correct",
-        grade="A",
+        gs_exps_and_arms=display_result(HAUGEN["gold_standard"], as_gs=True),
+        gen_exps_and_arms=display_result(HAUGEN["computed"], as_gs=False),
+        differences="The generated answer and the gold standard both have one experiment. While the gold standard spells out the abbrevation, the generated answer does not. This is an extremely minor difference, so we should ignore it. The model's descriptions of the trial arms for this study, however, seem substantially incorrect: the gold standard identifies the arms as a postintervention and a preintervention group, while the model's outputs mention cardiothoracic surgery and then a long discussion, which does not even appear to be a specific arm (this output seems like the wrong shape).",
+        grade="F",
     ),
 ]
 
@@ -151,19 +174,19 @@ SHARED_PROMPT_PARTS = dict(
 
 EXPERIMENTS_EXAMPLE = """{ordinal_word}, consider the following gold standard, which describes the experiment{maybe_plural_gs_exp} conducted in a study:
 
-{gs_exps}
+{gs_exps_and_arms}
 
 The machine learning model generated the following experiment{maybe_plural_gen_exp}:
 
-{gen_exps}
+{gen_exps_and_arms}
 
-Explain the major differences. Ignore differences in formatting, or uses of abbreviations, or other minor differences.
+Explain the major differences. Ignore differences in formatting, or uses of abbreviations, or other minor differences. The model's outputs will generally not be as detailed as the gold standards, but you should not reduce scores for this unless the model's outputs are actually incorrect.
 
 {differences}
 
 On an A-F scale, where A is the best, and F is the worst, the model scored: {grade}"""
 
-PREAMBLE = """Let's compare some of the generations from the machine learning model to our labeled gold standards. We're interested in knowing how well the model's results approximate the gold standards, so we'll ignore minor differences. Use the following grading scale:
+PREAMBLE = """Let's compare some of the generations from the machine learning model to our labeled gold standards. We're interested in knowing how well the model's results approximate the gold standards, so we'll ignore minor differences. The gold standards will include additional descriptions, which we are not using the model to generate. These additional descriptions are here only to provide context to help us better grade the model's outputs. Use the following grading scale:
 
 A: Substantially correct in all respects
 B: Agree on the number of outputs and the main thrust of their meanings, but with small differences.
@@ -178,6 +201,8 @@ def make_quick_eval_prompt(
     last_example = dict(
         gs_exps=numbered_list(to_exps(gs)),
         gen_exps=numbered_list(to_exps(result)),
+        gs_exps_and_arms=display_result(gs, as_gs=True),
+        gen_exps_and_arms=display_result(result, as_gs=False),
         differences=stop(""),
     )
     parts = [PREAMBLE] + list(

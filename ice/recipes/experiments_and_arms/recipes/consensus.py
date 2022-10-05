@@ -1,9 +1,7 @@
 from ice.recipe import recipe
-from ice.apis.openai import openai_complete
 from typing import Sequence
 from ice.recipes.experiments_and_arms.num_utils import strip_enumeration_prefix
-from ice.recipes.experiments_and_arms.prompts.cluster import (
-    build_count_prompt,
+from ice.recipes.experiments_and_arms.prompts.consensus import (
     build_final_prompt,
     build_cluster_prompt,
 )
@@ -21,20 +19,17 @@ EX = [
 Q = "When did world war 2 start?"
 
 
-async def best_answer_by_clustering(
+async def best_answer_by_consensus(
     question: str = Q, candidates: Sequence[str] = EX
 ) -> str:
     clusters = await recipe.agent().answer(
         prompt=build_cluster_prompt(question, candidates)
     )
-    counts = await recipe.agent().answer(
-        prompt=build_count_prompt(question, candidates, clusters)
-    )
     final_answer = await recipe.agent().answer(
-        prompt=build_final_prompt(question, candidates, clusters, counts)
+        prompt=build_final_prompt(question, candidates, clusters)
     )
 
     return strip_enumeration_prefix(final_answer)
 
 
-recipe.main(best_answer_by_clustering)
+recipe.main(best_answer_by_consensus)
