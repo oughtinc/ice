@@ -2,6 +2,7 @@ import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
 import { isEmpty, isString, last, omit, set } from "lodash";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
@@ -824,6 +825,13 @@ export const TracePage = () => {
 
   return !traceId ? null : (
     <TreeProvider key={traceId} traceId={traceId}>
+      {traceId && recipes[traceId] ? (
+        <Head>
+          <title>{recipes[traceId].title} | Interactive Composition Explorer</title>
+        </Head>
+      ) : (
+        "Interactive Composition Explorer"
+      )}
       <Trace traceId={traceId} />
     </TreeProvider>
   );
