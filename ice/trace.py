@@ -108,6 +108,21 @@ Recorder = Callable[..., None]
 recorder: Recorder = lambda **kwargs: None
 
 
+class _Recorder:
+    def __init__(self, id: str):
+        self.id = id
+
+    def __call__(self, **kwargs):
+        emit({f"{self.id}.records.{make_id()}": kwargs})
+
+    def __repr__(self):
+        # So this can be used in `diskcache()` functions
+        # The diskcache implementation should probably not
+        # depend on calling __repr__ but that
+        # seems like a larger refactor
+        return "ice.trace._Recorder"
+
+
 def trace(fn):
     if isclass(fn):
         for key, value in fn.__dict__.items():
@@ -159,9 +174,7 @@ def trace(fn):
             )
 
             if recorder_name:
-                kwargs[recorder_name] = lambda **kwargs: emit(
-                    {f"{id}.records.{make_id()}": kwargs}
-                )
+                kwargs[recorder_name] = _Recorder(id)
 
             result = await fn(*args, **kwargs)
             emit({f"{id}.result": result, f"{id}.end": monotonic_ns()})

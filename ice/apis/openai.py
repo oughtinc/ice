@@ -11,7 +11,7 @@ from tenacity.wait import wait_random_exponential
 
 from ice.cache import diskcache
 from ice.settings import settings
-from ice.trace import trace
+from ice.trace import trace, recorder
 
 log = get_logger()
 
@@ -86,6 +86,7 @@ def raise_if_too_long_error(prompt: object, response: Response) -> None:
     raise TooLongRequestError(prompt=prompt, detail=message)
 
 
+@diskcache()
 @retry(
     retry=retry_any(
         retry_if_exception(is_retryable_HttpError),
@@ -95,8 +96,9 @@ def raise_if_too_long_error(prompt: object, response: Response) -> None:
     wait=wait_random_exponential(min=1),
     after=log_attempt_number,
 )
-async def _post(endpoint: str, json: dict, timeout: float | None = None) -> dict:
+async def _post(endpoint: str, json: dict, timeout: float | None = None, cache_id: int = 0) -> dict:
     """Send a POST request to the OpenAI API and return the JSON response."""
+    cache_id  # unused
 
     async with httpx.AsyncClient() as client:
         response = await client.post(
@@ -112,8 +114,12 @@ async def _post(endpoint: str, json: dict, timeout: float | None = None) -> dict
         return response.json()
 
 
+# TODO: support more model types for conversion
+
+def get_davinci_equivalent_tokens(response: dict) -> int:
+    return (response.get("usage") or dict()).get("total_tokens", 0)
+
 @trace
-@diskcache()
 async def openai_complete(
     prompt: str,
     stop: str | None = "\n",
@@ -124,10 +130,10 @@ async def openai_complete(
     logprobs: int | None = None,
     n: int = 1,
     cache_id: int = 0,  # for repeated non-deterministic sampling using caching
+    record=recorder,
 ) -> dict:
     """Send a completion request to the OpenAI API and return the JSON response."""
-    cache_id  # unused
-    return await _post(
+    response = await _post(
         "completions",
         json={
             "prompt": prompt,
@@ -139,4 +145,9 @@ async def openai_complete(
             "logprobs": logprobs,
             "n": n,
         },
+        cache_id=cache_id
     )
+    record(davinci_equivalent_tokens=get_davinci_equivalent_tokens(response))
+    return response
+
+

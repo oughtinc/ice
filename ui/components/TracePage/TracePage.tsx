@@ -1,7 +1,7 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isEmpty, isString, last, omit, set } from "lodash";
+import { isEmpty, isNumber, isString, last, omit, reduce, set, sumBy } from "lodash";
 import { useRouter } from "next/router";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
@@ -128,8 +128,8 @@ interface CallInfo {
   doc: string;
   args: Record<string, unknown>;
   source?: string;
-  children?: Record<string, CallInfo>;
-  records?: Record<string, CallInfo>;
+  children?: Record<string, true>;
+  records?: Record<string, Record<string, unknown>>;
   result?: unknown;
   end?: number;
 }
@@ -188,7 +188,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         const contentLength = await getContentLength(url);
         if (offset >= contentLength) return;
 
-        const limit = Math.min(offset + 1e6, contentLength);
+        const limit = Math.min(offset + 1e9, contentLength);
         if (limit < contentLength) delay = 50;
 
         const response = await fetch(url, {
@@ -281,6 +281,26 @@ const useCallInfo = (id: string) => {
   };
 };
 
+const COST_PER_DAVINCI_TOKEN = 0.02 / 1000;
+
+const useCost = (id: string): number => {
+  const { records = {} } = useCallInfo(id);
+  const { getChildren } = useLinks();
+  const children = getChildren(id);
+  records && console.log(id, records);
+  const costOfSingleCall = (values: Record<string, unknown>) => {
+    const davinciEquivalentTokens =
+      "davinci_equivalent_tokens" in values && isNumber(values["davinci_equivalent_tokens"])
+        ? values["davinci_equivalent_tokens"]
+        : 0;
+    return davinciEquivalentTokens * COST_PER_DAVINCI_TOKEN;
+  };
+  return (
+    Object.keys(records).reduce((prev, curr) => prev + costOfSingleCall(records[curr]), 0) +
+    sumBy(children, useCost)
+  );
+};
+
 type SelectedCallInfo = {
   parent: string;
   start: number;
@@ -288,8 +308,8 @@ type SelectedCallInfo = {
   doc: string;
   args: Record<string, unknown>;
   source?: string;
-  children?: Record<string, CallInfo>;
-  records?: Record<string, CallInfo>;
+  children?: Record<string, true>;
+  records?: Record<string, Record<string, unknown>>;
   result?: unknown;
   end?: number;
   id: string;
@@ -363,12 +383,18 @@ function lineAnchorId(id: string) {
   return `line-anchor-${id}`;
 }
 
+const Cost = ({ id }: { id: string }) => {
+  const cost = useCost(id);
+  return <>${Math.round(cost * 1000) / 1000}</>;
+};
+
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const { name, args, children = {}, result, select, selected, focussed } = useCallInfo(id);
   const { selectedId } = useTreeContext();
   const { getParent } = useLinks();
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
+  const [showCost, setShowCost] = useState(false);
 
   const modelCall = isModelCall({ name, args });
   const isSiblingWithSelected = selectedId && getParent(id) === getParent(selectedId);
@@ -448,6 +474,13 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
               {result === undefined ? <Spinner size="small" /> : <ResultComponent value={result} />}
             </div>
           </div>
+        </Button>
+        <Button
+          aria-label={showCost ? "Hide cost" : "Show cost"}
+          size="sm"
+          onClick={event => setShowCost(!showCost)}
+        >
+          {showCost ? <Cost id={id} /> : <>Estimate cost</>}
         </Button>
       </div>
       {!modelCall && (
