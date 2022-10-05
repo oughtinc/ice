@@ -37,6 +37,8 @@ literal = str | int | float | StopSentinel
 
 literal_or_transform = literal | _Transform
 
+FormatValues = Sequence[Mapping[str, literal_or_transform]]
+
 _StdLibFormatStringParses = list[tuple[str, str | None, str | None, str | None]]
 
 
