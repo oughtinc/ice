@@ -200,7 +200,7 @@ async def choose_action(
 async def get_action_choice_probs(action_choice_prompt, actions):
     action_choice_probs, _ = await recipe.agent("instruct-reasoning-crowd").classify(
         prompt=action_choice_prompt,
-        choices=tuple(" {i}" for i in range(1, len(actions) + 1)),
+        choices=tuple(f" {i}" for i in range(1, len(actions) + 1)),
     )
     return action_choice_probs
 

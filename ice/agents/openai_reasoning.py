@@ -71,7 +71,7 @@ class OpenAIReasoningAgent(Agent):
 
         # Parse the responses and aggregate the answers and reasonings
         answers, reasonings = await self._parse_and_aggregate_responses(
-            reasoning_prompt, response, answer_prefix
+            reasoning_prompt, response, answer_prefix, choices=choices
         )
 
         # Return a dict [str, float] and the joined reasonings
@@ -104,7 +104,12 @@ class OpenAIReasoningAgent(Agent):
         return response
 
     async def _parse_and_aggregate_responses(
-        self, prompt: str, response: dict, answer_prefix: str, multiline: bool = False
+        self,
+        prompt: str,
+        response: dict,
+        answer_prefix: str,
+        multiline: bool = False,
+        choices: tuple[str, ...] | None = None,
     ) -> tuple[Counter[str], list[str]]:
         # Extract the response texts
         response_texts = [choice["text"] for choice in response["choices"]]
@@ -126,7 +131,13 @@ class OpenAIReasoningAgent(Agent):
             )
 
             # Update the answer counts and the reasoning list
-            answers[answer] += 1
+            if choices is not None:
+                for choice in choices:
+                    if answer.strip().startswith(choice.strip()):
+                        answers[choice] += 1
+            else:
+                answers[answer] += 1
+
             reasonings.append(reasoning)
 
         return answers, reasonings
