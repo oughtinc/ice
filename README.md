@@ -25,7 +25,9 @@ ICE is a Python library and trace visualizer for language model programs.
 
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-1. Add required secrets to `.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for a model.
+1. Clone the repository: `git clone https://github.com/oughtinc/ice.git && cd ice`
+
+1. Add required secrets to `.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format.
 
 1. Start ICE in its own terminal and leave it running:
 
