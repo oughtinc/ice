@@ -8,6 +8,7 @@ authors = ["Ought <team@ought.org>"]
 python = "3.10.4"
 defopt = "^6.3.0"
 Faker = "^13.12.1"
+fastapi = "^0.85.0"
 httpx = "^0.23.0"
 merge-args = "^0.1.4"
 nest-asyncio = "^1.5.5"
@@ -32,6 +33,7 @@ torch = { url = "https://download.pytorch.org/whl/cu116/torch-1.12.0%2Bcu116-cp3
 tqdm = "^4.64.0"
 transformers = "^4.19.2"
 ulid-py = "^1.1.0"
+uvicorn = "^0.18.3"
 
 
 [tool.poetry.dev-dependencies]
