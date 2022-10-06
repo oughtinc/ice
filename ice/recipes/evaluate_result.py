@@ -161,9 +161,8 @@ class EvaluateResult(Recipe):
         missing_info_prompt = make_compare_results_prompt(
             question=question, model_result=model_result, gold_result=gold_result
         )
-        missing_info = await self.agent().answer(
+        missing_info = await self.agent().complete(
             prompt=missing_info_prompt,
-            multiline=True,
             max_tokens=200,
         )
         classification_prompt = make_classificaiton_prompt(

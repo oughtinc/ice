@@ -260,14 +260,14 @@ class BlindingDynamic(Recipe):
         [intervention]? Return an answer supported by a quote.
         """
         prompt = make_paragraph_prompt(paragraph, intervention, group)
-        raw_quotes = await self.agent().answer(prompt=prompt, multiline=True)
+        raw_quotes = await self.agent().complete(prompt=prompt)
         quotes = parse_quotes(raw_quotes, ignore="n/a")
         if quotes and ask_followup:
             followup_prompt = make_followup_paragraph_prompt(
                 paragraph, intervention, group, raw_quotes
             )
-            followup_quotes = await self.agent().answer(
-                prompt=followup_prompt, multiline=True
+            followup_quotes = await self.agent().complete(
+                prompt=followup_prompt,
             )
             lines = parse_quotes(followup_quotes, ignore="n/a")
             quotes += lines

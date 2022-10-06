@@ -20,7 +20,7 @@ def eval_python(expression: str) -> str:
 
 async def choose_computation(question: str) -> str:
     prompt = make_computation_choice_prompt(question)
-    answer = (await recipe.agent().answer(prompt=prompt)).strip('" ')
+    answer = await recipe.agent().complete(prompt=prompt, stop='"')
     return answer
 
 
