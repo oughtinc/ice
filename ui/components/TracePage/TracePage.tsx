@@ -824,15 +824,17 @@ export const TracePage = () => {
   const traceId = useTraceId();
 
   return !traceId ? null : (
-    <TreeProvider key={traceId} traceId={traceId}>
-      {traceId && recipes[traceId] ? (
-        <Head>
-          <title>{recipes[traceId].title} | Interactive Composition Explorer</title>
-        </Head>
-      ) : (
-        "Interactive Composition Explorer"
-      )}
-      <Trace traceId={traceId} />
-    </TreeProvider>
+      <TreeProvider key={traceId} traceId={traceId}>
+          <Head>
+              <title>          
+                  {traceId && recipes[traceId] ? (
+                      `${recipes[traceId].title} | Interactive Composition Explorer`
+                  ) : (
+                      "Interactive Composition Explorer"
+                  )}
+              </title>
+          </Head>                  
+          <Trace traceId={traceId} />
+      </TreeProvider>
   );
 };
