@@ -4,16 +4,6 @@ from ice.trace import TracedABC
 class Agent(TracedABC):
     label: str | None = None
 
-    async def relevance(
-        self,
-        *,
-        context: str,
-        question: str,
-        verbose: bool = False,
-        default: float | None = None,
-    ) -> float:
-        raise NotImplementedError
-
     async def answer(
         self,
         *,
@@ -25,11 +15,6 @@ class Agent(TracedABC):
     ) -> str:
         raise NotImplementedError
 
-    async def predict(
-        self, *, context: str, default: str = "", verbose: bool = False
-    ) -> dict[str, float]:
-        raise NotImplementedError
-
     async def classify(
         self,
         *,
@@ -38,4 +23,21 @@ class Agent(TracedABC):
         default: str | None = None,
         verbose: bool = False,
     ) -> tuple[dict[str, float], str | None]:
+        raise NotImplementedError
+
+    # Methods below may be deprecated in the future:
+    
+    async def relevance(
+        self,
+        *,
+        context: str,
+        question: str,
+        verbose: bool = False,
+        default: float | None = None,
+    ) -> float:
+        raise NotImplementedError
+
+    async def predict(
+        self, *, context: str, default: str = "", verbose: bool = False
+    ) -> dict[str, float]:
         raise NotImplementedError
