@@ -61,7 +61,7 @@ interface CallInfo {
 
 type Calls = Record<string, CallInfo>;
 
-const MODEL_CALL_NAMES = ["relevance", "answer", "predict", "classify", "prompted_classify"];
+const MODEL_CALL_NAMES = ["relevance", "answer", "predict", "classify", "prompted_classify", "complete"];
 
 const TreeContext = createContext<{
   traceId: string;
