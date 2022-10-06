@@ -77,10 +77,10 @@ Assistant:""",
     return prompt, max_tokens
 
 
-def call_agent_answer(agent: Agent, prompt: str, max_tokens: int):
+def call_agent_complete(agent: Agent, prompt: str, max_tokens: int):
 
     start_time = time.time()
-    response = asyncio.run(agent.answer(prompt=prompt, max_tokens=max_tokens))
+    response = asyncio.run(agent.complete(prompt=prompt, max_tokens=max_tokens))
     elapsed = time.time() - start_time
 
     return response, elapsed
@@ -108,7 +108,7 @@ def main():
     prompt, max_tokens = select_answer_params()
 
     # Call agent method
-    response, elapsed = call_agent_answer(agent, prompt, max_tokens)
+    response, elapsed = call_agent_complete(agent, prompt, max_tokens)
     st.markdown(" > " + response)
     st.write(f"Response time: {elapsed:.2f} seconds")
 

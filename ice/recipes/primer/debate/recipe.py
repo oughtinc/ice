@@ -5,7 +5,7 @@ from ice.recipes.primer.debate.prompt import *
 
 async def turn(debate: Debate, agent: Agent, agent_name: Name, turns_left: int):
     prompt = render_debate_prompt(agent_name, debate, turns_left)
-    answer = await agent.answer(prompt=prompt, multiline=False)
+    answer = await agent.complete(prompt=prompt, multiline=False)
     return (agent_name, answer.strip('" '))
 
 

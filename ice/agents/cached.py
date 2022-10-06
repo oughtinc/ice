@@ -15,7 +15,7 @@ class CachedAgent(Agent):
         self.cache = SQLiteShelf(cache_file, cache_name)
         self.base_agent = base_agent
 
-    async def answer(
+    async def complete(
         self,
         *,
         prompt,
@@ -27,7 +27,7 @@ class CachedAgent(Agent):
         key = get_cache_key("answer", prompt)
         if key in self.cache:
             return self.cache[key]
-        answer = await self.base_agent.answer(
+        answer = await self.base_agent.complete(
             prompt=prompt,
             multiline=multiline,
             verbose=verbose,

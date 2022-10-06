@@ -37,7 +37,7 @@ class RankParagraphs(Recipe):
         async def cmp(a: Paragraph, b: Paragraph) -> int:
             progress_bar.update(1)
             answer = (
-                await self.agent().answer(
+                await self.agent().complete(
                     prompt=make_compare_paragraphs_prompt(a, b, question),
                     multiline=False,
                     max_tokens=1,

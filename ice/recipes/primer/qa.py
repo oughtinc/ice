@@ -21,7 +21,7 @@ async def answer(
     context: str = DEFAULT_CONTEXT, question: str = DEFAULT_QUESTION
 ) -> str:
     prompt = make_qa_prompt(context, question)
-    answer = (await recipe.agent().answer(prompt=prompt)).strip('" ')
+    answer = (await recipe.agent().complete(prompt=prompt)).strip('" ')
     return answer
 
 

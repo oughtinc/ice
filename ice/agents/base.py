@@ -4,7 +4,7 @@ from ice.trace import TracedABC
 class Agent(TracedABC):
     label: str | None = None
 
-    async def answer(
+    async def complete(
         self,
         *,
         prompt: str,
@@ -26,7 +26,7 @@ class Agent(TracedABC):
         raise NotImplementedError
 
     # Methods below may be deprecated in the future:
-    
+
     async def relevance(
         self,
         *,

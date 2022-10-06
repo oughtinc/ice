@@ -47,7 +47,7 @@ class FunnelSimple(Recipe):
         descriptions = []
         # Ask the agent to answer the prompt
         for chunk in window_by_tokens(full_paper_text, max_tokens=5000):
-            description = await self.agent().answer(
+            description = await self.agent().complete(
                 prompt=generate_qa_prompt_instruct(chunk),
                 multiline=True,
                 max_tokens=500,

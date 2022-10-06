@@ -20,7 +20,7 @@ class AugmentedAgent(Agent):
         )
         return human_resp
 
-    async def answer(
+    async def complete(
         self,
         *,
         prompt: str,
@@ -29,14 +29,14 @@ class AugmentedAgent(Agent):
         default: str = "",
         max_tokens: int = 256,
     ):
-        machine_resp = await self.machine.answer(
+        machine_resp = await self.machine.complete(
             prompt=prompt,
             multiline=multiline,
             verbose=verbose,
             default=default,
             max_tokens=max_tokens,
         )
-        return await self.human.answer(
+        return await self.human.complete(
             prompt=prompt,
             multiline=multiline,
             verbose=verbose,

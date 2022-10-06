@@ -63,7 +63,7 @@ async def is_info_sufficient(question: str, log: Log) -> bool:
 
 async def answer_directly(question: str, log: Log) -> str:
     answer_prompt = make_answer_prompt(question, log)
-    answer = await recipe.agent("instruct-reasoning").answer(prompt=answer_prompt)
+    answer = await recipe.agent("instruct-reasoning").complete(prompt=answer_prompt)
     return answer
 
 
@@ -102,7 +102,7 @@ You have access to a Python interpreter. What single-line calculation would most
         cls, question: str, log: Log, max_actions: int
     ) -> "CalculationAction":
         calculation_prompt = cls.make_proposal_prompt(question, log, max_actions)
-        calculation = await recipe.agent("instruct-reasoning").answer(
+        calculation = await recipe.agent("instruct-reasoning").complete(
             prompt=calculation_prompt, multiline=False
         )
         return cls(calculation)
@@ -139,7 +139,7 @@ Query:"""
         cls, question: str, log: Log, max_actions: int
     ) -> "WebSearchAction":
         websearch_prompt = cls.make_proposal_prompt(question, log, max_actions)
-        websearch = await recipe.agent("instruct-reasoning").answer(
+        websearch = await recipe.agent("instruct-reasoning").complete(
             prompt=websearch_prompt, multiline=False
         )
         search_term = websearch.strip('" ')

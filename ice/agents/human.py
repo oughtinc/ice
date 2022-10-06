@@ -3,7 +3,7 @@ from ice.environment import env
 
 
 class HumanAgent(Agent):
-    async def answer(
+    async def complete(
         self,
         *,
         prompt: str,

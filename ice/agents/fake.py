@@ -15,7 +15,7 @@ class FakeAgent(Agent):
     async def relevance(self, *, question, context, verbose=False, default=None):
         return random.random()
 
-    async def answer(
+    async def complete(
         self,
         *,
         prompt: str,

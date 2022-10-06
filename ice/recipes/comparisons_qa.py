@@ -61,7 +61,7 @@ class ComparisonsQA(Recipe):
             paragraphs=top_paragraphs,
         )
 
-        answer = await self.agent().answer(
+        answer = await self.agent().complete(
             prompt=qa_prompt, multiline=True, max_tokens=500
         )
 

@@ -26,7 +26,7 @@ class OpenAIReasoningAgent(Agent):
     def _answer_prefix(self, prompt: str) -> str:
         return prompt.split("\n")[-1]
 
-    async def answer(
+    async def complete(
         self,
         *,
         prompt: str,

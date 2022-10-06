@@ -43,7 +43,7 @@ class ApprovalAgent(Agent):
         else:
             yield {}
 
-    async def answer(
+    async def complete(
         self,
         *,
         prompt: str,
@@ -52,7 +52,7 @@ class ApprovalAgent(Agent):
         default: str = "",
         max_tokens: int = 256,
     ):
-        completion = await self.base_agent.answer(
+        completion = await self.base_agent.complete(
             prompt=prompt,
             multiline=multiline,
             verbose=verbose,
@@ -89,7 +89,7 @@ Is this output correct (y/n)?"""
                 assert is_yes(str(cache[approval_prompt]))
                 return
 
-        approval_action = await self.approval_agent.answer(prompt=approval_prompt)
+        approval_action = await self.approval_agent.complete(prompt=approval_prompt)
 
         if not is_yes(approval_action):
             raise NotApprovedException

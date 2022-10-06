@@ -63,7 +63,7 @@ class PlaceboDescription(Recipe):
         qa_prompt = self.make_prompt(paper, experiment)
 
         # Ask the agent to answer the prompt
-        placebo_description = await self.agent(self.agent_str).answer(
+        placebo_description = await self.agent(self.agent_str).complete(
             prompt=qa_prompt, multiline=True, max_tokens=300
         )
 
