@@ -341,7 +341,7 @@ class EvaluationReport(BaseModel):
     def __str__(self) -> str:
         return "\n".join(str(e) for e in self.to_rich_elements())
 
-    def make_dashboard_row(self):
+    def make_dashboard_row_df(self):
         CSVS_PATH.mkdir(parents=True, exist_ok=True)
 
         questions = self.questions_str()
@@ -399,7 +399,7 @@ class EvaluationReport(BaseModel):
         )
         return df
 
-    def make_experiments_evaluation_csv(self):
+    def make_experiments_evaluation_df(self):
         CSVS_PATH.mkdir(parents=True, exist_ok=True)
 
         rows = []
@@ -422,7 +422,7 @@ class EvaluationReport(BaseModel):
                 ),
                 "gs_quotes_found": result.evaluated_excerpts.num_gold_standards_found,
                 "proportion_gs_quotes_found": result.evaluated_excerpts.proportion_gold_standards_found,
-                "evaluted_excerpts": str(result.evaluated_excerpts),
+                "evaluated_excerpts": str(result.evaluated_excerpts),
                 "excerpts": result.evaluated_excerpts.excerpts,
                 "gs_quotes": result.evaluated_excerpts.gold_standards_str(),
                 "answer": result.answer,

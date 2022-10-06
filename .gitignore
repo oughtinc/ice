@@ -1,3 +1,8 @@
+# Since these ignore rules are shared between Git and Docker, every rule should take one of three forms:
+# **/SOME_PATTERN
+# /SOME_PATTERN
+# !/SOME_PATTERN
+
 **/__pycache__
 **/.DS_Store
 **/.vscode
