@@ -61,7 +61,14 @@ interface CallInfo {
 
 type Calls = Record<string, CallInfo>;
 
-const MODEL_CALL_NAMES = ["relevance", "answer", "predict", "classify", "prompted_classify"];
+const MODEL_CALL_NAMES = [
+  "relevance",
+  "answer",
+  "predict",
+  "classify",
+  "prompted_classify",
+  "complete",
+];
 
 const TreeContext = createContext<{
   traceId: string;
@@ -825,13 +832,13 @@ export const TracePage = () => {
 
   return !traceId ? null : (
     <TreeProvider key={traceId} traceId={traceId}>
-      {traceId && recipes[traceId] ? (
-        <Head>
-          <title>{recipes[traceId].title} | Interactive Composition Explorer</title>
-        </Head>
-      ) : (
-        "Interactive Composition Explorer"
-      )}
+      <Head>
+        <title>
+          {traceId && recipes[traceId]
+            ? `${recipes[traceId].title} | Interactive Composition Explorer`
+            : "Interactive Composition Explorer"}
+        </title>
+      </Head>
       <Trace traceId={traceId} />
     </TreeProvider>
   );
