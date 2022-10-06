@@ -103,7 +103,7 @@ You have access to a Python interpreter. What single-line calculation would most
     ) -> "CalculationAction":
         calculation_prompt = cls.make_proposal_prompt(question, log, max_actions)
         calculation = await recipe.agent("instruct-reasoning").complete(
-            prompt=calculation_prompt, multiline=False
+            prompt=calculation_prompt, stop="\n"
         )
         return cls(calculation)
 
@@ -138,11 +138,10 @@ Query:"""
     async def propose(
         cls, question: str, log: Log, max_actions: int
     ) -> "WebSearchAction":
-        websearch_prompt = cls.make_proposal_prompt(question, log, max_actions)
-        websearch = await recipe.agent("instruct-reasoning").complete(
-            prompt=websearch_prompt, multiline=False
+        search_term_prompt = cls.make_proposal_prompt(question, log, max_actions)
+        search_term = await recipe.agent("instruct-reasoning").complete(
+            prompt=search_term_prompt, stop='"'
         )
-        search_term = websearch.strip('" ')
         return cls(search_term)
 
     async def run(self) -> str:

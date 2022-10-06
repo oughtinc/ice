@@ -5,6 +5,7 @@ from typing import Any
 from structlog.stdlib import get_logger
 
 from ice.agents.base import Agent
+from ice.agents.base import Stop
 from ice.apis.openai import openai_complete
 from ice.environment import env
 from ice.utils import longest_common_prefix
@@ -29,7 +30,7 @@ class OpenAIAgent(Agent):
         self,
         *,
         prompt: str,
-        multiline: bool = True,
+        stop: Stop = None,
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,
@@ -37,7 +38,6 @@ class OpenAIAgent(Agent):
         """Generate an answer to a question given some context."""
         if verbose:
             self._print_markdown(prompt)
-        stop = None if multiline else "\n"
         response = await self._complete(prompt, stop=stop, max_tokens=max_tokens)
         completion = self._extract_completion(response)
         if verbose:

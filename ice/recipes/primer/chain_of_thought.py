@@ -14,7 +14,7 @@ async def chain_of_thought(
     answer_prefix: str = "Let's think step by step.",
 ) -> str:
     prompt = make_chain_of_thought_prompt(question, answer_prefix)
-    answer = (await recipe.agent().complete(prompt=prompt)).strip('" ')
+    answer = await recipe.agent().complete(prompt=prompt, stop='"')
     return answer
 
 

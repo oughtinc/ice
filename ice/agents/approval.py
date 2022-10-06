@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 from ice.agents.base import Agent
+from ice.agents.base import Stop
 
 
 class NotApprovedException(Exception):
@@ -47,14 +48,14 @@ class ApprovalAgent(Agent):
         self,
         *,
         prompt: str,
-        multiline: bool = True,
+        stop: Stop = None,
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,
     ):
         completion = await self.base_agent.complete(
             prompt=prompt,
-            multiline=multiline,
+            stop=stop,
             verbose=verbose,
             default=default,
             max_tokens=max_tokens,

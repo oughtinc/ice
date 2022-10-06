@@ -32,7 +32,7 @@ def eval_python(expression: str) -> str:
 
 async def choose_computation(question: str) -> str:
     prompt = make_computation_choice_prompt(question)
-    answer = (await recipe.agent().complete(prompt=prompt)).strip('" ')
+    answer = await recipe.agent().complete(prompt=prompt, stop='"')
     return answer
 
 
@@ -40,7 +40,7 @@ async def answer_by_computation(question: str):
     expression = await choose_computation(question)
     result = eval_python(expression)
     prompt = make_compute_qa_prompt(question, expression, result)
-    answer = (await recipe.agent().complete(prompt=prompt, multiline=False)).strip('" ')
+    answer = await recipe.agent().complete(prompt=prompt, stop='"')
     return answer
 
 

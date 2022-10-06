@@ -163,7 +163,6 @@ class EvaluateResult(Recipe):
         )
         missing_info = await self.agent().complete(
             prompt=missing_info_prompt,
-            multiline=True,
             max_tokens=200,
         )
         classification_prompt = make_classificaiton_prompt(

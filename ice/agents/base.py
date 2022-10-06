@@ -1,5 +1,7 @@
 from ice.trace import TracedABC
 
+Stop = str | list[str] | None
+
 
 class Agent(TracedABC):
     label: str | None = None
@@ -8,7 +10,7 @@ class Agent(TracedABC):
         self,
         *,
         prompt: str,
-        multiline: bool = True,
+        stop: Stop = None,
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,

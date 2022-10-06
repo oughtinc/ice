@@ -58,7 +58,7 @@ class DialogState(BaseModel):
     async def ask(self, question: str, multiline=True, answer_prefix=""):
         partial_answer = await self.agent.complete(
             prompt=f"{self.context}\n\nQ: {question}\n\nA: {answer_prefix}",
-            multiline=multiline,
+            stop=None if multiline else "\n",
         )
         answer = f"{answer_prefix} {partial_answer}".strip()
         successor_context = f"{self.context}\n\nQ: {question}\n\nA: {answer}"
@@ -357,7 +357,6 @@ class PlaceboDialogs(Recipe):
 
         answer_completion = await self.agent().complete(
             prompt=prompt,
-            multiline=True,
         )
         answer = f"The placebo was {answer_completion}"
 

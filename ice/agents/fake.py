@@ -3,6 +3,7 @@ import random
 from faker import Faker
 
 from ice.agents.base import Agent
+from ice.agents.base import Stop
 
 random.seed(0)
 Faker.seed(0)
@@ -19,7 +20,7 @@ class FakeAgent(Agent):
         self,
         *,
         prompt: str,
-        multiline: bool = True,
+        stop: Stop = None,
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,

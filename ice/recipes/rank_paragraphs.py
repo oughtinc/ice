@@ -39,7 +39,7 @@ class RankParagraphs(Recipe):
             answer = (
                 await self.agent().complete(
                     prompt=make_compare_paragraphs_prompt(a, b, question),
-                    multiline=False,
+                    stop=[" ", "\n"],
                     max_tokens=1,
                 )
             ).strip()

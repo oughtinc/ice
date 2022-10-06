@@ -37,7 +37,7 @@ async def answer_by_amplification(
 ):
     subs = await get_subs(question, depth - 1) if depth > 0 else []
     prompt = make_qa_prompt(question, subs=subs)
-    answer = (await recipe.agent().complete(prompt=prompt, multiline=False)).strip('" ')
+    answer = await recipe.agent().complete(prompt=prompt, stop='"')
     return answer
 
 

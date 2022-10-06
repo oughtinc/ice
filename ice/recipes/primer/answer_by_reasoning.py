@@ -20,13 +20,13 @@ Short answer: "
 
 async def get_reasoning(question: str) -> str:
     reasoning_prompt = generate_reasoning_prompt(question)
-    reasoning = (await recipe.agent().complete(prompt=reasoning_prompt)).strip('" ')
+    reasoning = await recipe.agent().complete(prompt=reasoning_prompt, stop='"')
     return reasoning
 
 
 async def get_answer(question: str, reasoning: str) -> str:
     answer_prompt = generate_answer_prompt(question, reasoning)
-    answer = (await recipe.agent().complete(prompt=answer_prompt)).strip('" ')
+    answer = await recipe.agent().complete(prompt=answer_prompt, stop='"')
     return answer
 
 

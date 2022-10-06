@@ -13,7 +13,7 @@ Answer: "
 
 async def answer(question: str) -> str:
     prompt = make_qa_prompt(question)
-    answer = (await recipe.agent().complete(prompt=prompt, multiline=False)).strip('" ')
+    answer = await recipe.agent().complete(prompt=prompt, stop='"')
     return answer
 
 

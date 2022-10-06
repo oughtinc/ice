@@ -64,7 +64,7 @@ class PlaceboDescription(Recipe):
 
         # Ask the agent to answer the prompt
         placebo_description = await self.agent(self.agent_str).complete(
-            prompt=qa_prompt, multiline=True, max_tokens=300
+            prompt=qa_prompt, max_tokens=300
         )
 
         # Save to trace
