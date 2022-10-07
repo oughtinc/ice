@@ -27,7 +27,8 @@ RUN \
     git \
     nodejs && \
   rm -rf /var/lib/apt/lists/* && \
-  git config --global --add safe.directory /code
+  git config --global --add safe.directory /code && \
+  npm install -g concurrently
 
 COPY poetry-requirements.txt poetry.lock pyproject.toml ./
 ARG poetry_install_args=""
@@ -47,4 +48,4 @@ RUN npm --prefix ui ci
 
 COPY . .
 
-CMD ["npm", "--prefix", "ui", "run", "dev"]
+CMD ["concurrently", "uvicorn ice.routes.app:app --host 0.0.0.0 --port 8935 --reload", "npm --prefix ui run dev"]
