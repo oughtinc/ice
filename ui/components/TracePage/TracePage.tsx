@@ -20,6 +20,7 @@ import {
 import { ArcherContainer, ArcherElement } from "react-archer";
 import { ArcherContainerHandle } from "react-archer/lib/ArcherContainer/ArcherContainer.types";
 import SyntaxHighlighter from "react-syntax-highlighter";
+import { PromptEditorModal, PromptEditorProvider, usePromptEditorContext } from "./PromptEditor";
 import Separator from "./Separator";
 import Spinner from "./Spinner";
 import { recipes } from "/helpers/recipes";
@@ -488,6 +489,7 @@ const TypeIdentifiers = {
 
 const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
   const toast = useToast();
+  const { openEditor } = usePromptEditorContext();
   const view: JsonChild = useMemo(() => {
     if (typeof data === "object" && data) {
       // Array or Object
@@ -525,9 +527,15 @@ const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
   return value ? (
     <span
       className="inline whitespace-pre-wrap"
-      onClick={() => {
-        navigator.clipboard.writeText(value);
-        toast({ title: "Copied to clipboard", duration: 1000 });
+      onClick={ev => {
+        if (ev.ctrlKey || ev.metaKey) {
+          // Open prompt editor
+          openEditor(value);
+        } else {
+          // Copy
+          navigator.clipboard.writeText(value);
+          toast({ title: "Copied to clipboard", duration: 1000 });
+        }
       }}
     >
       {value}
@@ -700,6 +708,7 @@ const stripIndent = (source: string): string => {
 const Trace = ({ traceId }: { traceId: string }) => {
   const { selectedId, rootId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
+  const { open: promptEditorOpen } = usePromptEditorContext();
 
   const maybeSetSelectedId = useCallback(
     (update: (id: string) => string | undefined) => {
@@ -724,7 +733,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
 
   const bindings = useMemo(
     () =>
-      (selectedId
+      (selectedId && !promptEditorOpen
         ? withVimBindings({
             ArrowUp: () =>
               maybeSetSelectedId(id => {
@@ -756,6 +765,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
       getPrior,
       maybeSetSelectedId,
       nextFrom,
+      promptEditorOpen,
       selectedId,
       setExpanded,
       rootId,
@@ -832,14 +842,17 @@ export const TracePage = () => {
 
   return !traceId ? null : (
     <TreeProvider key={traceId} traceId={traceId}>
-      <Head>
-        <title>
-          {traceId && recipes[traceId]
-            ? `${recipes[traceId].title} | Interactive Composition Explorer`
-            : "Interactive Composition Explorer"}
-        </title>
-      </Head>
-      <Trace traceId={traceId} />
+      <PromptEditorProvider>
+        <Head>
+          <title>
+            {traceId && recipes[traceId]
+              ? `${recipes[traceId].title} | Interactive Composition Explorer`
+              : "Interactive Composition Explorer"}
+          </title>
+        </Head>
+        <PromptEditorModal />
+        <Trace traceId={traceId} />
+      </PromptEditorProvider>
     </TreeProvider>
   );
 };
