@@ -1,0 +1,45 @@
+# TODO: Get rid of this file and just parameterize Dockerfile for production.
+
+FROM python:3.10.4-slim
+WORKDIR /code
+ENV \
+  DEBIAN_FRONTEND=noninteractive \
+  PIP_DEFAULT_TIMEOUT=100 \
+  PIP_DISABLE_PIP_VERSION_CHECK=on \
+  # This disables the cache dir: https://github.com/pypa/pip/issues/5735
+  PIP_NO_CACHE_DIR=off \
+  POETRY_VIRTUALENVS_IN_PROJECT=true \
+  PRE_COMMIT_HOME=.pre-commit-home \
+  PYTHONFAULTHANDLER=1 \
+  PYTHONPATH=/code \
+  PYTHONUNBUFFERED=1 \
+  # Suppress this warning:
+  #   None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available
+  #   and only tokenizers, configuration and file/data utilities can be used.
+  # TODO: Suppress only this warning instead of all warnings.
+  TRANSFORMERS_VERBOSITY=error
+
+RUN \
+  apt update && \
+  apt install -y \
+    build-essential \
+    git && \
+  rm -rf /var/lib/apt/lists/* && \
+  git config --global --add safe.directory /code
+
+COPY poetry-requirements.txt poetry.lock pyproject.toml ./
+ARG poetry_install_args=""
+RUN \
+  pip install -r poetry-requirements.txt && \
+  poetry install --no-dev --no-interaction --no-ansi $poetry_install_args && \
+  rm -rf /root/.cache/pypoetry
+
+ENV VIRTUAL_ENV=/code/.venv
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+
+RUN python -c "import nltk; nltk.download('punkt')"
+
+COPY . .
+
+# TODO: Use gunicorn in production: https://www.uvicorn.org/deployment/
+CMD ["uvicorn", "ice.routes.app:app", "--host", "0.0.0.0", "--port", "8935"]
