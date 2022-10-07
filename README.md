@@ -35,7 +35,7 @@ ICE is a Python library and trace visualizer for language model programs.
    scripts/run-local.sh
    ```
 
-1. Go through [the primer](https://primer.ought.org/).
+1. Go through [the Primer](https://primer.ought.org/).
 
 ## Terminology
 
@@ -48,6 +48,14 @@ ICE is a Python library and trace visualizer for language model programs.
   Agents don't know which recipe is calling them. Agents don’t maintain state between subtasks. Agents generally try to complete all subtasks they're asked to complete (however badly), but some will not have implementations for certain task types.
 
 - The **mode** in which a recipe runs is a global setting that can affect every agent call. For instance, whether to use humans or agents. Recipes can also run with certain `RecipeSettings`, which can map a task type to a specific `agent_name`, which can modify which agent is used for that specfic type of task.
+
+## Additional resources
+
+1. [Join the ICE Slack channel]([url](https://join.slack.com/t/ice-1mh7029/shared_invite/zt-1h8118i28-tPDSulG8C~4dr5ZdAky1gg)) to collaborate with other people composing language model tasks. You can also use it to ask questions about using ICE.
+
+2. [Watch the recording of Ought's Lab Meeting]([url](https://www.youtube.com/watch?v=cZqq4muY5_w)) to understand the high-level goals for ICE, how it interacts with Ought's other work, and how it contributes to alignment research. 
+
+3. [Read the ICE announcement post]([url](https://ought.org/updates/2022-10-06-ice-primer)) for another introduction.
 
 ## Contributions
 
