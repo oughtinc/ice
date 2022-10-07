@@ -1,6 +1,10 @@
 services:
   ice:
     image: docker.io/oughtinc/ice:0.1.1
+    environment:
+      OUGHT_INFERENCE_API_KEY: ${OUGHT_INFERENCE_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_ORG_ID: ${OPENAI_ORG_ID:-}
     restart: on-failure
     volumes:
       # When mounting /code, don't clobber generated directories.
