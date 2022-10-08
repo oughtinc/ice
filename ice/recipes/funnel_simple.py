@@ -41,13 +41,15 @@ def create_recipe_result(paper_id: str, experiment: str, answer: str) -> RecipeR
 
 
 class FunnelSimple(Recipe):
+    agent_str = "instruct"
+
     async def run(self, paper: Paper):
         full_paper_text = get_paper_text(paper)
 
         descriptions = []
         # Ask the agent to answer the prompt
         for chunk in window_by_tokens(full_paper_text, max_tokens=5000):
-            description = await self.agent().complete(
+            description = await self.agent(self.agent_str).complete(
                 prompt=generate_qa_prompt_instruct(chunk),
                 max_tokens=500,
             )
