@@ -1,6 +1,6 @@
 services:
   ice:
-    image: docker.io/oughtinc/ice:0.1.1
+    image: docker.io/oughtinc/ice:0.2.0
     environment:
       OUGHT_INFERENCE_API_KEY: ${OUGHT_INFERENCE_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
