@@ -17,7 +17,7 @@ const PromptEditorContext = createContext<{
   closeEditor: () => void;
 } | null>(null);
 
-function saveCaretPosition(context: any, plusOne?: boolean){
+function saveCaretPosition(context: any, plusOne?: boolean) {
   var sel = window.getSelection();
   if (!sel || sel.rangeCount < 1) return;
   var selection = sel;
@@ -26,32 +26,32 @@ function saveCaretPosition(context: any, plusOne?: boolean){
   range.setStart(context, 0);
   var len = range.toString().length;
 
-  return function restore(){
+  return function restore() {
     try {
       var pos = getTextNodeAtPosition(context, len);
       selection.removeAllRanges();
       var range = new Range();
-      range.setStart(pos.node ,pos.position + (plusOne ? 1 : 0));
+      range.setStart(pos.node, pos.position + (plusOne ? 1 : 0));
       selection.addRange(range);
     } catch (e) {
       // pass
     }
-  }
+  };
 }
 
-function getTextNodeAtPosition(root: any, index: any){
+function getTextNodeAtPosition(root: any, index: any) {
   const NODE_TYPE = NodeFilter.SHOW_TEXT;
   var treeWalker = document.createTreeWalker(root, NODE_TYPE, function next(elem: any) {
-      if(index > elem?.textContent?.length){
-          index -= elem?.textContent?.length;
-          return NodeFilter.FILTER_REJECT
-      }
-      return NodeFilter.FILTER_ACCEPT;
+    if (index > elem?.textContent?.length) {
+      index -= elem?.textContent?.length;
+      return NodeFilter.FILTER_REJECT;
+    }
+    return NodeFilter.FILTER_ACCEPT;
   });
   var c = treeWalker.nextNode();
   return {
-      node: c? c: root,
-      position: index
+    node: c ? c : root,
+    position: index,
   };
 }
 
@@ -92,7 +92,7 @@ export const PromptEditorModal = () => {
   const promptBoxRef = useRef<HTMLDivElement | null>(null);
   const promptContentRef = useRef<HTMLDivElement | null>(null);
 
-  const [promptResult, setPromptResult] = useState('');
+  const [promptResult, setPromptResult] = useState("");
 
   useEffect(() => {
     if (!open) return () => false;
@@ -109,25 +109,28 @@ export const PromptEditorModal = () => {
 
   useEffect(() => {
     if (!promptContentRef.current || !promptResult.length) return;
-    const span = document.createElement('span');
-    span.id = 'promptResult';
-    span.style.backgroundColor = 'skyblue';
+    const span = document.createElement("span");
+    span.id = "promptResult";
+    span.style.backgroundColor = "skyblue";
     span.appendChild(document.createTextNode(promptResult));
-    const oldSpan = document.getElementById('promptResult');
+    const oldSpan = document.getElementById("promptResult");
     if (!oldSpan) promptContentRef.current.appendChild(span);
     else promptContentRef.current.replaceChild(span, oldSpan);
   }, [promptResult]);
 
-  const handleInput = useCallback((ev: any) => {
-    setCurrentPrompt((ev.target as HTMLSpanElement).innerText);
-  }, [setCurrentPrompt]);
+  const handleInput = useCallback(
+    (ev: any) => {
+      setCurrentPrompt((ev.target as HTMLSpanElement).innerText);
+    },
+    [setCurrentPrompt],
+  );
 
   useEffect(() => {
     if (!promptContentRef.current) return;
-    const restore = saveCaretPosition(promptContentRef.current, currentPrompt.endsWith('\n'));
+    const restore = saveCaretPosition(promptContentRef.current, currentPrompt.endsWith("\n"));
     promptContentRef.current.textContent = currentPrompt;
     if (restore) restore();
-  }, [currentPrompt])
+  }, [currentPrompt]);
 
   return (
     <div
@@ -171,8 +174,11 @@ export const PromptEditorModal = () => {
               size="md"
               variant="outline"
               onClick={() => {
-                setTimeout(() => setPromptResult('The quick brown fox'), 500);
-                setTimeout(() => setPromptResult('The quick brown fox jumps over the lazy dog.'), 1000);
+                setTimeout(() => setPromptResult("The quick brown fox"), 500);
+                setTimeout(
+                  () => setPromptResult("The quick brown fox jumps over the lazy dog."),
+                  1000,
+                );
               }}
             >
               Prompt model
