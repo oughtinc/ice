@@ -120,7 +120,7 @@ export const PromptEditorModal = () => {
 
   const handleInput = useCallback(
     (ev: any) => {
-      setCurrentPrompt((ev.target as HTMLSpanElement).innerText);
+      setCurrentPrompt((ev.target as HTMLSpanElement).innerText || '');
     },
     [setCurrentPrompt],
   );
@@ -150,9 +150,16 @@ export const PromptEditorModal = () => {
         <div className="flex flex-col">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Prompt</h3>
           <div
-            className="rounded-4 border-slate-200 border flex-grow px-3 py-2 whitespace-pre-wrap inline-block"
+            className="rounded-4 border-slate-200 border flex-grow px-3 py-2 whitespace-pre-wrap"
             contentEditable
             onInput={ev => handleInput(ev)}
+            onKeyDown={(ev) => {
+              if (ev.key === 'Enter') {
+                ev.preventDefault();
+                ev.stopPropagation();
+                document.execCommand('insertLineBreak');
+              }
+            }}
             ref={promptContentRef}
           />
         </div>
