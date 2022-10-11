@@ -1,11 +1,11 @@
 from ice.recipes.primer.debate.types import *
 
 
-def initialize_debate(question: Message) -> Debate:
+def initialize_debate(question: Message, agent_names: tuple[Name, Name] = ("Alice", "Bob")) -> Debate:
     return [
         ("Question", question),
-        ("Alice", "I'm in favor."),
-        ("Bob", "I'm against."),
+        (agent_names[0], "I'm in favor."),
+        (agent_names[1], "I'm against."),
     ]
 
 
