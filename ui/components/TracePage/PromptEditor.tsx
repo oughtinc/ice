@@ -120,7 +120,7 @@ export const PromptEditorModal = () => {
 
   const handleInput = useCallback(
     (ev: any) => {
-      setCurrentPrompt((ev.target as HTMLSpanElement).innerText || '');
+      setCurrentPrompt((ev.target as HTMLSpanElement).innerText || "");
     },
     [setCurrentPrompt],
   );
@@ -153,11 +153,11 @@ export const PromptEditorModal = () => {
             className="rounded-4 border-slate-200 border flex-grow px-3 py-2 whitespace-pre-wrap"
             contentEditable
             onInput={ev => handleInput(ev)}
-            onKeyDown={(ev) => {
-              if (ev.key === 'Enter') {
+            onKeyDown={ev => {
+              if (ev.key === "Enter") {
                 ev.preventDefault();
                 ev.stopPropagation();
-                document.execCommand('insertLineBreak');
+                document.execCommand("insertLineBreak");
               }
             }}
             ref={promptContentRef}
