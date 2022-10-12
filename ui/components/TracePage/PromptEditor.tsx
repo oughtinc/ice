@@ -17,20 +17,22 @@ const PromptEditorContext = createContext<{
   closeEditor: () => void;
 } | null>(null);
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8935";
+
 function saveCaretPosition(context: any, plusOne?: boolean) {
-  var sel = window.getSelection();
+  const sel = window.getSelection();
   if (!sel || sel.rangeCount < 1) return;
-  var selection = sel;
-  var range = selection.getRangeAt(0);
+  const selection = sel;
+  const range = selection.getRangeAt(0);
   if (!range) return;
   range.setStart(context, 0);
-  var len = range.toString().length;
+  const len = range.toString().length;
 
   return function restore() {
     try {
-      var pos = getTextNodeAtPosition(context, len);
+      const pos = getTextNodeAtPosition(context, len);
       selection.removeAllRanges();
-      var range = new Range();
+      const range = new Range();
       range.setStart(pos.node, pos.position + (plusOne ? 1 : 0));
       selection.addRange(range);
     } catch (e) {
@@ -41,14 +43,14 @@ function saveCaretPosition(context: any, plusOne?: boolean) {
 
 function getTextNodeAtPosition(root: any, index: any) {
   const NODE_TYPE = NodeFilter.SHOW_TEXT;
-  var treeWalker = document.createTreeWalker(root, NODE_TYPE, function next(elem: any) {
+  const treeWalker = document.createTreeWalker(root, NODE_TYPE, function next(elem: any) {
     if (index > elem?.textContent?.length) {
       index -= elem?.textContent?.length;
       return NodeFilter.FILTER_REJECT;
     }
     return NodeFilter.FILTER_ACCEPT;
   });
-  var c = treeWalker.nextNode();
+  const c = treeWalker.nextNode();
   return {
     node: c ? c : root,
     position: index,
@@ -92,7 +94,22 @@ export const PromptEditorModal = () => {
   const promptBoxRef = useRef<HTMLDivElement | null>(null);
   const promptContentRef = useRef<HTMLDivElement | null>(null);
 
+  const [keepResults, setKeepResults] = useState(true);
+
   const [promptResult, setPromptResult] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [agents, setAgents] = useState<string[]>([]);
+  const [selectedAgent, setSelectedAgent] = useState<string | undefined>();
+  const [multiline, setMultiline] = useState(false);
+  useEffect(() => {
+    fetch(`${backendUrl}/agents/list`)
+      .then(res => res.json())
+      .then(agents => {
+        setAgents(agents);
+        setSelectedAgent(agents[0]);
+      });
+  }, []);
 
   useEffect(() => {
     if (!open) return () => false;
@@ -120,9 +137,14 @@ export const PromptEditorModal = () => {
 
   const handleInput = useCallback(
     (ev: any) => {
+      if (!keepResults) {
+        const oldSpan = document.getElementById("promptResult");
+        if (oldSpan) promptContentRef.current?.removeChild(oldSpan);
+      }
       setCurrentPrompt((ev.target as HTMLSpanElement).innerText || "");
+      setPromptResult("");
     },
-    [setCurrentPrompt],
+    [setCurrentPrompt, keepResults],
   );
 
   useEffect(() => {
@@ -144,13 +166,13 @@ export const PromptEditorModal = () => {
       }}
     >
       <div
-        className="rounded-4 px-6 py-4 bg-white h-2/3 w-2/3 shadow cursor-default flex gap-6"
+        className="rounded-4 px-6 py-4 bg-white h-2/3 w-2/3 shadow cursor-default flex"
         ref={promptBoxRef}
       >
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Prompt</h3>
           <div
-            className="rounded-4 border-slate-200 border flex-grow px-3 py-2 whitespace-pre-wrap"
+            className="rounded-4 flex-grow border-slate-200 border px-3 py-2 whitespace-pre-wrap w-full overflow-auto"
             contentEditable
             onInput={ev => handleInput(ev)}
             onKeyDown={ev => {
@@ -163,17 +185,21 @@ export const PromptEditorModal = () => {
             ref={promptContentRef}
           />
         </div>
-        <div className="flex flex-col w-48">
+        <div className="flex flex-col w-48 pl-6">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Agent</h3>
           <label className="text-sm mb-1 text-gray-600">Model</label>
-          <Select>
-            <option>GPT-3</option>
-            <option>AGI-1</option>
-            <option>Roko&apos;s Basilisk</option>
+          <Select onChange={ev => setSelectedAgent(ev.target.value)} value={selectedAgent}>
+            {agents.map(el => (
+              <option key={el} value={el}>
+                {el}
+              </option>
+            ))}
           </Select>
           <label className="text-sm mb-1 mt-3 text-gray-600">Multiline</label>
-          <Checkbox />
+          <Checkbox isChecked={multiline} onChange={ev => setMultiline(ev.target.checked)} />
           <div className="flex-grow"></div>
+          <label className="text-sm mb-1 mt-3 text-gray-600">Keep prompt results</label>
+          <Checkbox isChecked={keepResults} onChange={ev => setKeepResults(ev.target.checked)} />
           <div>
             <Button
               aria-label="prompt language model"
@@ -181,14 +207,26 @@ export const PromptEditorModal = () => {
               size="md"
               variant="outline"
               onClick={() => {
-                setTimeout(() => setPromptResult("The quick brown fox"), 500);
-                setTimeout(
-                  () => setPromptResult("The quick brown fox jumps over the lazy dog."),
-                  1000,
-                );
+                setLoading(true);
+                fetch(`${backendUrl}/agents/complete`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    agent: selectedAgent,
+                    prompt: currentPrompt,
+                    multiline,
+                  }),
+                })
+                  .then(res => res.json())
+                  .then(data => {
+                    setPromptResult(data);
+                    setLoading(false);
+                  });
               }}
             >
-              Prompt model
+              {loading ? "Loading..." : "Prompt model"}
             </Button>
           </div>
         </div>
