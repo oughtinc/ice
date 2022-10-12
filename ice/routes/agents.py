@@ -23,6 +23,6 @@ async def complete(request: CompleteRequest):
         return "Invalid agent!"
     completionAgent = MACHINE_AGENTS.get(request.agent)()
     result = await completionAgent.complete(
-        prompt=request.prompt, stop=(None if request.multiline else "\n")
+        prompt=request.prompt, stop=([] if request.multiline else "\n")
     )
     return result
