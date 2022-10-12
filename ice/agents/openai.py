@@ -34,11 +34,12 @@ class OpenAIAgent(Agent):
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,
+        cache_id: int = 0,  # for repeated non-deterministic sampling using caching
     ) -> str:
         """Generate an answer to a question given some context."""
         if verbose:
             self._print_markdown(prompt)
-        response = await self._complete(prompt, stop=stop, max_tokens=max_tokens)
+        response = await self._complete(prompt, stop=stop, max_tokens=max_tokens, cache_id=cache_id)
         completion = self._extract_completion(response)
         if verbose:
             self._print_markdown(completion)
