@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from ice.routes.base import RouteModel
 from ice.agent import MACHINE_AGENTS
+from ice.routes.base import RouteModel
 
 router = APIRouter(prefix="/agents", tags=["agents"])
 
@@ -22,5 +22,7 @@ async def complete(request: CompleteRequest):
     if not request.agent in MACHINE_AGENTS:
         return "Invalid agent!"
     completionAgent = MACHINE_AGENTS.get(request.agent)()
-    result = await completionAgent.complete(prompt=request.prompt, stop=None if request.multiline else "\n")
+    result = await completionAgent.complete(
+        prompt=request.prompt, stop=None if request.multiline else "\n"
+    )
     return result
