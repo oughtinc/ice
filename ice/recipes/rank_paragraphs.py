@@ -39,11 +39,11 @@ Answer: Paragraph""".strip()
 
 class RankParagraphs(Recipe):
     async def run(
-        self, 
-        paper: Paper, 
-        question: str = "What are the interventions?", 
+        self,
+        paper: Paper,
+        question: str = "What are the interventions?",
         n: int = 5,
-        prompt_type = 'question'
+        prompt_type="question",
     ) -> list[Paragraph]:
         """
         Rank the paragraphs by how well they answers the question
@@ -53,12 +53,12 @@ class RankParagraphs(Recipe):
 
         async def cmp(a: Paragraph, b: Paragraph) -> int:
             progress_bar.update(1)
-            if prompt_type == 'question':
+            if prompt_type == "question":
                 prompt = make_compare_paragraphs_prompt(a, b, question)
-            elif prompt_type == 'summary':
+            elif prompt_type == "summary":
                 prompt = make_compare_summaries_prompt(a, b)
             else:
-                prompt = 'Not implemented yet. hah.'
+                prompt = "Not implemented yet. hah."
             answer = (
                 await self.agent().answer(
                     prompt=prompt,
