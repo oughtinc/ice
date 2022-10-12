@@ -19,10 +19,10 @@ class CompleteRequest(RouteModel):
 
 @router.post("/complete")
 async def complete(request: CompleteRequest):
-    if not request.agent in MACHINE_AGENTS:
+    if request.agent not in MACHINE_AGENTS:
         return "Invalid agent!"
     completionAgent = MACHINE_AGENTS.get(request.agent)()
     result = await completionAgent.complete(
-        prompt=request.prompt, stop=None if request.multiline else "\n"
+        prompt=request.prompt, stop=(None if request.multiline else "\n")
     )
     return result
