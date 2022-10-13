@@ -34,6 +34,7 @@ torch = [
     { url = "https://download.pytorch.org/whl/cu116/torch-1.12.0%2Bcu116-cp310-cp310-linux_x86_64.whl", optional = true },
 ]
 merge-args = "^0.1.4"
+python-dotenv = "^0.21.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
