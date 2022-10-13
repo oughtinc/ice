@@ -9,8 +9,8 @@
 **/*.pickle
 **/*.pt
 **/*.sqlite
+**/.env
 /.coverage
-/.env
 /.git
 /.mypy_cache
 /.pre-commit-home
