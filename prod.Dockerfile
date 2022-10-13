@@ -1,3 +1,5 @@
+# TODO: Get rid of this file and just parameterize Dockerfile for production.
+
 FROM python:3.10.4-slim
 WORKDIR /code
 ENV \
@@ -17,24 +19,19 @@ ENV \
   # TODO: Suppress only this warning instead of all warnings.
   TRANSFORMERS_VERBOSITY=error
 
-COPY nodesource.gpg ./
 RUN \
-  echo 'deb [signed-by=/code/nodesource.gpg] https://deb.nodesource.com/node_16.x focal main' \
-    >/etc/apt/sources.list.d/nodesource.list && \
   apt update && \
   apt install -y \
     build-essential \
-    git \
-    nodejs && \
+    git && \
   rm -rf /var/lib/apt/lists/* && \
-  git config --global --add safe.directory /code && \
-  npm install -g concurrently
+  git config --global --add safe.directory /code
 
 COPY poetry-requirements.txt poetry.lock pyproject.toml ./
 ARG poetry_install_args=""
 RUN \
   pip install -r poetry-requirements.txt && \
-  poetry install --no-interaction --no-ansi $poetry_install_args && \
+  poetry install --no-dev --no-interaction --no-ansi $poetry_install_args && \
   rm -rf /root/.cache/pypoetry
 
 ENV VIRTUAL_ENV=/code/.venv
@@ -42,10 +39,7 @@ ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
 RUN python -c "import nltk; nltk.download('punkt')"
 
-COPY ui/package.json ui/package-lock.json ui/
-COPY ui/patches/*.patch ui/patches/
-RUN npm --prefix ui ci
-
 COPY . .
 
-CMD ["concurrently", "uvicorn ice.routes.app:app --host 0.0.0.0 --port 8935 --reload", "npm --prefix ui run dev"]
+# TODO: Use gunicorn in production: https://www.uvicorn.org/deployment/
+CMD ["uvicorn", "ice.routes.app:app", "--host", "0.0.0.0", "--port", "8935"]
