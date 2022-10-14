@@ -1,7 +1,7 @@
+from transformers import GPT2TokenizerFast
+
 from ice.recipe import recipe
 from ice.recipes.elicit.search import elicit_search
-
-from transformers import GPT2TokenizerFast
 
 
 def make_gpt2_tokenizer() -> GPT2TokenizerFast:
