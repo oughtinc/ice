@@ -117,9 +117,7 @@ async def paragraph_synthesis(
     remaining_tokens = MAX_TOKENS - num_tokens(prompt)
 
     completion = await recipe.agent().complete(
-        prompt=prompt,
-        max_tokens=remaining_tokens,
-        stop=("<|endoftext|>",),
+        prompt=prompt, max_tokens=remaining_tokens, stop="<|endoftext|>"
     )
 
     return completion
