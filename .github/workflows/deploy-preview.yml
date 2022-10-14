@@ -34,7 +34,7 @@ jobs:
         uses: oughtinc/fly-pr-review-apps@5d455e7f825bd7f2bb6758ce48bbda3e6f0db366
         with:
           name: ice-pr-${{ github.event.number }}-backend
-          secrets: "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} OPENAI_ORG_ID=${{ secrets.OPENAI_ORG_ID }} OUGHT_INFERENCE_API_KEY=${{ secrets.OUGHT_INFERENCE_API_KEY }}"
+          secrets: "NEXT_PUBLIC_BACKEND_API_KEY=${{ secrets.NEXT_PUBLIC_BACKEND_API_KEY }} OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} OPENAI_ORG_ID=${{ secrets.OPENAI_ORG_ID }} OUGHT_INFERENCE_API_KEY=${{ secrets.OUGHT_INFERENCE_API_KEY }}"
 
   deploy-frontend-preview:
     name: Deploy frontend preview on Vercel
@@ -57,5 +57,5 @@ jobs:
       - name: Deploy on Vercel
         id: vercel-deploy
         run: |
-          export FRONTEND_PREVIEW_URL=$(npx vercel --confirm --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_TEAM_ID }} -b NEXT_PUBLIC_BACKEND_URL=${{ needs.deploy-backend-preview.outputs.backend_url }})
+          export FRONTEND_PREVIEW_URL=$(npx vercel --confirm --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_TEAM_ID }} -b NEXT_PUBLIC_BACKEND_API_KEY=${{ secrets.NEXT_PUBLIC_BACKEND_API_KEY }} -b NEXT_PUBLIC_BACKEND_URL=${{ needs.deploy-backend-preview.outputs.backend_url }})
           echo "::set-output name=frontend_url::${FRONTEND_PREVIEW_URL}"
