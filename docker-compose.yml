@@ -2,6 +2,7 @@ services:
   ice:
     image: docker.io/oughtinc/ice:0.2.0
     environment:
+      NEXT_PUBLIC_BACKEND_API_KEY: ${NEXT_PUBLIC_BACKEND_API_KEY:-}
       OUGHT_INFERENCE_API_KEY: ${OUGHT_INFERENCE_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_ORG_ID: ${OPENAI_ORG_ID:-}

@@ -11,6 +11,7 @@ else:
 
 
 class Settings(BaseSettings):
+    NEXT_PUBLIC_BACKEND_API_KEY: str
     OUGHT_INFERENCE_API_KEY: str
     OPENAI_API_KEY: str
     OPENAI_ORG_ID: str

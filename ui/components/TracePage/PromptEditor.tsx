@@ -212,6 +212,7 @@ export const PromptEditorModal = () => {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
+                    "X-Api-Key": process.env.NEXT_PUBLIC_API_KEY ?? "",
                   },
                   body: JSON.stringify({
                     agent: selectedAgent,

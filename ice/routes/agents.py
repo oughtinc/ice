@@ -1,13 +1,15 @@
 from fastapi import APIRouter
+from fastapi import Depends
 
 from ice.agent import MACHINE_AGENTS
+from ice.routes.auth import check_auth
 from ice.routes.base import RouteModel
 
 router = APIRouter(prefix="/agents", tags=["agents"])
 
 
-@router.get("/list")
-async def apiList():
+@router.get("/list", response_model=list[str])
+async def get_list():
     return list(MACHINE_AGENTS.keys())
 
 
@@ -17,7 +19,7 @@ class CompleteRequest(RouteModel):
     multiline: bool
 
 
-@router.post("/complete")
+@router.post("/complete", response_model=str, dependencies=[Depends(check_auth)])
 async def complete(request: CompleteRequest):
     if request.agent not in MACHINE_AGENTS:
         return "Invalid agent!"
