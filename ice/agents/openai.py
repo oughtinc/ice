@@ -19,7 +19,7 @@ class OpenAIAgent(Agent):
     def __init__(
         self,
         model: str = "text-davinci-002",
-        temperature: float = 0.0,
+        temperature: float = 0.7,
         top_p: float = 1.0,
     ):
         self.model = model
@@ -34,11 +34,13 @@ class OpenAIAgent(Agent):
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,
+        presence_penalty: float = 0.0,
+        frequency_penalty: float = 0.0,
     ) -> str:
         """Generate an answer to a question given some context."""
         if verbose:
             self._print_markdown(prompt)
-        response = await self._complete(prompt, stop=stop, max_tokens=max_tokens)
+        response = await self._complete(prompt, stop=stop, max_tokens=max_tokens, presence_penalty=presence_penalty, frequency_penalty=frequency_penalty)
         completion = self._extract_completion(response)
         if verbose:
             self._print_markdown(completion)

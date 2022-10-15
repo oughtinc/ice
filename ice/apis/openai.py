@@ -89,6 +89,8 @@ async def openai_complete(
     logprobs: int | None = None,
     n: int = 1,
     cache_id: int = 0,  # for repeated non-deterministic sampling using caching
+    presence_penalty: float = 0,
+    frequency_penalty: float = 0,
 ) -> dict:
     """Send a completion request to the OpenAI API and return the JSON response."""
     cache_id  # unused
@@ -103,5 +105,7 @@ async def openai_complete(
             "max_tokens": max_tokens,
             "logprobs": logprobs,
             "n": n,
+            "presence_penalty": presence_penalty,
+            "frequency_penalty": frequency_penalty,
         },
     )
