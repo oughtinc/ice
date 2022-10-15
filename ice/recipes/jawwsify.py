@@ -1,7 +1,7 @@
-from ice.recipe import recipe
 from ice.apis.openai import openai_complete
+from ice.recipe import recipe
 
-#TODO: Citation removal isn't what we want we should instead:
+# TODO: Citation removal isn't what we want we should instead:
 # a) Extract them into a "footnotes" section, and keep the footnote links inline
 # b) Remove them from the text, and then add them back in at the very end
 # Would also need us to test how well the agent keeps the footnote links in the right place
@@ -33,9 +33,10 @@ SEP = "\n ### \n"
 
 INITIAL_TEXT = """The majority of licensed vaccines provide protection through induction of protective antibodies (Plotkin, 2010). Isolation of HIV-1 broadly neutralizing antibodies (bnAbs) from HIV-infected individuals and the finding that passive transfer of bnAbs can protect non-human primates (NHPs) from simian/human immunodeficiency virus (SHIV) infection support the feasibility of an antibody-based HIV vaccine (Burton and Hangartner, 2016, Nishimura and Martin, 2017). Elicitation of neutralizing antibodies (nAbs) against clinically relevant HIV strains (i.e., tier 2 and tier 3 strains) by immunization has been difficult (Montefiori et al., 2018). Much of that challenge centers on structural features of the HIV envelope (Env), which have complex and incompletely understood immunological implications. Env consists of gp120 and gp41 components that form a trimeric spike that is the only viral protein on HIV virions and the only target for nAbs (Burton and Hangartner, 2016). Human immunization with monomeric gp120 has failed to elicit tier 2 nAbs in clinical trials (Haynes et al., 2012, Mascola et al., 1996, Rerks-Ngarm et al., 2009). The reasons for this are not obvious because nAb epitopes are present on gp120. Key developments in protein design have been made toward the expression of soluble native-like HIV Env trimers (Julien et al., 2013, Kulp et al., 2017, Lyumkis et al., 2013, Sanders et al., 2013). Immunization with these Env trimers elicited substantial strain-specific tier 2 nAbs in rabbits and guinea pigs but failed to elicit nAbs in mice (Feng et al., 2016, Hu et al., 2015, Sanders et al., 2015). Trimer immunization of NHPs has been sporadically successful (Havenar-Daughton et al., 2016a, Pauthner et al., 2017, Sanders et al., 2015, Zhou et al., 2017). For some regimes in NHPs, autologous tier 2 nAbs have been elicited within 10 weeks, which is comparable with the speed of nAb development in HIV-infected individuals (Pauthner et al., 2017, Richman et al., 2003, Wei et al., 2003). Thus, although nAb epitopes are presented on native-like trimers, the immunological parameters controlling the development of nAbs to Env remain to be elucidated. These parameters are also likely important for nAbs to other pathogens."""
 
+
 async def remove_citations(text: str):
     prompt = CITATION_REMOVAL_PROMPT
-    prompt += SEP 
+    prompt += SEP
     prompt += "Original text: " + EXAMPLE_0
     prompt += "\n"
     prompt += "Rewritten text: " + EXAMPLE_1
@@ -46,9 +47,10 @@ async def remove_citations(text: str):
 
     return await recipe.agent().complete(prompt=prompt, max_tokens=2000)
 
+
 async def split_paragraphs(text: str):
     prompt = SPLIT_PROMPT
-    prompt += SEP 
+    prompt += SEP
     prompt += "Original text: " + EXAMPLE_1
     prompt += "\n"
     prompt += "Rewritten text: " + EXAMPLE_2
@@ -59,8 +61,9 @@ async def split_paragraphs(text: str):
 
     return await recipe.agent().complete(prompt=prompt, max_tokens=2000)
 
+
 async def simplify(text: str):
-    prompt = SEP 
+    prompt = SEP
     prompt += SIMPLIFY_PROMPT
     prompt += "Original text: " + EXAMPLE_2
     prompt += "\n"
@@ -71,12 +74,16 @@ async def simplify(text: str):
     prompt += "\n"
     prompt += "Rewritten text:"
 
-    return await recipe.agent().complete(prompt=prompt, max_tokens=2000, frequency_penalty=0.5, presence_penalty=0.5)
+    return await recipe.agent().complete(
+        prompt=prompt, max_tokens=2000, frequency_penalty=0.5, presence_penalty=0.5
+    )
+
 
 async def pipeline(text: str = INITIAL_TEXT):
     text = await remove_citations(text)
     text = await split_paragraphs(text)
     text = await simplify(text)
     return text
+
 
 recipe.main(pipeline)
