@@ -26,7 +26,7 @@ MACHINE_AGENTS = {
     "instruct": lambda: OpenAIAgent(),
     "instruct-reasoning": lambda: OpenAIReasoningAgent(),
     "instruct-reasoning-crowd": lambda: OpenAIReasoningAgent(num_workers=8),
-    "davinci:ft-ought-experiments:synthesisv2-2022-10-17-23-02-55": lambda: OpenAIReasoningAgent(model="davinci:ft-ought-experiments:synthesisv2-2022-10-17-23-02-55"),
+    "davinci:ft-ought-experiments:synthesisv2-2022-10-17-23-02-55": lambda: OpenAIAgent(model="davinci:ft-ought-experiments:synthesisv2-2022-10-17-23-02-55"),
     "curie": lambda: OpenAIAgent(model="curie"),
     "qasper": lambda: SquadAgent(),
     "mono-t5": lambda: OughtInferenceAgent(engine="mono-t5-base"),
