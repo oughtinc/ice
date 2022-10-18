@@ -30,7 +30,7 @@ from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
 )
 from ice.recipe import Recipe, recipe
 from ice.recipes.experiments_and_arms.types import PassageWithReasoning
-from ice.trace import recorder, trace
+from ice.trace import Recorder, recorder, trace
 from ice.recipes.experiments_and_arms.num_utils import strip_enumeration_prefix
 
 
@@ -58,8 +58,19 @@ async def name_arms(
     paper: Paper,
     experiments: Sequence[str],
     experiment_in_question: str,
-    record=recorder,
-):
+    record: Recorder = recorder,
+) -> Sequence[str]:
+    """What were  the trial arms for this experiment?
+
+    Args:
+        paper (Paper): The paper in question.
+        experiments (Sequence[str]): All the experiments in the paper.
+        experiment_in_question (str): The experiment to identify the trial arms for.
+        record (Recorder, optional): (recorder for tracing). Defaults to recorder.
+
+    Returns:
+        Sequence[str]: The trial arms for the `experiment_in_question`
+    """
     paragraphs = paper.nonempty_paragraphs()
     passages_by_relevance = await rank_passages(
         [str(p) for p in paragraphs],
@@ -97,7 +108,11 @@ async def name_arms(
 
     assert arm_names.final_answer is not None
 
-    final_answer: str = (await openai_complete(make_quick_list_prompt(arm_names.final_answer), stop="\n\nAnswer"))["choices"][0]["text"]
+    final_answer: str = (
+        await openai_complete(
+            make_quick_list_prompt(arm_names.final_answer), stop="\n\nAnswer"
+        )
+    )["choices"][0]["text"]
 
     return (
         [
@@ -108,8 +123,6 @@ async def name_arms(
         if final_answer
         else []
     )
-
-
 
 
 recipe.main(name_arms)

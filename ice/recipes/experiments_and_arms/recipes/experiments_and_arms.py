@@ -1,3 +1,4 @@
+import json
 from typing import Sequence
 from ice.paper import Paper
 from ice.recipe import Recipe, recipe
@@ -10,13 +11,25 @@ from ice.recipes.experiment_arms import ExperimentArms
 from ice.utils import map_async
 from functools import partial
 from ice.trace import recorder, trace
+from ice.evaluation.evaluate_recipe_result import RecipeResult
 
 
 USE_GS = False
 
 
 @trace
-async def experiments_and_arms(paper: Paper, record=recorder):
+async def experiments_and_arms(
+    paper: Paper, record=recorder
+) -> tuple[str, str, ExperimentsArms, ExperimentsArms]:
+    """What were the experiments performed in this paper, and for each experiment, what were the trial arms?
+
+    Args:
+        paper (Paper): Paper to evaluate.
+        record (Recorder, optional): (recorder for tracing). Defaults to recorder.
+
+    Returns:
+        tuple[str, str, ExperimentsArms, ExperimentsArms]: The quick-eval grade, the explanation for that grade, the gold standard answer, and the generated answer.
+    """
     gs = get_ea_gs(paper.document_id)
     gs_exps, exps = await name_experiments(paper)
 
@@ -25,25 +38,51 @@ async def experiments_and_arms(paper: Paper, record=recorder):
     else:
         gs_exps = []
 
-    # arms = [([""], [""]) for _ in range(len(exps))]
     async def run_arms(experiment_in_question: str) -> Sequence[str]:
-        return await name_arms(paper=paper, experiments=exps, experiment_in_question=experiment_in_question)
+        return await name_arms(
+            paper=paper, experiments=exps, experiment_in_question=experiment_in_question
+        )
 
     arms_by_exp = await map_async(exps, run_arms)
-    result = ExperimentsArms(experiments=[
-        Experiment(
-            name=exp, description="", arms=[Arm(name=a, description="") for a in arm]
-        )
-        for exp, arm in zip(exps, arms_by_exp)
-    ])
-    gs_answer = gs.parsed_answer if gs and gs.parsed_answer else ExperimentsArms(experiments=[])
+    result = ExperimentsArms(
+        experiments=[
+            Experiment(
+                name=exp,
+                description="",
+                arms=[Arm(name=a, description="") for a in arm],
+            )
+            for exp, arm in zip(exps, arms_by_exp)
+        ]
+    )
+    gs_answer = (
+        gs.parsed_answer if gs and gs.parsed_answer else ExperimentsArms(experiments=[])
+    )
 
     evaluation, grade = await quick_evaluate(gs_answer, result)
 
     return grade, evaluation, gs_answer, result
 
 
-
 class ExperimentsAndArms(Recipe):
     async def run(self, paper: Paper):
-        return await experiments_and_arms(paper)
+        """Wrapped experiments and arms recipe for evaluation script.
+
+        Args:
+            paper (Paper): Paper to evaluate.
+        """
+        grade, evaluation, _, result = await experiments_and_arms(paper)
+        self.maybe_add_to_results(
+            [
+                RecipeResult(
+                    question_short_name="experiments_arms",
+                    document_id=paper.document_id,
+                    experiment="",
+                    excerpts=[],
+                    answer=json.dumps(
+                        result.dict()
+                        | dict(autoeval_grade=grade, autoeval_reasoning=evaluation)
+                    ),
+                    result=result,
+                )
+            ]
+        )

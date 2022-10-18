@@ -24,6 +24,18 @@ async def reasoning_sample(
     stop: tuple[str, ...],
     cache_id: int,
 ) -> str:
+    """Sample reasoning from the agent.
+
+    Args:
+        prompt (str): The reasoning prompt
+        get_reasoning (Callable[[str], str]): Extract the reasoning from the generated answer.
+        temperature (float): The temperature at which to sample.
+        stop (tuple[str, ...]): Stop sequence(s) for reasoning
+        cache_id (int): Cache ID for persistent cache identity across multiple calls.
+
+    Returns:
+        str: Generated reasoning.
+    """
     response = await openai_complete(
         prompt=prompt,
         temperature=temperature,
@@ -43,6 +55,19 @@ async def greedy_continuation(
     max_tokens: int,
     final_answer_processor: Callable[[dict], T1],
 ) -> tuple[dict, T1]:
+    """Greedily sample a continuation.
+
+    Args:
+        texts (Sequence[str]): The texts for the prompt.
+        helpfulness (str | None): Generated helpfulness.
+        reasoning (str | None): Generated reasoning.
+        prompt_func (MultipartReasoningPrompt): Create a prompt from the texts, helpfulness (if it exists), and reasoning.
+        max_tokens (int): Max tokens for the openai request.
+        final_answer_processor (Callable[[dict], T1]): Function to extract an answer from the OpenAI response.
+
+    Returns:
+        tuple[dict, T1]: OpenAI response and the extracted answer.
+    """
     prompt = prompt_func(texts, helpfulness=helpfulness, reasoning=reasoning)
     response = await openai_complete(
         prompt=prompt, logprobs=10, max_tokens=max_tokens, stop=None
@@ -57,6 +82,18 @@ async def _get_helpfulness(
     get_helpfulness: Callable[[str], str],
     max_tokens: int = 100,
 ) -> str:
+    """Get helpfulness based on the generated reasoning.
+
+    Args:
+        texts (Sequence[str]): The texts for the prompt.
+        reasoning (str): Generated reasoning.
+        prompt_func (MultipartReasoningPrompt): Create a prompt from texts and reasoning.
+        get_helpfulness (Callable[[str], str]): Extract helpfulness statement from generated answer.
+        max_tokens (int, optional): Max tokens for the helpfulness request. Defaults to 100.
+
+    Returns:
+        str: The generated helpfulness.
+    """
     _, helpfulness = await greedy_continuation(
         texts,
         helpfulness=None,
@@ -76,6 +113,19 @@ async def _get_final_answer(
     final_answer_processor: Callable[[dict], T1],
     max_tokens: int = 50,
 ) -> T1:
+    """Get final answer based on the generated reasoning (and optionally, helpfulness).
+
+    Args:
+        texts (Sequence[str]): The texts for the prompt.
+        helpfulness (str | None): Generated helpfulness, if it exsts.
+        reasoning (str): Generated reasoning.
+        prompt_func (MultipartReasoningPrompt): Create a prompt from the texts, helpfulness (if it exists), and reasoning.
+        final_answer_processor (Callable[[dict], T1]): Extract final answer from the OpenAI response.
+        max_tokens (int, optional): Max tokens for the final answer generation request. Defaults to 50.
+
+    Returns:
+        T1: The final answer.
+    """
     _, final_answer = await greedy_continuation(
         texts,
         helpfulness=helpfulness,
@@ -98,8 +148,24 @@ async def reason_select_and_answer(
     get_helpfulness: Callable[[str], str] | None,
     final_answer_processor: Callable[[dict], T1],
 ) -> PassageWithReasoning[T1]:
-    """
-    Reason at a high temperature, then select and answer with greedy decoding.
+    """Prompt chaining technique that samples reasoning, then optionally greedily generates helpfulness, then a final answer.
+
+    Args:
+        texts (Sequence[str]): The texts for the prompt.
+        num_examples (int): The number of shots for few-shot prompts.
+        cache_id (int): Cache ID for cache-breaking purposes.
+        reasoning_temperature (float): Temperature for reasoning sample.
+        reasoning_stop (tuple[str, ...]): Stop sequence(s) for reasoning.
+        prompt_func (Callable[[int], MultipartReasoningPrompt]): Generate prompts based on texts, (optional) reasoning, (optional) helpfulness, and the final answer.
+        get_reasoning (Callable[[str], str]): Extract reasoning from the generation in response to the reasoning prompt.
+        get_helpfulness (Callable[[str], str] | None): Extract helpfulness from the generation in response to the helpfulness prompt. If None, do not generate helpfulness.
+        final_answer_processor (Callable[[dict], T1]): Extract final answer from the OpenAI response to final answer prompt.
+
+    Raises:
+        TooLongRequestError: If the prompts are too long after first reducing the number of shots, then dropping texts.
+
+    Returns:
+        PassageWithReasoning[T1]: Final answer with reasoning.
     """
     try:
         reasoning_prompt = prompt_func(num_examples)([t for t in texts])
@@ -186,6 +252,24 @@ async def sample_reason_select_and_answer(
     get_helpfulness: Callable[[str], str] | None,
     final_answer_processor: Callable[[dict], T1],
 ) -> T2:
+    """Sample multiple reasonings, greedily generating helpfulness (optional) and a final answer based on the reasoning.
+    Choose a final answer based on the technique passed in as the `selector`.
+
+    Args:
+        num_samples (int): Number of distinct reasoning candidates to generate.
+        selector (Callable[[Sequence[PassageWithReasoning[T1]]], Awaitable[T2]]): Function that selects the "best" reasoning among the candidates.
+        texts (Sequence[str]): Texts for the prompts.
+        num_examples (int): Number of shots for the prompts (will be reduced if prompts are too long).
+        reasoning_temperature (float): Reasoning temperature.
+        reasoning_stop (tuple[str, ...]): Stop sequence(s) for the reasoning
+        prompt_func (Callable[[int], MultipartReasoningPrompt]): Given the number of shots, return a function that can generate prompts based on the chaining technique applied here.
+        get_reasoning (Callable[[str], str]): Extract reasoning from the reasoning prompt.
+        get_helpfulness (Callable[[str], str] | None): Extract helpfulness from the helpfulness prompt. If `None`, do not generate helpfulness.
+        final_answer_processor (Callable[[dict], T1]): Extract final answer (generic) based on the OpenAI response to the greedy final answer prompt.
+
+    Returns:
+        T2: Final answer.
+    """
     async def sample(cache_id: int):
         return await reason_select_and_answer(
             texts,

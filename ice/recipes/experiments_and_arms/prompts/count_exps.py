@@ -13,7 +13,7 @@ log = get_logger()
 
 COUNT_EXPERIMENTS_PREFACE = """When evaluating a randomized controlled trial, you should first identify the number of distinct experiments (e.g., randomized controlled trials, or RCTs) conducted. An experiment is where the authors evaluate the effect of some program, action, or substance on a population. Two experiments are distinct if they are conducted on different populations. Experiments have different "trial arms". Trial arms describe the different treatment conditions participants were in.
 
-Let's look at excerpts from five different papers to see what information, if any, they provide about the study's experiments (e.g., RCTs). We'll have to identify what each extract tells us about the experiments. If there is no explicit information indicating that multiple experiments or studies were conducted, assume there was just one experiment.""".strip()
+Let's look at excerpts from five different papers to see what information, if any, they provide about the study's experiments (e.g., RCTs). We'll have to identify what each extract tells us about whether the authors conducted one or several experiments. If there is no explicit information indicating that multiple experiments or studies were conducted, assume there was just one experiment.""".strip()
 
 COUNT_EXPERIMENTS_EXAMPLE_TEMPLATE = """
 {ordinal}, consider the following excerpt{maybe_plural_excerpts} from a paper:

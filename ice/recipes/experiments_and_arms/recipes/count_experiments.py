@@ -15,15 +15,31 @@ from ice.recipes.experiments_and_arms.prompts.count_exps import (
     get_count_exps_reasoning,
     make_count_experiments_prompt_func,
 )
-from ice.recipes.experiments_and_arms.prompts.passages_to_keep import most_helpful_paragraphs
+from ice.recipes.experiments_and_arms.prompts.passages_to_keep import (
+    most_helpful_paragraphs,
+)
 from ice.recipes.experiments_and_arms.prompts.utils import plurality_greedy
-from ice.recipes.experiments_and_arms.recipes.best_passages import rank_passages, initial_passages
+from ice.recipes.experiments_and_arms.recipes.best_passages import (
+    rank_passages,
+    initial_passages,
+)
 from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
     sample_reason_select_and_answer,
 )
+from ice.recipes.experiments_and_arms.types import PassageWithReasoning
 
 
-async def count_experiments(paper: Paper) -> tuple[int, Sequence[str]]:
+async def count_experiments(
+    paper: Paper,
+) -> tuple[PassageWithReasoning[int], Sequence[str]]:
+    """How many distinct experiments are in the paper?
+
+    Args:
+        paper (Paper): Paper to count experiments in.
+
+    Returns:
+        tuple[PassageWithReasoning[int], Sequence[str]]: The number of experiments and the paragraphs used to count the experiments.
+    """
     paragraphs = paper.nonempty_paragraphs()
     passages_by_relevance = await rank_passages(
         [str(p) for p in paragraphs],
@@ -53,5 +69,6 @@ async def count_experiments(paper: Paper) -> tuple[int, Sequence[str]]:
     )
 
     return experiment_count, paragraphs_to_keep
+
 
 recipe.main(count_experiments)

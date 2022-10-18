@@ -10,6 +10,7 @@ from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
     sample_reason_select_and_answer,
 )
 from ice.recipe import recipe
+from ice.utils import window_dropping
 
 from ice.recipes.experiments_and_arms.types import (
     MultipartReasoningPrompt,
@@ -22,13 +23,6 @@ log = get_logger()
 T = TypeVar("T")
 
 
-class Sentinel(Enum):
-    token = 0
-
-
-_sentinel = Sentinel.token
-
-
 def choices_log_probs(response: dict, choices: Sequence[str]):
     top_logprobs: dict[str, float] = response["choices"][0]["logprobs"]["top_logprobs"][
         0
@@ -36,17 +30,17 @@ def choices_log_probs(response: dict, choices: Sequence[str]):
     return {choice: top_logprobs.get(choice) for choice in choices}
 
 
-def window_dropping(items: Sequence[T], n, step) -> Sequence[Sequence[T]]:
-    """Windows over items, shortening n if necessary"""
-    return [
-        [i for i in window if i is not _sentinel]
-        for window in windowed(items, n=n, step=step, fillvalue=_sentinel)
-    ]
-
-
 async def rank_passages_selector(
     samples: Sequence[PassageWithReasoning[float]],
 ) -> PassageWithReasoning[float]:
+    """Select the reasoning with the final answer closest to the mean.
+
+    Args:
+        samples (Sequence[PassageWithReasoning[float]]): Passages with reasoning to rank.
+
+    Returns:
+        PassageWithReasoning[float]: Passage with reasoning closest to the mean.
+    """
     scores = [sample.final_answer for sample in samples if sample.final_answer]
     mean_score = (
         sum(scores) / len(scores) if scores else -100_000
@@ -98,7 +92,6 @@ async def initial_passages(
     return sorted_answers
 
 
-
 async def rank_passages(
     passages: Sequence[str],
     prompt_func: Callable[[int], MultipartReasoningPrompt],
@@ -112,7 +105,28 @@ async def rank_passages(
     num_shots: int,
     passages_per_prompt: int = 4,
     step: int = 1,
-):
+) -> Sequence[PassageWithReasoning[float]]:
+    """Rank passages by final answer probability after sampling reasoning.
+
+    Args:
+        passages (Sequence[str]): Paragraphs to break into longer passages and rank
+        prompt_func (Callable[[int], MultipartReasoningPrompt]): Function that returns a multipart reasoning prompt with the given number of examples
+        choices (Sequence[str]): Final answer choices
+        best_choice (str): Choice in choices that should be considered "correct" for purposes of ranking by logprobs
+        reasoning_stop (tuple[str, ...]): Stop sequence(s) for reasoning prompt
+        get_reasoning (Callable[[str], str]): Extract reasoning from a completion
+        get_helpfulness (Callable[[str], str]): Extract helpfulness statement from a completion
+        num_shots (int): Number of few-shot examples to use in prompts
+        num_samples (int, optional): Number of samples for each passage; if >1, scores are averaged and the final reasoning closest to the average is chosen. Defaults to 1.
+        passages_per_prompt (int, optional): Number of paragraphs to include in each passage. Defaults to 4. Reduced if prompts are too long.
+        step (int, optional): Overlap between passages. Defaults to 1.
+
+    Raises:
+        TooLongRequestError: If context is too long even after reducing the number of passages per prompt
+
+    Returns:
+        Sequence[PassageWithReasoning[float]]: Ranked passages in descending order, with reasoning and helpfulness for each passage.
+    """
     try:
         candidates = window_dropping(items=passages, n=passages_per_prompt, step=step)
         assert best_choice in choices, "best_choice should be in choices"

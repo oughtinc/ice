@@ -1,3 +1,4 @@
+from enum import Enum
 import itertools
 import os
 import threading as td
@@ -15,6 +16,7 @@ from typing import Generic
 from typing import TypeVar
 
 import anyio
+from more_itertools import windowed
 import tqdm
 
 from structlog.stdlib import get_logger
@@ -77,6 +79,34 @@ async def filter_async(
     return [item for item, value in zip(iterable_list, values) if value]
 
 
+T = TypeVar("T")
+S = TypeVar("S")
+
+
+async def reduce_async(
+    fn: Callable[[T, S], Awaitable[T]], iterable: Iterable[S], initial: T
+):
+    current = initial
+    for item in iterable:
+        current = await fn(current, item)
+    return current
+
+
+class _Sentinel(Enum):
+    token = 0
+
+
+_sentinel = _Sentinel.token
+
+
+def window_dropping(items: Sequence[T], n, step) -> Sequence[Sequence[T]]:
+    """Windows over items, shortening n if necessary"""
+    return [
+        [i for i in window if i is not _sentinel]
+        for window in windowed(items, n=n, step=step, fillvalue=_sentinel)
+    ]
+
+
 def longest_common_prefix(xs: Sequence[str]) -> str:
     if not xs:
         return ""
@@ -85,8 +115,6 @@ def longest_common_prefix(xs: Sequence[str]) -> str:
         prefix = os.path.commonprefix([prefix, x])
     return prefix
 
-
-T = TypeVar("T")
 
 AsyncComparator = Callable[[T, T], Awaitable[int]]
 
