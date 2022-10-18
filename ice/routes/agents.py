@@ -29,12 +29,16 @@ async def complete(request: CompleteRequest):
     )
     return result
 
+
 class classifyRequest(RouteModel):
     agent: str
     prompt: str
     options: list[str]
 
-@router.post("/classify", response_model=dict[str, float], dependencies=[Depends(check_auth)])
+
+@router.post(
+    "/classify", response_model=dict[str, float], dependencies=[Depends(check_auth)]
+)
 async def classify(request: classifyRequest):
     if request.agent not in MACHINE_AGENTS:
         return "Invalid agent!"
