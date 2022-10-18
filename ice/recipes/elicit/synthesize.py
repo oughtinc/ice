@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from transformers import GPT2TokenizerFast
 
 from ice.recipe import recipe
+import json
 
 
 @dataclass
@@ -203,6 +204,18 @@ async def synthesize(question: str, abstracts: list[Abstract]) -> str:
     )
 
     return completion
+
+async def synthesize_from_df(
+    question,
+    papers,
+    **kwargs
+):
+    return await synthesize(question, [Abstract(
+        title=paper["title"],
+        authors=paper["authors"],
+        year=paper["year"],
+        text=paper["abstract"],
+    ) for paper in json.loads(papers)])
 
 
 async def synthesize_test():
