@@ -112,7 +112,7 @@ export const ClassifyOptions = ({
       <h3 className="text-lg font-semibold text-gray-700 mb-2 mt-3">Options</h3>
       <div className="flex gap-2">
         {options.map(opt => (
-          <div className="bg-gray-200 rounded-8 pl-3 pr-2 my-2 flex items-center">
+          <div className="bg-gray-200 rounded-8 pl-3 pr-2 my-2 flex items-center" key={opt}>
             {opt}
             <span className="rounded-full bg-gray-300 text-white ml-2 inline-flex">
               <X
@@ -154,7 +154,7 @@ export const ClassifyResults = ({
       <h3 className="text-lg font-semibold text-gray-700 mb-2 mt-3">Results</h3>
       <div className="flex flex-col gap-1">
         {options.map(opt => (
-          <div className="flex">
+          <div className="flex" key={opt}>
             <span className="text-gray-700 mr-2">{opt}</span>
             <div className="border border-slate-200 rounded-4 flex-grow mr-2">
               <span
