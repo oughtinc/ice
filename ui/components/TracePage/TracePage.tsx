@@ -281,24 +281,36 @@ const useCallInfo = (id: string) => {
   };
 };
 
-const COST_PER_DAVINCI_TOKEN = 0.02 / 1000;
-
-const useCost = (id: string): number => {
+const useTotalTokens = (id: string): number => {
+  const tokensFromRecord = (values: Record<string, unknown>) =>
+    "davinci_equivalent_tokens" in values && isNumber(values["davinci_equivalent_tokens"])
+      ? values["davinci_equivalent_tokens"]
+      : 0;
+  const children = useLinks()["getChildren"](id);
   const { records = {} } = useCallInfo(id);
-  const { getChildren } = useLinks();
-  const children = getChildren(id);
-  records && console.log(id, records);
-  const costOfSingleCall = (values: Record<string, unknown>) => {
-    const davinciEquivalentTokens =
-      "davinci_equivalent_tokens" in values && isNumber(values["davinci_equivalent_tokens"])
-        ? values["davinci_equivalent_tokens"]
-        : 0;
-    return davinciEquivalentTokens * COST_PER_DAVINCI_TOKEN;
-  };
   return (
-    Object.keys(records).reduce((prev, curr) => prev + costOfSingleCall(records[curr]), 0) +
-    sumBy(children, useCost)
+    sumBy(Object.keys(records), key => tokensFromRecord(records[key])) +
+    sumBy(children, useTotalTokens)
   );
+};
+
+const useCostEstimate = (id: string): number => {
+  const COST_USD_PER_DAVINCI_TOKEN = 0.02 / 1000;
+  return useTotalTokens(id) * COST_USD_PER_DAVINCI_TOKEN;
+};
+
+function union<T>(setA: Array<T> | Set<T>, setB: Array<T> | Set<T>): Set<T> {
+  const _union = new Set(setA);
+  for (const elem of setB) {
+    _union.add(elem);
+  }
+  return _union;
+}
+const useParams = (): Record<string, Array<unknown>> => {
+  const { calls } = useTreeContext();
+  const initial: Set<string> = new Set();
+  const args = reduce(calls, (prev, curr) => union(prev, Object.keys(curr.args)), initial);
+  return Object.fromEntries(Array.from(args).map(arg => [arg, []]));
 };
 
 type SelectedCallInfo = {
@@ -383,18 +395,13 @@ function lineAnchorId(id: string) {
   return `line-anchor-${id}`;
 }
 
-const Cost = ({ id }: { id: string }) => {
-  const cost = useCost(id);
-  return <>${Math.round(cost * 1000) / 1000}</>;
-};
-
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const { name, args, children = {}, result, select, selected, focussed } = useCallInfo(id);
   const { selectedId } = useTreeContext();
   const { getParent } = useLinks();
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
-  const [showCost, setShowCost] = useState(false);
+  const cost = useCostEstimate(id)
 
   const modelCall = isModelCall({ name, args });
   const isSiblingWithSelected = selectedId && getParent(id) === getParent(selectedId);
@@ -473,14 +480,8 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
               <span className="px-2">→</span>
               {result === undefined ? <Spinner size="small" /> : <ResultComponent value={result} />}
             </div>
+        {`\$${Math.round(cost * 100) / 100}`}
           </div>
-        </Button>
-        <Button
-          aria-label={showCost ? "Hide cost" : "Show cost"}
-          size="sm"
-          onClick={event => setShowCost(!showCost)}
-        >
-          {showCost ? <Cost id={id} /> : <>Estimate cost</>}
         </Button>
       </div>
       {!modelCall && (
@@ -634,7 +635,9 @@ const TabHeader = ({ id, doc }: { id: string; doc: string }) => (
     <h3 className="text-lg font-semibold text-gray-800">
       <CallName id={id} />
     </h3>
-    <p className="text-gray-600 text-sm">{doc}</p>
+    <p className="text-gray-600 text-sm" style={{ whiteSpace: "pre-line" }}>
+      {doc}
+    </p>
   </div>
 );
 
@@ -747,6 +750,7 @@ const stripIndent = (source: string): string => {
 const Trace = ({ traceId }: { traceId: string }) => {
   const { selectedId, rootId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
+  // const params = useParams()
 
   const maybeSetSelectedId = useCallback(
     (update: (id: string) => string | undefined) => {
@@ -860,6 +864,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
           <DetailPane />
         </div>
       </div>
+      {/* {Object.keys(params)} */}
     </div>
   );
 };
