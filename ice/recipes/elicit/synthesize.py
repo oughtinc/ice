@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from transformers import GPT2TokenizerFast
 
 from ice.recipe import recipe
-from ice.recipes.prompts import _create_prompt_ft
 import json
 
 
@@ -172,40 +171,35 @@ def _get_reference(authors: list[str], year: int | None) -> str:
 
 async def synthesize(question: str, abstracts: list[Abstract]) -> str:
 
-    # papers_str = "\n\n".join(
-    #     [
-    #         PAPER_FORMAT.format(
-    #             title=abstract.title,
-    #             reference=_get_reference(abstract.authors, abstract.year),
-    #             abstract=abstract.text,
-    #         )
-    #         for abstract in abstracts
-    #     ]
-    # )
-
-    # suffix = PROMPT_FORMAT.format(
-    #     question=question,
-    #     papers_str=papers_str,
-    # )
-
-    # sep = "\n\n###\n\n"
-
-    prompt = _create_prompt_ft(
-        query=question,
-        titles=[abstract.title for abstract in abstracts],
-        abstracts=[abstract.text for abstract in abstracts],
-        citations=[_get_reference(abstract.authors, abstract.year) for abstract in abstracts],
+    papers_str = "\n\n".join(
+        [
+            PAPER_FORMAT.format(
+                title=abstract.title,
+                reference=_get_reference(abstract.authors, abstract.year),
+                abstract=abstract.text,
+            )
+            for abstract in abstracts
+        ]
     )
-    # number_of_shots = len(SHOTS)
-    # while (
-    #     num_tokens(prompt) > MAX_TOKENS - MIN_COMPLETION_TOKENS and number_of_shots > 0
-    # ):
-    #     number_of_shots -= 1
-    #     prompt = PREFIX + sep + sep.join(SHOTS[:number_of_shots]) + sep + suffix
+
+    suffix = PROMPT_FORMAT.format(
+        question=question,
+        papers_str=papers_str,
+    )
+
+    sep = "\n\n###\n\n"
+
+    prompt = PREFIX + sep + sep.join(SHOTS) + sep + suffix
+    number_of_shots = len(SHOTS)
+    while (
+        num_tokens(prompt) > MAX_TOKENS - MIN_COMPLETION_TOKENS and number_of_shots > 0
+    ):
+        number_of_shots -= 1
+        prompt = PREFIX + sep + sep.join(SHOTS[:number_of_shots]) + sep + suffix
 
     remaining_tokens = MAX_TOKENS - num_tokens(prompt)
 
-    completion = await recipe.agent("davinci:ft-ought-experiments:synthesisv2-2022-10-17-23-02-55").complete(
+    completion = await recipe.agent().complete(
         prompt=prompt, max_tokens=remaining_tokens, stop="<|endoftext|>"
     )
 
