@@ -1,4 +1,13 @@
-import { Button, Checkbox, Select } from "@chakra-ui/react";
+import {
+  Button,
+  Checkbox,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+  Select,
+} from "@chakra-ui/react";
+import { X } from "phosphor-react";
 import {
   createContext,
   ReactNode,
@@ -89,6 +98,80 @@ export const usePromptEditorContext = () => {
   return context;
 };
 
+export const ClassifyOptions = ({
+  options,
+  setOptions,
+}: {
+  options: string[];
+  setOptions: (opts: string[]) => void;
+}) => {
+  const [val, setVal] = useState("");
+
+  return (
+    <>
+      <h3 className="text-lg font-semibold text-gray-700 mb-2 mt-3">Options</h3>
+      <div className="flex gap-2">
+        {options.map(opt => (
+          <div className="bg-gray-200 rounded-8 pl-3 pr-2 my-2 flex items-center">
+            {opt}
+            <span className="rounded-full bg-gray-300 text-white ml-2 inline-flex">
+              <X
+                className="inline-block"
+                onClick={() => {
+                  setOptions(options.filter(el => el !== opt));
+                }}
+              />
+            </span>
+          </div>
+        ))}
+        <input
+          value={val}
+          onChange={ev => setVal(ev.target.value)}
+          type="text"
+          placeholder="Enter an option, then press 'Enter' to add"
+          className="flex-grow border-slate-200 border px-3 py-2 block rounded-4 shadow-sm focus:border-blue-600 focus:ring-blue-600"
+          onKeyUp={ev => {
+            if (ev.key === "Enter") {
+              setOptions([...options, val]);
+              setVal("");
+            }
+          }}
+        />
+      </div>
+    </>
+  );
+};
+
+export const ClassifyResults = ({
+  options,
+  results,
+}: {
+  options: string[];
+  results: Record<string, number>;
+}) => {
+  return (
+    <div>
+      <h3 className="text-lg font-semibold text-gray-700 mb-2 mt-3">Results</h3>
+      <div className="flex flex-col gap-1">
+        {options.map(opt => (
+          <div className="flex">
+            <span className="text-gray-700 mr-2">{opt}</span>
+            <div className="border border-slate-200 rounded-4 flex-grow mr-2">
+              <span
+                className="bg-gray-700 rounded-4 block h-full"
+                style={{ width: `calc(100% * ${results[opt] || 0})` }}
+              />
+            </div>
+            <span className="text-gray-700 w-16">
+              {results[opt] !== undefined ? Math.round(results[opt] * 10000) / 100 : "..."}%
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export const PromptEditorModal = () => {
   const { open, currentPrompt, setCurrentPrompt, closeEditor } = usePromptEditorContext();
   const promptBoxRef = useRef<HTMLDivElement | null>(null);
@@ -101,7 +184,10 @@ export const PromptEditorModal = () => {
 
   const [agents, setAgents] = useState<string[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<string | undefined>();
+  const [task, setTask] = useState("complete");
   const [multiline, setMultiline] = useState(false);
+  const [classifyOptions, setClassifyOptions] = useState<string[]>([]);
+  const [classifyResults, setClassifyResults] = useState<Record<string, number>>({});
   useEffect(() => {
     fetch(`${backendUrl}/agents/list`)
       .then(res => res.json())
@@ -184,6 +270,12 @@ export const PromptEditorModal = () => {
             }}
             ref={promptContentRef}
           />
+          {task === "classify" ? (
+            <ClassifyOptions options={classifyOptions} setOptions={setClassifyOptions} />
+          ) : null}
+          {task === "classify" ? (
+            <ClassifyResults options={classifyOptions} results={classifyResults} />
+          ) : null}
         </div>
         <div className="flex flex-col w-48 pl-6">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Agent</h3>
@@ -194,6 +286,11 @@ export const PromptEditorModal = () => {
                 {el}
               </option>
             ))}
+          </Select>
+          <label className="text-sm mb-1 mt-3 text-gray-600">Task</label>
+          <Select onChange={ev => setTask(ev.target.value)} value={task}>
+            <option value="complete">Complete</option>
+            <option value="classify">Classify</option>
           </Select>
           <label className="text-sm mb-1 mt-3 text-gray-600">Multiline</label>
           <Checkbox isChecked={multiline} onChange={ev => setMultiline(ev.target.checked)} />
@@ -208,7 +305,7 @@ export const PromptEditorModal = () => {
               variant="outline"
               onClick={() => {
                 setLoading(true);
-                fetch(`${backendUrl}/agents/complete`, {
+                fetch(`${backendUrl}/agents/${task}`, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -217,12 +314,13 @@ export const PromptEditorModal = () => {
                   body: JSON.stringify({
                     agent: selectedAgent,
                     prompt: currentPrompt,
-                    multiline,
+                    options: task === "classify" ? classifyOptions : undefined,
+                    multiline: task === "complete" ? multiline : undefined,
                   }),
                 })
                   .then(res => res.json())
                   .then(data => {
-                    setPromptResult(data);
+                    setClassifyResults(data);
                     setLoading(false);
                   });
               }}

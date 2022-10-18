@@ -28,3 +28,18 @@ async def complete(request: CompleteRequest):
         prompt=request.prompt, stop=None if request.multiline else "\n"
     )
     return result
+
+class classifyRequest(RouteModel):
+    agent: str
+    prompt: str
+    options: list[str]
+
+@router.post("/classify", response_model=dict[str, float], dependencies=[Depends(check_auth)])
+async def classify(request: classifyRequest):
+    if request.agent not in MACHINE_AGENTS:
+        return "Invalid agent!"
+    classifyAgent = MACHINE_AGENTS[request.agent]()
+    result = await classifyAgent.classify(
+        prompt=request.prompt, choices=tuple(request.options)
+    )
+    return result[0]
