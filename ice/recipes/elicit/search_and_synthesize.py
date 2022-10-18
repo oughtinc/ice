@@ -1,7 +1,7 @@
 from ice.recipe import recipe
 from ice.recipes.elicit.search import elicit_search
-from ice.recipes.elicit.synthesize import Abstract
-from ice.recipes.elicit.synthesize import synthesize
+from ice.recipes.synthesize import Abstract
+from ice.recipes.synthesize import synthesize
 
 
 async def search_and_synthesize(
