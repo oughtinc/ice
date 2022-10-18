@@ -5,9 +5,10 @@ from ice.evaluation.evaluate_recipe_result import RecipeResult
 from ice.utils import map_async
 from ice.evaluation.evaluation_report import EvaluationReport
 from ice.evaluation.evaluate_recipe_result import EvaluatedRecipeResult
+from ice.recipes.elicit.synthesize_ft import synthesize_ft_from_df
 
 GS_FILENAME = "data/Paragraph synthesis fine-tuning data - Gold standards.csv"
-recipe_to_run = synthesize_from_df
+recipe_to_run = synthesize_ft_from_df
 
 def make_recipe_result(row: pd.Series) -> RecipeResult:
     return RecipeResult(
