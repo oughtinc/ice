@@ -39,6 +39,11 @@ export const elicitRecipes: Recipes = {
     title: "Sample size per trial arm at randomization",
     description: "For each experiment and trial arm, what was the sample size at randomization?",
   },
+  "01GFRNYGHZ98M50S4HVSBN5BNM": {
+    title: "Search and synthesize",
+    description:
+      "Run a search using the Elicit API and generate a synthesis of the returned abstracts",
+  },
 };
 
 export const primerRecipes: Recipes = {
