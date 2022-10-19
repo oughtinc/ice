@@ -6,9 +6,10 @@ from ice.utils import map_async
 from ice.evaluation.evaluation_report import EvaluationReport
 from ice.evaluation.evaluate_recipe_result import EvaluatedRecipeResult
 from ice.recipes.elicit.synthesize_ft import synthesize_ft_from_df
+from ice.recipes.elicit.synthesize_in_app import synthesize_in_app_from_df
 
 GS_FILENAME = "data/Paragraph synthesis fine-tuning data - Gold standards.csv"
-recipe_to_run = synthesize_ft_from_df
+recipe_to_run = synthesize_from_df
 
 def make_recipe_result(row: pd.Series) -> RecipeResult:
     return RecipeResult(
@@ -23,8 +24,12 @@ async def run_recipe_on_row(row: pd.Series, recipe_to_run: Recipe):
     return await recipe_to_run(**row)
 
 async def run_over_df():
-    gs_df = pd.read_csv(GS_FILENAME)[:3]
-    gs_df["answer"] = await map_async([row for _, row in gs_df.iterrows()], lambda row: run_recipe_on_row(row, recipe_to_run))
+    gs_df = pd.read_csv(GS_FILENAME)
+    gs_df["answer"] = await map_async(
+        [row for _, row in gs_df.iterrows()],
+        lambda row: run_recipe_on_row(row, recipe_to_run),
+        max_concurrency=1
+    )
     recipe_results = gs_df.apply(make_recipe_result, axis=1)
     evaluation_report = EvaluationReport(
         technique_name=recipe_to_run.__name__,

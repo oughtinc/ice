@@ -6,7 +6,7 @@ from ice.recipes.elicit.synthesize import Abstract, _get_reference, num_tokens
 
 tokenizer = transformers.GPT2Tokenizer.from_pretrained("gpt2")
 
-MAX_TOKENS = 2000
+MAX_TOKENS = 2040
 FT_MODEL = "davinci:ft-ought-experiments:synthesisv2-2022-10-17-23-02-55"
 
 PAPERS = """Paper {i}: {title}
@@ -56,14 +56,14 @@ def _create_prompt_ft(query: str, titles: list[str], abstracts: list[str], citat
     prompt = PROMPT.format(question=query, paper_str=paper_str)
 
     while n_tokens(prompt) > 1700 and abstract_max_tokens > 0:
-        paper_str = _create_paper_str(titles, citations, abstracts, abstract_max_tokens=1000)
+        paper_str = _create_paper_str(titles, citations, abstracts, abstract_max_tokens=abstract_max_tokens)
         prompt = PROMPT.format(question=query, paper_str=paper_str)
         abstract_max_tokens -= 10
 
     return prompt
 
-async def synthesize_ft(question: str, abstracts: list[Abstract]) -> str:
-    prompt = _create_prompt_ft(
+async def synthesize_charlie(question: str, abstracts: list[Abstract], create_prompt_fn = _create_prompt_ft) -> str:
+    prompt = create_prompt_fn(
         query=question,
         titles=[abstract.title for abstract in abstracts],
         abstracts=[abstract.text for abstract in abstracts],
@@ -83,7 +83,7 @@ async def synthesize_ft_from_df(
     papers,
     **kwargs
 ):
-    return await synthesize_ft(question, [Abstract(
+    return await synthesize_charlie(question, [Abstract(
         title=paper["title"],
         authors=paper["authors"],
         year=paper["year"],
