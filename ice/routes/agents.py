@@ -16,7 +16,7 @@ async def get_list():
 class CompleteRequest(RouteModel):
     agent: str
     prompt: str
-    multiline: bool
+    stop: list[str]
 
 
 @router.post("/complete", response_model=str, dependencies=[Depends(check_auth)])
@@ -25,7 +25,7 @@ async def complete(request: CompleteRequest):
         return "Invalid agent!"
     completionAgent = MACHINE_AGENTS[request.agent]()
     result = await completionAgent.complete(
-        prompt=request.prompt, stop=None if request.multiline else "\n"
+        prompt=request.prompt, stop=request.stop if len(request.stop) else None
     )
     return result
 
