@@ -1,8 +1,8 @@
 import transformers
 from ice.recipe import recipe
-from ice.recipes.prompts import _create_prompt_ft
 import json
-from ice.recipes.elicit.synthesize import Abstract, _get_reference, num_tokens
+from ice.recipes.elicit.synthesize import Abstract, _get_reference, num_tokens, synthesize_from_df
+from functools import partial
 
 tokenizer = transformers.GPT2Tokenizer.from_pretrained("gpt2")
 
@@ -62,7 +62,7 @@ def _create_prompt_ft(query: str, titles: list[str], abstracts: list[str], citat
 
     return prompt
 
-async def synthesize_charlie(question: str, abstracts: list[Abstract], create_prompt_fn = _create_prompt_ft) -> str:
+async def synthesize_ft(question: str, abstracts: list[Abstract], create_prompt_fn = _create_prompt_ft) -> str:
     prompt = create_prompt_fn(
         query=question,
         titles=[abstract.title for abstract in abstracts],
@@ -78,14 +78,5 @@ async def synthesize_charlie(question: str, abstracts: list[Abstract], create_pr
 
     return completion
 
-async def synthesize_ft_from_df(
-    question,
-    papers,
-    **kwargs
-):
-    return await synthesize_charlie(question, [Abstract(
-        title=paper["title"],
-        authors=paper["authors"],
-        year=paper["year"],
-        text=paper["abstract"],
-    ) for paper in json.loads(papers)])
+synthesize_ft_from_df = partial(synthesize_from_df, synthesize_fn=synthesize_ft)
+synthesize_ft_from_df.__name__ = "synthesize_ft_from_df"
