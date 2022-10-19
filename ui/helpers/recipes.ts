@@ -16,7 +16,7 @@ export const elicitRecipes: Recipes = {
     description: "What was the adherence/drop-out rate of the experiment?",
   },
   "01GBXKV6EK63YW503VTMMSER3B": {
-    title: "Experiments and Arms baseline using simple comparisons question-answering",
+    title: "Experiments and arms baseline using simple comparisons question-answering",
     description:
       "What separate experiments were conducted, and for each experiment, what were the trial arms? Baseline approach using simple decomposition.",
   },
