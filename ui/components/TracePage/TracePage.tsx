@@ -580,9 +580,7 @@ const TabHeader = ({ id, doc }: { id: string; doc: string }) => (
     <h3 className="text-lg font-semibold text-gray-800">
       <CallName id={id} />
     </h3>
-    <p className="text-gray-600 text-sm whitespace-pre-line">
-      {doc}
-    </p>
+    <p className="text-gray-600 text-sm whitespace-pre-line">{doc}</p>
   </div>
 );
 
