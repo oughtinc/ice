@@ -8,31 +8,35 @@ from ice.routes.base import RouteModel
 
 router = APIRouter(prefix="/agents", tags=["agents"])
 
+
 class CompleteRequest(RouteModel):
     agent: str
     prompt: str
     stop: list[str]
 
-    @validator('agent')
+    @validator("agent")
     def agent_must_exist(cls, v):
         if v not in MACHINE_AGENTS:
-            raise ValueError('Invalid agent')
+            raise ValueError("Invalid agent")
         return v
+
 
 class classifyRequest(RouteModel):
     agent: str
     prompt: str
     options: list[str]
 
-    @validator('agent')
+    @validator("agent")
     def agent_must_exist(cls, v):
         if v not in MACHINE_AGENTS:
-            raise ValueError('Invalid agent')
+            raise ValueError("Invalid agent")
         return v
+
 
 @router.get("/list", response_model=list[str])
 async def get_list():
     return list(MACHINE_AGENTS.keys())
+
 
 @router.post("/complete", response_model=str, dependencies=[Depends(check_auth)])
 async def complete(request: CompleteRequest):
@@ -41,6 +45,7 @@ async def complete(request: CompleteRequest):
         prompt=request.prompt, stop=request.stop if len(request.stop) else None
     )
     return result
+
 
 @router.post(
     "/classify", response_model=dict[str, float], dependencies=[Depends(check_auth)]
