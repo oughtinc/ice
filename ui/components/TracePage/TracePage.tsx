@@ -120,7 +120,12 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         const contentLength = await getContentLength(url);
         if (offset >= contentLength) return;
 
-        const limit = Math.min(offset + 1e7, contentLength);
+        const initialOffset = 1e6;
+        const subsequentOffset = 1e7;
+        const limit = Math.min(
+          offset + (offset === 0 ? initialOffset : subsequentOffset),
+          contentLength,
+        );
         if (limit < contentLength) delay = 50;
 
         const response = await fetch(url, {
