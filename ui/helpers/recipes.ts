@@ -16,7 +16,7 @@ export const elicitRecipes: Recipes = {
     description: "What was the adherence/drop-out rate of the experiment?",
   },
   "01GBXKV6EK63YW503VTMMSER3B": {
-    title: "Experiments and Arms baseline using simple comparisons question-answering",
+    title: "Experiments and arms baseline using simple comparisons question-answering",
     description:
       "What separate experiments were conducted, and for each experiment, what were the trial arms? Baseline approach using simple decomposition.",
   },
@@ -38,6 +38,11 @@ export const elicitRecipes: Recipes = {
   "01GFRBF0HXC1VMGK210QFWPNC0": {
     title: "Sample size per trial arm at randomization",
     description: "For each experiment and trial arm, what was the sample size at randomization?",
+  },
+  "01GFRNYGHZ98M50S4HVSBN5BNM": {
+    title: "Search and synthesize",
+    description:
+      "Run a search using the Elicit API and generate a synthesis of the returned abstracts",
   },
 };
 
