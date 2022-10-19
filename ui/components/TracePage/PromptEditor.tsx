@@ -353,7 +353,7 @@ export const PromptEditorModal = () => {
           </Select>
           <label className="text-sm mb-1 mt-3 text-gray-700">Stop sequences</label>
           <label className="text-sm text-gray-500 mb-1">
-            Enter an option, then press 'Tab' to add
+            Enter an option, then press &apos;Tab&apos; to add
           </label>
           <ClassifyOptions options={stop} setOptions={setStop} placeholder="" />
           <label className="text-sm mb-1 mt-3 text-gray-600">Multiline</label>
