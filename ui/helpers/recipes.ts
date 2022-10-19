@@ -21,7 +21,7 @@ export const elicitRecipes: Recipes = {
       "What separate experiments were conducted, and for each experiment, what were the trial arms? Baseline approach using simple decomposition.",
   },
   "01GFRJDVHF2BG21SP22VB8M6N1": {
-    title: "Experiments and arms using ",
+    title: "Experiments and arms using chain-of-thought to rank and answer",
     description:
       "What separate experiments were conducted, and for each experiment, what were the trial arms? Decompose into separate questions, rank passages, and use chain-of-thought reasoning to answer.",
   },
