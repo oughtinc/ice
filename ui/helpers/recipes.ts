@@ -1,4 +1,12 @@
-export const recipes: Record<string, { title: string; description?: string; hidden?: boolean }> = {
+export interface Recipe {
+  title: string;
+  description?: string;
+  hidden?: boolean;
+}
+
+export type Recipes = Record<string, Recipe>;
+
+export const elicitRecipes: Recipes = {
   "01GCZNZ1YC0XRE1QHSAV6MPWJD": {
     title: "Placebo classification and description",
     description: "Did this paper use a placebo? If so, what was it?",
@@ -22,6 +30,9 @@ export const recipes: Record<string, { title: string; description?: string; hidd
     description:
       "Describe Placebo (assuming there is one), then auto-evaluate against gold standards",
   },
+};
+
+export const primerRecipes: Recipes = {
   "01GE0GN5PPQWYGMT1B4GFPDZ09": {
     title: "Hello world",
     hidden: true,
@@ -31,8 +42,8 @@ export const recipes: Record<string, { title: string; description?: string; hidd
     hidden: true,
   },
   "01GE0V4J1PR5SXMW0TRMW9GX1Z": {
-    title: "qa",
-    hidden: true,
+    title: "Q&A",
+    description: "A simple trace that makes a single language model call",
   },
   "01GE0VA96FWT7SSQNXD6CQH4BT": {
     title: "Debate",
@@ -110,8 +121,8 @@ export const recipes: Record<string, { title: string; description?: string; hidd
     hidden: true,
   },
   "01GE0XKTG8VWYBTXXGFF1GPFBC": {
-    title: "answer_by_reasoning",
-    hidden: true,
+    title: "Answer by reasoning",
+    description: "Answer a question by writing out a chain of thought.",
   },
   "01GE0XSKXKVVK6KB56AN6VGZ6C": {
     title: "answer_by_dispatch/classification",
@@ -127,4 +138,9 @@ export const recipes: Record<string, { title: string; description?: string; hidd
     description:
       "Choose a sequence of actions, one by one. At each step, ask if you have enough info to answer.",
   },
+};
+
+export const recipes = {
+  ...elicitRecipes,
+  ...primerRecipes,
 };
