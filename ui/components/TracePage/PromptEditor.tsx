@@ -10,7 +10,10 @@ import {
 import { X } from "phosphor-react";
 import {
   createContext,
+  Dispatch,
+  MutableRefObject,
   ReactNode,
+  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -176,44 +179,20 @@ export const ClassifyResults = ({
   );
 };
 
-export const PromptEditorModal = () => {
-  const { open, currentPrompt, setCurrentPrompt, closeEditor } = usePromptEditorContext();
-  const promptBoxRef = useRef<HTMLDivElement | null>(null);
+const PromptInput = ({
+  keepResults,
+  currentPrompt,
+  setCurrentPrompt,
+  promptResult,
+  setPromptResult,
+}: {
+  keepResults: boolean;
+  currentPrompt: string;
+  promptResult: string;
+  setCurrentPrompt: Dispatch<SetStateAction<string>>;
+  setPromptResult: Dispatch<SetStateAction<string>>;
+}) => {
   const promptContentRef = useRef<HTMLDivElement | null>(null);
-
-  const [keepResults, setKeepResults] = useState(true);
-
-  const [promptResult, setPromptResult] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const [agents, setAgents] = useState<string[]>([]);
-  const [selectedAgent, setSelectedAgent] = useState<string | undefined>();
-  const [task, setTask] = useState("complete");
-  const [multiline, setMultiline] = useState(true);
-  const [classifyOptions, setClassifyOptions] = useState<string[]>([]);
-  const [classifyResults, setClassifyResults] = useState<Record<string, number>>({});
-  const [stop, setStop] = useState<string[]>([]);
-  useEffect(() => {
-    fetch(`${backendUrl}/agents/list`)
-      .then(res => res.json())
-      .then(agents => {
-        setAgents(agents);
-        setSelectedAgent(agents[0]);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (!open) return () => false;
-
-    const closeOnEscape = (ev: KeyboardEvent) => {
-      if (ev.key === "Escape") {
-        closeEditor();
-      }
-    };
-
-    document.addEventListener("keyup", closeOnEscape);
-    return () => document.removeEventListener("keyup", closeOnEscape);
-  }, [open, closeEditor]);
 
   useEffect(() => {
     if (!promptContentRef.current || !promptResult.length) return;
@@ -247,6 +226,84 @@ export const PromptEditorModal = () => {
 
   return (
     <div
+      className="rounded-4 flex-grow border-slate-200 border px-3 py-2 whitespace-pre-wrap w-full overflow-auto"
+      contentEditable
+      onInput={ev => handleInput(ev)}
+      onKeyDown={ev => {
+        if (ev.key === "Enter") {
+          ev.preventDefault();
+          ev.stopPropagation();
+          document.execCommand("insertLineBreak");
+        }
+      }}
+      ref={promptContentRef}
+    />
+  );
+};
+
+export const PromptEditorModal = () => {
+  const { open, currentPrompt, setCurrentPrompt, closeEditor } = usePromptEditorContext();
+  const promptBoxRef = useRef<HTMLDivElement | null>(null);
+
+  const [agents, setAgents] = useState<string[]>([]);
+  useEffect(() => {
+    fetch(`${backendUrl}/agents/list`)
+      .then(res => res.json())
+      .then(agents => {
+        setAgents(agents);
+        setSelectedAgent(agents[0]);
+      });
+  }, []);
+
+  // Options
+  const [selectedAgent, setSelectedAgent] = useState<string | undefined>();
+  const [task, setTask] = useState("complete");
+  const [multiline, setMultiline] = useState(true);
+  const [classifyOptions, setClassifyOptions] = useState<string[]>([]);
+  const [stop, setStop] = useState<string[]>([]);
+  const [keepResults, setKeepResults] = useState(true);
+
+  // Results
+  const [classifyResults, setClassifyResults] = useState<Record<string, number>>({});
+  const [promptResult, setPromptResult] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open) return () => false;
+
+    const closeOnEscape = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") {
+        closeEditor();
+      }
+    };
+
+    document.addEventListener("keyup", closeOnEscape);
+    return () => document.removeEventListener("keyup", closeOnEscape);
+  }, [open, closeEditor]);
+
+  const handlePrompt = async () => {
+    setLoading(true);
+    const res = await fetch(`${backendUrl}/agents/${task}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": process.env.NEXT_PUBLIC_BACKEND_API_KEY ?? "",
+      },
+      body: JSON.stringify({
+        agent: selectedAgent,
+        prompt: currentPrompt,
+        options: task === "classify" ? classifyOptions : undefined,
+        stop: multiline ? stop : [...stop, "\n"],
+      }),
+    });
+    const data = await res.json();
+    if (task === "classify") setClassifyResults(data);
+    if (task === "complete") setPromptResult(data);
+    setLoading(false);
+  };
+
+  return (
+    <div
       className={`${
         open ? "flex" : "hidden"
       } h-screen w-screen absolute top-0 left-0 bg-gray-200 bg-opacity-50 z-50 justify-center items-center cursor-pointer`}
@@ -262,18 +319,12 @@ export const PromptEditorModal = () => {
       >
         <div className="flex flex-col w-full">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">Prompt</h3>
-          <div
-            className="rounded-4 flex-grow border-slate-200 border px-3 py-2 whitespace-pre-wrap w-full overflow-auto"
-            contentEditable
-            onInput={ev => handleInput(ev)}
-            onKeyDown={ev => {
-              if (ev.key === "Enter") {
-                ev.preventDefault();
-                ev.stopPropagation();
-                document.execCommand("insertLineBreak");
-              }
-            }}
-            ref={promptContentRef}
+          <PromptInput
+            currentPrompt={currentPrompt}
+            setCurrentPrompt={setCurrentPrompt}
+            keepResults={keepResults}
+            promptResult={promptResult}
+            setPromptResult={setPromptResult}
           />
           {task === "classify" ? (
             <>
@@ -316,28 +367,7 @@ export const PromptEditorModal = () => {
               className="rounded-4 px-2 py-1 h-fit !shadow-none hover:bg-slate-200 mt-4 text-xs"
               size="md"
               variant="outline"
-              onClick={() => {
-                setLoading(true);
-                fetch(`${backendUrl}/agents/${task}`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    "X-Api-Key": process.env.NEXT_PUBLIC_BACKEND_API_KEY ?? "",
-                  },
-                  body: JSON.stringify({
-                    agent: selectedAgent,
-                    prompt: currentPrompt,
-                    options: task === "classify" ? classifyOptions : undefined,
-                    stop: multiline ? stop : [...stop, "\n"],
-                  }),
-                })
-                  .then(res => res.json())
-                  .then(data => {
-                    if (task === "classify") setClassifyResults(data);
-                    if (task === "complete") setPromptResult(data);
-                    setLoading(false);
-                  });
-              }}
+              onClick={handlePrompt}
             >
               {loading ? "Loading..." : "Prompt model"}
             </Button>
