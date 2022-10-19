@@ -89,6 +89,7 @@ async def openai_complete(
     logprobs: int | None = None,
     n: int = 1,
     cache_id: int = 0,  # for repeated non-deterministic sampling using caching
+    logit_bias: dict[str, float] | None = None,
 ) -> dict:
     """Send a completion request to the OpenAI API and return the JSON response."""
     cache_id  # unused
@@ -103,5 +104,6 @@ async def openai_complete(
             "max_tokens": max_tokens,
             "logprobs": logprobs,
             "n": n,
+            "logit_bias": logit_bias
         },
     )

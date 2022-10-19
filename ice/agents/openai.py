@@ -34,11 +34,12 @@ class OpenAIAgent(Agent):
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,
+        logit_bias: dict[str, float] | None = None,
     ) -> str:
         """Generate an answer to a question given some context."""
         if verbose:
             self._print_markdown(prompt)
-        response = await self._complete(prompt, stop=stop, max_tokens=max_tokens)
+        response = await self._complete(prompt, stop=stop, max_tokens=max_tokens, logit_bias=logit_bias)
         completion = self._extract_completion(response)
         if verbose:
             self._print_markdown(completion)
