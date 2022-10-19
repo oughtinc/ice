@@ -120,7 +120,12 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         const contentLength = await getContentLength(url);
         if (offset >= contentLength) return;
 
-        const limit = Math.min(offset + 1e6, contentLength);
+        const initialOffset = 1e6;
+        const subsequentOffset = 1e7;
+        const limit = Math.min(
+          offset + (offset === 0 ? initialOffset : subsequentOffset),
+          contentLength,
+        );
         if (limit < contentLength) delay = 50;
 
         const response = await fetch(url, {
@@ -580,7 +585,7 @@ const TabHeader = ({ id, doc }: { id: string; doc: string }) => (
     <h3 className="text-lg font-semibold text-gray-800">
       <CallName id={id} />
     </h3>
-    <p className="text-gray-600 text-sm">{doc}</p>
+    <p className="text-gray-600 text-sm whitespace-pre-line">{doc}</p>
   </div>
 );
 

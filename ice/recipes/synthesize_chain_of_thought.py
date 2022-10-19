@@ -1,8 +1,8 @@
 
 import transformers
 from ice.recipe import recipe
-from ice.recipes.elicit.synthesize import Abstract, _get_reference, num_tokens, synthesize_from_df
-from ice.recipes.elicit.synthesize_ft import n_tokens
+from ice.recipes.synthesize import Abstract, _get_reference, num_tokens, synthesize_from_df
+from ice.recipes.synthesize_ft import n_tokens
 from functools import partial
 
 PROMPT = """An ideal answer gives references to the academic literature. Example: "To our knowledge, the only freely and publicly available dense autoregressive language models larger than GPT2 are GPT-Neo (Black et al., 2021), GPT-J-6B (Wang and Komatsuzaki, 2021), Megatron-11B, Pangu-13B (Zeng et al., 2021), and the recently released FairSeq models (Artetxe et al., 2021)."

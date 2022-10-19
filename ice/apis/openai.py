@@ -93,17 +93,22 @@ async def openai_complete(
 ) -> dict:
     """Send a completion request to the OpenAI API and return the JSON response."""
     cache_id  # unused
+
+    json={
+        "prompt": prompt,
+        "stop": stop,
+        "top_p": top_p,
+        "temperature": temperature,
+        "model": model,
+        "max_tokens": max_tokens,
+        "logprobs": logprobs,
+        "n": n,
+    }
+
+    if logit_bias:
+        json["logit_bias"] = logit_bias
+
     return await _post(
         "completions",
-        json={
-            "prompt": prompt,
-            "stop": stop,
-            "top_p": top_p,
-            "temperature": temperature,
-            "model": model,
-            "max_tokens": max_tokens,
-            "logprobs": logprobs,
-            "n": n,
-            "logit_bias": logit_bias
-        },
+        json
     )

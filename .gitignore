@@ -15,7 +15,7 @@
 /.mypy_cache
 /.pre-commit-home
 /data
-/ice/contrib
+/ice/contrib/*/
 /papers/*.pdf
 /papers/*.txt
 !/papers/keenan-2018-tiny.txt

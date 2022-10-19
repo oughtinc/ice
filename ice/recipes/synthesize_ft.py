@@ -1,7 +1,7 @@
 import transformers
 from ice.recipe import recipe
 import json
-from ice.recipes.elicit.synthesize import Abstract, _get_reference, num_tokens, synthesize_from_df
+from ice.recipes.synthesize import Abstract, _get_reference, num_tokens, synthesize_from_df
 from functools import partial
 
 tokenizer = transformers.GPT2Tokenizer.from_pretrained("gpt2")
