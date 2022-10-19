@@ -30,6 +30,10 @@ export const elicitRecipes: Recipes = {
     description:
       "Describe Placebo (assuming there is one), then auto-evaluate against gold standards",
   },
+  "01GFRBF0HXC1VMGK210QFWPNC0": {
+    title: "Sample size per trial arm at randomization",
+    description: "For each experiment and trial arm, what was the sample size at randomization?",
+  },
 };
 
 export const primerRecipes: Recipes = {
