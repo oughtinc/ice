@@ -16,7 +16,6 @@ from .experiment_arms import ExperimentArms
 from .funnel_simple import FunnelSimple
 from .placebo_description import PlaceboDescriptionInstruct
 from .program_search.nodes.decontext.decontextualize import PaperDecontext
-from .program_search.nodes.select.select import PaperSelect
 from .program_search.example import DecontextAndSelect
 from .placebo_dialogs import PlaceboDialogs
 from .placebo_keyword_baseline import PlaceboKeywordBaseline
@@ -40,7 +39,6 @@ def get_recipe_classes() -> list[Type[Recipe]]:
         EvaluateResults,
         ExampleMetaRecipe,
         PaperDecontext,
-        PaperSelect,
         DecontextAndSelect,
         ExperimentArms,
         FunnelSimple,

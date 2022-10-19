@@ -36,6 +36,16 @@ def logprobs_greater_than_none(
 async def select(
     question: str, texts: Sequence[str], existing: Sequence[str]
 ) -> Sequence[str]:
+    """Select additional texts by comparing logprobs of indices considered by the model.
+
+    Args:
+        question (str): The question to select texts for.
+        texts (Sequence[str]): Texts to consider for selection.
+        existing (Sequence[str]): Already-selected texts
+
+    Returns:
+        Sequence[str]: Newly selected texts (subset of texts)
+    """
     if len(texts) > 5:
         log.warning(
             "The OpenAI API only returns the top 5 logprobs, so passing more than 5 candidates means that not all can be fully considered.",
@@ -52,6 +62,15 @@ async def select(
 
 
 async def select_reduce(question: str, texts: Sequence[Sequence[str]]) -> Sequence[str]:
+    """Select texts that answer the question by reducing over `select`
+
+    Args:
+        question (str): The question to select texts for.
+        texts (Sequence[Sequence[str]]): Texts to consider for selection, split into groups to consider at each step.
+
+    Returns:
+        Sequence[str]: Selected texts.
+    """
     async def select_some(existing: list[str], new_texts: Sequence[str]):
         try:
             new_selections = await select(question, new_texts, existing)
@@ -63,7 +82,18 @@ async def select_reduce(question: str, texts: Sequence[Sequence[str]]) -> Sequen
     return await reduce_async(select_some, texts, cast(list[str], []))
 
 
-async def windowed_select(question: str, texts: Sequence[str], n: int, step: int):
+async def windowed_select(question: str, texts: Sequence[str], n: int, step: int) -> Sequence[str]:
+    """Select texts that answer the question via 
+
+    Args:
+        question (str): The question to select texts for.
+        texts (Sequence[str]): Texts to consider for selection.
+        n (int): Number of texts to consider at each step.
+        step (int): Overlap between windows. (if n == step, partition the document; if step < n, window with step size).
+
+    Returns:
+        Sequence[str]: Selected texts.
+    """
     windowed_texts = window_dropping(texts, n, step)
     return await select_reduce(question, windowed_texts)
 
@@ -76,16 +106,6 @@ async def windowed_select(question: str, texts: Sequence[str], n: int, step: int
 # Value functions
 # Intrinsic (e.g., halter probability of answerable)
 # Extrinsic (e.g., ROUGE-L of halter output with answer)
-
-
-class PaperSelect(Recipe):
-    async def run(self, paper: Paper):
-        return await windowed_select(
-            "What experiments were conducted?",
-            texts=list(paper.sentences()),
-            n=5,
-            step=5,
-        )
 
 
 recipe.main(windowed_select)

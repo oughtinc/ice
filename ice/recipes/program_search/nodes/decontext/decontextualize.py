@@ -26,6 +26,15 @@ class Decontextualize(Protocol):
 async def autoregressive_decontext(
     texts: Sequence[Selection], k: int = 15
 ) -> Sequence[Decontext]:
+    """Decontextualize the (ordered) contexts autoregressively.
+
+    Args:
+        texts (Sequence[Selection]): Texts to decontextualize.
+        k (int, optional): Number of previous texts to keep in the context. Defaults to 15.
+
+    Returns:
+        Sequence[Decontext]: Decontextualized texts
+    """
     first = texts[0]
     output: list[Decontext] = [
         Decontext(p=first.p, start=first.start, end=first.end, out=str(first))
@@ -44,6 +53,14 @@ async def autoregressive_decontext(
 
 
 async def paper_decontext(paper: Paper) -> Paper:
+    """Decontextualize the paper by adding explanations in square brackets.
+
+    Args:
+        paper (Paper): Paper to decontextualize.
+
+    Returns:
+        Paper: Paper with the decontextualized text.
+    """
     texts = sentences(paper)
     decontexted = await autoregressive_decontext(texts)
     restructured: list[Paragraph] = []
@@ -61,9 +78,11 @@ async def paper_decontext(paper: Paper) -> Paper:
         )
     return Paper(paragraphs=restructured, document_id=f"decontext-{paper.document_id}")
 
+
 class PaperDecontext(Recipe):
     async def run(self, paper: Paper):
         return await paper_decontext(paper)
+
 
 recipe.main(autoregressive_decontext)
 # Meta-Strategies

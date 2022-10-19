@@ -1,3 +1,4 @@
+from typing import Literal, Sequence
 from ice.recipe import Recipe
 from ice.recipes.program_search.nodes.answer.answer import simple_answer
 from ice.recipes.program_search.nodes.decontext.decontextualize import (
@@ -40,23 +41,17 @@ def baseline(question: str):
 
 
 class DecontextAndSelect(Recipe):
-    async def run(self, paper: Paper):
-        gs = get_ea_gs(paper.document_id)
+    async def decontext_and_select(self, paper: Paper, question: str):
+        """Answer the question by first enriching the paper by adding context autoregressively,
+        then selecting sentences needed to answer the question.
 
-        # TODO: Actually iterate over all possible choices (this is a hack to get a spread across papers)
-        # for which we currently have labeled data
+        Args:
+            paper (Paper): Paper to answer the question about
+            question (str): The question
 
-        if not gs or not gs.parsed_answer:
-            return
-        exps = gs.parsed_answer.experiments[0]
-        arm = exps.arms[0]
-        if not arm.sample or arm.sample.stage != "randomized":
-            return
-
-        question = f"The {exps.name} experiment included {len(exps.arms)} arms: {', '.join((arm.name for arm in exps.arms))}. How many participants were initially allocated to the {arm.name} arm of the {exps.name} experiment?"
-
-        baseline_answer = await (baseline(question)(mode=self.mode).run(paper=paper))
-
+        Returns:
+            answer: str
+        """
         decontexted = await (PaperDecontext(mode=self.mode).run(paper))
 
         texts = await windowed_select(
@@ -66,5 +61,37 @@ class DecontextAndSelect(Recipe):
             step=2,
         )
         answer = await simple_answer(question, texts)
-        gold_answer = arm.sample.size
-        return gold_answer, baseline_answer, answer
+        return answer
+
+    async def run(
+        self, paper: Paper
+    ) -> Sequence[tuple[int | Literal["Unclear"] | None, str, str] | None]:
+        """Identify the initial sample size for each trial arm, for each experiment.
+
+        Return the gold standard (if it exists), along with the answer from a baseline end-to-end approach and a decompositional approach.
+
+        Args:
+            paper (Paper): Paper
+
+        Returns:
+            tuple[int | Literal["Unclear"] | None, str, str]: gold standard, baseline approach answer, decomposed answer
+        """
+        gs = get_ea_gs(paper.document_id)
+        assert gs and gs.parsed_answer
+
+        answers: list[tuple[int | Literal["Unclear"] | None, str, str]] = []
+
+        for exp in gs.parsed_answer.experiments:
+            for arm in exp.arms:
+                question = f"The {exp.name} experiment included {len(exp.arms)} arms: {', '.join((arm.name for arm in exp.arms))}. How many participants were initially allocated to the {arm.name} arm of the {exp.name} experiment?"
+
+                baseline_answer = await (
+                    baseline(question)(mode=self.mode).run(paper=paper)
+                )
+
+                answer = await self.decontext_and_select(paper=paper, question=question)
+
+                gold_answer = arm.sample.size if arm and arm.sample else None
+                answers.append((gold_answer, baseline_answer, answer))
+
+        return answers
