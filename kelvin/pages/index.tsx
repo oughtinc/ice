@@ -1,16 +1,78 @@
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useImmerReducer } from "use-immer";
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8935";
 
+type State = {
+  workspace: Workspace | null;
+  loading: boolean;
+  error: Error | null;
+};
+
+type Action =
+  | { type: "FETCH_REQUEST" }
+  | { type: "FETCH_FAILURE"; payload: Error }
+  | { type: "FETCH_WORKSPACE_SUCCESS"; payload: Workspace };
+
+type Card = {
+  rows: list[string];
+};
+
+type Workspace = {
+  cards: { [string]: Card };
+  currentCardId: string;
+};
+
+const initialState: State = {
+  workspace: null,
+  loading: false,
+  error: null,
+};
+
+const reducer = (draft: State, action: Action) => {
+  switch (action.type) {
+    case "FETCH_REQUEST":
+      draft.loading = true;
+      draft.error = null;
+      break;
+    case "FETCH_FAILURE":
+      draft.loading = false;
+      draft.error = action.payload;
+      break;
+    case "FETCH_WORKSPACE_SUCCESS":
+      draft.loading = false;
+      draft.workspace = action.payload;
+      break;
+    default:
+      return;
+  }
+};
+
+const CurrentCard = ({ workspace }: { workspace: Workspace }) => {
+  const { currentCardId, cards } = workspace;
+  const currentCard = cards[currentCardId];
+  return <pre>{JSON.stringify(currentCard)}</pre>;
+};
+
 export default function HomePage() {
-  const [examples, setExamples] = useState<string[]>([]);
+  const [state, dispatch] = useImmerReducer(reducer, initialState);
+
+  const { workspace, loading, error } = state;
+
+  const fetchInitialWorkspace = async () => {
+    dispatch({ type: "FETCH_REQUEST" });
+    try {
+      const response = await fetch(`${backendUrl}/kelvin/workspaces/initial`);
+      const data = await response.json();
+      dispatch({ type: "FETCH_WORKSPACE_SUCCESS", payload: data });
+    } catch (err) {
+      dispatch({ type: "FETCH_FAILURE", payload: err });
+    }
+  };
+
   useEffect(() => {
-    fetch(`${backendUrl}/kelvin/examples/list`)
-      .then(res => res.json())
-      .then(examples => {
-        setExamples(examples);
-      });
+    fetchInitialWorkspace();
   }, []);
 
   return (
@@ -18,8 +80,9 @@ export default function HomePage() {
       <Head>
         <title>Kelvin</title>
       </Head>
-      <p>Kelvin</p>
-      <pre>{examples.join("\n")}</pre>
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error.message}</p>}
+      {!loading && workspace && <CurrentCard workspace={workspace} />}
     </div>
   );
 }

@@ -9,11 +9,11 @@
 **/*.pickle
 **/*.pt
 **/*.sqlite
-/.coverage
-/.env
-/.git
-/.mypy_cache
-/.pre-commit-home
+**/.coverage
+**/.env
+**/.git
+**/.mypy_cache
+**/.pre-commit-home
 /data
 /ice/contrib
 /papers/*.pdf

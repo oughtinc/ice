@@ -14,7 +14,8 @@
     "react-archer": "^4.1.0",
     "react-dom": "^17.0.2",
     "react-syntax-highlighter": "^15.5.0",
-    "ulidx": "^0.3.0"
+    "ulidx": "^0.3.0",
+    "use-immer": "^0.7.0"
   },
   "devDependencies": {
     "@types/node": "17.0.35",
