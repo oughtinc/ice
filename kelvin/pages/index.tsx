@@ -10,14 +10,23 @@ type State = {
   error: Error | null;
 };
 
-type Action =
+type ReducerAction =
   | { type: "FETCH_REQUEST" }
   | { type: "FETCH_FAILURE"; payload: Error }
   | { type: "FETCH_WORKSPACE_SUCCESS"; payload: Workspace };
 
-type Card = {
-  rows: list[string];
+type Card<T> = {
+  rows: T[];
 };
+
+type TextCard = Card<string>;
+
+type Action = {
+  name: string;
+  params: Record<string, any>;
+};
+
+type ActionCard = Card<Action>;
 
 type Workspace = {
   cards: { [string]: Card };
@@ -30,7 +39,7 @@ const initialState: State = {
   error: null,
 };
 
-const reducer = (draft: State, action: Action) => {
+const reducer = (draft: State, action: ReducerAction) => {
   switch (action.type) {
     case "FETCH_REQUEST":
       draft.loading = true;
