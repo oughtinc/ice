@@ -24,3 +24,6 @@
 /ui/.next/
 /ui/node_modules
 /ui/public/traces/*.jsonl
+/kelvin/.next/
+/kelvin/node_modules
+/kelvin/public/traces/*.jsonl

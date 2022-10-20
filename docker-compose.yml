@@ -11,7 +11,9 @@ services:
       # https://stackoverflow.com/a/37898591
       - /code/.venv/
       - /code/ui/node_modules/
+      - /code/kelvin/node_modules/
       - ./:/code
     ports:
       - "3000:3000"
+      - "3001:3001"
       - "8935:8935"

@@ -1,0 +1,43 @@
+{
+  "dependencies": {
+    "@chakra-ui/react": "^1.8.8",
+    "@chakra-ui/system": "^1.12.1",
+    "@emotion/react": "^11.10.0",
+    "@emotion/styled": "^11.10.0",
+    "classnames": "^2.3.1",
+    "framer-motion": "^6.3.3",
+    "immer": "^9.0.15",
+    "lodash": "^4.17.21",
+    "next": "12.1.6",
+    "phosphor-react": "^1.4.1",
+    "react": "^17.0.2",
+    "react-archer": "^4.1.0",
+    "react-dom": "^17.0.2",
+    "react-syntax-highlighter": "^15.5.0",
+    "ulidx": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "17.0.35",
+    "@types/react": "^17.0.48",
+    "@types/react-dom": "^17.0.17",
+    "@types/react-syntax-highlighter": "^15.5.5",
+    "autoprefixer": "^10.4.8",
+    "eslint": "8.16.0",
+    "eslint-config-next": "12.1.6",
+    "patch-package": "^6.4.7",
+    "postcss": "^8.4.16",
+    "tailwindcss": "^3.1.8",
+    "tailwindcss-labeled-groups": "^0.0.2",
+    "typescript": "4.6.4"
+  },
+  "name": "ui",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "next lint",
+    "start": "next start",
+    "postinstall": "patch-package"
+  },
+  "version": "0.2.0"
+}

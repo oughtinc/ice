@@ -44,8 +44,12 @@ RUN python -c "import nltk; nltk.download('punkt')"
 
 COPY ui/package.json ui/package-lock.json ui/
 COPY ui/patches/*.patch ui/patches/
+COPY kelvin/package.json kelvin/package-lock.json kelvin/
+COPY kelvin/patches/*.patch kelvin/patches/
+
 RUN npm --prefix ui ci
+RUN npm --prefix kelvin ci
 
 COPY . .
 
-CMD ["concurrently", "uvicorn ice.routes.app:app --host 0.0.0.0 --port 8935 --reload", "npm --prefix ui run dev"]
+CMD ["concurrently", "uvicorn ice.routes.app:app --host 0.0.0.0 --port 8935 --reload", "npm --prefix ui run dev", "npm --prefix kelvin run dev"]

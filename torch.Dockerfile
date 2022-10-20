@@ -61,7 +61,11 @@ RUN python -c "import nltk; nltk.download('punkt')"
 
 COPY ui/package.json ui/package-lock.json ui/
 COPY ui/patches/*.patch ui/patches/
+COPY kelvin/package.json kelvin/package-lock.json kelvin/
+COPY kelvin/patches/*.patch kelvin/patches/
+
 RUN npm --prefix ui ci
+RUN npm --prefix kelvin ci
 
 COPY . .
 
