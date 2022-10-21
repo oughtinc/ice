@@ -5,6 +5,7 @@ from typing import Any
 from structlog.stdlib import get_logger
 
 from ice.agents.base import Agent
+from ice.agents.base import Stop
 from ice.apis.openai import openai_complete
 from ice.environment import env
 from ice.utils import longest_common_prefix
@@ -25,11 +26,11 @@ class OpenAIAgent(Agent):
         self.temperature = temperature
         self.top_p = top_p
 
-    async def answer(
+    async def complete(
         self,
         *,
         prompt: str,
-        multiline: bool = True,
+        stop: Stop = None,
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,
@@ -37,12 +38,11 @@ class OpenAIAgent(Agent):
         """Generate an answer to a question given some context."""
         if verbose:
             self._print_markdown(prompt)
-        stop = None if multiline else "\n"
         response = await self._complete(prompt, stop=stop, max_tokens=max_tokens)
-        answer = self._extract_answer(response)
+        completion = self._extract_completion(response)
         if verbose:
-            self._print_markdown(answer)
-        return answer
+            self._print_markdown(completion)
+        return completion
 
     async def predict(self, *, context, default="", verbose=False) -> dict[str, float]:
         """Generate a probability distribution over the next token given some context."""
@@ -100,7 +100,7 @@ class OpenAIAgent(Agent):
             raise ValueError(f"No choices in response: {response}")
         return response
 
-    def _extract_answer(self, response: dict) -> str:
+    def _extract_completion(self, response: dict) -> str:
         """Extract the answer text from the completion response."""
         return response["choices"][0]["text"].strip()
 

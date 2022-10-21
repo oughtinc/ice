@@ -4,6 +4,8 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ICE_DIR=${SCRIPT_DIR}/../
 ELICIT_NEXT_DIR=$1
 
+mkdir -p ${ICE_DIR}/data/in_app_qa_results
+
 cd ${ELICIT_NEXT_DIR}
 os=$(uname -s | tr '[:upper:]' '[:lower:]')
 docker compose -f docker-compose.yaml -f docker-compose.$os.yaml up -d

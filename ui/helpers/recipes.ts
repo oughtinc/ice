@@ -1,4 +1,12 @@
-export const recipes: Record<string, { title: string; description?: string; hidden?: boolean }> = {
+export interface Recipe {
+  title: string;
+  description?: string;
+  hidden?: boolean;
+}
+
+export type Recipes = Record<string, Recipe>;
+
+export const elicitRecipes: Recipes = {
   "01GCZNZ1YC0XRE1QHSAV6MPWJD": {
     title: "Placebo classification and description",
     description: "Did this paper use a placebo? If so, what was it?",
@@ -8,9 +16,14 @@ export const recipes: Record<string, { title: string; description?: string; hidd
     description: "What was the adherence/drop-out rate of the experiment?",
   },
   "01GBXKV6EK63YW503VTMMSER3B": {
-    title: "Experiments and Arms baseline using simple comparisons question-answering",
+    title: "Experiments and arms baseline using simple comparisons question-answering",
     description:
-      "What separate experiments were conducted, and for each experiment, what were the trial arms?",
+      "What separate experiments were conducted, and for each experiment, what were the trial arms? Baseline approach using simple decomposition.",
+  },
+  "01GFRJDVHF2BG21SP22VB8M6N1": {
+    title: "Experiments and arms using chain-of-thought to rank and answer",
+    description:
+      "What separate experiments were conducted, and for each experiment, what were the trial arms? Decompose into separate questions, rank passages, and use chain-of-thought reasoning to answer.",
   },
   "01GBXTYND8V67HH5H1GWZWJKGB": {
     title: "Evaluation of results",
@@ -22,6 +35,18 @@ export const recipes: Record<string, { title: string; description?: string; hidd
     description:
       "Describe Placebo (assuming there is one), then auto-evaluate against gold standards",
   },
+  "01GFRBF0HXC1VMGK210QFWPNC0": {
+    title: "Sample size per trial arm at randomization",
+    description: "For each experiment and trial arm, what was the sample size at randomization?",
+  },
+  "01GFRNYGHZ98M50S4HVSBN5BNM": {
+    title: "Search and synthesize",
+    description:
+      "Run a search using the Elicit API and generate a synthesis of the returned abstracts",
+  },
+};
+
+export const primerRecipes: Recipes = {
   "01GE0GN5PPQWYGMT1B4GFPDZ09": {
     title: "Hello world",
     hidden: true,
@@ -31,8 +56,8 @@ export const recipes: Record<string, { title: string; description?: string; hidd
     hidden: true,
   },
   "01GE0V4J1PR5SXMW0TRMW9GX1Z": {
-    title: "qa",
-    hidden: true,
+    title: "Q&A",
+    description: "A simple trace that makes a single language model call",
   },
   "01GE0VA96FWT7SSQNXD6CQH4BT": {
     title: "Debate",
@@ -84,7 +109,7 @@ export const recipes: Record<string, { title: string; description?: string; hidd
     hidden: true,
   },
   "01GE0WHGQ89V3QC0DHNAE06JPQ": {
-    title: "Verify reasoning setps",
+    title: "Verify reasoning steps",
     description: "Check reasoning steps for a math problem",
   },
   "01GE0WVSS2622HPERJ6FC7MQXY": {
@@ -110,8 +135,8 @@ export const recipes: Record<string, { title: string; description?: string; hidd
     hidden: true,
   },
   "01GE0XKTG8VWYBTXXGFF1GPFBC": {
-    title: "answer_by_reasoning",
-    hidden: true,
+    title: "Answer by reasoning",
+    description: "Answer a question by writing out a chain of thought.",
   },
   "01GE0XSKXKVVK6KB56AN6VGZ6C": {
     title: "answer_by_dispatch/classification",
@@ -127,4 +152,9 @@ export const recipes: Record<string, { title: string; description?: string; hidd
     description:
       "Choose a sequence of actions, one by one. At each step, ask if you have enough info to answer.",
   },
+};
+
+export const recipes = {
+  ...elicitRecipes,
+  ...primerRecipes,
 };

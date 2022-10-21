@@ -11,7 +11,7 @@ Answer: "
 
 async def answer(question: str = "What is happening on 9/9/2022?"):
     prompt = make_qa_prompt(question)
-    answer = (await recipe.agent().answer(prompt=prompt)).strip('" ')
+    answer = await recipe.agent().complete(prompt=prompt, stop='"')
     return answer
 
 

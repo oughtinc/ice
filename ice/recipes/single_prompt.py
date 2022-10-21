@@ -48,8 +48,8 @@ class SinglePrompt(Recipe):
         qa_prompt = self.qa_prompt_template.format(paper_text=paper_text)
 
         # Ask the agent to answer the prompt
-        answer = await self.agent(self.agent_str).answer(
-            prompt=qa_prompt, multiline=True, max_tokens=300
+        answer = await self.agent(self.agent_str).complete(
+            prompt=qa_prompt, max_tokens=300
         )
 
         # Save results for each experiment

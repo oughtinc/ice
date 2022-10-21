@@ -3,6 +3,7 @@ from collections import Counter
 from structlog.stdlib import get_logger
 
 from ice.agents.base import Agent
+from ice.agents.base import Stop
 from ice.apis.openai import openai_complete
 
 log = get_logger()
@@ -26,11 +27,11 @@ class OpenAIReasoningAgent(Agent):
     def _answer_prefix(self, prompt: str) -> str:
         return prompt.split("\n")[-1]
 
-    async def answer(
+    async def complete(
         self,
         *,
         prompt: str,
-        multiline: bool = True,
+        stop: Stop = None,
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,
@@ -45,7 +46,7 @@ class OpenAIReasoningAgent(Agent):
 
         # Parse the responses and aggregate the answers and reasonings
         answers, reasonings = await self._parse_and_aggregate_responses(
-            reasoning_prompt, response, answer_prefix, multiline=multiline
+            reasoning_prompt, response, answer_prefix, stop=stop
         )
 
         # Return the most common answer (TODO: Smarter aggregation)
@@ -71,7 +72,7 @@ class OpenAIReasoningAgent(Agent):
 
         # Parse the responses and aggregate the answers and reasonings
         answers, reasonings = await self._parse_and_aggregate_responses(
-            reasoning_prompt, response, answer_prefix
+            reasoning_prompt, response, answer_prefix, choices=choices
         )
 
         # Return a dict [str, float] and the joined reasonings
@@ -104,7 +105,12 @@ class OpenAIReasoningAgent(Agent):
         return response
 
     async def _parse_and_aggregate_responses(
-        self, prompt: str, response: dict, answer_prefix: str, multiline: bool = False
+        self,
+        prompt: str,
+        response: dict,
+        answer_prefix: str,
+        stop: Stop = None,
+        choices: tuple[str, ...] | None = None,
     ) -> tuple[Counter[str], list[str]]:
         # Extract the response texts
         response_texts = [choice["text"] for choice in response["choices"]]
@@ -117,26 +123,28 @@ class OpenAIReasoningAgent(Agent):
             if answer_prefix not in response_text:
                 # If not, request an explicit answer from the API
                 response_text = await self._request_explicit_answer(
-                    prompt, response_text, answer_prefix, multiline=multiline
+                    prompt, response_text, answer_prefix, stop=stop
                 )
 
             # Parse the answer and the reasoning from the response
             answer, reasoning = self._parse_answer_and_reasoning(
-                response_text, answer_prefix, multiline=multiline
+                response_text, answer_prefix, stop=stop
             )
 
             # Update the answer counts and the reasoning list
-            answers[answer] += 1
+            if choices is not None:
+                for choice in choices:
+                    if answer.strip().startswith(choice.strip()):
+                        answers[choice] += 1
+            else:
+                answers[answer] += 1
+
             reasonings.append(reasoning)
 
         return answers, reasonings
 
     async def _request_explicit_answer(
-        self,
-        prompt: str,
-        response_text: str,
-        answer_prefix: str,
-        multiline: bool = True,
+        self, prompt: str, response_text: str, answer_prefix: str, stop: Stop = None
     ) -> str:
         # Generate a follow-up prompt with the answer prefix
         followup_prompt = f"{prompt}{response_text}\n\n{answer_prefix}"
@@ -144,7 +152,7 @@ class OpenAIReasoningAgent(Agent):
         # Request a single completion from the API
         followup_response = await openai_complete(
             followup_prompt,
-            stop=None,
+            stop=stop,
             model=self.model,
             temperature=self.temperature,
             top_p=self.top_p,
@@ -153,7 +161,7 @@ class OpenAIReasoningAgent(Agent):
 
         # Extract the follow-up response text
         followup_response_text = self._enforce_stop(
-            followup_response["choices"][0]["text"], multiline
+            followup_response["choices"][0]["text"], stop
         )
 
         # Append the follow-up response text to the original response text
@@ -161,12 +169,13 @@ class OpenAIReasoningAgent(Agent):
 
         return response_text
 
-    def _enforce_stop(self, response_text: str, multiline: bool) -> str:
-        stop = "\n\n" if multiline else "\n"
-        return response_text.strip().split(stop)[0]
+    def _enforce_stop(self, response_text: str, stop: Stop) -> str:
+        if stop is None:
+            return response_text.strip()
+        return response_text.strip().split("".join(stop))[0]
 
     def _parse_answer_and_reasoning(
-        self, response_text: str, answer_prefix: str, multiline: bool = True
+        self, response_text: str, answer_prefix: str, stop: Stop
     ) -> tuple[str, str]:
         # Split the response text by the answer prefix
         response_parts = response_text.split(answer_prefix, maxsplit=1)
@@ -183,7 +192,7 @@ class OpenAIReasoningAgent(Agent):
         if not reasoning or not answer:
             log.warning(f"Empty reasoning or answer: {response_text}")
 
-        answer = self._enforce_stop(answer, multiline)
+        answer = self._enforce_stop(answer, stop)
 
         return answer, reasoning
 

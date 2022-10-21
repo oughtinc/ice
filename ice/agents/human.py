@@ -1,18 +1,22 @@
 from ice.agents.base import Agent
+from ice.agents.base import Stop
 from ice.environment import env
 
 
 class HumanAgent(Agent):
-    async def answer(
+    async def complete(
         self,
         *,
         prompt: str,
-        multiline: bool = True,
+        stop: Stop = None,
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,
     ) -> str:
         verbose  # ignored for HumanAgent
+        multiline = (
+            False if stop is None or "\n" in stop else True
+        )  # TODO: better way to detect multiline
         completion = await env().answer(prompt, default=default, multiline=multiline)
         return completion
 

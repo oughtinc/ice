@@ -27,7 +27,8 @@ RUN \
     git \
     nodejs && \
   rm -rf /var/lib/apt/lists/* && \
-  git config --global --add safe.directory /code
+  git config --global --add safe.directory /code && \
+  npm install -g concurrently
 
 COPY poetry-requirements.txt poetry.lock pyproject.toml ./
 ARG poetry_install_args=""
@@ -41,9 +42,10 @@ ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
 RUN python -c "import nltk; nltk.download('punkt')"
 
-COPY ui/package.json ui/package-lock.json ui/patches ui/
+COPY ui/package.json ui/package-lock.json ui/
+COPY ui/patches/*.patch ui/patches/
 RUN npm --prefix ui ci
 
 COPY . .
 
-CMD ["npm", "--prefix", "ui", "run", "dev"]
+CMD ["concurrently", "uvicorn ice.routes.app:app --host 0.0.0.0 --port 8935 --reload", "npm --prefix ui run dev"]

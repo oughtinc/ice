@@ -39,7 +39,8 @@ RUN \
     xz-utils \
     zlib1g-dev && \
   rm -rf /var/lib/apt/lists/* && \
-  git config --global --add safe.directory /code
+  git config --global --add safe.directory /code && \
+  npm install -g concurrently
 
 WORKDIR /root
 RUN git clone --depth=1 https://github.com/pyenv/pyenv.git .pyenv
@@ -59,8 +60,9 @@ ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 RUN python -c "import nltk; nltk.download('punkt')"
 
 COPY ui/package.json ui/package-lock.json ui/
+COPY ui/patches/*.patch ui/patches/
 RUN npm --prefix ui ci
 
 COPY . .
 
-CMD ["npm", "--prefix", "ui", "run", "dev"]
+CMD ["concurrently", "uvicorn ice.routes.app:app --host 0.0.0.0 --port 8935 --reload", "npm --prefix ui run dev"]

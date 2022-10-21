@@ -55,6 +55,9 @@ class EvaluatedExcerpts(BaseModel):
         )
 
     def summary_stats_str(self) -> str:
+        if not self.excerpts:
+            return "The recipe didn't find any excerpts. This usually means that the recipe didn't try to find excerpts and instead answered by reading the whole paper."
+
         found_count = len(
             [
                 gold_standard
@@ -64,30 +67,29 @@ class EvaluatedExcerpts(BaseModel):
         )
         total_count = len(self.gold_standards_in_excerpts_results)
         proportion = self.proportion_gold_standards_found
-        excerpt_count = len(self.excerpts)
-        return f"""Found {found_count}/{total_count}{' (' + f'{proportion:.0%}' + ')' if proportion is not None else ''} gold standards in {excerpt_count} excerpts"""
+        return f"""The recipe found {found_count}/{total_count}{' (' + f'{proportion:.0%}' + ')' if proportion is not None else ''} gold standard excerpts."""
 
     def gold_standards_str(self) -> str:
         return "\n".join(
-            f"{i+1}. {'(Found)' if gold_standard_match.found else '(Not found)'} {gold_standard_match.text}"
+            f"{i+1}. {'(Found by recipe)' if gold_standard_match.found else '(Not found by recipe)'} {gold_standard_match.text}"
             for i, gold_standard_match in enumerate(
                 self.gold_standards_in_excerpts_results
             )
         )
 
     def excerpts_str(self) -> str:
-        return "\n".join(f"{i+1}. {excerpt}" for i, excerpt in enumerate(self.excerpts))
+        if self.excerpts:
+            return "\n\nRecipe excerpts:\n\n" + "\n".join(
+                f"{i}. {excerpt}" for i, excerpt in enumerate(self.excerpts, 1)
+            )
+        return ""
 
     def __str__(self) -> str:
         return f"""{self.summary_stats_str()}
 
-Gold standards:
+Gold standard excerpts:
 
-{self.gold_standards_str()}
-
-Excerpts:
-
-{self.excerpts_str()}
+{self.gold_standards_str()}{self.excerpts_str()}
 
 Average ROUGE-L recall across all gold standards (for debugging): {self.average_recall}
 """

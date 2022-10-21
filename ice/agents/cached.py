@@ -1,4 +1,5 @@
 from ice.agents.base import Agent
+from ice.agents.base import Stop
 from ice.settings import settings
 from ice.sqlite_shelf import SQLiteShelf
 
@@ -15,11 +16,11 @@ class CachedAgent(Agent):
         self.cache = SQLiteShelf(cache_file, cache_name)
         self.base_agent = base_agent
 
-    async def answer(
+    async def complete(
         self,
         *,
         prompt,
-        multiline=True,
+        stop: Stop = None,
         verbose=False,
         default="",
         max_tokens: int = 256,
@@ -27,9 +28,9 @@ class CachedAgent(Agent):
         key = get_cache_key("answer", prompt)
         if key in self.cache:
             return self.cache[key]
-        answer = await self.base_agent.answer(
+        answer = await self.base_agent.complete(
             prompt=prompt,
-            multiline=multiline,
+            stop=stop,
             verbose=verbose,
             default=default,
             max_tokens=max_tokens,

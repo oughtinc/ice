@@ -70,7 +70,13 @@ Environment = TypeVar("Environment", bound=EnvironmentInterface)
 
 class CliEnvironment(EnvironmentInterface):
     def __init__(self):
-        nest_asyncio.apply()  # Needed for questionary to work
+        try:
+            nest_asyncio.apply()  # Needed for questionary to work
+        except RuntimeError:
+            log.warning(
+                "Nest_asyncio failed to apply. This is expected when using Streamlit."
+            )
+            pass
         self._console = Console()
 
     def spinner(self, msg):
