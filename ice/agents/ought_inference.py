@@ -18,6 +18,7 @@ class OughtInferenceAgent(Agent):
     async def relevance(
         self, *, question, context, verbose=False, default=None
     ) -> float:
+        assert settings.OUGHT_INFERENCE_API_KEY, "Ought Inference API key not set"
         async with httpx.AsyncClient() as client:
             client.headers["x-api-key"] = settings.OUGHT_INFERENCE_API_KEY
             response = await client.post(
