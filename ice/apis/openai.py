@@ -38,6 +38,7 @@ def log_attempt_number(retry_state):
 
 RETRYABLE_STATUS_CODES = {408, 429, 502, 503, 504}
 OPENAI_BASE_URL = "https://api.openai.com/v1"
+
 OPENAI_DEFAULT_HEADERS = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
@@ -104,5 +105,6 @@ async def openai_complete(
             "max_tokens": max_tokens,
             "logprobs": logprobs,
             "n": n,
-        } | ({"logit_bias": logit_bias} if logit_bias else {}),
+        }
+        | ({"logit_bias": logit_bias} if logit_bias else {}),
     )
