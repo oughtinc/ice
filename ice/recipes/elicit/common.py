@@ -12,13 +12,13 @@ from tenacity import stop_after_attempt
 from tenacity import wait_random_exponential
 
 from ice.cache import diskcache
-
+from ice.settings import settings
 
 script_dir = Path(__file__).parent
 root_dir = script_dir.parent.parent.parent
 config = dotenv_values(root_dir / ".env")
 
-ELICIT_AUTH_TOKEN = os.getenv("ELICIT_AUTH_TOKEN", config.get("ELICIT_AUTH_TOKEN"))
+ELICIT_AUTH_TOKEN = settings.ELICIT_AUTH_TOKEN
 
 if not ELICIT_AUTH_TOKEN:
     raise Exception(
@@ -65,7 +65,7 @@ def deep_merge(base, nxt):
 @diskcache()
 @retry(stop=stop_after_attempt(2), wait=wait_random_exponential(2))
 def send_elicit_request(*, request_body, endpoint: str):
-    assert ELICIT_AUTH_TOKEN is not None, "ELICIT_AUTH_TOKEN is not set"
+    assert ELICIT_AUTH_TOKEN, "ELICIT_AUTH_TOKEN is not set"
     headers = {
         "Content-Type": "application/json",
         "Authorization": ELICIT_AUTH_TOKEN,
@@ -79,7 +79,6 @@ def send_elicit_request(*, request_body, endpoint: str):
         timeout=40,
     ) as r:
         for chunk in r.iter_text():
-            print(chunk)
             chunks.append(chunk)
     joined = "".join(chunks)
     split_on_newlines = joined.split("\n")
