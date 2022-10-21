@@ -3,7 +3,7 @@ import pandas as pd
 from ice.recipe import Recipe
 from ice.recipe import recipe
 from ice.recipes.eval_vs_gs import run_over_gs
-from ice.recipes.synthesize_compositional import synthesize_compositional_from_df
+from ice.recipes.paragraph_synthesis.synthesize_compositional import synthesize_compositional_from_df
 from ice.utils import reorder_columns
 
 # from ice.recipes.synthesize_ft import synthesize_ft_from_df

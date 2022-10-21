@@ -5,8 +5,8 @@ from ice.recipes.abstract_qa import Abstract
 from ice.recipes.abstract_qa import abstract_qa
 from ice.recipes.abstract_qa import DEFAULT_ABSTRACTS
 from ice.recipes.combine_abstract_answers import combine_abstract_answers
-from ice.recipes.synthesize import synthesize_from_df
-from ice.recipes.synthesize_ft import synthesize_ft
+from ice.recipes.paragraph_synthesis.synthesize import synthesize_from_df
+from ice.recipes.paragraph_synthesis.synthesize_ft import synthesize_ft
 from ice.utils import map_async
 
 

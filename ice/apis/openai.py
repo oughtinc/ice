@@ -1,3 +1,5 @@
+from typing import Any
+
 import httpx
 
 from httpx import TimeoutException
@@ -94,7 +96,7 @@ async def openai_complete(
     """Send a completion request to the OpenAI API and return the JSON response."""
     cache_id  # unused
 
-    json = {
+    json: dict[str, Any] = {
         "prompt": prompt,
         "stop": stop,
         "top_p": top_p,

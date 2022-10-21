@@ -4,7 +4,6 @@ from ice.evaluation.evaluate_recipe_result import EvaluatedRecipeResult
 from ice.evaluation.evaluate_recipe_result import RecipeResult
 from ice.evaluation.evaluation_report import EvaluationReport
 from ice.recipe import Recipe
-from ice.recipe import recipe
 from ice.utils import map_async
 
 
