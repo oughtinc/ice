@@ -5,39 +5,43 @@ import pandas as pd
 from ice.recipes.synthesize_compositional import synthesize_compositional_from_df
 # from ice.recipes.synthesize import synthesize_from_df
 from ice.recipe import Recipe, recipe
-from ice.recipes.run_over_gs import run_over_gs
-from ice.utils import order_columns
+from ice.recipes.eval_vs_gs import run_over_gs
+from ice.utils import reorder_columns
 
 RECIPE_TO_RUN = synthesize_compositional_from_df
-GS_DF = pd.read_csv("data/Paragraph synthesis fine-tuning data - Gold standards.csv")
+GS_FILENAME = "gold_standards/paragraph_synthesis_gs.csv"
 
 async def eval_synthesize():
-    answers_df = await run_over_gs(RECIPE_TO_RUN, GS_DF)
+    gs_df = pd.read_csv(GS_FILENAME)
+    gs_df = pd.read_csv("gold_standards/paragraph_synthesis_gs.csv")
+    gs_df = gs_df[gs_df["is_gs"] == True].reset_index()
+    answers_df = await run_over_gs(RECIPE_TO_RUN, gs_df)
     answers_df["question"] = answers_df["document_id"]
-    merged_df = answers_df.merge(GS_DF, on="question", how="left", suffixes=("_answer", "_gs"))
+    gs_df.columns = [f"{column}_gs" for column in gs_df.columns]
+    gs_df["question"] = gs_df["question_gs"]
+    merged_df = answers_df.merge(gs_df, on="question", how="left", suffixes=("_answer", "_gs"))
     merged_df = merged_df.sort_values(["question", "technique"])
     rating_cols_to_add = ["citedness (0-1)", "hallucination (0 = none, 2 = substantive)", "answer_rating", "failure_modes", "notes"]
     for col in rating_cols_to_add:
         merged_df[col] = ""
-    merged_df = order_columns(merged_df, [
+    merged_df = reorder_columns(merged_df, [
         "technique",
         "question",
         "answer",
-        "papers_cited",
-        "synthesis",
+        "answer_gs",
     ] + rating_cols_to_add + [
-        "citation_1",
-        "abstract_1",
-        "paper_1_answer",
-        "citation_2",
-        "abstract_2",
-        "paper_2_answer",
-        "citation_3",
-        "abstract_3",
-        "paper_3_answer",
-        "citation_4",
-        "abstract_4",
-        "paper_4_answer"
+        "citation_1_gs",
+        "abstract_1_gs",
+        "paper_1_answer_gs",
+        "citation_2_gs",
+        "abstract_2_gs",
+        "paper_2_answer_gs",
+        "citation_3_gs",
+        "abstract_3_gs",
+        "paper_3_answer_gs",
+        "citation_4_gs",
+        "abstract_4_gs",
+        "paper_4_answer_gs"
     ])
 
     merged_df.to_csv(f"data/{RECIPE_TO_RUN.__name__}_eval.csv", index=False)

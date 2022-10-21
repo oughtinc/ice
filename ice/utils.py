@@ -311,9 +311,7 @@ def max_by_value(
 ) -> tuple[K, V]:
     return max(d.items(), key=lambda x: key(x[1]))
 
-def order_columns(df: pd.DataFrame, ordered_columns: list[str]) -> pd.DataFrame:
+def reorder_columns(df: pd.DataFrame, ordered_columns: list[str]) -> pd.DataFrame:
     rest_columns = [column for column in df.columns if column not in ordered_columns]
-    columns = [
-        column for column in (ordered_columns + rest_columns) if column in df.columns
-    ]
+    columns = ordered_columns + rest_columns
     return df[columns]

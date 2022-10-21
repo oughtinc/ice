@@ -18,13 +18,14 @@ async def run_recipe_on_row(row: pd.Series, recipe_to_run: Recipe):
     return await recipe_to_run(**row)
 
 async def run_over_gs(recipe_to_run: Recipe, gs_df: pd.DataFrame) -> EvaluationReport:
-    gs_df["answer"] = await map_async(
-        [row for _, row in gs_df.iterrows()],
+    answers_df = gs_df.copy()
+    answers_df["answer"] = await map_async(
+        [row for _, row in answers_df.iterrows()],
         lambda row: run_recipe_on_row(row, recipe_to_run),
         # set this if you're getting OpenAI errors
         # max_concurrency=1
     )
-    recipe_results = gs_df.apply(make_recipe_result, axis=1)
+    recipe_results = answers_df.apply(make_recipe_result, axis=1)
     evaluation_report = EvaluationReport(
         technique_name=recipe_to_run.__name__,
         results=await map_async(
