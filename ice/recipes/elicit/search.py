@@ -6,6 +6,7 @@ ELICIT_SEARCH_ENDPOINT = (
     "https://dev.elicit.org/elicit-previews/charlie/cheap-lit-review/lit-review"
 )
 
+
 def make_request_body(
     query: str, num_papers: int = 4, filters: dict | None = None
 ) -> dict:
