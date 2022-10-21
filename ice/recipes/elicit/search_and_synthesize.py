@@ -6,8 +6,8 @@ from ice.recipes.synthesize_compositional import synthesize_compositional
 
 
 async def search_and_synthesize(
-    question: str = "What is the effect of creatine on cognition?",
-    compositional: bool = False,
+    question: str = "What are the benefits and drawbacks of using a pregnancy tracking app?",
+    compositional: bool = True,
 ):
     elicit_response = await elicit_search(question=question, num_papers=4)
     elicit_papers = list(elicit_response["papers"].values())

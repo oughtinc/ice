@@ -1,10 +1,12 @@
+import re
+
 from typing import List
+
 from transformers import GPT2TokenizerFast
 
+from ice.apis.openai import openai_complete
 from ice.recipe import recipe
 from ice.recipes.elicit.search import elicit_search
-from ice.apis.openai import openai_complete
-import re
 
 
 def make_gpt2_tokenizer() -> GPT2TokenizerFast:
@@ -108,7 +110,7 @@ A summary should get a 3 if:
 - Supported MOSTLY by the evidence
 - Cite ALL of the 4 papers above(in the form (Author, Year) E.g Ogawa et al. (2017))
 - Somewhat helpful at answering the question "{question}"
-- It is somewhat detailed 
+- It is somewhat detailed
 
 A summary should get a 2 if:
 - Supported AT LEAST SOMEWHAT by the evidence
@@ -122,7 +124,7 @@ A summary should get a 1 if:
 - Not helpful at answering the question "{question}"
 - It contains no details
 
-Be harsh, but fair. If you think a summary is bad, give it a low score. If you think a summary is good, give it a high score. 
+Be harsh, but fair. If you think a summary is bad, give it a low score. If you think a summary is good, give it a high score.
 Do not hesitate to give a summary a low score. Only the VERY BEST summaries will get a 5.
 
 Write "Reasoning" then "Score" for each summary.
@@ -130,6 +132,7 @@ After you have scored summary 5, write "END" to indicate that you are done.
 
 Summary 1)
 Reasoning:"""
+
 
 def parse_scores(scores: str) -> List[int]:
     for score in scores:
@@ -139,8 +142,10 @@ def parse_scores(scores: str) -> List[int]:
         else:
             yield 0
 
+
 def mean(scores: List[int]) -> float:
     return sum(scores) / len(scores) if len(scores) > 0 else 0
+
 
 def _get_reference(authors: list[str], year: int | None) -> str:
     if len(authors) == 0:
@@ -198,7 +203,9 @@ async def paragraph_synthesis(
 
     choices = response["choices"]
     summaries = [choice["text"].strip() for choice in choices]
-    summary_str = "\n\n".join([f"Summary {i + 1})\n\n"+s for i, s in enumerate(summaries)])
+    summary_str = "\n\n".join(
+        [f"Summary {i + 1})\n\n" + s for i, s in enumerate(summaries)]
+    )
 
     ranking_prompt = RANKING_PROMPT.format(
         question=question,
@@ -222,7 +229,12 @@ async def paragraph_synthesis(
 
     scores = [mean([score[i] for score in all_scores]) for i in range(5)]
     scored_summaries = sorted(zip(scores, summaries), key=lambda x: x[0], reverse=True)
-    summary_str = "\n\n".join([f"Summary {i + 1}) Score: {score}\n\n"+summary for i, (score, summary) in enumerate(scored_summaries)])
+    summary_str = "\n\n".join(
+        [
+            f"Summary {i + 1}) Score: {score}\n\n" + summary
+            for i, (score, summary) in enumerate(scored_summaries)
+        ]
+    )
 
     return summary_str
 
