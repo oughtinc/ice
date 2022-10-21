@@ -2,6 +2,7 @@ import itertools
 import os
 import threading as td
 import time
+import pandas as pd
 
 from collections import defaultdict
 from collections.abc import Awaitable
@@ -309,3 +310,10 @@ def max_by_value(
     d: dict[K, V], *, key: Callable[[V], Any] = lambda x: x
 ) -> tuple[K, V]:
     return max(d.items(), key=lambda x: key(x[1]))
+
+def order_columns(df: pd.DataFrame, ordered_columns: list[str]) -> pd.DataFrame:
+    rest_columns = [column for column in df.columns if column not in ordered_columns]
+    columns = [
+        column for column in (ordered_columns + rest_columns) if column in df.columns
+    ]
+    return df[columns]
