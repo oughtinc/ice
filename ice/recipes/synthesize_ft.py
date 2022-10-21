@@ -1,8 +1,14 @@
-import transformers
-from ice.recipe import recipe
 import json
-from ice.recipes.synthesize import Abstract, _get_reference, num_tokens, synthesize_from_df
+
 from functools import partial
+
+import transformers
+
+from ice.recipe import recipe
+from ice.recipes.synthesize import _get_reference
+from ice.recipes.synthesize import Abstract
+from ice.recipes.synthesize import num_tokens
+from ice.recipes.synthesize import synthesize_from_df
 
 tokenizer = transformers.GPT2Tokenizer.from_pretrained("gpt2")
 
@@ -26,13 +32,21 @@ Let's summarize each paper individually first.
 
 Summaries (starting with paper 1):"""
 
+
 def truncate(string: str, max_tokens: int) -> str:
     return tokenizer.decode(tokenizer.encode(string)[:max_tokens])
+
 
 def n_tokens(string: str) -> int:
     return len(tokenizer.encode(string))
 
-def _create_paper_str(titles: list[str], citations: list[str], abstracts: list[str], abstract_max_tokens: int) -> str:
+
+def _create_paper_str(
+    titles: list[str],
+    citations: list[str],
+    abstracts: list[str],
+    abstract_max_tokens: int,
+) -> str:
     # Use davinci:ft-ought-experiments:synthesisv2-2022-10-17-23-02-55
     return "\n\n".join(
         [
@@ -49,25 +63,36 @@ def _create_paper_str(titles: list[str], citations: list[str], abstracts: list[s
     )
 
 
-def _create_prompt_ft(query: str, titles: list[str], abstracts: list[str], citations: list[str]) -> str:
+def _create_prompt_ft(
+    query: str, titles: list[str], abstracts: list[str], citations: list[str]
+) -> str:
     # Use fine-tuned model
     abstract_max_tokens = 1000
-    paper_str = _create_paper_str(titles, citations, abstracts, abstract_max_tokens=abstract_max_tokens)
+    paper_str = _create_paper_str(
+        titles, citations, abstracts, abstract_max_tokens=abstract_max_tokens
+    )
     prompt = PROMPT.format(question=query, paper_str=paper_str)
 
     while n_tokens(prompt) > 1700 and abstract_max_tokens > 0:
-        paper_str = _create_paper_str(titles, citations, abstracts, abstract_max_tokens=abstract_max_tokens)
+        paper_str = _create_paper_str(
+            titles, citations, abstracts, abstract_max_tokens=abstract_max_tokens
+        )
         prompt = PROMPT.format(question=query, paper_str=paper_str)
         abstract_max_tokens -= 10
 
     return prompt
 
-async def synthesize_ft(question: str, abstracts: list[Abstract], create_prompt_fn = _create_prompt_ft) -> str:
+
+async def synthesize_ft(
+    question: str, abstracts: list[Abstract], create_prompt_fn=_create_prompt_ft
+) -> str:
     prompt = create_prompt_fn(
         query=question,
         titles=[abstract.title for abstract in abstracts],
         abstracts=[abstract.text for abstract in abstracts],
-        citations=[_get_reference(abstract.authors, abstract.year) for abstract in abstracts],
+        citations=[
+            _get_reference(abstract.authors, abstract.year) for abstract in abstracts
+        ],
     )
 
     remaining_tokens = MAX_TOKENS - num_tokens(prompt)
@@ -77,6 +102,7 @@ async def synthesize_ft(question: str, abstracts: list[Abstract], create_prompt_
     )
 
     return completion
+
 
 synthesize_ft_from_df = partial(synthesize_from_df, synthesize_fn=synthesize_ft)
 synthesize_ft_from_df.__name__ = "synthesize_ft_from_df"

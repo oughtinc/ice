@@ -94,7 +94,7 @@ async def openai_complete(
     """Send a completion request to the OpenAI API and return the JSON response."""
     cache_id  # unused
 
-    json={
+    json = {
         "prompt": prompt,
         "stop": stop,
         "top_p": top_p,
@@ -108,7 +108,4 @@ async def openai_complete(
     if logit_bias:
         json["logit_bias"] = logit_bias
 
-    return await _post(
-        "completions",
-        json
-    )
+    return await _post("completions", json)

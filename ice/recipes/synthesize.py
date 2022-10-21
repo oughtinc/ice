@@ -1,10 +1,10 @@
+import json
+
 from transformers import GPT2TokenizerFast
 
 from ice.recipe import recipe
 from ice.recipes.abstract_qa import Abstract
 from ice.recipes.abstract_qa import DEFAULT_ABSTRACTS
-
-import json
 
 
 def make_gpt2_tokenizer() -> GPT2TokenizerFast:
@@ -139,17 +139,19 @@ async def synthesize_cli():
     return await synthesize(question, abstracts)
 
 
+async def synthesize_from_df(question, papers, synthesize_fn=synthesize, **kwargs):
+    return await synthesize_fn(
+        question,
+        [
+            Abstract(
+                title=paper["title"],
+                authors=paper["authors"],
+                year=paper["year"],
+                text=paper["abstract"],
+            )
+            for paper in json.loads(papers)
+        ],
+    )
 
-async def synthesize_from_df(
-    question,
-    papers,
-    synthesize_fn=synthesize,
-    **kwargs
-):
-    return await synthesize_fn(question, [Abstract(
-        title=paper["title"],
-        authors=paper["authors"],
-        year=paper["year"],
-        text=paper["abstract"],
-    ) for paper in json.loads(papers)])
+
 recipe.main(synthesize_cli)

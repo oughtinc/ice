@@ -2,7 +2,6 @@ import itertools
 import os
 import threading as td
 import time
-import pandas as pd
 
 from collections import defaultdict
 from collections.abc import Awaitable
@@ -16,6 +15,7 @@ from typing import Generic
 from typing import TypeVar
 
 import anyio
+import pandas as pd
 import tqdm
 
 from structlog.stdlib import get_logger
@@ -310,6 +310,7 @@ def max_by_value(
     d: dict[K, V], *, key: Callable[[V], Any] = lambda x: x
 ) -> tuple[K, V]:
     return max(d.items(), key=lambda x: key(x[1]))
+
 
 def reorder_columns(df: pd.DataFrame, ordered_columns: list[str]) -> pd.DataFrame:
     rest_columns = [column for column in df.columns if column not in ordered_columns]

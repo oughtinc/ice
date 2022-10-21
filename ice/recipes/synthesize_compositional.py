@@ -1,12 +1,13 @@
+from functools import partial
+
 from ice.recipe import recipe
 from ice.recipes.abstract_qa import Abstract
 from ice.recipes.abstract_qa import abstract_qa
 from ice.recipes.abstract_qa import DEFAULT_ABSTRACTS
 from ice.recipes.combine_abstract_answers import combine_abstract_answers
+from ice.recipes.synthesize import synthesize_from_df
 from ice.recipes.synthesize_ft import synthesize_ft
 from ice.utils import map_async
-from functools import partial
-from ice.recipes.synthesize import synthesize_from_df
 
 
 async def synthesize_compositional(question: str, abstracts: list[Abstract]) -> str:
@@ -28,6 +29,7 @@ async def synthesize_compositional_cli() -> str:
 
 recipe.main(synthesize_compositional_cli)
 
-synthesize_compositional_from_df = partial(synthesize_from_df, synthesize_fn=synthesize_compositional)
+synthesize_compositional_from_df = partial(
+    synthesize_from_df, synthesize_fn=synthesize_compositional
+)
 synthesize_compositional_from_df.__name__ = "synthesize_compositional_from_df"
-

@@ -1,9 +1,12 @@
 import pandas as pd
-from ice.recipe import Recipe, recipe
-from ice.evaluation.evaluate_recipe_result import RecipeResult
-from ice.utils import map_async
-from ice.evaluation.evaluation_report import EvaluationReport
+
 from ice.evaluation.evaluate_recipe_result import EvaluatedRecipeResult
+from ice.evaluation.evaluate_recipe_result import RecipeResult
+from ice.evaluation.evaluation_report import EvaluationReport
+from ice.recipe import Recipe
+from ice.recipe import recipe
+from ice.utils import map_async
+
 
 def make_recipe_result(row: pd.Series) -> RecipeResult:
     return RecipeResult(
@@ -14,8 +17,10 @@ def make_recipe_result(row: pd.Series) -> RecipeResult:
         excerpts=row.get("excerpts", []),
     )
 
+
 async def run_recipe_on_row(row: pd.Series, recipe_to_run: Recipe):
     return await recipe_to_run(**row)
+
 
 async def run_over_gs(recipe_to_run: Recipe, gs_df: pd.DataFrame) -> EvaluationReport:
     answers_df = gs_df.copy()

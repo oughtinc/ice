@@ -1,9 +1,13 @@
+from functools import partial
 
 import transformers
+
 from ice.recipe import recipe
-from ice.recipes.synthesize import Abstract, _get_reference, num_tokens, synthesize_from_df
+from ice.recipes.synthesize import _get_reference
+from ice.recipes.synthesize import Abstract
+from ice.recipes.synthesize import num_tokens
+from ice.recipes.synthesize import synthesize_from_df
 from ice.recipes.synthesize_ft import n_tokens
-from functools import partial
 
 PROMPT = """An ideal answer gives references to the academic literature. Example: "To our knowledge, the only freely and publicly available dense autoregressive language models larger than GPT2 are GPT-Neo (Black et al., 2021), GPT-J-6B (Wang and Komatsuzaki, 2021), Megatron-11B, Pangu-13B (Zeng et al., 2021), and the recently released FairSeq models (Artetxe et al., 2021)."
 
@@ -51,7 +55,7 @@ Paper: The acute effects of L‐theanine in comparison with alprazolam on antici
 Reference: Lu et al. (2004)
 Excerpt: L‐Theanine (δ‐glutamylethylamide) is one of the predominant amino acids ordinarily found in green tea, and historically has been used as a relaxing agent. The current study examined the acute effects of L‐theanine in comparison with a standard benzodiazepine anxiolytic, alprazolam and placebo on behavioural measures of anxiety in healthy human subjects using the model of anticipatory anxiety (AA). Sixteen healthy volunteers received alprazolam (1 mg), L‐theanine (200 mg) or placebo in a double‐blind placebo‐controlled repeated measures design. The acute effects of alprazolam and L‐theanine were assessed under a relaxed and experimentally induced anxiety condition. Subjective self‐reports of anxiety including BAI, VAMS, STAI state anxiety, were obtained during both task conditions at pre‐ and post‐drug administrations. The results showed some evidence for relaxing effects of L‐theanine during the baseline condition on the tranquil–troubled subscale of the VAMS. Alprazolam did not exert any anxiolytic effects in comparison with the placebo on any of the measures during the relaxed state. Neither L‐theanine nor alprazalam had any significant anxiolytic effects during the experimentally induced anxiety state. The findings suggest that while L‐theanine may have some relaxing effects under resting conditions, neither L‐theanine not alprazolam demonstrate any acute anxiolytic effects under conditions of increased anxiety in the AA model. Copyright © 2004 John Wiley & Sons, Ltd.
 
-Let's think about how each paper answers the overall question: Ogawa et al. (2017) found that l-theanine exerts anxiolytic effects in an independent set of animals, which suggests that l-theanine is effective for anxiety. Raj Juneja et al. (1999) review the evidence for l-theanine. They find that oral administration of l-theanine in humans led to α-waves (indicative of relaxation), which also suggests that l-theanine is effective for anxiety. Lu et al. (2004) found that while l-theanine may have relaxing effects under resting conditions, it did not demonstrate acute acute anxiolytic effects under anxious conditions, which suggests the opposite conclusion that l-theanine may not be effective for anxiety. 
+Let's think about how each paper answers the overall question: Ogawa et al. (2017) found that l-theanine exerts anxiolytic effects in an independent set of animals, which suggests that l-theanine is effective for anxiety. Raj Juneja et al. (1999) review the evidence for l-theanine. They find that oral administration of l-theanine in humans led to α-waves (indicative of relaxation), which also suggests that l-theanine is effective for anxiety. Lu et al. (2004) found that while l-theanine may have relaxing effects under resting conditions, it did not demonstrate acute acute anxiolytic effects under anxious conditions, which suggests the opposite conclusion that l-theanine may not be effective for anxiety.
 
 Now let's answer the question: "How does l-theanine affect anxiety?"
 
@@ -67,22 +71,30 @@ Here are the relevant papers, and excerpts from those papers:\n\n"""
 
 SUFFIX = "\n\nLet's think about how each paper answers the overall question:"
 
+
 def _get_prompt(question, titles, citations, abstracts):
-    paper_prompt = PREFIX.format(question=question)+"\n\n".join(
-        PAPER_FORMAT.format(title=title, citation=citation, abstract=abstract)
-        for title, citation, abstract in zip(titles, citations, abstracts)
-    )+SUFFIX
-    prompt = PREFIX+"\n\n"+EXTRA_SHOT+"\n\n"+paper_prompt
-    if n_tokens(prompt) > 3700: # 300 tokens for the completion
-        prompt = PREFIX+"\n\n"+paper_prompt
+    paper_prompt = (
+        PREFIX.format(question=question)
+        + "\n\n".join(
+            PAPER_FORMAT.format(title=title, citation=citation, abstract=abstract)
+            for title, citation, abstract in zip(titles, citations, abstracts)
+        )
+        + SUFFIX
+    )
+    prompt = PREFIX + "\n\n" + EXTRA_SHOT + "\n\n" + paper_prompt
+    if n_tokens(prompt) > 3700:  # 300 tokens for the completion
+        prompt = PREFIX + "\n\n" + paper_prompt
     return prompt, 4000 - n_tokens(prompt)
+
 
 async def synthesize_chain_of_thought(question: str, abstracts: list[Abstract]) -> str:
     prompt, max_tokens = _get_prompt(
         question=question,
         titles=[abstract.title for abstract in abstracts],
         abstracts=[abstract.text for abstract in abstracts],
-        citations=[_get_reference(abstract.authors, abstract.year) for abstract in abstracts],
+        citations=[
+            _get_reference(abstract.authors, abstract.year) for abstract in abstracts
+        ],
     )
 
     completion = await recipe.agent().complete(
@@ -94,6 +106,8 @@ async def synthesize_chain_of_thought(question: str, abstracts: list[Abstract]) 
 
     return completion
 
-synthesize_chain_of_thought_from_df = partial(synthesize_from_df, synthesize_fn=synthesize_chain_of_thought)
-synthesize_chain_of_thought_from_df.__name__ = "synthesize_chain_of_thought_from_df"
 
+synthesize_chain_of_thought_from_df = partial(
+    synthesize_from_df, synthesize_fn=synthesize_chain_of_thought
+)
+synthesize_chain_of_thought_from_df.__name__ = "synthesize_chain_of_thought_from_df"
