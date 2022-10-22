@@ -12,28 +12,35 @@ router = APIRouter(prefix="/kelvin", tags=["kelvin"])
 T = TypeVar("T")
 
 
+class ActionParam(BaseModel):
+    name: str
+    kind: Literal["text_param"] = "text_param"
+    value: str | None = None
+
+
+class Action(BaseModel):
+    kind: Literal["question_action"]
+    params: List[ActionParam]
+
+
 class Card(Generic[T], BaseModel):
+    kind: str
     rows: List[T]
 
 
 class TextCard(Card[str]):
-    pass
-
-
-class Action(BaseModel):
-    action_type: Literal["ask_question"]
-    action_param_types: dict
-    action_param_values: dict
-
-
-class QuestionAction(Action):
-    action_type: Literal["ask_question"] = "ask_question"
-    action_param_types: dict = {"question": "text"}
-    action_param_values: dict = {}
+    kind: Literal["text_card"] = "text_card"
+    rows: List[str]
 
 
 class ActionCard(Card[Action]):
-    pass
+    kind: Literal["action_card"] = "action_card"
+    rows: list[Action]
+
+
+class QuestionAction(Action):
+    kind: Literal["question_action"] = "question_action"
+    params: list[ActionParam] = [ActionParam(name="question", kind="text_param")]
 
 
 class Workspace(BaseModel):
