@@ -1,7 +1,10 @@
-from typing import List, TypeVar, Generic
-from pydantic import BaseModel
+from typing import Generic
+from typing import List
+from typing import Literal
+from typing import TypeVar
 
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/kelvin", tags=["kelvin"])
 
@@ -18,8 +21,15 @@ class TextCard(Card[str]):
 
 
 class Action(BaseModel):
-    name: str
-    params: dict
+    action_type: Literal["ask_question"]
+    action_param_types: dict
+    action_param_values: dict
+
+
+class QuestionAction(Action):
+    action_type: Literal["ask_question"] = "ask_question"
+    action_param_types: dict = {"question": "text"}
+    action_param_values: dict = {}
 
 
 class ActionCard(Card[Action]):
@@ -35,7 +45,7 @@ class Workspace(BaseModel):
 async def initial_workspace():
     return Workspace(
         cards={
-            "initial": TextCard(rows=["one", "two"]),
+            "initial": ActionCard(rows=[QuestionAction()]),
         },
         currentCardId="initial",
     )

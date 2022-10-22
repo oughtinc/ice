@@ -22,8 +22,15 @@ type Card<T> = {
 type TextCard = Card<string>;
 
 type Action = {
-  name: string;
-  params: Record<string, any>;
+  action_type: "ask_question";
+  action_param_types: { [key: string]: string };
+  action_param_values: { [key: string]: any };
+};
+
+type QuestionAction = {
+  action_type: "ask_question";
+  action_param_types: { question: "text" };
+  action_param_values: { question?: string };
 };
 
 type ActionCard = Card<Action>;
