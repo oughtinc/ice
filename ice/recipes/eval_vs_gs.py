@@ -21,8 +21,11 @@ async def run_recipe_on_row(row: pd.Series, recipe_to_run: Recipe):
     return await recipe_to_run(**row)
 
 
-async def run_over_gs(recipe_to_run: Recipe, gs_df: pd.DataFrame) -> EvaluationReport:
+async def run_over_gs(recipe_to_run: Recipe, gs_df: pd.DataFrame, splits: list[str]) -> EvaluationReport:
     answers_df = gs_df.copy()
+
+    answers_df = answers_df[answers_df.split.isin(splits)].reset_index(drop=True)
+
     answers_df["answer"] = await map_async(
         [row for _, row in answers_df.iterrows()],
         lambda row: run_recipe_on_row(row, recipe_to_run),

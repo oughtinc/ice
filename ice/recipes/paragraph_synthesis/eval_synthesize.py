@@ -12,13 +12,14 @@ from ice.utils import reorder_columns
 
 RECIPE_TO_RUN = synthesize_compositional_from_df
 GS_FILENAME = "gold_standards/paragraph_synthesis_gs.csv"
+SPLITS = ["validation"]
 
 
 async def eval_synthesize():
     gs_df = pd.read_csv(GS_FILENAME)
     gs_df = pd.read_csv("gold_standards/paragraph_synthesis_gs.csv")
     gs_df = gs_df[gs_df["is_gs"] == True].reset_index()
-    answers_df = await run_over_gs(RECIPE_TO_RUN, gs_df)
+    answers_df = await run_over_gs(RECIPE_TO_RUN, gs_df, SPLITS)
     answers_df["question"] = answers_df["document_id"]
     gs_df.columns = [f"{column}_gs" for column in gs_df.columns]
     gs_df["question"] = gs_df["question_gs"]
