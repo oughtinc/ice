@@ -18,7 +18,7 @@ from ice.environment import env
 
 log = get_logger()
 
-PDF_PARSER_URL = "https://dev.elicit.org/elicit-previews/james/oug-3083-support-parsing-arbitrary-pdfs-using/parse_pdf"
+PDF_PARSER_URL = "https://test.elicit.org/elicit-previews/james/oug-3083-support-parsing-arbitrary-pdfs-using/parse_pdf"
 
 SectionType = Literal["abstract", "main", "back"]
 
