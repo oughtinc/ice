@@ -1,28 +1,31 @@
-export type ActionParam = {
+type TextParam = {
   name: string;
   kind: "text_param";
   value: string | null;
 };
 
-export type Action = {
+type QuestionAction = {
   kind: "question_action";
-  params: ActionParam[];
+  params: TextParam[];
 };
 
-export type Card<T> = {
+type Action = QuestionAction;
+
+type Card<T> = {
+  id: string;
   kind: string;
   rows: T[];
 };
 
-export type TextCard = Card<string> & {
+type TextCard = Card<string> & {
   kind: "text_card";
 };
 
-export type ActionCard = Card<Action> & {
+type ActionCard = Card<Action> & {
   kind: "action_card";
 };
 
-export type Workspace = {
-  cards: { [string]: Card };
+type Workspace = {
+  cards: (TextCard | ActionCard)[];
   currentCardId: string;
 };

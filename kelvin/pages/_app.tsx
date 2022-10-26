@@ -1,7 +1,8 @@
-import "../styles/globals.css";
-import type { AppProps } from "next/app";
 import { css, Global } from "@emotion/react";
+import type { AppProps } from "next/app";
+import "../styles/globals.css";
 import { ChakraWrapper } from "/components/ChakraWrapper/ChakraWrapper";
+import { WorkspaceProvider } from "/contexts/workspaceContext";
 
 const GlobalStyles = css`
   // Remove Chakra focus outline is the element is not actually focussed
@@ -64,7 +65,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraWrapper>
       <Global styles={GlobalStyles} />
-      <Component {...pageProps} />
+      <WorkspaceProvider>
+        <Component {...pageProps} />
+      </WorkspaceProvider>
     </ChakraWrapper>
   );
 }

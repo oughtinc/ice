@@ -24,6 +24,7 @@ class Action(BaseModel):
 
 
 class Card(Generic[T], BaseModel):
+    id: str
     kind: str
     rows: List[T]
 
@@ -44,15 +45,20 @@ class QuestionAction(Action):
 
 
 class Workspace(BaseModel):
-    cards: dict[str, Card]
+    cards: list[Card]
     currentCardId: str
+
+
+@router.get("/hello/", response_model=str)
+async def hello_world():
+    return "Hello World"
 
 
 @router.get("/workspaces/initial", response_model=Workspace)
 async def initial_workspace():
     return Workspace(
-        cards={
-            "initial": ActionCard(rows=[QuestionAction()]),
-        },
+        cards=[
+            ActionCard(id="initial", rows=[QuestionAction()]),
+        ],
         currentCardId="initial",
     )
