@@ -109,6 +109,7 @@ class Enrolment(BaseModel):
 
 
 class Experiment(BaseModel):
+    name: str
     description: str | None = None
     reasoning: str | None = None
     enrolment: Enrolment | None
