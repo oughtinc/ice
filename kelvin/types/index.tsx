@@ -5,7 +5,7 @@ type TextParam = {
 };
 
 type QuestionAction = {
-  kind: "question_action";
+  kind: "create_question_action";
   params: TextParam[];
 };
 

@@ -8,7 +8,7 @@ type Props = {
 };
 
 const actionLabels: Record<string, string> = {
-  question_action: "Ask a research question",
+  create_question_action: "Ask a research question",
 };
 
 const Action = ({ action, onSubmit }: Props) => {
