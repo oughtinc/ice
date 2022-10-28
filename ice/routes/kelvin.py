@@ -114,6 +114,31 @@ async def initial_workspace():
     )
 
 
+def get_available_actions(card: Card, selected_row_index: int | None) -> List[Action]:
+    # Return a list of actions that can be performed on the card
+    # based on its kind and the selected row index
+
+    if card.kind == "text_card":
+        # For text cards, the available actions are adding a new row
+        # or editing an existing row
+        actions: list[Action] = [AddTextRowAction()]
+        if selected_row_index is not None and 0 <= selected_row_index < len(card.rows):
+            # If a row is selected, also allow editing it
+            actions.append(
+                EditTextRowAction(
+                    params=[
+                        ActionParam(name="new_row_text", kind="text_param"),
+                        ActionParam(
+                            name="row_index", kind="int_param", value=selected_row_index
+                        ),
+                    ]
+                )
+            )
+        return actions
+    else:
+        raise NotImplementedError(f"Unsupported card kind: {card.kind}")
+
+
 def handle_add_action(action: AddTextRowAction, card: Card) -> CardWithView:
 
     if not action.kind == "add_text_row_action":
@@ -137,17 +162,7 @@ def handle_add_action(action: AddTextRowAction, card: Card) -> CardWithView:
     new_view = CardView(
         card_id=new_card_id,
         selected_row_index=len(new_card.rows) - 1,
-        available_actions=[
-            AddTextRowAction(),
-            EditTextRowAction(
-                params=[
-                    ActionParam(name="new_row_text", kind="text_param"),
-                    ActionParam(
-                        name="row_index", kind="int_param", value=len(new_card.rows) - 1
-                    ),
-                ]
-            ),
-        ],
+        available_actions=get_available_actions(new_card, len(new_card.rows) - 1),
     )
 
     # Return the new card and view
@@ -190,15 +205,7 @@ def handle_edit_action(action: EditTextRowAction, card: Card) -> CardWithView:
     new_view = CardView(
         card_id=new_card.id,
         selected_row_index=row_index,
-        available_actions=[
-            AddTextRowAction(),
-            EditTextRowAction(
-                params=[
-                    ActionParam(name="new_row_text", kind="text_param"),
-                    ActionParam(name="row_index", kind="int_param", value=row_index),
-                ]
-            ),
-        ],
+        available_actions=get_available_actions(new_card, row_index),
     )
 
     log.info("handle_edit_action", new_card=new_card, new_view=new_view)
