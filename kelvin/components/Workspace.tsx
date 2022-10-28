@@ -25,11 +25,11 @@ const Workspace = () => {
   const { view } = workspace;
   const actions = view.available_actions;
   return (
-    <div class="flex h-screen">
-      <div class="flex-1 p-4 bg-gray-100 mr-2">
+    <div className="flex h-screen">
+      <div className="flex-1 p-4 bg-gray-100 mr-2">
         <Card card={currentCard} />
       </div>
-      <div class="flex-1 p-4 overflow-auto bg-gray-100 ml-2">
+      <div className="flex-1 p-4 overflow-auto bg-gray-100 ml-2">
         {actions.map((row, index) => (
           <Action
             key={index}

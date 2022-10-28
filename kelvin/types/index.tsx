@@ -4,26 +4,39 @@ type TextParam = {
   value: string | null;
 };
 
-type AddQuestionAction = {
-  kind: "add_question_action";
+type IntParam = {
+  name: string;
+  kind: "int_param";
+  value: string | null;
+};
+
+type ActionParam = TextParam | IntParam;
+
+type AddTextRowAction = {
+  kind: "add_text_row_action";
   params: TextParam[];
 };
 
-type Action = AddQuestionAction;
+type EditTextRowAction = {
+  kind: "edit_text_row_action";
+  params: [TextParam, IntParam];
+};
 
-type Card<T> = {
+type Action = AddTextRowAction | EditTextRowAction;
+
+type TextCard = {
   id: string;
-  kind: string;
-  rows: T[];
-};
-
-type TextCard = Card<string> & {
   kind: "text_card";
+  rows: string[];
 };
 
-type ActionCard = Card<Action> & {
+type ActionCard = {
+  id: string;
   kind: "action_card";
+  rows: Action[];
 };
+
+type Card = TextCard | ActionCard;
 
 type CardView = {
   card_id: string;
@@ -31,12 +44,12 @@ type CardView = {
   available_actions: Action[];
 };
 
-type Workspace = {
-  cards: Card<any>[];
+type CardWithView = {
+  card: Card;
   view: CardView;
 };
 
-type CardWithView = {
-  card: Card<any>;
+type Workspace = {
+  cards: Card[];
   view: CardView;
 };

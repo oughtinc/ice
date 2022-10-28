@@ -46,6 +46,7 @@ const reducer = (draft: State, action: ReducerAction) => {
         cards: [...draft.workspace!.cards, card],
         view,
       };
+      console.log({ card, view, newWorkspace });
       draft.loading = false;
       draft.workspace = newWorkspace;
       break;
