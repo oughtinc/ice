@@ -1,4 +1,4 @@
-import { Action, Workspace } from "/types";
+import { Action, Card, Workspace } from "/types";
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8935/kelvin";
 
@@ -26,15 +26,15 @@ export async function updateWorkspace(workspace: Workspace) {
   return updatedWorkspace;
 }
 
-export async function executeAction(workspace: Workspace, action: Action) {
-  const requestBody = JSON.stringify({ workspace, action });
-  const response = await fetch(`${backendUrl}/workspaces/act`, {
+export async function executeAction(action: Action, card: Card) {
+  const requestBody = JSON.stringify({ action, card });
+  const response = await fetch(`${backendUrl}/actions/execute`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: requestBody,
   });
-  const newWorkspace = await response.json();
-  return newWorkspace;
+  const newCard = await response.json();
+  return newCard;
 }

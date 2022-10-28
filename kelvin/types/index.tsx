@@ -4,12 +4,12 @@ type TextParam = {
   value: string | null;
 };
 
-type QuestionAction = {
-  kind: "create_question_action";
+type AddQuestionAction = {
+  kind: "add_question_action";
   params: TextParam[];
 };
 
-type Action = QuestionAction;
+type Action = AddQuestionAction;
 
 type Card<T> = {
   id: string;
@@ -25,7 +25,18 @@ type ActionCard = Card<Action> & {
   kind: "action_card";
 };
 
+type CardView = {
+  card_id: string;
+  selected_row_index: number | null;
+  available_actions: Action[];
+};
+
 type Workspace = {
-  cards: (TextCard | ActionCard)[];
-  currentCardId: string;
+  cards: Card<any>[];
+  view: CardView;
+};
+
+type CardWithView = {
+  card: Card<any>;
+  view: CardView;
 };

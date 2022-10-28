@@ -6,10 +6,12 @@ type Props = {
 
 const TextCard = ({ card }: Props) => {
   return (
-    <div className="bg-gray-100 p-4 rounded-md">
-      {card.rows.map((row, index) => (
-        <p key={index}>{row}</p>
-      ))}
+    <div className="rounded-md pl-8">
+      <ol>
+        {card.rows.map((row, index) => (
+          <li key={index}>{row}</li>
+        ))}
+      </ol>
     </div>
   );
 };

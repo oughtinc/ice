@@ -31,7 +31,7 @@ class ActionParam(BaseModel):
 
 
 class Action(BaseModel):
-    kind: Literal["create_question_action"]
+    kind: Literal["add_question_action"]
     params: List[ActionParam]
 
 
@@ -51,14 +51,25 @@ class ActionCard(Card[Action]):
     rows: list[Action]
 
 
-class QuestionAction(Action):
-    kind: Literal["create_question_action"] = "create_question_action"
+class AddQuestionAction(Action):
+    kind: Literal["add_question_action"] = "add_question_action"
     params: list[ActionParam] = [ActionParam(name="question", kind="text_param")]
+
+
+class CardView(BaseModel):
+    card_id: str
+    selected_row_index: int | None = None
+    available_actions: List[Action]
+
+
+class CardWithView(BaseModel):
+    card: Card
+    view: CardView
 
 
 class Workspace(BaseModel):
     cards: list[Card]
-    currentCardId: str
+    view: CardView
 
 
 @router.get("/hello/", response_model=str)
@@ -70,18 +81,26 @@ async def hello_world():
 async def initial_workspace():
     initial_card_id = generate_card_id()
     return Workspace(
-        cards=[
-            ActionCard(id=initial_card_id, rows=[QuestionAction()]),
-        ],
-        currentCardId=initial_card_id,
+        cards=[TextCard(id=initial_card_id, rows=[])],
+        view=CardView(
+            card_id=initial_card_id,
+            selected_row_index=None,
+            available_actions=[AddQuestionAction()],
+        ),
     )
 
 
-@router.post("/workspaces/act", response_model=Workspace)
-async def execute_action(workspace: Workspace, action: Action):
-    if not action.kind == "create_question_action":
+@router.post("/actions/execute", response_model=CardWithView)
+async def execute_action(action: Action, card: Card):
+    if not action.kind == "add_question_action":
         raise HTTPException(
             status_code=400, detail=f"Unsupported action kind: {action.kind}"
+        )
+
+    if not card.kind == "text_card":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported card kind for add_question_action: {card.kind}",
         )
 
     # Get the question from the action params
@@ -89,9 +108,13 @@ async def execute_action(workspace: Workspace, action: Action):
     # Generate a new card id
     new_card_id = generate_card_id()
     # Create a new text card with the question
-    new_card = TextCard(id=new_card_id, rows=[question])
-    # Add the new card to the workspace
-    workspace.cards.append(new_card)
-    # Update the current card id
-    workspace.currentCardId = new_card_id
-    return workspace
+    new_card = TextCard(id=new_card_id, rows=card.rows + [question])
+    # Create a new view for the new card
+    new_view = CardView(
+        card_id=new_card_id,
+        selected_row_index=None,  # TODO
+        available_actions=[AddQuestionAction()],  # TODO
+    )
+
+    # Return the new card and view
+    return CardWithView(card=new_card, view=new_view)
