@@ -12,7 +12,10 @@
     "phosphor-react": "^1.4.1",
     "react": "^17.0.2",
     "react-archer": "^4.1.0",
+    "react-aria": "^3.20.0",
     "react-dom": "^17.0.2",
+    "react-hotkeys-hook": "^3.4.7",
+    "react-stately": "^3.18.0",
     "react-syntax-highlighter": "^15.5.0",
     "ulidx": "^0.3.0",
     "use-immer": "^0.7.0"

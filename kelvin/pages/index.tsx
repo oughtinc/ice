@@ -3,7 +3,7 @@ import Workspace from "/components/Workspace";
 
 export default function HomePage() {
   return (
-    <div className="m-8">
+    <div>
       <Head>
         <title>Kelvin</title>
       </Head>

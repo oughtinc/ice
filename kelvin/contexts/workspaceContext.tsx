@@ -1,7 +1,13 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useRef } from "react";
 import { useImmerReducer } from "use-immer";
-import { executeAction as apiExecuteAction, getInitialWorkspace, updateWorkspace } from "../api";
+import {
+  executeAction as apiExecuteAction,
+  getAvailableActions,
+  getInitialWorkspace,
+  updateWorkspace,
+} from "../api";
 import { Workspace } from "../types";
+import { getCurrentCardWithView } from "/utils/workspace";
 
 type State = {
   workspace: Workspace | null;
@@ -14,7 +20,12 @@ type ReducerAction =
   | { type: "FETCH_FAILURE"; payload: Error }
   | { type: "FETCH_WORKSPACE_SUCCESS"; payload: Workspace }
   | { type: "UPDATE_WORKSPACE_SUCCESS"; payload: Workspace }
-  | { type: "EXECUTE_ACTION_SUCCESS"; payload: Workspace };
+  | { type: "EXECUTE_ACTION_SUCCESS"; payload: Workspace }
+  | {
+      type: "SET_SELECTED_CARD_ROWS";
+      payload: (rows: Record<string, boolean>) => Record<string, boolean>;
+    }
+  | { type: "UPDATE_AVAILABLE_ACTIONS_SUCCESS"; payload: Action[] };
 
 const initialState: State = {
   workspace: null,
@@ -50,6 +61,13 @@ const reducer = (draft: State, action: ReducerAction) => {
       draft.loading = false;
       draft.workspace = newWorkspace;
       break;
+    case "SET_SELECTED_CARD_ROWS":
+      draft.workspace.view.selected_rows = action.payload(draft.workspace.view.selected_rows);
+      break;
+    case "UPDATE_AVAILABLE_ACTIONS_SUCCESS":
+      draft.loading = false;
+      draft.workspace.view.available_actions = action.payload;
+      break;
     default:
       return;
   }
@@ -67,11 +85,15 @@ export function useWorkspace() {
 // create a provider component that uses the reducer and dispatches actions
 export function WorkspaceProvider({ children }) {
   const [state, dispatch] = useImmerReducer(reducer, initialState);
+  const stateRef = useRef(state);
 
   useEffect(() => {
-    // fetch the workspace data on mount
     fetchWorkspace();
   }, []);
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   // create a function that dispatches a fetch request action
   const fetchWorkspace = () => {
@@ -86,11 +108,10 @@ export function WorkspaceProvider({ children }) {
   };
 
   // create a function that dispatches an update workspace action
-  const updateWorkspaceData = newData => {
+  const updateWorkspaceData = workspace => {
     dispatch({ type: "FETCH_REQUEST" });
-    updateWorkspace(newData)
+    updateWorkspace({ workspace })
       .then(data => {
-        // dispatch an action with the new data
         dispatch({ type: "UPDATE_WORKSPACE_SUCCESS", payload: data });
       })
       .catch(err => {
@@ -98,15 +119,11 @@ export function WorkspaceProvider({ children }) {
       });
   };
 
-  // create a function that dispatches an execute action action
   const executeAction = action => {
     dispatch({ type: "FETCH_REQUEST" });
-    // use the current card from the state
-    const { cards, view } = state.workspace;
-    const currentCard = cards.find(card => card.id === view.card_id);
-    apiExecuteAction(action, currentCard)
+    const { card, view } = getCurrentCardWithView(stateRef.current.workspace);
+    apiExecuteAction({ card, view, action })
       .then(data => {
-        // dispatch an action with the new data
         dispatch({ type: "EXECUTE_ACTION_SUCCESS", payload: data });
       })
       .catch(err => {
@@ -114,9 +131,30 @@ export function WorkspaceProvider({ children }) {
       });
   };
 
-  // render the provider component with the context value and the callback functions
+  const updateAvailableActions = () => {
+    dispatch({ type: "FETCH_REQUEST" });
+    const { card, view } = getCurrentCardWithView(stateRef.current.workspace);
+    console.log("updateAvailableActions", { selected: view.selected_rows });
+    getAvailableActions({ card, view })
+      .then(data => {
+        dispatch({ type: "UPDATE_AVAILABLE_ACTIONS_SUCCESS", payload: data });
+      })
+      .catch(err => {
+        dispatch({ type: "FETCH_FAILURE", payload: err });
+      });
+  };
+
+  const setSelectedCardRows = rowUpdateFn => {
+    dispatch({ type: "SET_SELECTED_CARD_ROWS", payload: rowUpdateFn });
+    updateAvailableActions();
+  };
+
+  console.log("outer", { selected: stateRef.current?.workspace?.view.selected_rows });
+
   return (
-    <WorkspaceContext.Provider value={{ ...state, updateWorkspaceData, executeAction }}>
+    <WorkspaceContext.Provider
+      value={{ ...state, updateWorkspaceData, setSelectedCardRows, executeAction }}
+    >
       {children}
     </WorkspaceContext.Provider>
   );

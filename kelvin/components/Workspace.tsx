@@ -1,46 +1,86 @@
-import { Action as ActionType } from "../types";
+import { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import Action from "./Action";
-import Card from "./Card";
-import Error from "./Error";
-import Loading from "./Loading";
-import NotFound from "./NotFound";
+import ActionForm from "./ActionForm";
+import { Pane, Panes, usePaneSwitch } from "./Panes";
+import SelectionList from "./SelectionList";
+import StatusBar from "./StatusBar";
 import { useWorkspace } from "/contexts/workspaceContext";
-
-function useCurrentCard(workspace: Workspace | null) {
-  if (!workspace) return null;
-  const { cards, view } = workspace;
-  return cards.find(card => card.id === view.card_id);
-}
+import { getCurrentActions, getCurrentCard, getSelectedCardRows } from "/utils/workspace";
 
 const Workspace = () => {
-  const { workspace, executeAction, loading, error } = useWorkspace();
+  const { workspace, executeAction, setSelectedCardRows, loading, error } = useWorkspace();
+  const [activePane, setActivePane, LEFT_PANE, RIGHT_PANE] = usePaneSwitch();
+  const [selectedActions, setSelectedActions] = useState({});
+  const [actionToPrepare, setActionToPrepare] = useState(null);
 
-  const currentCard = useCurrentCard(workspace);
+  const card = getCurrentCard(workspace);
+  const actions = getCurrentActions(workspace);
+  const selectedCardRows = getSelectedCardRows(workspace);
 
-  if (loading) return <Loading />;
-  if (error) return <Error error={error} />;
-  if (!workspace) return <NotFound message="Workspace not found" />;
-  if (!currentCard) return <NotFound message={`No card found for id ${workspace.view.card_id}`} />;
+  const selectCardRowAndSwitchPane = row => {
+    setSelectedCardRows(prev => ({
+      ...prev,
+      [row.id]: true,
+    }));
+    setActivePane(RIGHT_PANE);
+  };
 
-  const { view } = workspace;
-  const actions = view.available_actions;
+  const executeActionAndDeselectAll = action => {
+    if (action.params.every(param => param.value !== null)) {
+      executeAction(action);
+      setSelectedCardRows(() => ({}));
+      setActionToPrepare(null);
+      setActivePane(LEFT_PANE);
+    } else {
+      setActionToPrepare(action);
+    }
+  };
+
+  useHotkeys(
+    "escape",
+    () => {
+      if (activePane === LEFT_PANE) {
+        setSelectedCardRows(() => ({}));
+      } else {
+        setSelectedActions(() => ({}));
+        setActivePane(LEFT_PANE);
+        setActionToPrepare(null);
+      }
+    },
+    [activePane, setSelectedCardRows, setActivePane, LEFT_PANE],
+  );
+
   return (
-    <div className="flex h-screen">
-      <div className="flex-1 p-4 bg-gray-100 mr-2">
-        <Card card={currentCard} />
-      </div>
-      <div className="flex-1 p-4 overflow-auto bg-gray-100 ml-2">
-        {actions.map((row, index) => (
-          <Action
-            key={index}
-            action={row}
-            onSubmit={(action: ActionType) => {
-              executeAction(action);
-            }}
+    <Panes>
+      <Pane active={activePane === LEFT_PANE}>
+        <SelectionList
+          name="Card"
+          items={card?.rows || []}
+          selected={selectedCardRows}
+          setSelected={setSelectedCardRows}
+          onEnter={selectCardRowAndSwitchPane}
+          active={activePane === LEFT_PANE}
+          renderItem={row => <span>{row.text}</span>}
+        />
+      </Pane>
+      <Pane active={activePane === RIGHT_PANE}>
+        {actionToPrepare ? (
+          <ActionForm partialAction={actionToPrepare} onSubmit={executeActionAndDeselectAll} />
+        ) : (
+          <SelectionList
+            name="Actions"
+            items={actions || []}
+            selected={selectedActions}
+            setSelected={setSelectedActions}
+            onEnter={executeActionAndDeselectAll}
+            active={activePane === RIGHT_PANE}
+            renderItem={action => <Action {...action} />}
           />
-        ))}
-      </div>
-    </div>
+        )}
+      </Pane>
+      <StatusBar loading={loading} error={error} />
+    </Panes>
   );
 };
 
