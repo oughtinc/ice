@@ -48,7 +48,6 @@ export async function executeAction({
 }
 
 export async function getAvailableActions({ card, view }: { card: Card; view: CardView }) {
-  console.log("getAvailableActions", { card, view });
   const requestBody = JSON.stringify({ card, view });
   const response = await fetch(`${backendUrl}/actions/available`, {
     method: "POST",

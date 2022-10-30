@@ -57,7 +57,6 @@ const reducer = (draft: State, action: ReducerAction) => {
         cards: [...draft.workspace!.cards, card],
         view,
       };
-      console.log({ card, view, newWorkspace });
       draft.loading = false;
       draft.workspace = newWorkspace;
       break;
@@ -121,7 +120,11 @@ export function WorkspaceProvider({ children }) {
 
   const executeAction = action => {
     dispatch({ type: "FETCH_REQUEST" });
-    const { card, view } = getCurrentCardWithView(stateRef.current.workspace);
+    const cardWithView = getCurrentCardWithView(stateRef.current.workspace);
+    if (!cardWithView) {
+      return;
+    }
+    const { card, view } = cardWithView;
     apiExecuteAction({ card, view, action })
       .then(data => {
         dispatch({ type: "EXECUTE_ACTION_SUCCESS", payload: data });
@@ -133,8 +136,11 @@ export function WorkspaceProvider({ children }) {
 
   const updateAvailableActions = () => {
     dispatch({ type: "FETCH_REQUEST" });
-    const { card, view } = getCurrentCardWithView(stateRef.current.workspace);
-    console.log("updateAvailableActions", { selected: view.selected_rows });
+    const cardWithView = getCurrentCardWithView(stateRef.current.workspace);
+    if (!cardWithView) {
+      return;
+    }
+    const { card, view } = cardWithView;
     getAvailableActions({ card, view })
       .then(data => {
         dispatch({ type: "UPDATE_AVAILABLE_ACTIONS_SUCCESS", payload: data });
@@ -148,8 +154,6 @@ export function WorkspaceProvider({ children }) {
     dispatch({ type: "SET_SELECTED_CARD_ROWS", payload: rowUpdateFn });
     updateAvailableActions();
   };
-
-  console.log("outer", { selected: stateRef.current?.workspace?.view.selected_rows });
 
   return (
     <WorkspaceContext.Provider

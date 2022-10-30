@@ -89,7 +89,7 @@ class AddTextRowAction(Action):
     params: list[ActionParam] = [
         ActionParam(name="row_text", kind="text_param", label="Text")
     ]
-    label: str = "Add line"
+    label: str = "Add bullet"
 
 
 class EditTextRowAction(Action):
@@ -197,7 +197,8 @@ def handle_add_action(action: AddTextRowAction, card: Card) -> CardWithView:
     # Generate a new card id
     new_card_id = generate_id()
     # Create a new text card with the new_row_text
-    new_card = TextCard(id=new_card_id, rows=card.rows + [TextRow(text=new_row_text)])
+    new_row = TextRow(text=new_row_text)
+    new_card = TextCard(id=new_card_id, rows=card.rows + [new_row])
     # Create a new view for the new card
     new_view = CardView(
         card_id=new_card_id,

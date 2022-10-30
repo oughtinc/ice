@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
-// A component that renders a list item with a checkbox
-const SelectionListItem = ({ item, focus, selected, onToggle, onEnter, active, renderItem }) => {
+const SelectionListItem = ({
+  item,
+  focus,
+  selected,
+  setItemSelection,
+  onEnter,
+  active,
+  renderItem,
+}) => {
   // Use hotkeys to handle toggle and enter
   useHotkeys(
     "space",
     () => {
-      // Invoke the onToggle callback with the item
-      onToggle(item);
+      console.log("space", { item, selected });
+      setItemSelection(item, "toggle");
     },
     { enabled: active && focus },
     [active, item.id],
@@ -19,7 +26,8 @@ const SelectionListItem = ({ item, focus, selected, onToggle, onEnter, active, r
     () => {
       // Invoke the onEnter callback with the item
       console.log("enter", { item });
-      onEnter(item);
+      onEnter(item); // call the original onEnter prop
+      setItemSelection(item, true);
     },
     { enabled: active && focus },
     [active, item.id],
@@ -34,8 +42,8 @@ const SelectionListItem = ({ item, focus, selected, onToggle, onEnter, active, r
   }
 
   return (
-    <li className={`flex items-baseline ${bgColor}`}>
-      <span className="mr-2">•</span>
+    <li className={`flex p-1 pl-2 pr-2 items-baseline ${bgColor}`}>
+      <span className={`mr-2 ${selected ? "text-blue-500" : "text-black"}`}>•</span>
       {renderItem(item)}
     </li>
   );
@@ -65,36 +73,16 @@ const useFocusIndex = ({ name, items, initialIndex = 0, active }) => {
   return [focusIndex, items[focusIndex]?.id];
 };
 
-const useSelection = (items, initialSelection = {}) => {
-  const [selected, setSelected] = useState(initialSelection);
-
-  const toggle = item => {
-    setSelected(prev => ({
-      ...prev,
-      [item.id]: !prev[item.id],
-    }));
-  };
-
-  return [selected, toggle];
-};
-
-const SelectionList = ({
-  name,
-  items,
-  onEnter,
-  active,
-  renderItem,
-  selected = null,
-  setSelected = null,
-}) => {
+const SelectionList = ({ name, items, onEnter, active, renderItem, selected, setSelected }) => {
   const [focusIndex, focusId] = useFocusIndex({ name, items, active });
-  const [internalSelected, internalToggle] = useSelection(items);
-  const currentSelected = selected ?? internalSelected;
-  const toggle = setSelected
-    ? item => setSelected(prev => ({ ...prev, [item.id]: !prev[item.id] }))
-    : internalToggle;
 
-  console.log("SelectionList", { items });
+  const setItemSelection = (item, value) => {
+    if (value === "toggle") {
+      setSelected(prev => ({ ...prev, [item.id]: !prev[item.id] }));
+    } else {
+      setSelected(prev => ({ ...prev, [item.id]: value }));
+    }
+  };
 
   return (
     <ul className="list-disc list-inside">
@@ -103,8 +91,8 @@ const SelectionList = ({
           key={item.id}
           item={item}
           focus={item.id === focusId}
-          selected={currentSelected[item.id]}
-          onToggle={toggle}
+          selected={selected[item.id]}
+          setItemSelection={setItemSelection}
           onEnter={onEnter}
           active={active}
           renderItem={renderItem}
