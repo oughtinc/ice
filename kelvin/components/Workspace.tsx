@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import Action from "./Action";
 import ActionForm from "./ActionForm";
@@ -26,8 +26,6 @@ const CardRow = ({ cardKind, row }) => {
 const Workspace = () => {
   const { workspace, executeAction, setSelectedCardRows, loading, error } = useWorkspace();
 
-  console.log("Workspace", workspace);
-
   const [activePane, setActivePane, LEFT_PANE, RIGHT_PANE] = usePaneSwitch();
   const [selectedActions, setSelectedActions] = useState({});
   const [actionToPrepare, setActionToPrepare] = useState(null);
@@ -54,6 +52,13 @@ const Workspace = () => {
       setActionToPrepare(action);
     }
   };
+
+  useEffect(() => {
+    console.log("effect", { card, actions });
+    if (card && !card.rows.length && actions) {
+      setActivePane(RIGHT_PANE);
+    }
+  }, [card?.rows, actions]);
 
   useHotkeys(
     "escape",
