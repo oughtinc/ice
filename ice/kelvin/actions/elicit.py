@@ -7,6 +7,8 @@ from ice.kelvin.actions.base import ActionParam
 from ice.kelvin.cards.base import Card
 from ice.kelvin.cards.paper import PaperCard
 from ice.kelvin.cards.paper import PaperRow
+from ice.kelvin.cards.text import TextCard
+from ice.kelvin.cards.text import TextRow
 from ice.kelvin.utils import truncate_text
 from ice.kelvin.view import CardView
 from ice.kelvin.view import CardWithView
@@ -40,7 +42,7 @@ class ElicitSearchAction(Action):
                     authors=authors,
                     year=year,
                     citations=citations,
-                    raw_data=search_result,
+                    raw_data=paper_fields,
                 )
             )
 
@@ -60,6 +62,78 @@ class ElicitSearchAction(Action):
                     params=[
                         ActionParam(
                             name="query", kind="TextParam", label="Query", value=query
+                        )
+                    ],
+                )
+                actions.append(action)
+        return actions
+
+
+class ViewPaperAction(Action):
+
+    kind: Literal["ViewPaperAction"] = "ViewPaperAction"
+    params: list[ActionParam] = [
+        ActionParam(name="paperRowId", kind="IdParam", label="Paper")
+    ]
+    label: str = "View paper"
+
+    def validate_input(self, card: Card) -> None:
+        if not card.kind == "PaperCard":
+            raise ValueError("ViewPaperAction can only be applied to paper cards")
+
+    def execute(self, card: Card) -> CardWithView:
+        new_row_text = self.params[0].value
+        new_row = TextRow(text=new_row_text)
+        new_rows = card.rows + [new_row]
+
+        # Get the paper
+        paper_id = self.params[0].value
+        paper = next((row for row in card.rows if row.id == paper_id), None)
+        if not paper:
+            raise ValueError(f"Execute couldn't find paper for id {paper_id}")
+
+        # Get each paragraph from the paper
+        abstract = paper.raw_data["abstract"]
+        body = paper.raw_data["body"]["value"]
+        text_bullets = []
+        MAX_BULLET_LEN = 200  # chars
+        for paragraph in abstract["paragraphs"] + body["paragraphs"]:
+            bullet = ""
+            for sentence in paragraph["sentences"]:
+                bullet += f"{sentence} "
+                if len(bullet) >= MAX_BULLET_LEN:
+                    text_bullets.append(bullet)
+                    bullet = ""
+            if bullet:
+                text_bullets.append(bullet)
+                bullet = ""
+
+        # Convert to card & view
+        new_rows = [TextRow(text=text) for text in text_bullets]
+        new_card = TextCard(rows=new_rows)
+        new_view = CardView(
+            card_id=new_card.id,
+            selected_rows={},
+        )
+
+        return CardWithView(card=new_card, view=new_view)
+
+    @classmethod
+    def instantiate(cls, card: Card, selected_rows: dict[str, bool]) -> list[Action]:
+        actions: list[Action] = []
+        if card.kind == "PaperCard":
+            for row in card.get_selected_rows(selector=selected_rows):
+                paper_id = row.id
+                title = row.title
+                short_title = truncate_text(title, max_length=80)
+                action = cls(
+                    label=f'View paper "{short_title}"',
+                    params=[
+                        ActionParam(
+                            name="paperRowId",
+                            kind="IdParam",
+                            label="Paper",
+                            value=paper_id,
                         )
                     ],
                 )

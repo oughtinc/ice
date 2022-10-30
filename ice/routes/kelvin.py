@@ -6,7 +6,6 @@ from ice.kelvin.actions.all import ACTION_TYPE_UNION
 from ice.kelvin.actions.all import get_available_actions
 from ice.kelvin.actions.base import Action
 from ice.kelvin.cards.all import CARD_TYPE_UNION
-from ice.kelvin.cards.base import Card
 from ice.kelvin.view import CardView
 from ice.kelvin.view import CardWithView
 from ice.kelvin.workspace import get_initial_workspace
@@ -27,12 +26,8 @@ async def initial_workspace():
     return get_initial_workspace()
 
 
-# Action has two subclasses, Action1 and Action2
-# Action has a "kind" attribute that distinguishes the subclasses
-
-
 @router.post("/actions/execute", response_model=CardWithView)
-async def execute_action(action: ACTION_TYPE_UNION, card: Card):
+async def execute_action(action: ACTION_TYPE_UNION, card: CARD_TYPE_UNION):
     try:
         action.validate_input(card)
     except ValueError:
@@ -44,5 +39,4 @@ async def execute_action(action: ACTION_TYPE_UNION, card: Card):
 
 @router.post("/actions/available", response_model=list[Action])
 async def available_actions(card: CARD_TYPE_UNION, view: CardView):
-    log.info("available_actions", card=card, rows=card.rows)
     return get_available_actions(card, view)

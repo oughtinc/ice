@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { createRef, forwardRef, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 const SelectionListItem = ({
@@ -9,8 +9,8 @@ const SelectionListItem = ({
   onEnter,
   active,
   renderItem,
+  forwardedRef,
 }) => {
-  // Use hotkeys to handle toggle and enter
   useHotkeys(
     "space",
     () => {
@@ -24,16 +24,14 @@ const SelectionListItem = ({
   useHotkeys(
     "enter",
     () => {
-      // Invoke the onEnter callback with the item
       console.log("enter", { item });
-      onEnter(item); // call the original onEnter prop
+      onEnter(item);
       setItemSelection(item, true);
     },
     { enabled: active && focus },
     [active, item.id],
   );
 
-  // Use different background colors for selected and focus states
   let bgColor = "";
   if (focus && active) {
     bgColor = "bg-blue-200";
@@ -42,7 +40,7 @@ const SelectionListItem = ({
   }
 
   return (
-    <li className={`flex p-1 pl-2 pr-2 items-baseline ${bgColor}`}>
+    <li className={`flex p-1 pl-2 pr-2 items-baseline ${bgColor}`} ref={forwardedRef}>
       <span className={`mr-2 ${selected ? "text-blue-500" : "text-black"}`}>•</span>
       {renderItem(item)}
     </li>
@@ -73,6 +71,10 @@ const useFocusIndex = ({ name, items, initialIndex = 0, active }) => {
   return [focusIndex, items[focusIndex]?.id];
 };
 
+const SelectionListItemWithRef = forwardRef((props, ref) => (
+  <SelectionListItem {...props} forwardedRef={ref} />
+));
+
 const SelectionList = ({ name, items, onEnter, active, renderItem, selected, setSelected }) => {
   const [focusIndex, focusId] = useFocusIndex({ name, items, active });
 
@@ -84,10 +86,21 @@ const SelectionList = ({ name, items, onEnter, active, renderItem, selected, set
     }
   };
 
+  const itemRefs = useRef([]);
+  itemRefs.current = items.map((_, i) => itemRefs.current[i] || createRef());
+
+  useEffect(() => {
+    const currentRef = itemRefs.current[focusIndex];
+    console.log("scroll", { focusIndex, currentRef, itemRefs });
+    if (currentRef && currentRef.current) {
+      currentRef.current.scrollIntoView({ block: "nearest" });
+    }
+  }, [focusIndex]);
+
   return (
     <ul className="list-disc list-inside">
-      {items.map(item => (
-        <SelectionListItem
+      {items.map((item, i) => (
+        <SelectionListItemWithRef
           key={item.id}
           item={item}
           focus={item.id === focusId}
@@ -96,6 +109,7 @@ const SelectionList = ({ name, items, onEnter, active, renderItem, selected, set
           onEnter={onEnter}
           active={active}
           renderItem={renderItem}
+          ref={itemRefs.current[i]}
         />
       ))}
     </ul>
