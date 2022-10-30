@@ -1,15 +1,18 @@
 from fastapi import APIRouter
 from fastapi import HTTPException
+from structlog import get_logger
 
 from ice.kelvin.actions.all import ACTION_TYPE_UNION
 from ice.kelvin.actions.all import get_available_actions
 from ice.kelvin.actions.base import Action
+from ice.kelvin.cards.all import CARD_TYPE_UNION
 from ice.kelvin.cards.base import Card
 from ice.kelvin.view import CardView
 from ice.kelvin.view import CardWithView
 from ice.kelvin.workspace import get_initial_workspace
 from ice.kelvin.workspace import Workspace
 
+log = get_logger()
 
 router = APIRouter(prefix="/kelvin", tags=["kelvin"])
 
@@ -40,5 +43,6 @@ async def execute_action(action: ACTION_TYPE_UNION, card: Card):
 
 
 @router.post("/actions/available", response_model=list[Action])
-async def available_actions(card: Card, view: CardView):
+async def available_actions(card: CARD_TYPE_UNION, view: CardView):
+    log.info("available_actions", card=card, rows=card.rows)
     return get_available_actions(card, view)

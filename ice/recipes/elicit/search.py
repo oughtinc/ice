@@ -1,7 +1,7 @@
 from ice.recipe import recipe
 from ice.recipes.elicit.common import send_elicit_request
 
-ELICIT_SEARCH_ENDPOINT = "https://inference.elicit.org/elicit-black/lit-review"
+ELICIT_SEARCH_ENDPOINT = "https://prod.elicit.org/elicit-black/lit-review"
 
 
 def make_request_body(

@@ -143,6 +143,7 @@ export function WorkspaceProvider({ children }) {
       return;
     }
     const { card, view } = cardWithView;
+    console.log("updateAvailableActions", cardWithView);
     getAvailableActions({ card, view })
       .then(data => {
         dispatch({ type: "UPDATE_AVAILABLE_ACTIONS_SUCCESS", payload: data });

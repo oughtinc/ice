@@ -8,6 +8,7 @@ from ice.kelvin.cards.base import Card
 from ice.kelvin.cards.text import TextCard
 from ice.kelvin.cards.text import TextRow
 from ice.kelvin.utils import generate_id
+from ice.kelvin.utils import truncate_text
 from ice.kelvin.view import CardView
 from ice.kelvin.view import CardWithView
 
@@ -67,7 +68,7 @@ class EditTextRowAction(Action):
                 f"Unsupported card kind for EditTextRowAction: {card.kind}",
             )
         row_id = self.params[1].value
-        if row_id not in {row["id"] for row in card.rows}:
+        if row_id not in {row.id for row in card.rows}:
             raise ValueError(f"Invalid row id: {row_id}")
 
     def execute(self, card: Card) -> CardWithView:
@@ -76,9 +77,7 @@ class EditTextRowAction(Action):
         row_id = self.params[1].value
 
         new_rows = [
-            TextRow(
-                id=row["id"], text=new_row_text if row["id"] == row_id else row["text"]
-            )
+            TextRow(id=row.id, text=new_row_text if row.id == row_id else row.text)
             for row in card.rows
         ]
 
@@ -96,21 +95,9 @@ class EditTextRowAction(Action):
         if not card.kind == "TextCard":
             return []
         actions: list[Action] = []
-        for (selected_row_id, is_selected) in selected_rows.items():
-            if not is_selected:
-                continue
-            rows = card.rows
-            row = next(
-                (row for i, row in enumerate(rows) if row["id"] == selected_row_id),
-                None,
-            )
-            if row is None:
-                raise ValueError(f"Row id {selected_row_id} not found")
-            previous_text = row["text"]
-            # truncate the previous text and add ellipsis if longer than 20 characters
-            truncated_text = previous_text[:20] + (
-                "..." if len(previous_text) > 20 else ""
-            )
+        for row in card.get_selected_rows(selector=selected_rows):
+            previous_text = row.text
+            truncated_text = truncate_text(previous_text, max_length=20)
             actions.append(
                 cls(
                     params=[
@@ -120,7 +107,7 @@ class EditTextRowAction(Action):
                         ActionParam(
                             name="row_id",
                             kind="IdParam",
-                            value=selected_row_id,
+                            value=row.id,
                             label="Text Id",
                         ),
                     ],

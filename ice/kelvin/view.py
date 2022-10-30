@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from ice.kelvin.cards.base import Card
+from ice.kelvin.cards.all import CARD_TYPE_UNION
 
 
 class CardView(BaseModel):
@@ -9,5 +9,5 @@ class CardView(BaseModel):
 
 
 class CardWithView(BaseModel):
-    card: Card
+    card: CARD_TYPE_UNION
     view: CardView

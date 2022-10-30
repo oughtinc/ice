@@ -8,8 +8,25 @@ import StatusBar from "./StatusBar";
 import { useWorkspace } from "/contexts/workspaceContext";
 import { getCurrentActions, getCurrentCard, getSelectedCardRows } from "/utils/workspace";
 
+const CardRow = ({ cardKind, row }) => {
+  if (cardKind == "TextCard") {
+    return <span>{row.text}</span>;
+    /* } else if (cardKind == "PaperCard") {
+     *   return (
+     *     <div>
+     *       {row.title} ({row.year})
+     *     </div>
+     *   ); */
+  } else {
+    return <pre>{JSON.stringify(row, null, 2)}</pre>;
+  }
+};
+
 const Workspace = () => {
   const { workspace, executeAction, setSelectedCardRows, loading, error } = useWorkspace();
+
+  console.log("Workspace", workspace);
+
   const [activePane, setActivePane, LEFT_PANE, RIGHT_PANE] = usePaneSwitch();
   const [selectedActions, setSelectedActions] = useState({});
   const [actionToPrepare, setActionToPrepare] = useState(null);
@@ -61,7 +78,7 @@ const Workspace = () => {
           setSelected={setSelectedCardRows}
           onEnter={selectCardRowAndSwitchPane}
           active={activePane === LEFT_PANE}
-          renderItem={row => <span>{row.text}</span>}
+          renderItem={row => <CardRow cardKind={card?.kind} row={row} />}
         />
       </Pane>
       <Pane active={activePane === RIGHT_PANE}>

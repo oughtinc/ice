@@ -38,13 +38,28 @@ type TextCard = {
   rows: TextRow[];
 };
 
+type PaperRow = {
+  id: string;
+  title: string | null;
+  authors: string[];
+  year: number | null;
+  citations: number | null;
+  raw_data: Record<string, any>;
+};
+
+type PaperCard = {
+  kind: "PaperCard";
+  id: string;
+  rows: PaperRow[];
+};
+
 type ActionCard = {
   kind: "ActionCard";
   id: string;
   rows: Action[];
 };
 
-type Card = TextCard | ActionCard;
+type Card = TextCard | ActionCard | PaperCard;
 
 type CardView = {
   card_id: string;

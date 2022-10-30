@@ -3,7 +3,7 @@ from structlog import get_logger
 
 from ice.kelvin.actions.all import get_available_actions
 from ice.kelvin.actions.base import Action
-from ice.kelvin.cards.base import Card
+from ice.kelvin.cards.all import CARD_TYPE_UNION
 from ice.kelvin.cards.text import TextCard
 from ice.kelvin.cards.text import TextRow
 from ice.kelvin.utils import generate_id
@@ -13,7 +13,7 @@ log = get_logger()
 
 
 class Workspace(BaseModel):
-    cards: list[Card]
+    cards: list[CARD_TYPE_UNION]
     view: CardView
     available_actions: list[Action]
 

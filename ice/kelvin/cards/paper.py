@@ -7,12 +7,16 @@ from ice.kelvin.cards.base import CardRow
 from ice.kelvin.utils import generate_id
 
 
-class TextRow(CardRow):
+class PaperRow(CardRow):
     id: str = Field(default_factory=generate_id)
-    text: str
+    title: str | None
+    authors: list[str]
+    year: int | None
+    citations: int | None
+    raw_data: dict
 
 
-class TextCard(Card):
+class PaperCard(Card):
     id: str = Field(default_factory=generate_id)
-    kind: Literal["TextCard"] = "TextCard"
-    rows: list[TextRow]
+    kind: Literal["PaperCard"] = "PaperCard"
+    rows: list[PaperRow]

@@ -6,7 +6,7 @@ from ice.recipes.elicit.fixtures import default_papers
 
 log = get_logger()
 
-ELICIT_QA_ENDPOINT = "https://inference.elicit.org/elicit-black/full-text-qa"
+ELICIT_QA_ENDPOINT = "https://prod.elicit.org/elicit-black/full-text-qa"
 
 
 def get_span_container(paper, source):
