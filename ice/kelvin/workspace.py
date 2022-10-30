@@ -24,11 +24,12 @@ def get_initial_workspace() -> Workspace:
         id=initial_card_id,
         rows=[TextRow(text="one"), TextRow(text="two"), TextRow(text="three")],
     )
+    initial_view = CardView(
+        card_id=initial_card_id,
+        selected_rows={},
+    )
     return Workspace(
         cards=[initial_card],
-        view=CardView(
-            card_id=initial_card_id,
-            selected_rows={},
-        ),
-        available_actions=get_available_actions(card=initial_card, selected_rows={}),
+        view=initial_view,
+        available_actions=get_available_actions(card=initial_card, view=initial_view),
     )

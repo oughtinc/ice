@@ -41,4 +41,4 @@ async def execute_action(action: ACTION_TYPE_UNION, card: Card):
 
 @router.post("/actions/available", response_model=list[Action])
 async def available_actions(card: Card, view: CardView):
-    return get_available_actions(card, view.selected_rows)
+    return get_available_actions(card, view)

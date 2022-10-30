@@ -46,10 +46,12 @@ class Action(BaseModel):
     id: str = Field(default_factory=generate_id)
     label: str
 
-    # Define an abstract method for validating the action and card kinds
     def validate_input(self, card: Card) -> None:
         raise NotImplementedError
 
-    # Define an abstract method for executing the action and returning a new card and view
     def execute(self, card: Card) -> CardWithView:
+        raise NotImplementedError
+
+    @classmethod
+    def instantiate(cls, card: Card, selected_rows: dict[str, bool]) -> list["Action"]:
         raise NotImplementedError

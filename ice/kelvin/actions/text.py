@@ -41,6 +41,12 @@ class AddTextRowAction(Action):
 
         return CardWithView(card=new_card, view=new_view)
 
+    @classmethod
+    def instantiate(cls, card: Card, selected_rows: dict[str, bool]) -> list[Action]:
+        if not card.kind == "TextCard":
+            return []
+        return [cls()]
+
 
 class EditTextRowAction(Action):
     """An action that edits the text of an existing row in a text card."""
@@ -84,3 +90,41 @@ class EditTextRowAction(Action):
         )
 
         return CardWithView(card=new_card, view=new_view)
+
+    @classmethod
+    def instantiate(cls, card: Card, selected_rows: dict[str, bool]) -> list[Action]:
+        if not card.kind == "TextCard":
+            return []
+        actions: list[Action] = []
+        for (selected_row_id, is_selected) in selected_rows.items():
+            if not is_selected:
+                continue
+            rows = card.rows
+            row = next(
+                (row for i, row in enumerate(rows) if row["id"] == selected_row_id),
+                None,
+            )
+            if row is None:
+                raise ValueError(f"Row id {selected_row_id} not found")
+            previous_text = row["text"]
+            # truncate the previous text and add ellipsis if longer than 20 characters
+            truncated_text = previous_text[:20] + (
+                "..." if len(previous_text) > 20 else ""
+            )
+            actions.append(
+                cls(
+                    params=[
+                        ActionParam(
+                            name="new_row_text", kind="TextParam", label="New text"
+                        ),
+                        ActionParam(
+                            name="row_id",
+                            kind="IdParam",
+                            value=selected_row_id,
+                            label="Text Id",
+                        ),
+                    ],
+                    label=f'Edit text "{truncated_text}"',
+                )
+            )
+        return actions
