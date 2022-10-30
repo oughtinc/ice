@@ -8,9 +8,9 @@ type Props = {
 
 const Card = ({ card }: Props) => {
   switch (card.kind) {
-    case "text_card":
+    case "TextCard":
       return <TextCard card={card} />;
-    case "action_card":
+    case "ActionCard":
       return <ActionCard card={card} />;
     default:
       return <p>Unknown card type: {card.kind}</p>;

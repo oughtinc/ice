@@ -13,7 +13,7 @@ const Param = ({ param, onChange }: Props) => {
   return (
     <span className="bg-white px-2 py-1 rounded-md border border-gray-300">
       {`${param.name}: `}
-      {param.kind == "text_param" ? (
+      {param.kind == "TextParam" ? (
         <input
           type="text"
           placeholder={`Enter ${param.name}`}

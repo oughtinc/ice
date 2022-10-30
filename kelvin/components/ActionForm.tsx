@@ -45,7 +45,7 @@ const ActionForm = ({ partialAction, onSubmit }) => {
       return null;
     }
     switch (kind) {
-      case "text_param":
+      case "TextParam":
         return (
           <div key={name} className="mb-4">
             <label htmlFor={name} className="block text-sm font-medium text-gray-700">
@@ -62,7 +62,7 @@ const ActionForm = ({ partialAction, onSubmit }) => {
             />
           </div>
         );
-      case "int_param":
+      case "IntParam":
         return (
           <div key={name} className="mb-4">
             <label htmlFor={name} className="block text-sm font-medium text-gray-700">
@@ -79,7 +79,7 @@ const ActionForm = ({ partialAction, onSubmit }) => {
             />
           </div>
         );
-      case "id_param":
+      case "IdParam":
         return (
           <div key={name} className="mb-4">
             <label htmlFor={name} className="block text-sm font-medium text-gray-700">

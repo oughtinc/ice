@@ -65,7 +65,7 @@ const reducer = (draft: State, action: ReducerAction) => {
       break;
     case "UPDATE_AVAILABLE_ACTIONS_SUCCESS":
       draft.loading = false;
-      draft.workspace.view.available_actions = action.payload;
+      draft.workspace.available_actions = action.payload;
       break;
     default:
       return;
@@ -125,9 +125,11 @@ export function WorkspaceProvider({ children }) {
       return;
     }
     const { card, view } = cardWithView;
+    console.log("executeAction", { card, view, action });
     apiExecuteAction({ card, view, action })
       .then(data => {
         dispatch({ type: "EXECUTE_ACTION_SUCCESS", payload: data });
+        updateAvailableActions();
       })
       .catch(err => {
         dispatch({ type: "FETCH_FAILURE", payload: err });

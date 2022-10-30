@@ -1,39 +1,31 @@
 type TextParam = {
+  kind: "TextParam";
   name: string;
-  kind: "text_param";
   value: string | null;
   label: string;
 };
 
 type IntParam = {
+  kind: "IntParam";
   name: string;
-  kind: "int_param";
   value: string | null;
   label: string;
 };
 
 type IdParam = {
+  kind: "IdParam";
   name: string;
-  kind: "id_param";
   value: string | null;
   label: string;
 };
 
 type ActionParam = TextParam | IntParam | IdParam;
 
-type AddTextRowAction = {
-  kind: "add_text_row_action";
-  params: TextParam[];
+type Action = {
+  kind: string;
+  params: ActionParam[];
   label: string;
 };
-
-type EditTextRowAction = {
-  kind: "edit_text_row_action";
-  params: [TextParam, IdParam];
-  label: string;
-};
-
-type Action = AddTextRowAction | EditTextRowAction;
 
 type TextRow = {
   id: string;
@@ -41,14 +33,14 @@ type TextRow = {
 };
 
 type TextCard = {
+  kind: "TextCard";
   id: string;
-  kind: "text_card";
   rows: TextRow[];
 };
 
 type ActionCard = {
+  kind: "ActionCard";
   id: string;
-  kind: "action_card";
   rows: Action[];
 };
 
@@ -57,7 +49,6 @@ type Card = TextCard | ActionCard;
 type CardView = {
   card_id: string;
   selected_rows: { [row_id: string]: boolean };
-  available_actions: Action[];
 };
 
 type CardWithView = {
@@ -68,4 +59,5 @@ type CardWithView = {
 type Workspace = {
   cards: Card[];
   view: CardView;
+  available_actions: Action[];
 };
