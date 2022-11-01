@@ -21,6 +21,8 @@ import ulid
 
 from structlog import get_logger
 
+from ice.paper import Paper
+
 log = get_logger()
 
 
@@ -65,6 +67,8 @@ class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, dict):
             return {repr(k): v for k, v in o.items()}
+        if isinstance(o, Paper):
+            return dict(document_id=o.document_id)
         if hasattr(o, "dict") and callable(o.dict):
             return o.dict()
         if isfunction(o):
@@ -79,16 +83,6 @@ class JSONEncoder(json.JSONEncoder):
             return super().iterencode(o)
         except TypeError:
             return self.default(o)
-
-
-def compress_arg(k: str, v):
-    if k == "paper":
-        return {"document_id": v.document_id}
-    return v
-
-
-def compress_args(arg_dict):
-    return {k: compress_arg(k, v) for k, v in arg_dict.items()}
 
 
 # To add records to the trace, use the following code:
@@ -142,7 +136,6 @@ def trace(fn):
                     arg_dict.update(v)
                 else:
                     arg_dict[k] = v
-            compressed_args = compress_args(arg_dict)
 
             emit(
                 {
@@ -151,7 +144,7 @@ def trace(fn):
                         start=monotonic_ns(),
                         name=fn.__name__,
                         doc=getdoc(fn),
-                        args=compressed_args,
+                        args=arg_dict,
                         source=getsource(fn),
                     ),
                     f"{parent_id}.children.{id}": True,
