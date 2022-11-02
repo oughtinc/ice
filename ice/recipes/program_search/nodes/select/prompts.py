@@ -1,7 +1,17 @@
+from itertools import cycle
 from ice.formatter.multi import format_multi, stop, StopSentinel
 from ice.formatter.transform.value import ValueTransform, numbered_list
-from typing import Mapping, Sequence
+from typing import Literal, Mapping, Sequence, TypedDict
 
+from ice.recipes.program_search.nodes.select.dynamic import (
+    SelectionExample,
+    best_negative_example,
+    first_positive_example,
+    make_examples,
+)
+from ice.recipes.program_search.types import Selection
+
+NONE_ANSWER = "None of the new excerpts are needed to answer the question."
 
 EXAMPLES: list[dict[str, str | ValueTransform | StopSentinel]] = [
     dict(
@@ -20,7 +30,8 @@ EXAMPLES: list[dict[str, str | ValueTransform | StopSentinel]] = [
                 """The WithAI score [of the medical students in the AIL group] (88.87 ± 5.51) was significantly higher than the prelearning score [of the medical students in the AIL group] (75.73 ± 10.58, p < 0.01).""",
             ]
         ),
-        selections="(none)",
+        selections=NONE_ANSWER,
+        NONE_ANSWER=NONE_ANSWER,
     ),
     dict(
         question="What was the design of the Ghana experiment?",
@@ -40,6 +51,7 @@ EXAMPLES: list[dict[str, str | ValueTransform | StopSentinel]] = [
             ]
         ),
         selections="1",
+        NONE_ANSWER=NONE_ANSWER,
     ),
     dict(
         question="What was the sample size?",
@@ -58,17 +70,25 @@ EXAMPLES: list[dict[str, str | ValueTransform | StopSentinel]] = [
                 """CONCLUSION: Physical examination including a thorough neurological examination did not reveal important differences between the two groups [of 8-year-old singletons, one group born through ICSI and the other group born after spontaneous conception].""",
             ]
         ),
-        selections="(none)",
+        selections=NONE_ANSWER,
+        NONE_ANSWER=NONE_ANSWER,
     ),
 ]
 
-PREFACE = 'Instructions: Selecting which new excerpts are needed, in addition to already selected excerpts, to answer the question. If none of the new excerpts are helpful or the already selected excerpts already fully answer the question, answer "(none)"'
+PREFACE = f'Instructions: You are selecting some excerpts to provide as context to someone who will need to answer each question. They should receive exactly the excerpts they need, with no extra excerpts that are redundant or that do not answer the exact question being asked. For each question, you can select exactly one new excerpt to provide to the person who will use these excerpts to answer the question, in addition to the excerpts they already have (if any). If none of the new excerpts answer the exact question asked, or the excerpts they already have do answer the question fully, say "{NONE_ANSWER}".'
 
 EXAMPLE_TEMPLATE = """
 Question: {question}
-Already selected excerpts: {existing}
-New excerpts: {texts}
-New excerpts needed to answer the question (from most to least helpfulness): {selections}"""
+
+Excerpts the person answering the question already has access to:
+
+{existing}
+
+Additional excerpts, from which you will choose one at most to add to the excerpts they already have, only if it answers the question:
+
+{texts}
+
+Excerpt to add to the already chosen excerpts (if they can already answer the question or none of these excerpts answer the question, say "{NONE_ANSWER}"): {selections}"""
 
 
 # pretty diverse questions
@@ -76,19 +96,86 @@ New excerpts needed to answer the question (from most to least helpfulness): {se
 # some examples with best out of multiple okay candidates
 
 
+class RenderableSelectionExample(TypedDict):
+    question: str
+    existing: ValueTransform | str
+    texts: ValueTransform | str
+    selections: str
+    NONE_ANSWER: str
+
+
+NO_EXISTING = "(no excerpts selected so far)"
+
+def render_selection_example(
+    question: str, example: SelectionExample
+) -> RenderableSelectionExample:
+    return RenderableSelectionExample(
+        question=question,
+        existing=numbered_list(example.existing) if example.existing else NO_EXISTING,
+        texts=numbered_list([str(text) for text in example.selection]),
+        selections=NONE_ANSWER if not example.positive_idxs else str(example.positive_idxs[0] + 1),
+        NONE_ANSWER=NONE_ANSWER,
+    )
+
+
+# async def examples_from_gold_standard(
+#     question: str,
+#     texts: Sequence[Selection],
+#     gs_quotes: Sequence[str],
+#     *,
+#     n: int,
+#     step: int,
+#     max_existing: int,
+# ) -> Sequence[RenderableSelectionExample]:
+#     examples = await make_examples(
+#         texts, gs_quotes, n=n, step=step, max_existing=max_existing
+#     )
+#     return [
+#         render_selection_example(question, example)
+#         for example in (
+#             first_positive_example(examples),
+#             best_negative_example(examples),
+#         )
+#         if example
+#     ]
+
+
+# async def varied_examples_from_gold_standards(
+#     standards: Sequence[tuple[str, Sequence[Selection], Sequence[str]]],
+#     *,
+#     n: int,
+#     step: int,
+# ) -> Sequence[RenderableSelectionExample]:
+#     max_existing = cycle(range(5))
+#     which_example = cycle((0, -1))
+#     examples: list[RenderableSelectionExample] = []
+#     for question, texts, gs_quotes in standards:
+#         new_examples = await examples_from_gold_standard(
+#             question, texts, gs_quotes, n=n, step=step, max_existing=next(max_existing)
+#         )
+#         if new_examples:
+#             examples.append(new_examples[next(which_example)])
+#     return examples
+
+
 def make_selection_prompt(
-    *, question: str, existing: Sequence[str], texts: Sequence[str]
+    *,
+    question: str,
+    existing: Sequence[str],
+    texts: Sequence[str],
+    examples: list[RenderableSelectionExample] | None = None,
 ) -> str:
-    examples = EXAMPLES + [
+    all_examples = (examples or EXAMPLES) + [
         dict(
             question=question,
-            existing=numbered_list(existing),
+            existing=numbered_list(existing) if existing else NO_EXISTING,
             texts=numbered_list(texts),
-            selections=stop("("),
+            selections=stop("None"),
+            NONE_ANSWER=NONE_ANSWER
         )
     ]
-    filled_examples = format_multi(EXAMPLE_TEMPLATE, examples)
-    prompt = "\n\n".join((PREFACE, "\n\n".join(filled_examples)))
+    filled_examples = format_multi(EXAMPLE_TEMPLATE, all_examples)  # type: ignore[arg-type]
+    prompt = "\n\n".join((PREFACE, "\n\n---\n\n".join(filled_examples)))
     return prompt
 
 

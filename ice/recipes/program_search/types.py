@@ -1,6 +1,7 @@
 import typing as t
 from pydantic import BaseModel, root_validator, validator
 from pydantic.generics import GenericModel
+from pyparsing import Optional
 from ice.paper import Paper
 
 
@@ -12,6 +13,7 @@ class Selection(BaseModel):
     p: Paper
     start: int
     end: int
+    is_gs: bool | None = None
 
     # TODO: validate on creation
 
@@ -26,13 +28,20 @@ class Selection(BaseModel):
         after = [Selection(p=self.p, start=end - 1, end=end) for end in idxs_after]
         return before, after
 
+    @t.final
+    @property
+    def original(self):
+        return _to_str(self.p, self.start, self.end)
+
     def __str__(self):
         return _to_str(self.p, self.start, self.end)
 
+    class Config:
+        copy_on_model_validation = False
 
 def make_selector(paper: Paper) -> t.Callable[[int, int], Selection]:
     def s(start: int, end: int) -> Selection:
-        return Selection(p=paper, start=start, end=end)
+        return Selection.construct(p=paper, start=start, end=end)
 
     return s
 
@@ -42,8 +51,12 @@ def sentences(paper: Paper) -> t.Sequence[Selection]:
     return [s(start, start + 1) for start in range(0, len(list(paper.sentences())))]
 
 
+def text_to_selection(text: str, selections: t.Sequence[Selection]):
+    selection_dict = {selection.original: selection for selection in selections}
+    return selection_dict[text]
+
 class Decontext(Selection):
-    question: str | None
+    questions: t.Sequence[str] | None
     out: str
 
     def __str__(self):

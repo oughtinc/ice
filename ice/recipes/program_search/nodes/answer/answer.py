@@ -15,7 +15,7 @@ async def simple_answer(question: str, texts: Sequence[str]):
             f"""Answer to the question "{question}":""",
         )
     )
-    return await recipe.agent().answer(prompt=prompt)
+    return await recipe.agent().complete(prompt=prompt)
 
 
 recipe.main(simple_answer)

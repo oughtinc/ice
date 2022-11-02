@@ -3,12 +3,18 @@ from typing_extensions import reveal_type
 from ice.apis.openai import TooLongRequestError, openai_complete
 from ice.paper import Paper
 from ice.recipe import Recipe, recipe
+from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
+from ice.recipes.program_search.utils.find_examples import matches
 from ice.utils import reduce_async, window_dropping
 from structlog.stdlib import get_logger
+from ice.recipes.program_search.nodes.prune.prune import prune
+import numpy as np
 
 from ice.recipes.program_search.nodes.select.prompts import (
+    RenderableSelectionExample,
     get_selections,
     make_selection_prompt,
+    render_selection_example,
 )
 
 log = get_logger()
@@ -34,7 +40,10 @@ def logprobs_greater_than_none(
 
 
 async def select(
-    question: str, texts: Sequence[str], existing: Sequence[str]
+    question: str,
+    texts: Sequence[str],
+    existing: Sequence[str],
+    examples: list[RenderableSelectionExample] | None = None,
 ) -> Sequence[str]:
     """Select additional texts by comparing logprobs of indices considered by the model.
 
@@ -51,17 +60,40 @@ async def select(
             "The OpenAI API only returns the top 5 logprobs, so passing more than 5 candidates means that not all can be fully considered.",
             num_candidates=len(texts),
         )
-    prompt = make_selection_prompt(question=question, existing=existing, texts=texts)
-    response = await openai_complete(
-        prompt=prompt, max_tokens=0, logprobs=100, echo=True
+    prompt = make_selection_prompt(
+        question=question,
+        existing=existing,
+        texts=[t for t in texts if t],
+        examples=examples,
     )
+    try:
+        response = await openai_complete(
+            prompt=prompt, max_tokens=0, logprobs=100, echo=True
+        )
+    except TooLongRequestError:
+        if examples and len(examples) >= 2:
+            return await select(question, texts, existing, examples[:-1])
+        else:
+            raise
     choice_logprobs = get_selections(last_token_top_logprobs(response), len(texts))
     return logprobs_greater_than_none(
         choice_logprobs, last_token_logprob(response), texts
     )
 
 
-async def select_reduce(question: str, texts: Sequence[Sequence[str]]) -> Sequence[str]:
+async def maybe_binary_prune(question: str, existing: list[str], max_to_keep=8):
+    try:
+        return await prune(question, existing, max_to_keep=8)
+    except TooLongRequestError:
+        mid = len(existing) // 2
+        h1 = await maybe_binary_prune(question, existing[:mid], max_to_keep=max_to_keep)
+        h2 = await maybe_binary_prune(question, existing[mid:], max_to_keep=max_to_keep)
+        return await maybe_binary_prune(question, h1 + h2, max_to_keep=max_to_keep)
+
+
+async def select_reduce(
+    question: str, texts: Sequence[Sequence[str]], do_prune: bool = False, examples: list[RenderableSelectionExample] | None = None
+) -> Sequence[str]:
     """Select texts that answer the question by reducing over `select`
 
     Args:
@@ -71,19 +103,28 @@ async def select_reduce(question: str, texts: Sequence[Sequence[str]]) -> Sequen
     Returns:
         Sequence[str]: Selected texts.
     """
+
     async def select_some(existing: list[str], new_texts: Sequence[str]):
         try:
-            new_selections = await select(question, new_texts, existing)
+            new_selections = await select(question, new_texts, existing, examples)
         except TooLongRequestError:
-            log.warning("Skipping because prompt full")  # TODO: handle this case better
+            if do_prune:
+                existing = await maybe_binary_prune(
+                    question, existing, max_to_keep=8
+                )  # TODO: Be smarter about the limit here
+                return await select_some(existing, new_texts)
+            else:
+                log.warning("Skipping because prompt full")
             return existing
         return existing + list(new_selections)
 
     return await reduce_async(select_some, texts, cast(list[str], []))
 
 
-async def windowed_select(question: str, texts: Sequence[str], n: int, step: int) -> Sequence[str]:
-    """Select texts that answer the question via 
+async def windowed_select(
+    question: str, texts: Sequence[str], n: int, step: int, examples: list[RenderableSelectionExample] | None = None
+) -> Sequence[bool]:
+    """Select texts that answer the question via
 
     Args:
         question (str): The question to select texts for.
@@ -95,7 +136,50 @@ async def windowed_select(question: str, texts: Sequence[str], n: int, step: int
         Sequence[str]: Selected texts.
     """
     windowed_texts = window_dropping(texts, n, step)
-    return await select_reduce(question, windowed_texts)
+    selections = set(await select_reduce(question, windowed_texts, do_prune=True, examples=examples))
+    return [t in selections for t in texts]
+
+def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str]:
+    return [t for t, s in zip(texts, selections) if s]
+
+
+async def select_metrics(texts: Sequence[str], selections: Sequence[bool], golds: Sequence[str]):
+    # TODO: better typing
+    assert len(texts) == len(selections)
+    ground_truth = await label_texts(texts, golds)
+    gt_array = np.array(ground_truth.values(), dtype=bool)
+    label_array = np.array(selections, dtype=bool)
+    tp = (gt_array & label_array).sum()
+    tn = (~gt_array & ~label_array).sum()
+    fn = (gt_array & ~label_array).sum()
+    fp = (~gt_array & label_array).sum()
+    recall = tp / (tp + fn) if tp or fn else 0
+    precision = tp / (tp + fp) if tp or fp else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if precision or recall else 0
+    return dict(tp=tp, tn=tn, fn=fn, fp=fp, recall=recall, precision=precision, f1=f1)
+
+def aggregate_select_metrics(metrics: Sequence[Mapping]) -> Mapping:
+    # TODO: better typing
+    def agg(key: str) -> int:
+        values = [m[key] for m in metrics if key in m]
+        return sum(values) if values else 0
+    tp, tn, fn, fp = map(agg, ("tp", "tn", "fn", "fp"))
+    recall = tp / (tp + fn) if tp or fn else 0
+    precision = tp / (tp + fp) if tp or fp else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if precision or recall else 0
+    return dict(tp=tp, tn=tn, fp=tp, fn=fn, recall=recall, precision=precision, f1=f1)
+
+
+
+
+
+async def label_texts(texts: Sequence[str], golds: Sequence[str]) -> Mapping[str, bool]:
+    gs_labeled = {text: False for text in texts}
+    for gold in golds:
+        gs_matches = await matches(hypotheses=texts, references=[gold], lcs_threshold=0.7)
+        for match in gs_matches:
+            gs_labeled[match] = True
+    return gs_labeled
 
 
 # Meta-methods

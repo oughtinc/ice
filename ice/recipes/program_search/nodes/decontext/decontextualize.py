@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Protocol, Sequence
+from ice.apis.openai import TooLongRequestError
 from ice.paper import Paper, Paragraph
 
 from ice.recipes.program_search.types import Decontext, Selection, sentences
@@ -9,19 +10,19 @@ from itertools import count
 from tqdm import tqdm
 
 
-@dataclass
-class Example:
-    question: str | None
-    texts: list[str]
-    decontextualized: list[str]
+async def local_decontext(texts: Sequence[Selection], to_decontext: Selection, questions: Sequence[str] | None = None) -> Decontext:
+    context = " ".join((str(text) for text in texts))
+    prompt = decontext_prompt(context, passage=str(to_decontext), questions=questions)
+    decontext = await recipe.agent().complete(prompt=prompt, stop="\n\n")
+    return Decontext(p=to_decontext.p, start=to_decontext.start, end=to_decontext.end, questions=questions, out=decontext.strip())
 
-
-class Decontextualize(Protocol):
-    async def __call__(
-        self, question: str | None, texts: list[str], examples: list[Example]
-    ) -> list[str]:
-        pass
-
+async def _decontext(context: Sequence[str], passage: str):
+    try:
+        prompt = decontext_prompt(" ".join(context), passage=passage)
+        return await recipe.agent().complete(prompt=prompt, stop="\n\n")
+    except TooLongRequestError:
+        return await _decontext(context[-(len(context) - 1):], passage)
+    
 
 async def autoregressive_decontext(
     texts: Sequence[Selection], k: int = 15
@@ -41,12 +42,11 @@ async def autoregressive_decontext(
     ]
 
     for text in tqdm(texts[1:]):
-        context = " ".join((dec.out for dec in output[-k:]))
-        prompt = decontext_prompt(context=context, passage=str(text))
-        decontext = await recipe.agent().answer(prompt=prompt)
+        context = [dec.out for dec in output[-k:]]
+        decontext = await _decontext(context, str(text))
         output.append(
             Decontext(
-                p=text.p, start=text.start, end=text.end, question=None, out=decontext
+                p=text.p, start=text.start, end=text.end, questions=None, out=decontext.strip()
             )
         )
     return output
