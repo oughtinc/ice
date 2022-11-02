@@ -38,6 +38,7 @@ transformers = "^4.19.2"
 ulid-py = "^1.1.0"
 uvicorn = "^0.18.3"
 websockets = "^10.3"
+"ruamel.yaml" = "^0.17.21"
 
 [tool.poetry.dev-dependencies]
 autoflake = "^1.4"
