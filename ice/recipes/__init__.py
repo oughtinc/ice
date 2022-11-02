@@ -16,7 +16,7 @@ from .experiment_arms import ExperimentArms
 from .funnel_simple import FunnelSimple
 from .placebo_description import PlaceboDescriptionInstruct
 from .program_search.nodes.decontext.decontextualize import PaperDecontext
-from .program_search.example import DecontextAndSelect
+from .consort_flow.allocated_to_arms import DecontextAndSelect
 from .placebo_dialogs import PlaceboDialogs
 from .placebo_keyword_baseline import PlaceboKeywordBaseline
 from .placebo_simple import PlaceboSimpleInstruct

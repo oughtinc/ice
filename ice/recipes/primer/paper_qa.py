@@ -1,3 +1,4 @@
+from typing import Sequence
 from ice.paper import Paper
 from ice.paper import Paragraph
 from ice.recipe import recipe
@@ -33,12 +34,12 @@ async def get_relevant_paragraphs(
 
 
 async def answer_for_paper(
-    paper: Paper, question: str = "What was the study population?"
-):
-    relevant_paragraphs = await get_relevant_paragraphs(paper, question)
+    paper: Paper, question: str = "What was the study population?", top_n: int = 3
+) -> tuple[str, Sequence[str]]:
+    relevant_paragraphs = await get_relevant_paragraphs(paper, question, top_n=top_n)
     relevant_str = "\n\n".join(str(p) for p in relevant_paragraphs)
     response = await answer(context=relevant_str, question=question)
-    return response
+    return response, [str(p) for p in relevant_paragraphs]
 
 
 recipe.main(answer_for_paper)
