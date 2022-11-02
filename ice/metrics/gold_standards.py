@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from functools import cache
 from functools import cached_property
-from typing import Any
+from typing import Any, Literal
 from typing import Generic
 from typing import overload
 from typing import Type
@@ -21,6 +21,7 @@ log = get_logger()
 
 ModelType = TypeVar("ModelType", bound=BaseModel)
 
+GoldStandardSplit = Literal["test", "validation", "iterate"]
 
 # TODO: merge with RecipeResult
 class GoldStandard(GenericModel, Generic[ModelType]):
