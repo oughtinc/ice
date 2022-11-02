@@ -12,6 +12,7 @@ fastapi = "^0.85.0"
 httpx = "^0.23.0"
 merge-args = "^0.1.4"
 nest-asyncio = "^1.5.5"
+fairseq = { version = "0.9.0", optional=true }
 nltk = "^3.7"
 numerizer = "0.2.1"  # Simple regex-ing module with no transitive dependencies, let's pin it hard
 numpy = "^1.22.3"
@@ -52,7 +53,10 @@ pytest-mock = "^3.8.2"
 
 [tool.poetry.extras]
 streamlit = ["plotly", "stqdm", "streamlit"]
-torch = ["torch", "sentencepiece", "protobuf"]
+torch = ["torch", "sentencepiece", "protobuf", "fairseq"]
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.16.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
