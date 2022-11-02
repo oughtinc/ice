@@ -21,8 +21,6 @@ import ulid
 
 from structlog import get_logger
 
-from ice.paper import Paper
-
 log = get_logger()
 
 
@@ -63,14 +61,22 @@ def emit(value):
         print(file=trace_file, flush=True)
 
 
+def compress(o: object):
+    if isinstance(o, dict):
+        if {"paragraphs", "document_id"} <= set(o):
+            return {"document_id": o["document_id"]}
+        return {k: compress(v) for k, v in o.items()}
+    if isinstance(o, list):
+        return [compress(v) for v in o]
+    return o
+
+
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, dict):
             return {repr(k): v for k, v in o.items()}
-        if isinstance(o, Paper):
-            return dict(document_id=o.document_id)
         if hasattr(o, "dict") and callable(o.dict):
-            return o.dict()
+            return compress(o.dict())
         if isfunction(o):
             return dict(class_name=o.__class__.__name__, name=o.__name__)
         try:
