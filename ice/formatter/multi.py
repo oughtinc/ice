@@ -206,7 +206,7 @@ def _format_multi(
         c[1] for c in filled_cases
     ]
     if any(truncated[:-1]):
-        log.warn(_STOP_EARLY_WARNING)
+        log.warn(_STOP_EARLY_WARNING, format_string=format_string, cases=cases)
     return ret_val
 
 
