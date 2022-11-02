@@ -20,10 +20,10 @@ async def best_answer_by_consensus(
     Returns:
         str: The consensus answer according to the agent.
     """
-    clusters = await recipe.agent().answer(
+    clusters = await recipe.agent().complete(
         prompt=build_cluster_prompt(question, candidates)
     )
-    final_answer = await recipe.agent().answer(
+    final_answer = await recipe.agent().complete(
         prompt=build_final_prompt(question, candidates, clusters)
     )
 

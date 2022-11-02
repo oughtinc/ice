@@ -20,4 +20,3 @@ def list_gs_experiments(document_id: str) -> Sequence[str] | None:
 def count_gs_experiments(document_id: str) -> int | None:
     experiments = list_gs_experiments(document_id)
     return len(experiments) if experiments is not None else None
-

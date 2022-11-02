@@ -64,7 +64,7 @@ async def _which_paras_were_helpful(
     helpfulness_prefix: str, helpful_line: str, num_excerpts: int
 ) -> list[int]:
     prompt = make_helpfulness_prompt(helpfulness_prefix, helpful_line, num_excerpts)
-    completion = await recipe.agent().answer(prompt=prompt, multiline=False)
+    completion = await recipe.agent().complete(prompt=prompt, stop="\n")
     return [num - 1 for num in extract_nums(completion)]
 
 

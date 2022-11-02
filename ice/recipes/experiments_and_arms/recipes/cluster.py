@@ -21,13 +21,13 @@ async def best_answer_by_clustering(question: str, candidates: Sequence[str]) ->
     Returns:
         str: The best answer identified by applying the clustering method.
     """
-    clusters = await recipe.agent().answer(
+    clusters = await recipe.agent().complete(
         prompt=build_cluster_prompt(question, candidates)
     )
-    counts = await recipe.agent().answer(
+    counts = await recipe.agent().complete(
         prompt=build_count_prompt(question, candidates, clusters)
     )
-    final_answer = await recipe.agent().answer(
+    final_answer = await recipe.agent().complete(
         prompt=build_final_prompt(question, candidates, clusters, counts)
     )
 
