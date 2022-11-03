@@ -6,6 +6,7 @@ authors = ["Ought <team@ought.org>"]
 
 [tool.poetry.dependencies]
 python = "3.10.4"
+"ruamel.yaml" = "^0.17.21"
 Faker = "^13.12.1"
 defopt = "^6.3.0"
 fastapi = "^0.85.0"
