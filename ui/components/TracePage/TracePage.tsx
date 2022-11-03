@@ -86,6 +86,7 @@ const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
 
 const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactNode }) => {
   const traceOffsetRef = useRef(0);
+  const remainderRef = useRef("");
   const [calls, setCalls] = useState<Calls>({});
   const [selectedId, setSelectedId] = useState<string>();
   const [rootId, setRootId] = useState<string>("");
@@ -129,23 +130,29 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         if (limit < contentLength) delay = 50;
 
         const response = await fetch(url, {
-          headers: { Range: `bytes=${offset}-${limit}` },
+          headers: { Range: `bytes=${offset}-${limit - 1}` }, // range-end is inclusive
         });
-        const { status } = response;
+        const { status, headers } = response;
         if (status !== 206) throw new Error(`Unexpected status: ${status}`);
-        const text = await response.text();
+
+        const contentRange = headers.get("content-range");
+        const rangeMatch = contentRange?.match(/bytes \d+-(\d+)\/\d+/);
+        if (!rangeMatch) throw new Error(`Unexpected content-range: ${contentRange}`);
+
+        const chunk = remainderRef.current + (await response.text());
         if (!mounted) return;
 
-        const end = text.lastIndexOf("\n") + 1;
-        traceOffsetRef.current += end;
+        traceOffsetRef.current = +rangeMatch[1] + 1; // range-end is inclusive
+        const end = chunk.lastIndexOf("\n") + 1; // will be 0 if no newline
         setCalls(calls =>
           produce(calls, draft => {
-            text
+            chunk
               .slice(0, end)
               .split("\n")
               .forEach(line => line && applyUpdates(draft, JSON.parse(line)));
           }),
         );
+        remainderRef.current = chunk.slice(end);
       } catch (e) {
         console.warn("fetch failed", e);
       } finally {
