@@ -15,6 +15,8 @@ from typing import Any
 from typing import Generic
 from typing import TypeVar
 
+import subprocess
+
 import anyio
 import tqdm
 
@@ -317,6 +319,8 @@ def max_by_value(
 def make_gpt2_tokenizer() -> GPT2TokenizerFast:
     return GPT2TokenizerFast.from_pretrained("gpt2")
 
-
 def n_tokens(text: str) -> int:
     return len(make_gpt2_tokenizer().tokenize(text))
+
+def latest_commit_hash():
+    return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode("utf-8").strip()
