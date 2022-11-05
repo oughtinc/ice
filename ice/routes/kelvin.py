@@ -6,7 +6,6 @@ from ice.kelvin.actions.all import ACTION_TYPE_UNION
 from ice.kelvin.actions.all import get_available_actions
 from ice.kelvin.actions.base import Action
 from ice.kelvin.cards.all import CARD_TYPE_UNION
-from ice.kelvin.view import CardView
 from ice.kelvin.view import CardWithView
 from ice.kelvin.workspace import get_initial_workspace
 from ice.kelvin.workspace import Workspace
@@ -38,5 +37,5 @@ async def execute_action(action: ACTION_TYPE_UNION, card: CARD_TYPE_UNION):
 
 
 @router.post("/actions/available", response_model=list[Action])
-async def available_actions(card: CARD_TYPE_UNION, view: CardView):
-    return get_available_actions(card, view)
+async def available_actions(card_with_view: CardWithView):
+    return get_available_actions(card_with_view)

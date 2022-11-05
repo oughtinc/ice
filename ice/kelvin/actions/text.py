@@ -20,7 +20,7 @@ class AddTextRowAction(Action):
     params: list[ActionParam] = [
         ActionParam(name="row_text", kind="TextParam", label="Text")
     ]
-    label: str = "Add bullet"
+    label: str = "Add bullet point"
 
     def validate_input(self, card: Card) -> None:
         """Check that the card kind is TextCard."""
@@ -43,8 +43,8 @@ class AddTextRowAction(Action):
         return CardWithView(card=new_card, view=new_view)
 
     @classmethod
-    def instantiate(cls, card: Card, selected_rows: dict[str, bool]) -> list[Action]:
-        if not card.kind == "TextCard":
+    def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
+        if not card_with_view.card.kind == "TextCard":
             return []
         return [cls()]
 
@@ -91,11 +91,11 @@ class EditTextRowAction(Action):
         return CardWithView(card=new_card, view=new_view)
 
     @classmethod
-    def instantiate(cls, card: Card, selected_rows: dict[str, bool]) -> list[Action]:
-        if not card.kind == "TextCard":
+    def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
+        if not card_with_view.card.kind == "TextCard":
             return []
         actions: list[Action] = []
-        for row in card.get_selected_rows(selector=selected_rows):
+        for row in card_with_view.get_selected_rows():
             previous_text = row.text
             truncated_text = truncate_text(previous_text, max_length=20)
             actions.append(

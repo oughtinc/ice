@@ -51,14 +51,14 @@ class ElicitSearchAction(Action):
         return CardWithView(card=new_card, view=new_view)
 
     @classmethod
-    def instantiate(cls, card: Card, selected_rows: dict[str, bool]) -> list[Action]:
-        actions: list[Action] = [cls(label="Search Elicit papers (enter query)")]
-        if card.kind == "TextCard":
-            for row in card.get_selected_rows(selector=selected_rows):
+    def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
+        actions: list[Action] = [cls(label="Search papers")]
+        if card_with_view.card.kind == "TextCard":
+            for row in card_with_view.get_selected_rows():
                 query = row.text
                 short_query = truncate_text(query, max_length=20)
                 action = cls(
-                    label=f'Search Elicit papers (query "{short_query}")',
+                    label=f'Search papers for "{short_query}"',
                     params=[
                         ActionParam(
                             name="query", kind="TextParam", label="Query", value=query
@@ -119,10 +119,10 @@ class ViewPaperAction(Action):
         return CardWithView(card=new_card, view=new_view)
 
     @classmethod
-    def instantiate(cls, card: Card, selected_rows: dict[str, bool]) -> list[Action]:
+    def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
         actions: list[Action] = []
-        if card.kind == "PaperCard":
-            for row in card.get_selected_rows(selector=selected_rows):
+        if card_with_view.card.kind == "PaperCard":
+            for row in card_with_view.get_selected_rows():
                 paper_id = row.id
                 title = row.title
                 short_title = truncate_text(title, max_length=80)

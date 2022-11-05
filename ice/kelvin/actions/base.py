@@ -53,5 +53,5 @@ class Action(BaseModel):
         raise NotImplementedError
 
     @classmethod
-    def instantiate(cls, card: Card, selected_rows: dict[str, bool]) -> list["Action"]:
+    def instantiate(cls, card_with_view: CardWithView) -> list["Action"]:
         raise NotImplementedError

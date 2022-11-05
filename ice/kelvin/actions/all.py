@@ -5,8 +5,7 @@ from ice.kelvin.actions.elicit import ElicitSearchAction
 from ice.kelvin.actions.elicit import ViewPaperAction
 from ice.kelvin.actions.text import AddTextRowAction
 from ice.kelvin.actions.text import EditTextRowAction
-from ice.kelvin.cards.base import Card
-from ice.kelvin.view import CardView
+from ice.kelvin.view import CardWithView
 
 
 ACTION_TYPE_UNION = (
@@ -20,10 +19,8 @@ ACTION_CLASSES = [
 ]
 
 
-def get_available_actions(card: Card, view: CardView) -> list[Action]:
+def get_available_actions(card_with_view: CardWithView) -> list[Action]:
     available_actions: list[Action] = []
     for action_class in ACTION_CLASSES:
-        available_actions += cast(Action, action_class).instantiate(
-            card, view.selected_rows
-        )
+        available_actions += cast(Action, action_class).instantiate(card_with_view)
     return available_actions
