@@ -1,44 +1,30 @@
-import { createRef, forwardRef, useEffect, useRef, useState } from "react";
+import { createRef, useEffect, useRef } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+
+const useScrollIntoView = ({ items, focusIndex }) => {
+  const itemRefs = useRef([]);
+  itemRefs.current = items.map((_, i) => itemRefs.current[i] || createRef());
+
+  useEffect(() => {
+    const currentRef = itemRefs.current[focusIndex];
+    if (currentRef && currentRef.current) {
+      currentRef.current.scrollIntoView({ block: "nearest" });
+    }
+  }, [focusIndex]);
+
+  return itemRefs;
+};
 
 const SelectionListItem = ({
   item,
-  focus,
+  focused,
   selected,
-  setItemSelection,
-  onEnter,
   active,
+  setSelected,
   renderItem,
   forwardedRef,
 }) => {
-  useHotkeys(
-    "space",
-    () => {
-      console.log("space", { item, selected });
-      setItemSelection(item, "toggle");
-    },
-    { enabled: active && focus },
-    [active, item.id],
-  );
-
-  useHotkeys(
-    "enter",
-    () => {
-      console.log("enter", { item });
-      onEnter(item);
-      setItemSelection(item, true);
-    },
-    { enabled: active && focus },
-    [active, item.id],
-  );
-
-  let bgColor = "";
-  if (focus && active) {
-    bgColor = "bg-blue-200";
-  } else if (selected) {
-    bgColor = "bg-blue-150";
-  }
-
+  const bgColor = focused ? "bg-blue-200" : selected ? "bg-blue-150" : "";
   return (
     <li className={`flex p-1 pl-2 pr-2 items-baseline ${bgColor}`} ref={forwardedRef}>
       <span className={`mr-2 ${selected ? "text-blue-500" : "text-black"}`}>•</span>
@@ -47,69 +33,73 @@ const SelectionListItem = ({
   );
 };
 
-const useFocusIndex = ({ name, items, initialIndex = 0, active }) => {
-  const [focusIndex, setFocusIndex] = useState(initialIndex);
+const SelectionList = ({
+  name,
+  items,
+  onEnter,
+  active,
+  renderItem,
+  selected,
+  setSelected,
+  focusIndex,
+  setFocusIndex,
+}) => {
+  const itemRefs = useScrollIntoView({ items, focusIndex });
+
+  useHotkeys(
+    "space",
+    () => {
+      const item = items[focusIndex];
+      if (item) {
+        setSelected(prev => ({ ...prev, [item.id]: !prev[item.id] }));
+      }
+    },
+    { enabled: active },
+    [active, items, focusIndex],
+  );
+
+  useHotkeys(
+    "enter",
+    () => {
+      const item = items[focusIndex];
+      if (item) {
+        onEnter(item);
+      }
+    },
+    { enabled: active },
+    [active, items, focusIndex],
+  );
 
   useHotkeys(
     "up, k",
     () => {
-      setFocusIndex(prev => (prev - 1 + items.length) % items.length);
+      setFocusIndex(prev => ((prev || 0) - 1 + items.length) % items.length);
     },
     { enabled: active },
-    [active, items],
+    [items, active],
   );
 
   useHotkeys(
     "down, j",
     () => {
-      setFocusIndex(prev => (prev + 1) % items.length);
+      setFocusIndex(prev => ((prev || 0) + 1) % items.length);
     },
     { enabled: active },
-    [active, items],
+    [items, active],
   );
-
-  return [focusIndex, items[focusIndex]?.id];
-};
-
-const SelectionListItemWithRef = forwardRef((props, ref) => (
-  <SelectionListItem {...props} forwardedRef={ref} />
-));
-
-const SelectionList = ({ name, items, onEnter, active, renderItem, selected, setSelected }) => {
-  const [focusIndex, focusId] = useFocusIndex({ name, items, active });
-
-  const setItemSelection = (item, value) => {
-    if (value === "toggle") {
-      setSelected(prev => ({ ...prev, [item.id]: !prev[item.id] }));
-    } else {
-      setSelected(prev => ({ ...prev, [item.id]: value }));
-    }
-  };
-
-  const itemRefs = useRef([]);
-  itemRefs.current = items.map((_, i) => itemRefs.current[i] || createRef());
-
-  useEffect(() => {
-    const currentRef = itemRefs.current[focusIndex];
-    console.log("scroll", { focusIndex, currentRef, itemRefs });
-    if (currentRef && currentRef.current) {
-      currentRef.current.scrollIntoView({ block: "nearest" });
-    }
-  }, [focusIndex]);
 
   return (
     <ul className="list-disc list-inside">
       {items.map((item, i) => (
-        <SelectionListItemWithRef
+        <SelectionListItem
           key={item.id}
           item={item}
-          focus={item.id === focusId}
+          focused={i === focusIndex}
           selected={selected[item.id]}
-          setItemSelection={setItemSelection}
-          onEnter={onEnter}
           active={active}
+          setSelected={setSelected}
           renderItem={renderItem}
-          ref={itemRefs.current[i]}
+          forwardedRef={itemRefs.current[i]}
         />
       ))}
     </ul>

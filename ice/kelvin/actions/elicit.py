@@ -54,7 +54,7 @@ class ElicitSearchAction(Action):
     def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
         actions: list[Action] = [cls(label="Search papers")]
         if card_with_view.card.kind == "TextCard":
-            for row in card_with_view.get_selected_rows():
+            for row in card_with_view.get_marked_rows():
                 query = row.text
                 short_query = truncate_text(query, max_length=20)
                 action = cls(
@@ -122,7 +122,7 @@ class ViewPaperAction(Action):
     def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
         actions: list[Action] = []
         if card_with_view.card.kind == "PaperCard":
-            for row in card_with_view.get_selected_rows():
+            for row in card_with_view.get_marked_rows():
                 paper_id = row.id
                 title = row.title
                 short_title = truncate_text(title, max_length=80)

@@ -22,6 +22,10 @@ type ReducerAction =
   | { type: "UPDATE_WORKSPACE_SUCCESS"; payload: Workspace }
   | { type: "EXECUTE_ACTION_SUCCESS"; payload: Workspace }
   | {
+      type: "SET_FOCUSED_ROW_INDEX";
+      payload: number;
+    }
+  | {
       type: "SET_SELECTED_CARD_ROWS";
       payload: (rows: Record<string, boolean>) => Record<string, boolean>;
     }
@@ -62,6 +66,9 @@ const reducer = (draft: State, action: ReducerAction) => {
       break;
     case "SET_SELECTED_CARD_ROWS":
       draft.workspace.view.selected_rows = action.payload(draft.workspace.view.selected_rows);
+      break;
+    case "SET_FOCUSED_ROW_INDEX":
+      draft.workspace.view.focused_row_index = action.payload;
       break;
     case "UPDATE_AVAILABLE_ACTIONS_SUCCESS":
       draft.loading = false;
@@ -143,7 +150,6 @@ export function WorkspaceProvider({ children }) {
       return;
     }
     const { card, view } = cardWithView;
-    console.log("updateAvailableActions", cardWithView);
     getAvailableActions({ card, view })
       .then(data => {
         dispatch({ type: "UPDATE_AVAILABLE_ACTIONS_SUCCESS", payload: data });
@@ -158,9 +164,25 @@ export function WorkspaceProvider({ children }) {
     updateAvailableActions();
   };
 
+  const setFocusedCardRow = rowIndexOrUpdateFn => {
+    // If rowIndexOrUpdateFn is a function, use it to compute the new row index based on the current state
+    const rowIndex =
+      typeof rowIndexOrUpdateFn === "function"
+        ? rowIndexOrUpdateFn(stateRef.current.workspace.view.focused_row_index)
+        : rowIndexOrUpdateFn;
+    dispatch({ type: "SET_FOCUSED_ROW_INDEX", payload: rowIndex });
+    updateAvailableActions();
+  };
+
   return (
     <WorkspaceContext.Provider
-      value={{ ...state, updateWorkspaceData, setSelectedCardRows, executeAction }}
+      value={{
+        ...state,
+        updateWorkspaceData,
+        setSelectedCardRows,
+        setFocusedCardRow,
+        executeAction,
+      }}
     >
       {children}
     </WorkspaceContext.Provider>

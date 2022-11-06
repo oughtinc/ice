@@ -26,3 +26,10 @@ export function getCurrentCardWithView(workspace: Workspace | null) {
   if (!currentCard) return null;
   return { card: currentCard, view };
 }
+
+export function getFocusIndex(workspace: Workspace | null) {
+  if (!workspace) return null;
+  const { view } = workspace;
+  if (!view) return null;
+  return view.focused_row_index;
+}

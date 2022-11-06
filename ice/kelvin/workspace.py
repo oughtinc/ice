@@ -27,6 +27,7 @@ def get_initial_workspace() -> Workspace:
     initial_view = CardView(
         card_id=initial_card_id,
         selected_rows={},
+        focused_row_index=None,
     )
     return Workspace(
         cards=[initial_card],

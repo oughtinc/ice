@@ -38,6 +38,7 @@ class AddTextRowAction(Action):
         new_view = CardView(
             card_id=new_card_id,
             selected_rows={},
+            focused_row_index=len(card.rows),
         )
 
         return CardWithView(card=new_card, view=new_view)
@@ -83,9 +84,14 @@ class EditTextRowAction(Action):
 
         new_card = TextCard(id=generate_id(), rows=new_rows)
 
+        new_focused_row_index = next(
+            (i for i, row in enumerate(new_rows) if row.id == row_id), None
+        )
+
         new_view = CardView(
             card_id=new_card.id,
             selected_rows={},
+            focused_row_index=new_focused_row_index,
         )
 
         return CardWithView(card=new_card, view=new_view)
@@ -95,7 +101,7 @@ class EditTextRowAction(Action):
         if not card_with_view.card.kind == "TextCard":
             return []
         actions: list[Action] = []
-        for row in card_with_view.get_selected_rows():
+        for row in card_with_view.get_marked_rows():
             previous_text = row.text
             truncated_text = truncate_text(previous_text, max_length=20)
             actions.append(

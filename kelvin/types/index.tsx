@@ -64,6 +64,7 @@ type Card = TextCard | ActionCard | PaperCard;
 type CardView = {
   card_id: string;
   selected_rows: { [row_id: string]: boolean };
+  focused_row_index: number | null;
 };
 
 type CardWithView = {
