@@ -27,6 +27,7 @@ async def initial_workspace():
 
 @router.post("/actions/execute", response_model=CardWithView)
 async def execute_action(action: ACTION_TYPE_UNION, card: CARD_TYPE_UNION):
+    log.info("execute_action", action=action, card=card)
     try:
         action.validate_input(card)
     except ValueError:

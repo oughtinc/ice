@@ -34,7 +34,7 @@
     "tailwindcss-labeled-groups": "^0.0.2",
     "typescript": "4.6.4"
   },
-  "name": "ui",
+  "name": "kelvin",
   "private": true,
   "scripts": {
     "build": "next build",
