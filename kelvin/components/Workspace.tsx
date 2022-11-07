@@ -29,8 +29,14 @@ const CardRow = ({ cardKind, row }) => {
 };
 
 const Workspace = () => {
-  const { workspace, executeAction, setSelectedCardRows, setFocusedCardRow, loading, error } =
-    useWorkspace();
+  const {
+    workspace,
+    executeAction,
+    setSelectedCardRows,
+    setFocusedCardRow,
+    activeRequestCount,
+    error,
+  } = useWorkspace();
 
   const [baseActivePane, setActivePane, LEFT_PANE, RIGHT_PANE] = usePaneSwitch();
   const [selectedActions, setSelectedActions] = useState({});
@@ -40,7 +46,7 @@ const Workspace = () => {
   const card = getCurrentCard(workspace);
   const actions = getCurrentActions(workspace);
   const selectedCardRows = getSelectedCardRows(workspace);
-  const cardFocusIndex = getFocusIndex(workspace);
+  const cardFocusIndex = getFocusIndex(workspace) || 0;
 
   const activePane = card && !card.rows.length && actions ? RIGHT_PANE : baseActivePane;
 
@@ -105,7 +111,7 @@ const Workspace = () => {
           />
         )}
       </Pane>
-      <StatusBar loading={loading} error={error} />
+      <StatusBar activeRequestCount={activeRequestCount} error={error} />
     </Panes>
   );
 };

@@ -20,7 +20,7 @@ class AddTextRowAction(Action):
     params: list[ActionParam] = [
         ActionParam(name="row_text", kind="TextParam", label="Text")
     ]
-    label: str = "Add bullet point"
+    label: str = "Add bullet point to card"
 
     def validate_input(self, card: Card) -> None:
         """Check that the card kind is TextCard."""

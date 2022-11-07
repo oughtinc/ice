@@ -40,10 +40,6 @@ const ActionForm = ({ partialAction, onSubmit }) => {
 
   const renderParam = (param, index) => {
     const { name, kind, value, label } = param;
-    if (value !== null) {
-      // skip the param if it already has a value
-      return null;
-    }
     switch (kind) {
       case "TextParam":
         return (
@@ -106,7 +102,7 @@ const ActionForm = ({ partialAction, onSubmit }) => {
     <div className="action-form bg-white p-6 max-w-md mx-auto">
       <h3 className="text-gray-900 mb-4">{label}</h3>
       <form onSubmit={handleSubmit}>
-        {params.map(renderParam)}
+        {params.filter(param => param.value == null).map(renderParam)}
         <button
           type="submit"
           className="w-full bg-blue-150 py-2 px-4 hover:bg-blue-200 focus:bg-blue-200 focus:outline-none"

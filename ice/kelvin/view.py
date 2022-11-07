@@ -18,7 +18,7 @@ class CardWithView(BaseModel):
         """
         Return a list of row dicts from the card that are selected
         """
-        rows = self.card.rows
+        rows: list[CardRow] = self.card.rows
         return [
             row
             for (index, row) in enumerate(rows)

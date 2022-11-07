@@ -11,8 +11,8 @@ import { getCurrentCardWithView } from "/utils/workspace";
 
 type State = {
   workspace: Workspace | null;
-  loading: boolean;
   error: Error | null;
+  activeRequestCount: number;
 };
 
 type ReducerAction =
@@ -33,35 +33,35 @@ type ReducerAction =
 
 const initialState: State = {
   workspace: null,
-  loading: false,
   error: null,
+  activeRequestCount: 0,
 };
 
 const reducer = (draft: State, action: ReducerAction) => {
   switch (action.type) {
     case "FETCH_REQUEST":
-      draft.loading = true;
+      draft.activeRequestCount++;
       draft.error = null;
       break;
     case "FETCH_FAILURE":
-      draft.loading = false;
+      draft.activeRequestCount--;
       draft.error = action.payload;
       break;
     case "FETCH_WORKSPACE_SUCCESS":
-      draft.loading = false;
+      draft.activeRequestCount--;
       draft.workspace = action.payload;
       break;
     case "UPDATE_WORKSPACE_SUCCESS":
-      draft.loading = false;
+      draft.activeRequestCount--;
       draft.workspace = action.payload;
       break;
     case "EXECUTE_ACTION_SUCCESS":
+      draft.activeRequestCount--;
       const { card, view } = action.payload;
       const newWorkspace = {
         cards: [...draft.workspace!.cards, card],
         view,
       };
-      draft.loading = false;
       draft.workspace = newWorkspace;
       break;
     case "SET_SELECTED_CARD_ROWS":
@@ -71,7 +71,7 @@ const reducer = (draft: State, action: ReducerAction) => {
       draft.workspace.view.focused_row_index = action.payload;
       break;
     case "UPDATE_AVAILABLE_ACTIONS_SUCCESS":
-      draft.loading = false;
+      draft.activeRequestCount--;
       draft.workspace.available_actions = action.payload;
       break;
     default:
@@ -165,7 +165,6 @@ export function WorkspaceProvider({ children }) {
   };
 
   const setFocusedCardRow = rowIndexOrUpdateFn => {
-    // If rowIndexOrUpdateFn is a function, use it to compute the new row index based on the current state
     const rowIndex =
       typeof rowIndexOrUpdateFn === "function"
         ? rowIndexOrUpdateFn(stateRef.current.workspace.view.focused_row_index)
