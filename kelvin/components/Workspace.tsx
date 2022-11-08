@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import Action from "./Action";
 import ActionForm from "./ActionForm";
+import CardRow from "./CardRow";
 import { Pane, Panes, usePaneSwitch } from "./Panes";
 import SelectionList from "./SelectionList";
 import StatusBar from "./StatusBar";
@@ -13,19 +14,36 @@ import {
   getSelectedCardRows,
 } from "/utils/workspace";
 
-const CardRow = ({ cardKind, row }) => {
-  if (cardKind == "TextCard") {
-    return <span>{row.text}</span>;
-  } else if (cardKind == "PaperCard") {
-    const hasFullText = row?.raw_data?.body?.value?.paragraphs?.length;
-    return (
-      <div>
-        {hasFullText ? "📰" : ""} {row.title} ({row.year})
-      </div>
+const useActionHotkeys = (actions, executeActionAndDeselectAll, actionToPrepare) => {
+  const findActionByLabel = label => {
+    const lowerLabel = label.toLowerCase();
+    return actions?.find(action => action.label.toLowerCase().startsWith(lowerLabel)) || null;
+  };
+
+  const actionHotkeys = {
+    a: "Add bullet point to card",
+    c: "Clear card",
+    e: "Edit text",
+  };
+
+  // For each entry in actionHotkeys, bind the key (e.g. a) to
+  // executing the first action that has a title that starts with the
+  // hotkey text (e.g. the first action in the actions list that has
+  // .label "Add bullet point to card").
+  Object.entries(actionHotkeys).forEach(([key, label]) => {
+    useHotkeys(
+      key,
+      () => {
+        if (!actionToPrepare) {
+          const action = findActionByLabel(label);
+          if (action) {
+            executeActionAndDeselectAll(action);
+          }
+        }
+      },
+      [actionHotkeys, actions, executeActionAndDeselectAll],
     );
-  } else {
-    return <pre>{JSON.stringify(row, null, 2)}</pre>;
-  }
+  });
 };
 
 const Workspace = () => {
@@ -57,6 +75,7 @@ const Workspace = () => {
       setActionToPrepare(null);
       setActivePane(LEFT_PANE);
     } else {
+      setActivePane(RIGHT_PANE);
       setActionToPrepare(action);
     }
   };
@@ -78,6 +97,8 @@ const Workspace = () => {
   useEffect(() => {
     setActionFocusIndex(0);
   }, [cardFocusIndex, actions]);
+
+  useActionHotkeys(actions, executeActionAndDeselectAll, actionToPrepare);
 
   return (
     <Panes>
