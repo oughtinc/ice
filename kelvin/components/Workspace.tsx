@@ -15,34 +15,36 @@ import {
 } from "/utils/workspace";
 
 const useActionHotkeys = (actions, executeActionAndDeselectAll, actionToPrepare) => {
-  const findActionByLabel = label => {
-    const lowerLabel = label.toLowerCase();
-    return actions?.find(action => action.label.toLowerCase().startsWith(lowerLabel)) || null;
-  };
-
-  const actionHotkeys = {
+  const labelFromKey = {
     a: "Add bullet point to card",
     c: "Clear card",
     e: "Edit text",
   };
 
-  // For each entry in actionHotkeys, bind the key (e.g. a) to
-  // executing the first action that has a title that starts with the
-  // hotkey text (e.g. the first action in the actions list that has
-  // .label "Add bullet point to card").
-  Object.entries(actionHotkeys).forEach(([key, label]) => {
+  const actionMatchesLabel = (action, label) => {
+    return action.label.toLowerCase().startsWith(label.toLowerCase());
+  };
+
+  for (const [key, label] of Object.entries(labelFromKey)) {
     useHotkeys(
       key,
       () => {
         if (!actionToPrepare) {
-          const action = findActionByLabel(label);
+          const action = actions.find(action => actionMatchesLabel(action, label));
           if (action) {
             executeActionAndDeselectAll(action);
           }
         }
       },
-      [actionHotkeys, actions, executeActionAndDeselectAll],
+      [actionToPrepare, executeActionAndDeselectAll, actions],
     );
+  }
+
+  return actions.map(action => {
+    const key = Object.keys(labelFromKey).find(key =>
+      actionMatchesLabel(action, labelFromKey[key]),
+    );
+    return key ? action.label : null;
   });
 };
 
@@ -62,7 +64,7 @@ const Workspace = () => {
   const [actionToPrepare, setActionToPrepare] = useState(null);
 
   const card = getCurrentCard(workspace);
-  const actions = getCurrentActions(workspace);
+  const actions = getCurrentActions(workspace) || [];
   const selectedCardRows = getSelectedCardRows(workspace);
   const cardFocusIndex = getFocusIndex(workspace) || 0;
 
@@ -123,7 +125,7 @@ const Workspace = () => {
           <SelectionList
             name="Actions"
             multiselect={false}
-            items={actions || []}
+            items={actions}
             selected={selectedActions}
             setSelected={setSelectedActions}
             onEnter={executeActionAndDeselectAll}
