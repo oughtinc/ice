@@ -39,7 +39,7 @@ const ActionForm = ({ partialAction, onSubmit }) => {
   };
 
   const renderParam = (param, index) => {
-    const { name, kind, value, label } = param;
+    const { name, kind, value, label, default_value } = param;
     switch (kind) {
       case "TextParam":
         return (
@@ -51,7 +51,7 @@ const ActionForm = ({ partialAction, onSubmit }) => {
               type="text"
               id={name}
               name={name}
-              value={formValues[name] || ""}
+              value={formValues[name] || default_value || ""}
               onChange={e => handleChange(name, e.target.value)}
               className="mt-1 block w-full border border-gray-300 py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               ref={index === 0 ? firstInputRef : null} // assign the ref to the first input
@@ -68,7 +68,7 @@ const ActionForm = ({ partialAction, onSubmit }) => {
               type="number"
               id={name}
               name={name}
-              value={formValues[name] || ""}
+              value={formValues[name] || default_value || ""}
               onChange={e => handleChange(name, e.target.value)}
               className="mt-1 block w-full border border-gray-300 py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               ref={index === 0 ? firstInputRef : null} // assign the ref to the first input
@@ -85,7 +85,7 @@ const ActionForm = ({ partialAction, onSubmit }) => {
               type="text"
               id={name}
               name={name}
-              value={formValues[name] || ""}
+              value={formValues[name] || default_value || ""}
               onChange={e => handleChange(name, e.target.value)}
               className="mt-1 block w-full border border-gray-300 py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               readOnly // assume id_param is read-only

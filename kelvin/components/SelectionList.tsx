@@ -20,15 +20,49 @@ const SelectionListItem = ({
   focused,
   selected,
   active,
+  multiselect,
   setSelected,
   renderItem,
   forwardedRef,
 }) => {
-  const bgColor = focused ? "bg-blue-200" : selected ? "bg-blue-150" : "";
+  // Use a checkmark icon instead of a bullet point
+  const checkmark =
+    selected || !active & focused ? (
+      <svg
+        className={`${selected ? "text-blue-500" : "text-gray-500"} mr-2`}
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5.33333 10.6667L2.66667 8L1.33333 9.33333L5.33333 13.3333L14.6667 4L13.3333 2.66667L5.33333 10.6667Z"
+          fill="currentColor"
+        />
+      </svg>
+    ) : (
+      // Use an empty checkmark icon on hover
+      <svg
+        className={`text-gray-400 mr-2 ${focused ? "opacity-100" : "opacity-0"}`}
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect x="0.5" y="0.5" width="15" height="15" rx="2.5" stroke="currentColor" />
+      </svg>
+    );
+
+  const bullet = <div className="w-3">•</div>;
+
+  // Use a consistent background color for focused and selected items
+  const bgColor = focused ? "bg-blue-200" : selected ? "bg-blue-100" : "";
+
   return (
-    <li className={`flex p-1 pl-2 pr-2 items-baseline ${bgColor}`} ref={forwardedRef}>
-      <span className={`mr-2 ${selected ? "text-blue-500" : "text-black"}`}>•</span>
-      {renderItem(item)}
+    <li className={`flex p-1 pl-2 pr-2 items-center ${bgColor}`} ref={forwardedRef}>
+      {multiselect ? checkmark : bullet} {renderItem(item)}
     </li>
   );
 };
@@ -36,6 +70,7 @@ const SelectionListItem = ({
 const SelectionList = ({
   name,
   items,
+  multiselect,
   onEnter,
   active,
   renderItem,
@@ -47,14 +82,14 @@ const SelectionList = ({
   const itemRefs = useScrollIntoView({ items, focusIndex });
 
   useHotkeys(
-    "space",
+    "space, x",
     () => {
       const item = items[focusIndex];
       if (item) {
         setSelected(prev => ({ ...prev, [item.id]: !prev[item.id] }));
       }
     },
-    { enabled: active },
+    { enabled: active && multiselect },
     [active, items, focusIndex],
   );
 
@@ -73,7 +108,7 @@ const SelectionList = ({
   useHotkeys(
     "up, k",
     () => {
-      setFocusIndex(prev => ((prev || 0) - 1 + items.length) % items.length);
+      setFocusIndex(prev => Math.max((prev || 0) - 1, 0));
     },
     { enabled: active },
     [items, active],
@@ -82,10 +117,31 @@ const SelectionList = ({
   useHotkeys(
     "down, j",
     () => {
-      setFocusIndex(prev => ((prev || 0) + 1) % items.length);
+      setFocusIndex(prev => Math.min((prev || 0) + 1, items.length - 1));
     },
     { enabled: active },
     [items, active],
+  );
+
+  // Detect the platform and the modifier key
+  const isMac =
+    typeof window !== "undefined" ? window.navigator.platform.toLowerCase().includes("mac") : false;
+  const modifierKey = isMac ? "command" : "ctrl";
+
+  useHotkeys(
+    `${modifierKey}+a`,
+    event => {
+      event.preventDefault();
+      setSelected(draft => {
+        items.forEach(item => {
+          draft[item.id] = true;
+        });
+        return draft;
+      });
+      setFocusIndex(items.length - 1);
+    },
+    { enabled: active },
+    [items, active, selected],
   );
 
   return (
@@ -94,6 +150,7 @@ const SelectionList = ({
         <SelectionListItem
           key={item.id}
           item={item}
+          multiselect={multiselect}
           focused={i === focusIndex}
           selected={selected[item.id]}
           active={active}

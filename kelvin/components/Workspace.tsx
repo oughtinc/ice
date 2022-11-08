@@ -84,6 +84,7 @@ const Workspace = () => {
       <Pane active={activePane === LEFT_PANE}>
         <SelectionList
           name="Card"
+          multiselect={true}
           items={card?.rows || []}
           selected={selectedCardRows}
           setSelected={setSelectedCardRows}
@@ -100,6 +101,7 @@ const Workspace = () => {
         ) : (
           <SelectionList
             name="Actions"
+            multiselect={false}
             items={actions || []}
             selected={selectedActions}
             setSelected={setSelectedActions}

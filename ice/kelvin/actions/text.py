@@ -108,7 +108,10 @@ class EditTextRowAction(Action):
                 cls(
                     params=[
                         ActionParam(
-                            name="new_row_text", kind="TextParam", label="New text"
+                            name="new_row_text",
+                            kind="TextParam",
+                            label="New text",
+                            default_value=previous_text,
                         ),
                         ActionParam(
                             name="row_id",

@@ -3,13 +3,15 @@ type TextParam = {
   name: string;
   value: string | null;
   label: string;
+  default_value: string | null;
 };
 
 type IntParam = {
   kind: "IntParam";
   name: string;
-  value: string | null;
+  value: int | null;
   label: string;
+  default_value: nt | null;
 };
 
 type IdParam = {
@@ -17,6 +19,7 @@ type IdParam = {
   name: string;
   value: string | null;
   label: string;
+  default_value: string | null;
 };
 
 type ActionParam = TextParam | IntParam | IdParam;

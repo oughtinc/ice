@@ -17,6 +17,7 @@ class ActionParam(BaseModel):
     kind: Literal["TextParam", "IntParam", "IdParam"]
     value: Any
     label: str
+    default_value: Any = None
 
 
 class ActionParamInt(ActionParam):
@@ -24,6 +25,7 @@ class ActionParamInt(ActionParam):
     kind: Literal["IntParam"] = "IntParam"
     value: int | None = None
     label: str = "Number"
+    default_value: int | None = None
 
 
 class ActionParamId(ActionParam):
@@ -31,6 +33,7 @@ class ActionParamId(ActionParam):
     kind: Literal["IdParam"] = "IdParam"
     value: str | None = None
     label: str = "Id"
+    default_value: str | None = None
 
 
 class ActionParamText(ActionParam):
@@ -38,6 +41,7 @@ class ActionParamText(ActionParam):
     kind: Literal["TextParam"] = "TextParam"
     value: str | None = None
     label: str = "Text"
+    default_value: str | None = None
 
 
 class Action(BaseModel):
