@@ -421,7 +421,9 @@ class EvaluationReport(BaseModel):
                 "excerpts": result.evaluated_excerpts.excerpts,
                 "gs_quotes": result.evaluated_excerpts.gold_standards_str(),
                 "answer": result.answer,
-                "gs_answer": result.gold_standard.answer if result.gold_standard else None,
+                "gs_answer": result.gold_standard.answer
+                if result.gold_standard
+                else None,
                 "answer_rating": result.answer_rating,
                 "failure_modes": result.failure_modes,
             }

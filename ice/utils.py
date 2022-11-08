@@ -1,5 +1,6 @@
 import itertools
 import os
+import subprocess
 import threading as td
 import time
 
@@ -14,8 +15,6 @@ from random import Random
 from typing import Any
 from typing import Generic
 from typing import TypeVar
-
-import subprocess
 
 import anyio
 import tqdm

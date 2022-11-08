@@ -1,4 +1,5 @@
 import asyncio
+import importlib
 import sys
 
 from abc import abstractmethod
@@ -15,6 +16,7 @@ from typing import TypeGuard
 from typing import TypeVar
 
 import defopt
+import pandas as pd
 
 from merge_args import merge_args
 from pydantic import BaseSettings
@@ -32,8 +34,6 @@ from ice.trace import enable_trace
 from ice.trace import trace
 from ice.trace import TracedABC
 from ice.utils import map_async
-import importlib
-import pandas as pd
 
 RecipeSettings = TypeVar("RecipeSettings", bound=BaseSettings)
 
@@ -95,6 +95,7 @@ class Recipe(TracedABC, Generic[RecipeSettings]):
 
 FunctionBasedRecipe = Callable[..., Awaitable]
 
+
 def function_recipe_from_path(path: str) -> FunctionBasedRecipe:
     # from https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
     file_path, _, recipe = path.partition(":")
@@ -103,6 +104,7 @@ def function_recipe_from_path(path: str) -> FunctionBasedRecipe:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return vars(module)[recipe]
+
 
 class RecipeHelper:
     def __init__(self):
