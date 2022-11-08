@@ -1,6 +1,7 @@
-from typing import Sequence
-from ice.recipe import recipe
+from collections.abc import Sequence
+
 from ice.formatter.transform.value import numbered_list
+from ice.recipe import recipe
 
 INSTRUCTIONS = "Answer the question based on the excerpts provided:"
 

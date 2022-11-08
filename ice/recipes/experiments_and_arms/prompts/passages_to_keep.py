@@ -1,14 +1,16 @@
+from collections.abc import Sequence
+from itertools import chain
+from typing import cast
+
+from structlog.stdlib import get_logger
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
+from ice.formatter.multi import StopSentinel
 from ice.recipe import recipe
-from typing import Sequence
 from ice.recipes.experiments_and_arms.num_utils import extract_nums
 from ice.recipes.experiments_and_arms.types import PassageWithReasoning
-from itertools import chain
-
-from ice.formatter.multi import stop, StopSentinel, format_multi
 from ice.trace import trace
-from typing import Sequence, cast
-from structlog.stdlib import get_logger
-from ice.recipe import recipe
 
 ## TODO: Make configurable for different ways of prompting helpfulness
 
@@ -23,7 +25,11 @@ def make_helpfulness_prompt(prefix: str, helpful_line: str, num_excerpts: int) -
 List the helpful excerpts here: {translation}""".strip()
 
     helpfulness_cases: list[dict[str, int | str | StopSentinel]] = [
-        dict(num_excerpts=4, helpful_line="None of the excerpts were helpful", translation="None"),
+        dict(
+            num_excerpts=4,
+            helpful_line="None of the excerpts were helpful",
+            translation="None",
+        ),
         dict(
             num_excerpts=4,
             helpful_line="Excerpt 3 was helpful. Excerpts 1, 2, and 4 were not helpful",
@@ -42,12 +48,14 @@ List the helpful excerpts here: {translation}""".strip()
         dict(
             num_excerpts=3,
             helpful_line="All of the excerpts were helpful.",
-            translation="1, 2, 3"
-        )
+            translation="1, 2, 3",
+        ),
     ]
     for example in helpfulness_cases:
         example["helpful_line"] = prefix + cast(str, example["helpful_line"])
-    helpfulness_cases.append(dict(num_excerpts=num_excerpts, helpful_line=helpful_line, translation=stop("")))
+    helpfulness_cases.append(
+        dict(num_excerpts=num_excerpts, helpful_line=helpful_line, translation=stop(""))
+    )
 
     filled = format_multi(TEMPLATE, helpfulness_cases)
     return "\n\n".join(filled)
@@ -88,7 +96,9 @@ def extract_helpful_line(reasoning: str) -> str | None:
 async def helpful_paragraphs(
     helpful_line: str, paragraphs: Sequence[str]
 ) -> Sequence[str]:
-    idxs = await _which_paras_were_helpful(HELPFULNESS_PREFIX, helpful_line, len(paragraphs))
+    idxs = await _which_paras_were_helpful(
+        HELPFULNESS_PREFIX, helpful_line, len(paragraphs)
+    )
     return [paragraphs[idx] for idx in idxs if idx < len(paragraphs)]
 
 
@@ -100,9 +110,7 @@ async def most_helpful_paragraphs(
     async def get_best_paras(
         passages_with_reasoning: Sequence[PassageWithReasoning],
     ):
-        helpful_lines = [
-            pwr.helpfulness for pwr in passages_with_reasoning
-        ]
+        helpful_lines = [pwr.helpfulness for pwr in passages_with_reasoning]
         helpful_lines_non_null = [
             (line, pwr)
             for line, pwr in zip(helpful_lines, passages_with_reasoning)
@@ -126,5 +134,6 @@ async def most_helpful_paragraphs(
         later_passages = later_passages[1:]
         best_paras = best_paras | set((await get_best_paras([next_para])))
     return [p for p in best_paras]
+
 
 recipe.main(most_helpful_paragraphs)

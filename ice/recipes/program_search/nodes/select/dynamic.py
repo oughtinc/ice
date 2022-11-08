@@ -1,13 +1,14 @@
-from typing import Generic, Sequence
-from ice.recipes.program_search.utils.find_examples import (
-    best_distractor,
-    mark_gs,
-    SelectionT_co,
-    rouge_distractor_scores,
-)
-from ice.recipes.program_search.types import Selection
-from ice.utils import window_dropping
+from collections.abc import Sequence
+from typing import Generic
+
 from pydantic.generics import GenericModel
+
+from ice.recipes.program_search.types import Selection
+from ice.recipes.program_search.utils.find_examples import best_distractor
+from ice.recipes.program_search.utils.find_examples import mark_gs
+from ice.recipes.program_search.utils.find_examples import rouge_distractor_scores
+from ice.recipes.program_search.utils.find_examples import SelectionT_co
+from ice.utils import window_dropping
 
 
 class SelectionExample(GenericModel, Generic[SelectionT_co]):
@@ -15,7 +16,6 @@ class SelectionExample(GenericModel, Generic[SelectionT_co]):
     existing: Sequence[str]
     positive_idxs: Sequence[int]
     distractor_score: float
-
 
 
 async def make_examples(
@@ -55,7 +55,7 @@ async def make_examples(
 
 
 def first_positive_example(
-    examples: Sequence[SelectionExample]
+    examples: Sequence[SelectionExample],
 ) -> SelectionExample | None:
     try:
         return next(

@@ -54,15 +54,13 @@ async def best_completion(
     prompts: list[str] = PROMPTS,
     completion: str = COMPLETION,
 ) -> list[tuple[str, float]]:
-    """Returns a sorted list of completions and their perplexities."""
+    """Returns a list of prompts and their perplexities."""
     perplexities = await map_async(
         input_list=prompts,
         fn=partial(completion_perplexity, completion=completion),
         max_concurrency=10,
     )
-    prompt_list = list(zip(prompts, perplexities))
-
-    return sorted(prompt_list, key=lambda x: x[1])
+    return list(zip(prompts, perplexities))
 
 
 recipe.main(best_completion)

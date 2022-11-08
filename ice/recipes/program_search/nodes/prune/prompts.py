@@ -1,9 +1,17 @@
 import math
-from typing import Mapping, Sequence, TypedDict, cast
+
+from collections.abc import Mapping
+from collections.abc import Sequence
+from typing import cast
+from typing import TypedDict
 
 import numpy as np
-from ice.formatter.transform.value import ValueTransform, numbered_list
-from ice.formatter.multi import StopSentinel, format_multi, stop
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
+from ice.formatter.multi import StopSentinel
+from ice.formatter.transform.value import numbered_list
+from ice.formatter.transform.value import ValueTransform
 
 EXAMPLES: list[dict[str, str | ValueTransform | StopSentinel]] = [
     dict(

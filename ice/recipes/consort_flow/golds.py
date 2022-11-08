@@ -1,34 +1,34 @@
 import itertools
-from typing import Callable, Literal, Sequence
-from fastapi import Path
 
-from pydantic import BaseModel
-from ice.cache import diskcache
-from ice.metrics.gold_standards import (
-    GoldStandard,
-    GoldStandardSplit,
-    get_gold_standard,
-    get_gold_standards,
-    retrieve_gold_standards_df,
-)
-from tqdm import tqdm
-from ice.paper import Paper
-from ice.recipes.consort_flow.types import ConsortFlow, SampleSize
-from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
-from ice.recipes.program_search.nodes.select.dynamic import (
-    SelectionExample,
-    best_negative_example,
-    first_positive_example,
-    make_examples,
-)
-from ice.recipes.program_search.nodes.select.prompts import (
-    RenderableSelectionExample,
-    render_selection_example,
-)
-from ice.recipes.program_search.types import Selection, sentences
+from collections.abc import Callable
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Literal
 
-from ice.utils import map_async, reduce_async
+from fastapi import Path
+from pydantic import BaseModel
+from tqdm import tqdm
+
+from ice.cache import diskcache
+from ice.metrics.gold_standards import get_gold_standard
+from ice.metrics.gold_standards import get_gold_standards
+from ice.metrics.gold_standards import GoldStandard
+from ice.metrics.gold_standards import GoldStandardSplit
+from ice.metrics.gold_standards import retrieve_gold_standards_df
+from ice.paper import Paper
+from ice.recipes.consort_flow.types import ConsortFlow
+from ice.recipes.consort_flow.types import SampleSize
+from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
+from ice.recipes.program_search.nodes.select.dynamic import best_negative_example
+from ice.recipes.program_search.nodes.select.dynamic import first_positive_example
+from ice.recipes.program_search.nodes.select.dynamic import make_examples
+from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
+from ice.recipes.program_search.nodes.select.prompts import render_selection_example
+from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
+from ice.recipes.program_search.types import Selection
+from ice.recipes.program_search.types import sentences
+from ice.utils import map_async
+from ice.utils import reduce_async
 
 
 def get_consort_gs(document_id: str) -> GoldStandard[ConsortFlow] | None:
@@ -101,11 +101,11 @@ async def gold_standard_examples_except(
     document_ids_to_exclude: Sequence[str],
     require_quotes: bool = True,
     limit: int | None = None,
-    decontextualize: bool = False
+    decontextualize: bool = False,
 ) -> Sequence[GoldStandardExample]:
     blocklist_ids = set(document_ids_to_exclude)
     papers = [p for p in download_papers() if p.document_id not in blocklist_ids]
-    papers = papers[:(limit or len(papers))]
+    papers = papers[: (limit or len(papers))]
     if decontextualize:
         papers = [(await paper_decontext(p)) for p in papers]
     gses = gold_standard_examples(papers)
@@ -155,9 +155,14 @@ def narrow_examples(
 
 
 async def selection_examples_for_paper(
-    paper: Paper, max_examples: int = 5, limit_papers: int | None = None, decontextualize: bool = False
+    paper: Paper,
+    max_examples: int = 5,
+    limit_papers: int | None = None,
+    decontextualize: bool = False,
 ) -> list[RenderableSelectionExample]:
-    golds = await gold_standard_examples_except([paper.document_id], limit=limit_papers, decontextualize=decontextualize)
+    golds = await gold_standard_examples_except(
+        [paper.document_id], limit=limit_papers, decontextualize=decontextualize
+    )
     examples = await select_examples(golds, n=5, step=5, max_existing=3)
     return [
         render_selection_example(question=question, example=example)

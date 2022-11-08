@@ -1,6 +1,16 @@
-from typing import NewType, Literal, Generic, TypeVar, Sequence, runtime_checkable, Protocol
-from pydantic import BaseModel, root_validator, validator
+from collections.abc import Sequence
+from typing import Generic
+from typing import Literal
+from typing import NewType
+from typing import Protocol
+from typing import runtime_checkable
+from typing import TypeVar
+
+from pydantic import BaseModel
+from pydantic import root_validator
+from pydantic import validator
 from pydantic.generics import GenericModel
+
 from ice.paper import Paragraph
 
 
@@ -59,7 +69,9 @@ class ExperimentsArms(BaseModel):
             return [Experiment.parse_obj(vals | dict(name=k)) for k, vals in v.items()]
         return v
 
+
 ReasoningStage = Literal["reasoning", "helpfulness", "answer"]
+
 
 class PassageWithReasoning(GenericModel, Generic[T]):
     passage: Sequence[str]
@@ -72,6 +84,9 @@ class PassageWithReasoning(GenericModel, Generic[T]):
 @runtime_checkable
 class MultipartReasoningPrompt(Protocol):
     def __call__(
-        self, paragraphs: Sequence[str], helpfulness: str | None = None, reasoning: str | None = None
+        self,
+        paragraphs: Sequence[str],
+        helpfulness: str | None = None,
+        reasoning: str | None = None,
     ) -> str:
         pass

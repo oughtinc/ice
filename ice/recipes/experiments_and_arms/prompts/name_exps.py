@@ -1,12 +1,20 @@
-from ice.formatter.multi import StopSentinel, stop, format_multi
-from ice.formatter.transform.value import ValueTransform, numbered_list
-from typing import Callable, Sequence, Sized
-from ice.formatter.transform.dependent import CountWord, DependentTransform, plural_transform
-from ice.formatter.transform.positional import OrdinalWord
-from ice.recipes.experiments_and_arms.num_utils import extract_nums
-from structlog.stdlib import get_logger
-from ice.recipes.experiments_and_arms.prompts.utils import get_part
+from collections.abc import Callable
+from collections.abc import Sequence
+from collections.abc import Sized
 
+from structlog.stdlib import get_logger
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
+from ice.formatter.multi import StopSentinel
+from ice.formatter.transform.dependent import CountWord
+from ice.formatter.transform.dependent import DependentTransform
+from ice.formatter.transform.dependent import plural_transform
+from ice.formatter.transform.positional import OrdinalWord
+from ice.formatter.transform.value import numbered_list
+from ice.formatter.transform.value import ValueTransform
+from ice.recipes.experiments_and_arms.num_utils import extract_nums
+from ice.recipes.experiments_and_arms.prompts.utils import get_part
 from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
 
 log = get_logger()
@@ -67,9 +75,15 @@ NAME_EXPERIMENTS_SHARED: dict[
         key="paragraphs", singular_case="", plural_case="s"
     ),
     experiments_count_word_or_just_one=CountWord("experiments_count", {1: "just one"}),
-    maybe_plural_experiments=plural_transform(key="experiments_count", singular_case="", plural_case="s"),
-    that_or_those=plural_transform(key="experiments_count", singular_case="that", plural_case="those"),
-    was_or_were=plural_transform(key="experiments_count", singular_case="was", plural_case="were"),
+    maybe_plural_experiments=plural_transform(
+        key="experiments_count", singular_case="", plural_case="s"
+    ),
+    that_or_those=plural_transform(
+        key="experiments_count", singular_case="that", plural_case="those"
+    ),
+    was_or_were=plural_transform(
+        key="experiments_count", singular_case="was", plural_case="were"
+    ),
     experiments_count_word=CountWord(key="experiments_count"),
 )
 
@@ -84,7 +98,9 @@ def count_from_answer(answer: str) -> int:
 NAME_EXPERIMENTS_REASONING_STOP = ("\n\nIn summary",)
 
 
-def make_name_exps_from_count(experiments_count: int) -> Callable[[int], MultipartReasoningPrompt]:
+def make_name_exps_from_count(
+    experiments_count: int,
+) -> Callable[[int], MultipartReasoningPrompt]:
     def make_name_experiments_prompt_func(num_shots: int) -> MultipartReasoningPrompt:
         def name_experiments_prompt(
             paragraphs: Sequence[str],
@@ -109,9 +125,9 @@ def make_name_exps_from_count(experiments_count: int) -> Callable[[int], Multipa
             return "\n\n".join([NAME_EXPERIMENTS_PREFACE] + list(shots))
 
         return name_experiments_prompt
+
     return make_name_experiments_prompt_func
 
 
 def get_name_exps_reasoning(response: str) -> str:
     return "".join(("Excerpt 1", get_part(response, ": ", "\nIn summary")))
-

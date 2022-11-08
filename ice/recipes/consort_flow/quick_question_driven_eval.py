@@ -1,6 +1,8 @@
 import math
-from ice.formatter.multi import format_multi, stop
+
 from ice.apis.openai import openai_complete
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
 
 EXAMPLES = [
     dict(

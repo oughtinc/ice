@@ -1,51 +1,45 @@
+from collections.abc import Awaitable
+from collections.abc import Callable
+from collections.abc import Iterable
+from collections.abc import Mapping
+from collections.abc import Sequence
 from curses import window
 from itertools import repeat
-from typing import (
-    Any,
-    Awaitable,
-    Callable,
-    Iterable,
-    Literal,
-    Mapping,
-    Sequence,
-    Protocol,
-)
-from ice.metrics.gold_standards import GoldStandard, ModelType
-from ice.recipe import Recipe, recipe
-from ice.recipes.consort_flow.golds import (
-    download_papers,
-    get_consort_gs,
-    selection_examples_for_paper,
-)
+from typing import Any
+from typing import Literal
+from typing import Protocol
+
+from ice.metrics.gold_standards import GoldStandard
+from ice.metrics.gold_standards import ModelType
+from ice.paper import Paper
+from ice.recipe import Recipe
+from ice.recipe import recipe
+from ice.recipes.consort_flow.golds import download_papers
+from ice.recipes.consort_flow.golds import get_consort_gs
+from ice.recipes.consort_flow.golds import selection_examples_for_paper
 from ice.recipes.consort_flow.quick_question_driven_eval import quick_eval
+from ice.recipes.consort_flow.types import ConsortFlow
+from ice.recipes.consort_flow.types import SampleSize
+from ice.recipes.experiments_and_arms.golds import get_ea_gs
 from ice.recipes.primer.paper_qa import answer_for_paper
 from ice.recipes.program_search.nodes.answer.answer import simple_answer
 from ice.recipes.program_search.nodes.augment_question.augment_question import (
     augment_question,
 )
 from ice.recipes.program_search.nodes.decontext.decontextualize import (
-    PaperDecontext,
     autoregressive_decontext,
-    local_decontext,
 )
+from ice.recipes.program_search.nodes.decontext.decontextualize import local_decontext
+from ice.recipes.program_search.nodes.decontext.decontextualize import PaperDecontext
 from ice.recipes.program_search.nodes.prune.prune import prune
-from ice.recipes.program_search.nodes.select.select import (
-    as_strings,
-    windowed_select,
-    select_metrics,
-    aggregate_select_metrics,
-)
-from ice.paper import Paper
-from ice.recipes.experiments_and_arms.golds import get_ea_gs
-from ice.recipes.program_search.types import (
-    Decontext,
-    Selection,
-    sentences,
-    text_to_selection,
-)
-from ice.recipes.consort_flow.types import ConsortFlow, SampleSize
-
-
+from ice.recipes.program_search.nodes.select.select import aggregate_select_metrics
+from ice.recipes.program_search.nodes.select.select import as_strings
+from ice.recipes.program_search.nodes.select.select import select_metrics
+from ice.recipes.program_search.nodes.select.select import windowed_select
+from ice.recipes.program_search.types import Decontext
+from ice.recipes.program_search.types import Selection
+from ice.recipes.program_search.types import sentences
+from ice.recipes.program_search.types import text_to_selection
 from ice.recipes.single_prompt import SinglePrompt
 from ice.utils import map_async
 
@@ -80,7 +74,9 @@ async def paper_qa_baseline(
 ) -> tuple[str, Mapping[str, int | float]]:
     all_paras = [str(p) for p in paper.paragraphs]
     answer, predicted_paras = await answer_for_paper(paper, question, top_n=1)
-    metrics = await select_metrics(all_paras, [p in predicted_paras for p in all_paras], gold or [])
+    metrics = await select_metrics(
+        all_paras, [p in predicted_paras for p in all_paras], gold or []
+    )
     return answer, metrics
 
 
@@ -97,12 +93,15 @@ async def eval_method(
     # TODO: make configurable
     papers = download_papers(split)[:5]
 
-    async def run_eval(input_data: tuple[Paper, str, str, Sequence[str]]) -> tuple[bool, Mapping]:
+    async def run_eval(
+        input_data: tuple[Paper, str, str, Sequence[str]]
+    ) -> tuple[bool, Mapping]:
         paper, question, gold_answer, gold_support = input_data
         generated, metrics = await method(paper, question, gold_support)
-        return await quick_eval(
-            question=question, gold=gold_answer, generated=generated
-        ), metrics
+        return (
+            await quick_eval(question=question, gold=gold_answer, generated=generated),
+            metrics,
+        )
 
     eval_data = []
     gold_supports: list[Sequence[str]] = []
@@ -123,7 +122,6 @@ async def eval_method(
     metrics_under_support = [m for m, gs in zip(metrics, gold_supports) if gs]
     aggregated_metrics = metrics_aggregator(metrics_under_support)
 
-
     return sum(scores) / len(scores), scores, aggregated_metrics
 
 
@@ -142,13 +140,20 @@ def allocated_questions_and_answers(
                 if isinstance(arm.allocated, str)
                 else arm.allocated.n or "Unknown"
             )
-            support = arm.allocated.quotes if arm.allocated and isinstance(arm.allocated, SampleSize) else []
+            support = (
+                arm.allocated.quotes
+                if arm.allocated and isinstance(arm.allocated, SampleSize)
+                else []
+            )
             yield question, str(answer), support
 
 
 async def eval_paper_qa_baseline():
     return await eval_method(
-        paper_qa_baseline, aggregate_select_metrics, allocated_questions_and_answers, split="validation"
+        paper_qa_baseline,
+        aggregate_select_metrics,
+        allocated_questions_and_answers,
+        split="validation",
     )
 
 
@@ -163,7 +168,10 @@ async def eval_decontext_and_select():
 
 async def eval_not_mentioned_baseline():
     return await eval_method(
-        not_mentioned, aggregate_select_metrics, allocated_questions_and_answers, split="validation"
+        not_mentioned,
+        aggregate_select_metrics,
+        allocated_questions_and_answers,
+        split="validation",
     )
 
 
@@ -268,7 +276,9 @@ class DecontextAndSelect(Recipe):
             # answer = await self.decontext_prune_and_select(
             #     paper=paper, question=question
             # )
-            answer, metrics = await self.decontext_and_select(paper=paper, question=question)
+            answer, metrics = await self.decontext_and_select(
+                paper=paper, question=question
+            )
 
             decomp_correct = await quick_eval(
                 question=question,

@@ -1,14 +1,18 @@
+from collections.abc import Mapping
+from collections.abc import Sequence
 from itertools import cycle
-from ice.formatter.multi import format_multi, stop, StopSentinel
-from ice.formatter.transform.value import ValueTransform, numbered_list
-from typing import Literal, Mapping, Sequence, TypedDict
+from typing import Literal
+from typing import TypedDict
 
-from ice.recipes.program_search.nodes.select.dynamic import (
-    SelectionExample,
-    best_negative_example,
-    first_positive_example,
-    make_examples,
-)
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
+from ice.formatter.multi import StopSentinel
+from ice.formatter.transform.value import numbered_list
+from ice.formatter.transform.value import ValueTransform
+from ice.recipes.program_search.nodes.select.dynamic import best_negative_example
+from ice.recipes.program_search.nodes.select.dynamic import first_positive_example
+from ice.recipes.program_search.nodes.select.dynamic import make_examples
+from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
 from ice.recipes.program_search.types import Selection
 
 NONE_ANSWER = "None of the new excerpts are needed to answer the question."
@@ -106,6 +110,7 @@ class RenderableSelectionExample(TypedDict):
 
 NO_EXISTING = "(no excerpts selected so far)"
 
+
 def render_selection_example(
     question: str, example: SelectionExample
 ) -> RenderableSelectionExample:
@@ -113,7 +118,9 @@ def render_selection_example(
         question=question,
         existing=numbered_list(example.existing) if example.existing else NO_EXISTING,
         texts=numbered_list([str(text) for text in example.selection]),
-        selections=NONE_ANSWER if not example.positive_idxs else str(example.positive_idxs[0] + 1),
+        selections=NONE_ANSWER
+        if not example.positive_idxs
+        else str(example.positive_idxs[0] + 1),
         NONE_ANSWER=NONE_ANSWER,
     )
 
@@ -171,7 +178,7 @@ def make_selection_prompt(
             existing=numbered_list(existing) if existing else NO_EXISTING,
             texts=numbered_list(texts),
             selections=stop("None"),
-            NONE_ANSWER=NONE_ANSWER
+            NONE_ANSWER=NONE_ANSWER,
         )
     ]
     filled_examples = format_multi(EXAMPLE_TEMPLATE, all_examples)  # type: ignore[arg-type]

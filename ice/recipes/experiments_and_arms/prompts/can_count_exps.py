@@ -1,12 +1,16 @@
-from typing import Sequence
+from collections.abc import Sequence
+
 from typing_extensions import assert_never
-from ice.formatter.transform.value import ValueTransform, numbered_list
-from ice.formatter.multi import StopSentinel, stop, format_multi
-from ice.recipes.experiments_and_arms.prompts.utils import get_part, start_last_example
-from ice.recipes.experiments_and_arms.types import (
-    MultipartReasoningPrompt,
-    ReasoningStage,
-)
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
+from ice.formatter.multi import StopSentinel
+from ice.formatter.transform.value import numbered_list
+from ice.formatter.transform.value import ValueTransform
+from ice.recipes.experiments_and_arms.prompts.utils import get_part
+from ice.recipes.experiments_and_arms.prompts.utils import start_last_example
+from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
+from ice.recipes.experiments_and_arms.types import ReasoningStage
 
 CAN_WE_COUNT_EXPERIMENTS_EXAMPLE_TEMPLATE = """Do the following excerpts explain the methodology of the paper, including how many experiments were conducted, and what the trial arms in each experiment were? If the passages merely discuss multiple interventions but do not specify that they belong to distinct experiments, answer "Unclear".
 
@@ -73,6 +77,7 @@ def make_can_we_count_experiments_prompt(num_shots: int) -> MultipartReasoningPr
             )
         )
         return prompt
+
     return can_we_count_experiments_prompt
 
 
@@ -85,7 +90,9 @@ def get_helpfulness(response: str):
 
 
 def get_reasoning(response: str):
-    return "".join(("Excerpt 1 ", get_part(response, "Let's think it over:", "\nWhich excerpt")))
+    return "".join(
+        ("Excerpt 1 ", get_part(response, "Let's think it over:", "\nWhich excerpt"))
+    )
 
 
 CAN_WE_COUNT_EXPERIMENTS_CHOICES = [" Yes", " No", " Unclear"]

@@ -1,7 +1,6 @@
-
-
 from dataclasses import dataclass
 from typing import Protocol
+
 
 @dataclass
 class Example:
@@ -11,5 +10,7 @@ class Example:
 
 
 class Compress(Protocol):
-    async def __call__(self, question: str | None, texts: list[str], examples: list[Example]) -> list[str]:
+    async def __call__(
+        self, question: str | None, texts: list[str], examples: list[Example]
+    ) -> list[str]:
         pass

@@ -1,12 +1,18 @@
-from ice.formatter.multi import StopSentinel, stop, format_multi
-from ice.formatter.transform.value import ValueTransform, numbered_list
-from typing import Sequence, Sized
-from ice.formatter.transform.dependent import DependentTransform, plural_transform
-from ice.formatter.transform.positional import OrdinalWord
-from ice.recipes.experiments_and_arms.num_utils import extract_nums
-from structlog.stdlib import get_logger
-from ice.recipes.experiments_and_arms.prompts.utils import get_part
+from collections.abc import Sequence
+from collections.abc import Sized
 
+from structlog.stdlib import get_logger
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
+from ice.formatter.multi import StopSentinel
+from ice.formatter.transform.dependent import DependentTransform
+from ice.formatter.transform.dependent import plural_transform
+from ice.formatter.transform.positional import OrdinalWord
+from ice.formatter.transform.value import numbered_list
+from ice.formatter.transform.value import ValueTransform
+from ice.recipes.experiments_and_arms.num_utils import extract_nums
+from ice.recipes.experiments_and_arms.prompts.utils import get_part
 from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
 
 log = get_logger()
@@ -93,8 +99,11 @@ def make_count_experiments_prompt_func(num_shots: int) -> MultipartReasoningProm
             COUNT_EXPERIMENTS_SHARED,
         )
         return "\n\n".join([COUNT_EXPERIMENTS_PREFACE] + list(shots))
+
     return count_experiments_prompt
 
-def get_count_exps_reasoning(response: str) -> str:
-    return "".join(("Excerpt 1 ", get_part(response, "RCTs): ", "\nHere's all the information")))
 
+def get_count_exps_reasoning(response: str) -> str:
+    return "".join(
+        ("Excerpt 1 ", get_part(response, "RCTs): ", "\nHere's all the information"))
+    )

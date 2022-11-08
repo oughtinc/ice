@@ -1,22 +1,37 @@
-from typing import Sequence, TypeVar, cast
+from collections.abc import Sequence
+from typing import cast
+from typing import TypeVar
+
 from ice.apis.openai import openai_complete
-from ice.formatter.transform.dependent import CountWord, plural_transform
+from ice.formatter.transform.dependent import CountWord
+from ice.formatter.transform.dependent import plural_transform
 from ice.formatter.transform.value import numbered_list
 from ice.paper import Paper
+from ice.recipe import Recipe
+from ice.recipe import recipe
 from ice.recipes.experiments_and_arms.golds import get_ea_gs
+from ice.recipes.experiments_and_arms.num_utils import strip_enumeration_prefix
 from ice.recipes.experiments_and_arms.prompts.can_name_arms import (
     CAN_WE_NAME_ARMS_BEST_CHOICE,
+)
+from ice.recipes.experiments_and_arms.prompts.can_name_arms import (
     CAN_WE_NAME_ARMS_CHOICES,
+)
+from ice.recipes.experiments_and_arms.prompts.can_name_arms import (
     CAN_WE_NAME_ARMS_REASONING_STOP,
+)
+from ice.recipes.experiments_and_arms.prompts.can_name_arms import (
     get_can_we_name_arms_helpfulness,
+)
+from ice.recipes.experiments_and_arms.prompts.can_name_arms import (
     get_can_we_name_arms_reasoning,
+)
+from ice.recipes.experiments_and_arms.prompts.can_name_arms import (
     make_can_we_name_arms_prompt,
 )
-from ice.recipes.experiments_and_arms.prompts.name_arms import (
-    NAME_ARMS_REASONING_STOP,
-    get_name_arms_reasoning,
-    make_name_arms_from_exps,
-)
+from ice.recipes.experiments_and_arms.prompts.name_arms import get_name_arms_reasoning
+from ice.recipes.experiments_and_arms.prompts.name_arms import make_name_arms_from_exps
+from ice.recipes.experiments_and_arms.prompts.name_arms import NAME_ARMS_REASONING_STOP
 from ice.recipes.experiments_and_arms.prompts.passages_to_keep import (
     most_helpful_paragraphs,
 )
@@ -28,10 +43,10 @@ from ice.recipes.experiments_and_arms.recipes.count_experiments import count_exp
 from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
     sample_reason_select_and_answer,
 )
-from ice.recipe import Recipe, recipe
 from ice.recipes.experiments_and_arms.types import PassageWithReasoning
-from ice.trace import Recorder, recorder, trace
-from ice.recipes.experiments_and_arms.num_utils import strip_enumeration_prefix
+from ice.trace import Recorder
+from ice.trace import recorder
+from ice.trace import trace
 
 
 def make_reduce_to_best_answer(experiment_in_question: str):

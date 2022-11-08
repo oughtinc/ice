@@ -3,6 +3,7 @@ import re
 from typing import Optional
 
 from structlog import get_logger
+
 from ice.apis.openai import openai_complete
 
 
@@ -14,7 +15,6 @@ NA_PHRASE = "not mentioned in the excerpt"
 # Instruct sometimes says "mentioned in the excerpt"
 # That's not a useful output, so we want to consider it a non-answer
 NA_MATCH_PHRASE = "mentioned in the excerpt"
-
 
 
 async def answer_like_elicit_qa(
@@ -43,7 +43,6 @@ async def answer_like_elicit_qa(
     return answer
 
 
-
 def _excerpt_prompt(
     *,
     qa_question: str,
@@ -67,15 +66,15 @@ Make sure everything you say is supported by the excerpt. \
 The excerpt may cite other papers; \
 answer about the paper you're reading the excerpt from, not the papers that it cites. \
 Answer in one phrase or sentence:
+
 Paper excerpt: {excerpt}
+
 Question: {qa_question}
+
 {full_answer_prefix}"""
 
 
-
-def _process_instruct_answer(
-    text: str
-) -> Optional[str]:
+def _process_instruct_answer(text: str) -> Optional[str]:
     text = text.strip()
     if re.search(NA_MATCH_PHRASE, text, re.IGNORECASE):
         return None
@@ -83,4 +82,3 @@ def _process_instruct_answer(
     text = re.sub(r"^the |^that |^is |\.$", "", text)
 
     return text
-

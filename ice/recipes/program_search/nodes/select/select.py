@@ -1,21 +1,29 @@
-from typing import Mapping, Protocol, Sequence, cast
-from typing_extensions import reveal_type
-from ice.apis.openai import TooLongRequestError, openai_complete
-from ice.paper import Paper
-from ice.recipe import Recipe, recipe
-from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
-from ice.recipes.program_search.utils.find_examples import matches
-from ice.utils import reduce_async, window_dropping
-from structlog.stdlib import get_logger
-from ice.recipes.program_search.nodes.prune.prune import prune
+from collections.abc import Mapping
+from collections.abc import Sequence
+from typing import cast
+from typing import Protocol
+
 import numpy as np
 
-from ice.recipes.program_search.nodes.select.prompts import (
-    RenderableSelectionExample,
-    get_selections,
-    make_selection_prompt,
-    render_selection_example,
-)
+from structlog.stdlib import get_logger
+from typing_extensions import reveal_type
+
+from ice.apis.openai import openai_complete
+from ice.apis.openai import TooLongRequestError
+from ice.paper import Paper
+from ice.recipe import Recipe
+from ice.recipe import recipe
+from ice.recipes.best_completion import best_completion
+from ice.recipes.consort_flow import baseline_elicit_answer
+from ice.recipes.program_search.nodes.prune.prune import prune
+from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
+from ice.recipes.program_search.nodes.select.prompts import get_selections
+from ice.recipes.program_search.nodes.select.prompts import make_selection_prompt
+from ice.recipes.program_search.nodes.select.prompts import render_selection_example
+from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
+from ice.recipes.program_search.utils.find_examples import matches
+from ice.utils import reduce_async
+from ice.utils import window_dropping
 
 log = get_logger()
 
@@ -92,7 +100,10 @@ async def maybe_binary_prune(question: str, existing: list[str], max_to_keep=8):
 
 
 async def select_reduce(
-    question: str, texts: Sequence[Sequence[str]], do_prune: bool = False, examples: list[RenderableSelectionExample] | None = None
+    question: str,
+    texts: Sequence[Sequence[str]],
+    do_prune: bool = False,
+    examples: list[RenderableSelectionExample] | None = None,
 ) -> Sequence[str]:
     """Select texts that answer the question by reducing over `select`
 
@@ -122,7 +133,11 @@ async def select_reduce(
 
 
 async def windowed_select(
-    question: str, texts: Sequence[str], n: int, step: int, examples: list[RenderableSelectionExample] | None = None
+    question: str,
+    texts: Sequence[str],
+    n: int,
+    step: int,
+    examples: list[RenderableSelectionExample] | None = None,
 ) -> Sequence[bool]:
     """Select texts that answer the question via
 
@@ -136,11 +151,19 @@ async def windowed_select(
         Sequence[str]: Selected texts.
     """
     windowed_texts = window_dropping(texts, n, step)
-    selections = set(await select_reduce(question, windowed_texts, do_prune=True, examples=examples))
+    selections = set(
+        await select_reduce(question, windowed_texts, do_prune=True, examples=examples)
+    )
     return [t in selections for t in texts]
+
 
 async def windowed_select_using_elicit_prompt(
-    question: str, texts: Sequence[str], n: int, step: int, examples: list[RenderableSelectionExample] | None = None, perplexity_threshold: float = 0.0
+    question: str,
+    texts: Sequence[str],
+    n: int,
+    step: int,
+    examples: list[RenderableSelectionExample] | None = None,
+    perplexity_threshold: float = 3.0,
 ) -> Sequence[bool]:
     """Select texts that answer the question via
 
@@ -154,14 +177,39 @@ async def windowed_select_using_elicit_prompt(
         Sequence[str]: Selected texts.
     """
     windowed_texts = window_dropping(texts, n, step)
-    selections = set(await select_reduce(question, windowed_texts, do_prune=True, examples=examples))
-    return [t in selections for t in texts]
+    selections = set(
+        await select_reduce(question, windowed_texts, do_prune=True, examples=examples)
+    )
+
+    prompts = [
+        baseline_elicit_answer._excerpt_prompt(
+            qa_question=question,
+            excerpt=text,
+            answer_prefix="",
+        )
+        for text in texts
+    ]
+
+    completion = " " + baseline_elicit_answer.NA_PHRASE
+
+    prompt_perplexities = await best_completion(
+        prompts=prompts,
+        completion=completion,
+    )
+
+    return [
+        perplexity < perplexity_threshold in selections
+        for _, perplexity in prompt_perplexities
+    ]
+
 
 def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str]:
     return [t for t, s in zip(texts, selections) if s]
 
 
-async def select_metrics(texts: Sequence[str], selections: Sequence[bool], golds: Sequence[str]):
+async def select_metrics(
+    texts: Sequence[str], selections: Sequence[bool], golds: Sequence[str]
+):
     # TODO: better typing
     assert len(texts) == len(selections)
     ground_truth = await label_texts(texts, golds)
@@ -176,11 +224,13 @@ async def select_metrics(texts: Sequence[str], selections: Sequence[bool], golds
     f1 = 2 * (precision * recall) / (precision + recall) if precision or recall else 0
     return dict(tp=tp, tn=tn, fn=fn, fp=fp, recall=recall, precision=precision, f1=f1)
 
+
 def aggregate_select_metrics(metrics: Sequence[Mapping]) -> Mapping:
     # TODO: better typing
     def agg(key: str) -> int:
         values = [m[key] for m in metrics if key in m]
         return sum(values) if values else 0
+
     tp, tn, fn, fp = map(agg, ("tp", "tn", "fn", "fp"))
     recall = tp / (tp + fn) if tp or fn else 0
     precision = tp / (tp + fp) if tp or fp else 0
@@ -188,13 +238,12 @@ def aggregate_select_metrics(metrics: Sequence[Mapping]) -> Mapping:
     return dict(tp=tp, tn=tn, fp=tp, fn=fn, recall=recall, precision=precision, f1=f1)
 
 
-
-
-
 async def label_texts(texts: Sequence[str], golds: Sequence[str]) -> Mapping[str, bool]:
     gs_labeled = {text: False for text in texts}
     for gold in golds:
-        gs_matches = await matches(hypotheses=texts, references=[gold], lcs_threshold=0.7)
+        gs_matches = await matches(
+            hypotheses=texts, references=[gold], lcs_threshold=0.7
+        )
         for match in gs_matches:
             gs_labeled[match] = True
     return gs_labeled

@@ -11,7 +11,8 @@ from tenacity.wait import wait_random_exponential
 
 from ice.cache import diskcache
 from ice.settings import settings
-from ice.trace import trace, recorder
+from ice.trace import recorder
+from ice.trace import trace
 
 log = get_logger()
 
@@ -96,7 +97,9 @@ def raise_if_too_long_error(prompt: object, response: Response) -> None:
     wait=wait_random_exponential(min=1),
     after=log_attempt_number,
 )
-async def _post(endpoint: str, json: dict, timeout: float | None = None, cache_id: int = 0) -> dict:
+async def _post(
+    endpoint: str, json: dict, timeout: float | None = None, cache_id: int = 0
+) -> dict:
     """Send a POST request to the OpenAI API and return the JSON response."""
     cache_id  # unused
 
@@ -116,8 +119,10 @@ async def _post(endpoint: str, json: dict, timeout: float | None = None, cache_i
 
 # TODO: support more model types for conversion
 
+
 def get_davinci_equivalent_tokens(response: dict) -> int:
     return (response.get("usage") or dict()).get("total_tokens", 0)
+
 
 @trace
 async def openai_complete(
@@ -148,9 +153,7 @@ async def openai_complete(
             "n": n,
             "echo": echo,
         },
-        cache_id=cache_id
+        cache_id=cache_id,
     )
     record(davinci_equivalent_tokens=get_davinci_equivalent_tokens(response))
     return response
-
-

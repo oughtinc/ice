@@ -1,8 +1,15 @@
-from ice.formatter.multi import format_multi, stop, StopSentinel
-from ice.formatter.transform.value import ValueTransform, numbered_list
-from typing import Sequence, TypedDict
-from structlog.stdlib import get_logger
 import re
+
+from collections.abc import Sequence
+from typing import TypedDict
+
+from structlog.stdlib import get_logger
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
+from ice.formatter.multi import StopSentinel
+from ice.formatter.transform.value import numbered_list
+from ice.formatter.transform.value import ValueTransform
 
 log = get_logger()
 
@@ -119,5 +126,9 @@ def get_new_questions(completion: str) -> tuple[str, Sequence[str]]:
         return questions[num - 1], questions
     except ValueError:
         log.warning("Unexpected response", completion=completion)
-        questions = [strip_enumeration_prefix(line) for line in remaining_part.split("\n") if line and line[0].isnumeric()]
+        questions = [
+            strip_enumeration_prefix(line)
+            for line in remaining_part.split("\n")
+            if line and line[0].isnumeric()
+        ]
         return questions[0], questions
