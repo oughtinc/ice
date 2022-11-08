@@ -146,6 +146,7 @@ async def openai_complete(
             "max_tokens": max_tokens,
             "logprobs": logprobs,
             "n": n,
+            "echo": echo,
         },
         cache_id=cache_id
     )
