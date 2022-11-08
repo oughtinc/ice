@@ -9,6 +9,7 @@ from collections.abc import Callable
 from collections.abc import Coroutine
 from collections.abc import Iterable
 from collections.abc import Sequence
+from functools import cache
 from random import Random
 from typing import Any
 from typing import Generic
@@ -19,7 +20,6 @@ import tqdm
 
 from structlog.stdlib import get_logger
 from transformers import GPT2TokenizerFast
-from functools import cache
 
 log = get_logger()
 
