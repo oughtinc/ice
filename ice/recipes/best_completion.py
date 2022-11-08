@@ -26,8 +26,8 @@ async def completion_perplexity(
 ) -> float:
     log.info("completion_perplexity", prompt=prompt, completion=completion)
     """Calculate the perplexity of a completion given a prompt."""
-    if not completion[0] == " ":
-        log.warning("Completion does not start with a space!", completion=completion)
+    if not completion[0].isspace():
+        log.warning("Completion does not start with whitespace!", completion=completion)
     response = await openai_complete(
         prompt=prompt + completion,
         max_tokens=0,
