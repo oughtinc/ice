@@ -176,10 +176,6 @@ async def windowed_select_using_elicit_prompt(
     Returns:
         Sequence[str]: Selected texts.
     """
-    windowed_texts = window_dropping(texts, n, step)
-    selections = set(
-        await select_reduce(question, windowed_texts, do_prune=True, examples=examples)
-    )
 
     prompts = [
         baseline_elicit_answer._excerpt_prompt(
@@ -197,10 +193,11 @@ async def windowed_select_using_elicit_prompt(
         completion=completion,
     )
 
-    return [
-        perplexity < perplexity_threshold in selections
-        for _, perplexity in prompt_perplexities
-    ]
+    return [perplexity < perplexity_threshold for _, perplexity in prompt_perplexities]
+
+# Few-shot prompt
+
+SELECTION_PROMPT = """"""
 
 
 def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str]:
