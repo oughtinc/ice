@@ -101,6 +101,7 @@ def function_recipe_from_path(path: str) -> FunctionBasedRecipe:
     file_path, _, recipe = path.partition(":")
     module_name = file_path.replace("/", ".").replace(".py", "")
     spec = importlib.util.spec_from_file_location(module_name, file_path)
+    assert spec
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return vars(module)[recipe]
