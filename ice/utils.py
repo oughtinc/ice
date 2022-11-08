@@ -9,6 +9,7 @@ from collections.abc import Callable
 from collections.abc import Coroutine
 from collections.abc import Iterable
 from collections.abc import Sequence
+from functools import cache
 from random import Random
 from typing import Any
 from typing import Generic
@@ -18,6 +19,7 @@ import anyio
 import tqdm
 
 from structlog.stdlib import get_logger
+from transformers import GPT2TokenizerFast
 
 log = get_logger()
 
@@ -309,3 +311,12 @@ def max_by_value(
     d: dict[K, V], *, key: Callable[[V], Any] = lambda x: x
 ) -> tuple[K, V]:
     return max(d.items(), key=lambda x: key(x[1]))
+
+
+@cache
+def make_gpt2_tokenizer() -> GPT2TokenizerFast:
+    return GPT2TokenizerFast.from_pretrained("gpt2")
+
+
+def n_tokens(text: str) -> int:
+    return len(make_gpt2_tokenizer().tokenize(text))
