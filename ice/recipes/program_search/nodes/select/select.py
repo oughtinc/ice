@@ -139,6 +139,24 @@ async def windowed_select(
     selections = set(await select_reduce(question, windowed_texts, do_prune=True, examples=examples))
     return [t in selections for t in texts]
 
+async def windowed_select_using_elicit_prompt(
+    question: str, texts: Sequence[str], n: int, step: int, examples: list[RenderableSelectionExample] | None = None, perplexity_threshold: float = 0.0
+) -> Sequence[bool]:
+    """Select texts that answer the question via
+
+    Args:
+        question (str): The question to select texts for.
+        texts (Sequence[str]): Texts to consider for selection.
+        n (int): Number of texts to consider at each step.
+        step (int): Overlap between windows. (if n == step, partition the document; if step < n, window with step size).
+
+    Returns:
+        Sequence[str]: Selected texts.
+    """
+    windowed_texts = window_dropping(texts, n, step)
+    selections = set(await select_reduce(question, windowed_texts, do_prune=True, examples=examples))
+    return [t in selections for t in texts]
+
 def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str]:
     return [t for t, s in zip(texts, selections) if s]
 
