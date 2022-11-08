@@ -19,6 +19,7 @@ import tqdm
 
 from structlog.stdlib import get_logger
 from transformers import GPT2TokenizerFast
+from functools import cache
 
 log = get_logger()
 
