@@ -204,46 +204,8 @@ def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str
     return [t for t, s in zip(texts, selections) if s]
 
 
-async def select_metrics(
-    texts: Sequence[str], selections: Sequence[bool], golds: Sequence[str]
-):
-    # TODO: better typing
-    assert len(texts) == len(selections)
-    ground_truth = await label_texts(texts, golds)
-    gt_array = np.array(ground_truth.values(), dtype=bool)
-    label_array = np.array(selections, dtype=bool)
-    tp = (gt_array & label_array).sum()
-    tn = (~gt_array & ~label_array).sum()
-    fn = (gt_array & ~label_array).sum()
-    fp = (~gt_array & label_array).sum()
-    recall = tp / (tp + fn) if tp or fn else 0
-    precision = tp / (tp + fp) if tp or fp else 0
-    f1 = 2 * (precision * recall) / (precision + recall) if precision or recall else 0
-    return dict(tp=tp, tn=tn, fn=fn, fp=fp, recall=recall, precision=precision, f1=f1)
 
 
-def aggregate_select_metrics(metrics: Sequence[Mapping]) -> Mapping:
-    # TODO: better typing
-    def agg(key: str) -> int:
-        values = [m[key] for m in metrics if key in m]
-        return sum(values) if values else 0
-
-    tp, tn, fn, fp = map(agg, ("tp", "tn", "fn", "fp"))
-    recall = tp / (tp + fn) if tp or fn else 0
-    precision = tp / (tp + fp) if tp or fp else 0
-    f1 = 2 * (precision * recall) / (precision + recall) if precision or recall else 0
-    return dict(tp=tp, tn=tn, fp=tp, fn=fn, recall=recall, precision=precision, f1=f1)
-
-
-async def label_texts(texts: Sequence[str], golds: Sequence[str]) -> Mapping[str, bool]:
-    gs_labeled = {text: False for text in texts}
-    for gold in golds:
-        gs_matches = await matches(
-            hypotheses=texts, references=[gold], lcs_threshold=0.7
-        )
-        for match in gs_matches:
-            gs_labeled[match] = True
-    return gs_labeled
 
 
 # Meta-methods

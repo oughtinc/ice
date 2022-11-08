@@ -243,7 +243,7 @@ async def reason_select_and_answer(
                 raise e
 
 
-async def sample_reason_select_and_answer(
+async def answer_with_best_reasoning(
     num_samples: int,
     selector: Callable[[Sequence[PassageWithReasoning[T1]]], Awaitable[T2]],
     texts: Sequence[str],
@@ -297,4 +297,4 @@ async def sample_reason_select_and_answer(
     return await selector(answers)
 
 
-recipe.main(sample_reason_select_and_answer)
+recipe.main(answer_with_best_reasoning)

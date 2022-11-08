@@ -5,22 +5,26 @@ from collections.abc import Mapping
 from collections.abc import Sequence
 from curses import window
 from itertools import repeat
-from typing import Any
-from typing import Literal
-from typing import Protocol
-
-from ice.metrics.gold_standards import GoldStandard
-from ice.metrics.gold_standards import ModelType
-from ice.paper import Paper
-from ice.recipe import Recipe
-from ice.recipe import recipe
-from ice.recipes.consort_flow.golds import download_papers
-from ice.recipes.consort_flow.golds import get_consort_gs
-from ice.recipes.consort_flow.golds import selection_examples_for_paper
-from ice.recipes.consort_flow.quick_question_driven_eval import quick_eval
-from ice.recipes.consort_flow.types import ConsortFlow
-from ice.recipes.consort_flow.types import SampleSize
-from ice.recipes.experiments_and_arms.golds import get_ea_gs
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Iterable,
+    Literal,
+    Mapping,
+    Sequence,
+    Protocol,
+)
+from ice.formatter.transform.value import numbered_list
+from ice.metrics.gold_standards import GoldStandard, ModelType
+from ice.recipe import Recipe, recipe
+from ice.recipes.consort_flow.golds import (
+    download_papers,
+    get_consort_gs,
+    selection_examples_for_paper,
+)
+from ice.recipes.meta.eval_paper_qa.quick_question_driven_eval import quick_eval
+from ice.recipes.experiments_and_arms.recipes.name_experiments import name_experiments
 from ice.recipes.primer.paper_qa import answer_for_paper
 from ice.recipes.program_search.nodes.answer.answer import simple_answer
 from ice.recipes.program_search.nodes.augment_question.augment_question import (
@@ -32,14 +36,22 @@ from ice.recipes.program_search.nodes.decontext.decontextualize import (
 from ice.recipes.program_search.nodes.decontext.decontextualize import local_decontext
 from ice.recipes.program_search.nodes.decontext.decontextualize import PaperDecontext
 from ice.recipes.program_search.nodes.prune.prune import prune
-from ice.recipes.program_search.nodes.select.select import aggregate_select_metrics
-from ice.recipes.program_search.nodes.select.select import as_strings
-from ice.recipes.program_search.nodes.select.select import select_metrics
-from ice.recipes.program_search.nodes.select.select import windowed_select
-from ice.recipes.program_search.types import Decontext
-from ice.recipes.program_search.types import Selection
-from ice.recipes.program_search.types import sentences
-from ice.recipes.program_search.types import text_to_selection
+from ice.recipes.program_search.nodes.select.select import (
+    as_strings,
+    windowed_select,
+)
+from ice.paper import Paper
+from ice.recipes.experiments_and_arms.golds import get_ea_gs
+from ice.recipes.program_search.types import (
+    Decontext,
+    Selection,
+    sentences,
+    text_to_selection,
+)
+from ice.recipes.experiments_and_arms.golds import ExperimentsArms
+from ice.recipes.consort_flow.types import ConsortFlow, SampleSize
+
+
 from ice.recipes.single_prompt import SinglePrompt
 from ice.utils import map_async
 
@@ -53,15 +65,6 @@ AI_PROMPT: str = "\nAssistant:"
 HUMAN_PROMPT: str = "\nHuman:"
 
 
-class PaperQaMethod(Protocol):
-    async def __call__(
-        self,
-        __paper: Paper,
-        __question: str,
-        __gold_support: Sequence[str] | None = None,
-    ) -> tuple[str, Mapping[str, int | float]]:
-        ...
-
 
 async def not_mentioned(
     paper: Paper, question: str, gold: Sequence[str] | None = None
@@ -69,61 +72,10 @@ async def not_mentioned(
     return "Not mentioned", {}
 
 
-async def paper_qa_baseline(
-    paper: Paper, question, gold: Sequence[str] | None = None
-) -> tuple[str, Mapping[str, int | float]]:
-    all_paras = [str(p) for p in paper.paragraphs]
-    answer, predicted_paras = await answer_for_paper(paper, question, top_n=1)
-    metrics = await select_metrics(
-        all_paras, [p in predicted_paras for p in all_paras], gold or []
-    )
-    return answer, metrics
 
 
-async def eval_method(
-    method: PaperQaMethod,
-    metrics_aggregator: Callable[[Sequence[Mapping]], Mapping],
-    question_and_answer_func: Callable[
-        [GoldStandard[ConsortFlow]], Iterable[tuple[str, str, Sequence[str]]]
-    ],
-    split: str,
-    max_concurrency: int = 10,
-):
 
-    # TODO: make configurable
-    papers = download_papers(split)[:5]
-
-    async def run_eval(
-        input_data: tuple[Paper, str, str, Sequence[str]]
-    ) -> tuple[bool, Mapping]:
-        paper, question, gold_answer, gold_support = input_data
-        generated, metrics = await method(paper, question, gold_support)
-        return (
-            await quick_eval(question=question, gold=gold_answer, generated=generated),
-            metrics,
-        )
-
-    eval_data = []
-    gold_supports: list[Sequence[str]] = []
-
-    for paper in papers:
-        gold = get_consort_gs(paper.document_id)
-        if not gold:
-            continue
-        for question, gold_answer, gold_support in question_and_answer_func(gold):
-            eval_data.append((paper, question, gold_answer, gold_support))
-            gold_supports.append(gold_support)
-
-    results = await map_async(eval_data, run_eval, max_concurrency=max_concurrency)
-    scores = [r[0] for r in results]
-    metrics = [r[1] for r in results]
-
-    # only aggregate where there is gold support (somewhat arbitrary choice but more informative)
-    metrics_under_support = [m for m, gs in zip(metrics, gold_supports) if gs]
-    aggregated_metrics = metrics_aggregator(metrics_under_support)
-
-    return sum(scores) / len(scores), scores, aggregated_metrics
-
+EXTRA_SPECIFICATION = "Make sure you are answering specifically for this experiment and this arm, and for the initial alllocation of the sample. If the initial allocation for this experiment and this arm is not mentioned, say so."
 
 def allocated_questions_and_answers(
     gold: GoldStandard[ConsortFlow],
@@ -148,12 +100,23 @@ def allocated_questions_and_answers(
             yield question, str(answer), support
 
 
+
 async def eval_paper_qa_baseline():
     return await eval_method(
         paper_qa_baseline,
         aggregate_select_metrics,
         allocated_questions_and_answers,
         split="validation",
+    )
+
+async def eval_exps_qa_baseline():
+    return await eval_method(
+        paper_qa_baseline,
+        aggregate_select_metrics,
+        experiments_questions_and_answers,
+        split="validation",
+        question_short_name="experiments_arms",
+        get_gs=get_ea_gs
     )
 
 
@@ -163,7 +126,30 @@ async def eval_decontext_and_select():
         aggregate_select_metrics,
         allocated_questions_and_answers,
         split="validation",
+        question_short_name="experiments_arms",
     )
+
+async def eval_exps_decontext_and_select():
+    return await eval_method(
+        DecontextAndSelect(mode="machine").decontext_and_select,
+        aggregate_select_metrics,
+        experiments_questions_and_answers,
+        get_gs=get_ea_gs,
+        split="validation",
+        question_short_name="experiments_arms",
+    )
+
+
+async def eval_exps_arms_exps():
+    return await eval_method(
+        name_experiments,
+        aggregate_select_metrics,
+        experiments_questions_and_answers,
+        get_gs=get_ea_gs,
+        split="validation",
+        question_short_name="experiments_arms",
+    )
+
 
 
 async def eval_not_mentioned_baseline():
@@ -288,7 +274,14 @@ class DecontextAndSelect(Recipe):
             evals.append(decomp_correct)
         return evals
 
+# Allocated to arms
 
 # recipe.main(eval_paper_qa_baseline)
-recipe.main(eval_decontext_and_select)
+# recipe.main(eval_decontext_and_select)
 # recipe.main(eval_not_mentioned_baseline)
+
+# Experiments
+
+recipe.main(eval_exps_qa_baseline)
+# recipe.main(eval_exps_decontext_and_select)
+# recipe.main(eval_exps_arms_exps)

@@ -1,3 +1,4 @@
+from typing import Mapping
 import httpx
 
 from httpx import Response
@@ -57,7 +58,7 @@ def is_retryable_HttpError(e: BaseException) -> bool:
 
 
 class TooLongRequestError(ValueError):
-    def __init__(self, *, prompt: str, detail: str):
+    def __init__(self, prompt: str = "", detail: str = ""):
         self.prompt = prompt
         self.detail = detail
         super().__init__(self.detail)
@@ -97,9 +98,7 @@ def raise_if_too_long_error(prompt: object, response: Response) -> None:
     wait=wait_random_exponential(min=1),
     after=log_attempt_number,
 )
-async def _post(
-    endpoint: str, json: dict, timeout: float | None = None, cache_id: int = 0
-) -> dict:
+async def _post(endpoint: str, json: dict, timeout: float | None = None, cache_id: int = 0) -> dict | TooLongRequestError:
     """Send a POST request to the OpenAI API and return the JSON response."""
     cache_id  # unused
 
@@ -112,7 +111,11 @@ async def _post(
         )
         if response.status_code == 429:
             raise RateLimitError(response)
-        raise_if_too_long_error(prompt=json.get("prompt"), response=response)
+        try:
+            raise_if_too_long_error(prompt=json.get("prompt"), response=response)
+        except TooLongRequestError as tlre:
+            # Hack alert: Don't raise here so this gets cached
+            return tlre
         response.raise_for_status()
         return response.json()
 
@@ -133,15 +136,14 @@ async def openai_complete(
     model: str = "text-davinci-002",
     max_tokens: int = 256,
     logprobs: int | None = None,
+    logit_bias: Mapping[str, int | float] | None = None,
     n: int = 1,
     echo: bool = False,
     cache_id: int = 0,  # for repeated non-deterministic sampling using caching
     record=recorder,
 ) -> dict:
     """Send a completion request to the OpenAI API and return the JSON response."""
-    response = await _post(
-        "completions",
-        json={
+    params = {
             "prompt": prompt,
             "stop": stop,
             "top_p": top_p,
@@ -151,9 +153,16 @@ async def openai_complete(
             "max_tokens": max_tokens,
             "logprobs": logprobs,
             "n": n,
-            "echo": echo,
-        },
-        cache_id=cache_id,
+        }
+    if logit_bias:
+        params["logit_bias"] = logit_bias  # type: ignore[assignment]
+
+    response = await _post(
+        "completions",
+        json=params,
+        cache_id=cache_id
     )
+    if isinstance(response, TooLongRequestError):
+        raise response
     record(davinci_equivalent_tokens=get_davinci_equivalent_tokens(response))
     return response

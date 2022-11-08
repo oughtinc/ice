@@ -1,7 +1,7 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isEmpty, isString, last, omit, set } from "lodash";
+import { sumBy, isEmpty, isString, last, omit, set, isNumber } from "lodash";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
@@ -306,7 +306,7 @@ const isModelCall = ({ name, args }: { name: string; args: Record<string, unknow
 
 const getFormattedName = (snakeCasedName: string) => {
   const spacedName = snakeCasedName.replace(/_/g, " ");
-  const capitalizedAndSpacedName = spacedName[0].toUpperCase() + spacedName.slice(1);
+  const capitalizedAndSpacedName = spacedName ? spacedName[0].toUpperCase() + spacedName.slice(1) : snakeCasedName;
   return capitalizedAndSpacedName;
 };
 

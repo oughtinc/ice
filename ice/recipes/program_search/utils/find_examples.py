@@ -1,27 +1,16 @@
 from collections.abc import Mapping
 from collections.abc import Sequence
 from enum import Enum
-from typing import TypeVar
-
-from ice.cache import diskcache
+from typing import Mapping, Sequence, TypeVar
+from ice.metrics.rouge import Rouge, RougeResult, matches, rouge_texts
 from ice.metrics.base import Sample
 from ice.metrics.nubia import Nubia
 from ice.metrics.nubia import NubiaResponse
 from ice.metrics.rouge import Rouge
 from ice.metrics.rouge import RougeResult
 from ice.recipes.program_search.types import Selection
-
-
-@diskcache()
-async def rouge_texts(
-    hypotheses: Sequence[str], references: Sequence[str]
-) -> Mapping[str, RougeResult]:
-    assert hypotheses, "hypotheses cannot be empty"
-    assert references, "references cannot be empty"
-    scores = await Rouge().compute(
-        [Sample(left=[hyp], right=references) for hyp in hypotheses]
-    )
-    return {hyp: score for hyp, score in zip(hypotheses, scores)}
+from ice.cache import diskcache
+from ice.recipe import recipe
 
 
 async def nubia_texts(
@@ -99,6 +88,20 @@ async def rouge_distractor_scores(
 SelectionT_co = TypeVar("SelectionT_co", bound=Selection, covariant=True)
 
 
+@diskcache()
+async def identify_gs_str(
+    candidates: Sequence[str], gs_quotes: Sequence[str], lcs_threshold: float = 0.7
+) -> Sequence[str]:
+    positive_selections = set[str]()
+    for gs_quote in gs_quotes:
+        gs_matches = await matches(
+            hypotheses=candidates, references=[gs_quote], lcs_threshold=lcs_threshold
+        )
+        for candidate in gs_matches:
+            positive_selections.add(candidate)
+    return [cand for cand in candidates if cand in positive_selections]
+
+
 async def mark_gs(
     selections: Sequence[SelectionT_co],
     gs_quotes: Sequence[str],
@@ -118,12 +121,4 @@ async def mark_gs(
     return list(selection_dict.values())
 
 
-async def matches(
-    hypotheses: Sequence[str], references: Sequence[str], lcs_threshold: float = 0.7
-):
-    rouge_scores = await rouge_texts(hypotheses=hypotheses, references=references)
-    return {
-        hyp: scores
-        for hyp, scores in rouge_scores.items()
-        if scores.rouge_l.r >= lcs_threshold
-    }
+recipe.main(mark_gs)

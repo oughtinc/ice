@@ -11,6 +11,7 @@ from ice.apis.openai import TooLongRequestError
 from ice.recipe import recipe
 from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
     reason_select_and_answer,
+    answer_with_best_reasoning,
 )
 from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
     sample_reason_select_and_answer,
@@ -79,7 +80,7 @@ async def initial_passages(
 ):
     # Dummy recipe to experiment with just returning the initial part of the doc
     candidates = window_dropping(items=passages, n=passages_per_prompt, step=step)[0]
-    sorted_answers = await rank_passages(
+    sorted_answers = await rate_helpfulness_with_reasoning(
         passages=candidates,
         prompt_func=prompt_func,
         choices=choices,
@@ -95,7 +96,7 @@ async def initial_passages(
     return sorted_answers
 
 
-async def rank_passages(
+async def rate_helpfulness_with_reasoning(
     passages: Sequence[str],
     prompt_func: Callable[[int], MultipartReasoningPrompt],
     choices: Sequence[str],
@@ -140,7 +141,7 @@ async def rank_passages(
         async def score(
             candidates: Sequence[str],
         ) -> PassageWithReasoning[float]:
-            return await sample_reason_select_and_answer(
+            return await answer_with_best_reasoning(
                 num_samples=num_samples,
                 selector=rank_passages_selector,
                 num_examples=num_shots,
@@ -177,7 +178,7 @@ async def rank_passages(
                 error_detail=e.detail,
             )
 
-            return await rank_passages(
+            return await rate_helpfulness_with_reasoning(
                 passages,
                 prompt_func,
                 choices,
@@ -194,4 +195,4 @@ async def rank_passages(
             raise e
 
 
-recipe.main(rank_passages)
+recipe.main(rate_helpfulness_with_reasoning)

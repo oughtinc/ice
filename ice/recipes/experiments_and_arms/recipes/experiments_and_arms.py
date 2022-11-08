@@ -20,7 +20,6 @@ from ice.trace import trace
 from ice.utils import map_async
 
 
-USE_GS = False
 
 
 @trace
