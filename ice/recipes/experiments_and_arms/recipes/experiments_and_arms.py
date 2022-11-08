@@ -14,7 +14,6 @@ from ice.trace import recorder, trace
 from ice.evaluation.evaluate_recipe_result import RecipeResult
 
 
-USE_GS = False
 
 
 @trace

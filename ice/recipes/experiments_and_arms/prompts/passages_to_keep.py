@@ -92,7 +92,7 @@ async def helpful_paragraphs(
     return [paragraphs[idx] for idx in idxs if idx < len(paragraphs)]
 
 
-async def most_helpful_paragraphs(
+async def keep_most_helpful_paragraphs(
     passages_with_reasoning: Sequence[PassageWithReasoning],
     start_with: int = 2,
     continue_if_less_than: int = 3,
@@ -127,4 +127,4 @@ async def most_helpful_paragraphs(
         best_paras = best_paras | set((await get_best_paras([next_para])))
     return [p for p in best_paras]
 
-recipe.main(most_helpful_paragraphs)
+recipe.main(keep_most_helpful_paragraphs)

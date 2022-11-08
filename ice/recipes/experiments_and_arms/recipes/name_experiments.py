@@ -18,15 +18,15 @@ from ice.recipes.experiments_and_arms.prompts.name_exps import (
     make_name_exps_from_count,
 )
 from ice.recipes.experiments_and_arms.prompts.passages_to_keep import (
-    most_helpful_paragraphs,
+    keep_most_helpful_paragraphs,
 )
 from ice.recipes.experiments_and_arms.prompts.quick_list import make_quick_list_prompt
-from ice.recipes.experiments_and_arms.recipes.best_passages import rank_passages
+from ice.recipes.experiments_and_arms.recipes.best_passages import rate_helpfulness_with_reasoning
 from ice.recipes.experiments_and_arms.recipes.cluster import best_answer_by_clustering
 from ice.recipes.experiments_and_arms.recipes.consensus import best_answer_by_consensus
 from ice.recipes.experiments_and_arms.recipes.count_experiments import count_experiments
 from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
-    sample_reason_select_and_answer,
+    answer_with_best_reasoning,
 )
 from ice.recipe import Recipe, recipe
 from ice.recipes.experiments_and_arms.types import PassageWithReasoning
@@ -56,11 +56,32 @@ def make_reduce_to_best_answer(num_experiments: int):
 
     return reduce_to_best_answer
 
+@trace
+async def best_paras_for_naming_experiments(paper: Paper):
+    experiment_count, _ = await count_experiments(paper)
+    assert experiment_count.final_answer is not None
+    paragraphs = [str(p) for p in paper.nonempty_paragraphs()]
+    passages_by_relevance = await rate_helpfulness_with_reasoning(
+        paragraphs,
+        make_can_we_name_experiments_prompt(experiment_count.final_answer),
+        CAN_WE_NAME_EXPERIMENTS_CHOICES,
+        CAN_WE_NAME_EXPERIMENTS_BEST_CHOICE,
+        reasoning_stop=CAN_WE_NAME_EXPERIMENTS_REASONING_STOP,
+        get_reasoning=get_can_we_name_experiments_reasoning,
+        get_helpfulness=get_can_we_name_experiments_helpfulness,
+        num_shots=3,
+        passages_per_prompt=4,
+        step=1,
+    )
+
+    paragraphs_to_keep = await keep_most_helpful_paragraphs(passages_by_relevance)
+    return [p in paragraphs_to_keep for p in paragraphs], paragraphs
+
 
 @trace
 async def name_experiments(
     paper: Paper, record: Recorder = recorder
-) -> tuple[Sequence[str], Sequence[str]]:
+) -> tuple[Sequence[str], Sequence[str], Sequence[str], Sequence[str]]:
     """What were the experiments conducted in this paper?
 
     Args:
@@ -79,7 +100,7 @@ async def name_experiments(
     assert experiment_count.final_answer is not None
 
     paragraphs = paper.nonempty_paragraphs()
-    passages_by_relevance = await rank_passages(
+    passages_by_relevance = await rate_helpfulness_with_reasoning(
         [str(p) for p in paragraphs],
         make_can_we_name_experiments_prompt(experiment_count.final_answer),
         CAN_WE_NAME_EXPERIMENTS_CHOICES,
@@ -92,9 +113,9 @@ async def name_experiments(
         step=1,
     )
 
-    paragraphs_to_keep = await most_helpful_paragraphs(passages_by_relevance)
+    paragraphs_to_keep = await keep_most_helpful_paragraphs(passages_by_relevance)
 
-    experiment_names = await sample_reason_select_and_answer(
+    experiment_names = await answer_with_best_reasoning(
         num_samples=10,  # TODO: Better sampling here
         selector=make_reduce_to_best_answer(
             num_experiments=experiment_count.final_answer
@@ -110,15 +131,10 @@ async def name_experiments(
         get_helpfulness=None,
         final_answer_processor=lambda resp: cast(str, resp["choices"][0]["text"]),
     )
+
+    standardized_answer = await convert_answer_to_standardized_format(experiment_names.final_answer)
+
     assert experiment_names.final_answer is not None
-
-    standardized_answer: str = (
-        await openai_complete(
-            prompt=make_quick_list_prompt(experiment_names.final_answer),
-            stop="\n\nAnswer:",
-        )
-    )["choices"][0]["text"]
-
     return (
         gs_names,
         [
@@ -128,7 +144,20 @@ async def name_experiments(
         ]
         if standardized_answer
         else [],
+        paragraphs_to_keep,
+        [str(p) for p in paragraphs]
     )
+
+
+@trace
+async def convert_answer_to_standardized_format(answer: str) -> str:
+    standardized_answer: str = (
+        await openai_complete(
+            prompt=make_quick_list_prompt(answer),
+            stop="\n\nAnswer:",
+        )
+    )["choices"][0]["text"]
+    return standardized_answer
 
 
 class NameExperiments(Recipe):
@@ -136,4 +165,4 @@ class NameExperiments(Recipe):
         return await name_experiments(paper)
 
 
-# recipe.main(name_experiments)
+recipe.main(name_experiments)

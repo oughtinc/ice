@@ -16,15 +16,15 @@ from ice.recipes.experiments_and_arms.prompts.count_exps import (
     make_count_experiments_prompt_func,
 )
 from ice.recipes.experiments_and_arms.prompts.passages_to_keep import (
-    most_helpful_paragraphs,
+    keep_most_helpful_paragraphs,
 )
 from ice.recipes.experiments_and_arms.prompts.utils import plurality_greedy
 from ice.recipes.experiments_and_arms.recipes.best_passages import (
-    rank_passages,
+    rate_helpfulness_with_reasoning,
     initial_passages,
 )
 from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
-    sample_reason_select_and_answer,
+    answer_with_best_reasoning,
 )
 from ice.recipes.experiments_and_arms.types import PassageWithReasoning
 
@@ -41,7 +41,7 @@ async def count_experiments(
         tuple[PassageWithReasoning[int], Sequence[str]]: The number of experiments and the paragraphs used to count the experiments.
     """
     paragraphs = paper.nonempty_paragraphs()
-    passages_by_relevance = await rank_passages(
+    passages_by_relevance = await rate_helpfulness_with_reasoning(
         [str(p) for p in paragraphs],
         make_can_we_count_experiments_prompt,
         CAN_WE_COUNT_EXPERIMENTS_CHOICES,
@@ -53,9 +53,9 @@ async def count_experiments(
         passages_per_prompt=4,
         step=1,
     )
-    paragraphs_to_keep = await most_helpful_paragraphs(passages_by_relevance)
+    paragraphs_to_keep = await keep_most_helpful_paragraphs(passages_by_relevance)
 
-    experiment_count = await sample_reason_select_and_answer(
+    experiment_count = await answer_with_best_reasoning(
         10,
         plurality_greedy,
         paragraphs_to_keep,

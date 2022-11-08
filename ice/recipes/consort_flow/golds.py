@@ -14,6 +14,7 @@ from ice.metrics.gold_standards import (
 from tqdm import tqdm
 from ice.paper import Paper
 from ice.recipes.consort_flow.types import ConsortFlow, SampleSize
+from ice.recipes.experiments_and_arms.golds import get_ea_gs
 from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
 from ice.recipes.program_search.nodes.select.dynamic import (
     SelectionExample,
@@ -39,14 +40,14 @@ def get_consort_gs(document_id: str) -> GoldStandard[ConsortFlow] | None:
     )
 
 
-def consort_gs_split(split: GoldStandardSplit) -> Sequence[GoldStandard[ConsortFlow]]:
+def consort_gs_split(split: GoldStandardSplit, question_short_name: str) -> Sequence[GoldStandard[ConsortFlow]]:
     golds = get_gold_standards(
-        question_short_name="consort_flow", model_type=ConsortFlow
+        question_short_name=question_short_name, model_type=ConsortFlow
     )
     return [gs for gs in golds if gs.split == split]
 
 
-def paper_to_gold_standards(
+def paper_to_allocation_gold_standards(
     paper: Paper,
 ) -> Sequence[tuple[str, Sequence[Selection], Sequence[str]]]:
     gs = get_consort_gs(paper.document_id)
@@ -66,6 +67,14 @@ def paper_to_gold_standards(
         for arm in (exp.arms or [])
     ]
 
+# def paper_to_experiments_gold_standard(paper: Paper) -> Sequence[tuple[str, Sequence[Selection], Sequence[str]]]:
+#     gs = get_ea_gs(paper.document_id)
+#     texts = sentences(paper)
+#     if not gs or not gs.parsed_answer:
+#         return []
+    
+
+
 
 class GoldStandardExample(BaseModel):
     question: str
@@ -79,7 +88,7 @@ def gold_standard_examples(
     return [
         GoldStandardExample(question=question, texts=texts, gs_quotes=gs_quotes)
         for result in tqdm(
-            map(paper_to_gold_standards, papers),
+            map(paper_to_allocation_gold_standards, papers),
             desc="Creating gold standard examples",
             total=len(papers),
         )
@@ -87,9 +96,9 @@ def gold_standard_examples(
     ]
 
 
-def download_papers(split: str = "validation"):
+def download_papers(split: str = "validation", question_short_name: str = "consort_flow"):
     paper_dir = Path("/code/papers/")  # fixed in container
-    doc_ids = {p.document_id for p in consort_gs_split(split)}
+    doc_ids = {p.document_id for p in consort_gs_split(split, question_short_name)}
     paper_files = [f for f in paper_dir.iterdir() if f.name in doc_ids]
     return [
         Paper.load(f)
