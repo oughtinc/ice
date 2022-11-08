@@ -24,7 +24,6 @@ async def completion_perplexity(
     prompt: str = PROMPTS[0],
     completion: str = COMPLETION,
 ) -> float:
-    log.info("completion_perplexity", prompt=prompt, completion=completion)
     """Calculate the perplexity of a completion given a prompt."""
     if not completion[0].isspace():
         log.warning("Completion does not start with whitespace!", completion=completion)
