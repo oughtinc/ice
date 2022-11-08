@@ -36,9 +36,8 @@ async def completion_perplexity(
 
     choices = response.get("choices", [])
 
-    if len(choices) == 0:
-        log.warning("No choices returned from OpenAI API", response=response)
-        return float("inf")
+    if not choices:
+        raise ValueError("No choices returned from OpenAI API")
 
     logits = choices[0]["logprobs"]["token_logprobs"]
 
