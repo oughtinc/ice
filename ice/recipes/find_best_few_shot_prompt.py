@@ -1,5 +1,6 @@
 from itertools import permutations
 from math import factorial
+from random import sample
 
 from structlog.stdlib import get_logger
 
@@ -61,14 +62,21 @@ async def best_few_shot(
     n_shots: int = 1,
     split_string: str = "\n\n",
     prefix: str = "",
+    max_permutations: int = 10,
+    max_test_size: int = 10,
 ) -> list[tuple[str, float]]:
 
     assert len(examples_prompts) == len(examples_completions)
 
-    n_perms = factorial(len(examples_prompts)) // factorial(len(examples_prompts) - n_shots)
+    n_possible_permutations = factorial(len(examples_prompts)) // factorial(len(examples_prompts) - n_shots)
+
+    n_perms = min(n_possible_permutations, max_permutations)
+
+    test_size = min(len(examples_prompts), max_test_size)
+
     log.info(
         "This will perform a brute force search of all possible combinations of few-shot prompts.",
-        number_of_requests=n_perms * (len(examples_prompts) - n_shots),
+        number_of_requests=n_perms * test_size,
     )
 
     prompts_and_completions = list(zip(examples_prompts, examples_completions))
@@ -80,7 +88,14 @@ async def best_few_shot(
         remaining_prompts_and_completions = remaining_prompts(
             prompts_and_completions, list(prompt_perm)
         )
-        all_prompts.append((prompt, remaining_prompts_and_completions))
+
+        test_prompts_and_completions = sample(
+            remaining_prompts_and_completions, k=test_size
+        )
+
+        all_prompts.append((prompt, test_prompts_and_completions))
+
+    all_prompts = sample(all_prompts, k=n_perms)
 
     scored_prompts = [
         (
