@@ -19,6 +19,7 @@ const useActionHotkeys = (actions, executeActionAndDeselectAll, actionToPrepare)
     a: "Add bullet point to card",
     c: "Clear card",
     e: "Edit text",
+    m: "Run language model",
   };
 
   const actionMatchesLabel = (action, label) => {
@@ -40,12 +41,14 @@ const useActionHotkeys = (actions, executeActionAndDeselectAll, actionToPrepare)
     );
   }
 
-  return actions.map(action => {
+  const actionKeys = actions.map(action => {
     const key = Object.keys(labelFromKey).find(key =>
       actionMatchesLabel(action, labelFromKey[key]),
     );
-    return key ? action.label : null;
+    return key;
   });
+
+  return { actionKeys };
 };
 
 const Workspace = () => {
@@ -100,7 +103,7 @@ const Workspace = () => {
     setActionFocusIndex(0);
   }, [cardFocusIndex, actions]);
 
-  useActionHotkeys(actions, executeActionAndDeselectAll, actionToPrepare);
+  const { actionKeys } = useActionHotkeys(actions, executeActionAndDeselectAll, actionToPrepare);
 
   return (
     <Panes>
@@ -126,6 +129,7 @@ const Workspace = () => {
             name="Actions"
             multiselect={false}
             items={actions}
+            keys={actionKeys}
             selected={selectedActions}
             setSelected={setSelectedActions}
             onEnter={executeActionAndDeselectAll}

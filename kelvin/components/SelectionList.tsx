@@ -17,6 +17,7 @@ const useScrollIntoView = ({ items, focusIndex }) => {
 
 const SelectionListItem = ({
   item,
+  itemKey,
   focused,
   selected,
   active,
@@ -60,9 +61,20 @@ const SelectionListItem = ({
   // Use a consistent background color for focused and selected items
   const bgColor = focused ? "bg-blue-200" : selected ? "bg-blue-100" : "";
 
+  // Use a different background color and text color for the keyboard shortcut depending on the focus state
+  const kbdBgColor = focused ? "bg-gray-100" : "bg-white";
+  const kbdTextColor = focused ? "text-gray-700" : "text-gray-500";
+
   return (
     <li className={`flex p-1 pl-2 pr-2 items-center ${bgColor}`} ref={forwardedRef}>
-      {multiselect ? checkmark : bullet} {renderItem(item)}
+      {multiselect ? checkmark : bullet} <div className="flex-grow">{renderItem(item)}</div>
+      <kbd
+        className={`font-mono ml-2 px-1.5 border border-gray-300 rounded-md ${kbdBgColor} ${kbdTextColor} ${
+          !itemKey && "opacity-0"
+        }`}
+      >
+        {itemKey || "x"}
+      </kbd>
     </li>
   );
 };
@@ -70,6 +82,7 @@ const SelectionListItem = ({
 const SelectionList = ({
   name,
   items,
+  keys,
   multiselect,
   onEnter,
   active,
@@ -150,6 +163,7 @@ const SelectionList = ({
         <SelectionListItem
           key={item.id}
           item={item}
+          itemKey={keys && keys[i]}
           multiselect={multiselect}
           focused={i === focusIndex}
           selected={selected[item.id]}
