@@ -41,8 +41,6 @@ async def completion_perplexity(
 
     logits = choices[0]["logprobs"]["token_logprobs"]
 
-    assert len(logits) == n_tokens(prompt + completion)
-
     completion_logits = logits[n_tokens(prompt) :]
 
     perplexity = math.exp(-sum(completion_logits) / len(completion_logits))
