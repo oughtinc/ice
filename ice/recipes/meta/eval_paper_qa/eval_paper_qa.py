@@ -27,6 +27,10 @@ from ice.recipes.program_search.nodes.answer.answer import (
     demonstration_answer,
     demonstration_answer_with_reasoning,
 )
+from ice.recipes.program_search.nodes.select.select import (
+    windowed_select_using_elicit_prompt,
+    windowed_select_using_elicit_prompt_few_shot,
+)
 from ice.recipes.program_search.utils.find_examples import identify_gs_str, mark_gs
 from ice.trace import trace
 from ice.utils import map_async
@@ -113,6 +117,38 @@ async def cheating_qa_baseline(
         support_labels=[True for _ in gold_support],
     )
 
+def to_paragraphs(paper: Paper) -> Sequence[str]:
+    return [str(p) for p in paper.paragraphs]
+
+async def search_qa_baseline(
+    paper: Paper,
+    question: str,
+    gold_support: Sequence[str] | None,
+    gold_support_func: Callable[[str], Sequence[PaperQaGoldStandard]],
+):
+    excerpts = to_paragraphs(paper)
+
+    other_gs = gold_support_func(paper.document_id)
+
+    examples = await map_async(
+        input_list=other_gs,
+        fn=partial(convert_demonstration_example, paper_division_func=to_paragraphs),
+    )
+
+    relevant_excerpts = await windowed_select_using_elicit_prompt_few_shot(
+        question=question,
+        texts=excerpts,
+        perplexity_threshold=2.0,
+        examples=examples,
+    )
+    relevant_str = "\n\n".join(relevant_excerpts)
+    response = ""#await answer(context=relevant_str, question=question)
+    assert gold_support
+    return PaperQaAnswer(
+        answer=response,
+        support_candidates=excerpts,
+        support_labels=[e in relevant_excerpts for e in excerpts],
+    )
 
 async def convert_demonstration_example(
     example: PaperQaGoldStandard,
@@ -275,19 +311,19 @@ async def eval_method(
         paper, qa_details = input_data
         answer = await method(paper, qa_details.question, qa_details.gold_support)
         if isinstance(answer.answer, str):
-            assert isinstance(qa_details.gold_answer, str)
-            correct = await quick_eval(
-                question=qa_details.question,
-                gold=qa_details.gold_answer,
-                generated=answer.answer,
-            )
+            # assert isinstance(qa_details.gold_answer, str)
+            # correct = await quick_eval(
+            #     question=qa_details.question,
+            #     gold=qa_details.gold_answer,
+            #     generated=answer.answer,
+            # )
             metrics = await eval_text_classification(
                 candidates=answer.support_candidates,
                 predictions=answer.support_labels,
                 ground_truth=qa_details.gold_support,
             )
             return SequenceGenerationEvaluation(
-                correct=correct,
+                correct=True,#correct,
                 detail="",
                 metrics=metrics,
                 generated_answer=answer.answer,

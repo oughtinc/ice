@@ -5,10 +5,10 @@ from ice.metrics.gold_standards import GoldStandard
 from typing import Iterable, Sequence
 from ice.paper import Paper
 from ice.recipes.experiments_and_arms.golds import get_ea_gs
-from ice.recipes.experiments_and_arms.recipes.name_experiments import (
-    NameExperiments,
-    best_paras_for_naming_experiments,
-)
+#from ice.recipes.experiments_and_arms.recipes.name_experiments import (
+#     NameExperiments,
+#     best_paras_for_naming_experiments,
+# )
 from ice.recipes.experiments_and_arms.types import ExperimentsArms
 from ice.recipes.meta.eval_paper_qa.eval_paper_qa import (
     cheating_few_shot_qa_baseline,
@@ -16,6 +16,7 @@ from ice.recipes.meta.eval_paper_qa.eval_paper_qa import (
     eval_method,
     few_shot_qa_with_support,
     paper_qa_baseline,
+    search_qa_baseline,
 )
 from ice.recipe import recipe
 
@@ -77,6 +78,20 @@ async def cheating_eval_experiments_qa_baseline():
     return await eval_method(
         method=method,
         question_and_answer_func=experiments_questions_and_answers,
+        split="validation",
+        question_short_name="experiments_arms",
+        get_gs=get_ea_gs,  # TODO: make native version
+    )
+
+async def search_eval_experiments_qa_baseline():
+    # Test search recipes with a baseline generation method
+    method = partial(
+        search_qa_baseline,
+        gold_support_func=experiments_gold_support_func,
+    )
+    return await eval_method(
+        method=method,
+        question_and_answer_func=experiments_questions_and_answers,#,experiments_questions_and_answers,
         split="validation",
         question_short_name="experiments_arms",
         get_gs=get_ea_gs,  # TODO: make native version
@@ -254,4 +269,4 @@ async def eval_non_cheating_exps():
 # recipe.main(cheating_eval_experiments_with_reasoning_demonstrations)
 # recipe.main(cheating_eval_arms_with_reasoning_demonstrations)
 # recipe.main(cheating_paragraph_eval_experiments_with_demonstrations)
-recipe.main(cheating_paragraph_eval_experiments_with_reasoning_demonstrations)
+recipe.main(search_eval_experiments_qa_baseline)
