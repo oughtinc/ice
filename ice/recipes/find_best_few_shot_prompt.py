@@ -68,7 +68,9 @@ async def best_few_shot(
 
     assert len(examples_prompts) == len(examples_completions)
 
-    n_possible_permutations = factorial(len(examples_prompts)) // factorial(len(examples_prompts) - n_shots)
+    n_possible_permutations = factorial(len(examples_prompts)) // factorial(
+        len(examples_prompts) - n_shots
+    )
 
     n_perms = min(n_possible_permutations, max_permutations)
 
