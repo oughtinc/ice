@@ -58,24 +58,24 @@ async def eval_prompt(
 async def best_few_shot(
     examples_prompts: list[str] = EXAMPLES_PROMPTS,
     examples_completions: list[str] = EXAMPLES_COMPLETIONS,
-    n: int = 1,
+    n_shots: int = 1,
     split_string: str = "\n\n",
     prefix: str = "",
 ) -> list[tuple[str, float]]:
 
     assert len(examples_prompts) == len(examples_completions)
 
-    n_perms = factorial(len(examples_prompts)) // factorial(len(examples_prompts) - n)
+    n_perms = factorial(len(examples_prompts)) // factorial(len(examples_prompts) - n_shots)
     log.info(
         "This will perform a brute force search of all possible combinations of few-shot prompts.",
-        number_of_requests=n_perms * (len(examples_prompts) - n),
+        number_of_requests=n_perms * (len(examples_prompts) - n_shots),
     )
 
     prompts_and_completions = list(zip(examples_prompts, examples_completions))
 
     all_prompts: list[tuple[str, list[tuple[str, str]]]] = []
 
-    for prompt_perm in permutations(prompts_and_completions, n):
+    for prompt_perm in permutations(prompts_and_completions, n_shots):
         prompt = prefix + split_string.join([p + c for p, c in prompt_perm])
         remaining_prompts_and_completions = remaining_prompts(
             prompts_and_completions, list(prompt_perm)
