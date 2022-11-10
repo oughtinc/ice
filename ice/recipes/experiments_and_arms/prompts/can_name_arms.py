@@ -1,15 +1,21 @@
 from ast import Call
-from typing import Callable, runtime_checkable, Protocol
-from ice.formatter.transform.positional import PositionalTransform, OrdinalWord
-from ice.formatter.transform.dependent import (
-    DependentTransform,
-    plural_transform,
-    CountWord,
-)
-from ice.formatter.transform.value import ValueTransform, numbered_list
-from ice.formatter.multi import format_multi, stop, StopSentinel
-from typing import Sequence
-from ice.recipes.experiments_and_arms.prompts.utils import get_part, start_last_example
+from collections.abc import Callable
+from collections.abc import Sequence
+from typing import Protocol
+from typing import runtime_checkable
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
+from ice.formatter.multi import StopSentinel
+from ice.formatter.transform.dependent import CountWord
+from ice.formatter.transform.dependent import DependentTransform
+from ice.formatter.transform.dependent import plural_transform
+from ice.formatter.transform.positional import OrdinalWord
+from ice.formatter.transform.positional import PositionalTransform
+from ice.formatter.transform.value import numbered_list
+from ice.formatter.transform.value import ValueTransform
+from ice.recipes.experiments_and_arms.prompts.utils import get_part
+from ice.recipes.experiments_and_arms.prompts.utils import start_last_example
 from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
 
 
@@ -78,7 +84,7 @@ CAN_WE_NAME_ARMS_EXAMPLES: list[
                 """Excerpt 1 discusses some findings but does not name trial arms, and it is not clear which experiment is being discussed.""",
                 """Excerpt 2 discusses how results were measured but does not identify trial arms.""",
                 """Excerpt 3 continues to discuss the assessment methodology""",
-                """Excerpt 4 continues to discuss measurement methodology."""
+                """Excerpt 4 continues to discuss measurement methodology.""",
             )
         ),
         helpfulness="Excerpts 1, 2, 3, and 4 were not helpful.",
@@ -131,7 +137,8 @@ def can_we_name_experiments_stop_seq(reasoning: str | None) -> Sequence[str]:
 
 
 def make_can_we_name_arms_prompt(
-    experiments: Sequence[str], experiment_in_question: str,
+    experiments: Sequence[str],
+    experiment_in_question: str,
 ) -> Callable[[int], MultipartReasoningPrompt]:
     def from_num_shot(num_shot: int):
         def make_can_we_name_arms_prompt(
@@ -156,6 +163,7 @@ def make_can_we_name_arms_prompt(
             instructions = """When evaluating a Randomized Controlled Trial, we should first identify its methodology; in particular, we should identify how different subgroups of participants were split into different trial arms, in order to receive different treatments or controls. We will look at a few paragraphs from different papers to identify whether any of those paragraphs identify the trial arms for specific experiments. Once we do this task, we will be able to draw a chart identifying, for each experiment, what the trial arms were. After that, we will look to identify how many participants were put into each arm, and how randomization was performed. Some of these excerpts may not be helpful, or it may be unclear. We'll try to find the paragraphs that most clearly identify what the different trial arms for the experiments in question were."""
             parts = [instructions] + list(shots)
             return "\n\n".join(parts)
+
         return make_can_we_name_arms_prompt
 
     return from_num_shot

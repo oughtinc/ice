@@ -1,6 +1,9 @@
-from ice.metrics.gold_standards import GoldStandard, get_gold_standard
+from collections.abc import Sequence
+
+from ice.metrics.gold_standards import get_gold_standard
+from ice.metrics.gold_standards import GoldStandard
 from ice.recipes.experiments_and_arms.types import ExperimentsArms
-from typing import Sequence
+
 
 def get_ea_gs(document_id: str) -> GoldStandard[ExperimentsArms] | None:
     return get_gold_standard(

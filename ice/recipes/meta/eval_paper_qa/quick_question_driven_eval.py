@@ -1,6 +1,8 @@
 import math
-from ice.formatter.multi import format_multi, stop
+
 from ice.apis.openai import openai_complete
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
 
 EXAMPLES = [
     dict(
@@ -69,7 +71,14 @@ def correct_or_incorrect(top_logprobs: dict[str, float]) -> bool:
     return sum(correct) > sum(incorrect)
 
 
-async def quick_eval(question: str, ground_truth: str | int, prediction: str | int) -> tuple[bool, str]:
-    prompt = make_quick_eval_prompt(question=question, gold=ground_truth, generated=str(prediction))
+async def quick_eval(
+    question: str, ground_truth: str | int, prediction: str | int
+) -> tuple[bool, str]:
+    prompt = make_quick_eval_prompt(
+        question=question, gold=ground_truth, generated=str(prediction)
+    )
     response = await openai_complete(prompt=prompt, max_tokens=1, logprobs=5)
-    return correct_or_incorrect(response["choices"][0]["logprobs"]["top_logprobs"][-1]), ""
+    return (
+        correct_or_incorrect(response["choices"][0]["logprobs"]["top_logprobs"][-1]),
+        "",
+    )

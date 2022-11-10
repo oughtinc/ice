@@ -135,7 +135,9 @@ def _format_truncate(
         k: v for k, v in concrete_values.items() if k in needed_keys
     }
     if not _no_sentinels_remaining(needed_concrete_values):
-        raise ValueError(f"Unfilled DependentTransform in partial example:\nFormat: {format_placeholder}\nNeeded Values: {needed_concrete_values}")
+        raise ValueError(
+            f"Unfilled DependentTransform in partial example:\nFormat: {format_placeholder}\nNeeded Values: {needed_concrete_values}"
+        )
     new_str = _unparse(keep).format_map(needed_concrete_values)
     return new_str
 

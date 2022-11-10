@@ -2,8 +2,10 @@ from collections.abc import Sequence
 from functools import cache
 from functools import cached_property
 from pathlib import Path
-from typing import Any, ClassVar, Literal
+from typing import Any
+from typing import ClassVar
 from typing import Generic
+from typing import Literal
 from typing import overload
 from typing import Type
 from typing import TypeVar
@@ -15,8 +17,8 @@ from pydantic.generics import GenericModel
 from structlog.stdlib import get_logger
 from yaml import CLoader as Loader
 from yaml import load
-from ice.paper import Paper
 
+from ice.paper import Paper
 from ice.settings import settings
 
 log = get_logger()

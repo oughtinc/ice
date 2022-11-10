@@ -306,7 +306,9 @@ const isModelCall = ({ name, args }: { name: string; args: Record<string, unknow
 
 const getFormattedName = (snakeCasedName: string) => {
   const spacedName = snakeCasedName.replace(/_/g, " ");
-  const capitalizedAndSpacedName = spacedName ? spacedName[0].toUpperCase() + spacedName.slice(1) : snakeCasedName;
+  const capitalizedAndSpacedName = spacedName
+    ? spacedName[0].toUpperCase() + spacedName.slice(1)
+    : snakeCasedName;
   return capitalizedAndSpacedName;
 };
 
@@ -338,7 +340,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
   const { getParent } = useLinks();
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
-  const cost = useCostEstimate(id)
+  const cost = useCostEstimate(id);
 
   const modelCall = isModelCall({ name, args });
   const isSiblingWithSelected = selectedId && getParent(id) === getParent(selectedId);
@@ -417,7 +419,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
               <span className="px-2">→</span>
               {result === undefined ? <Spinner size="small" /> : <ResultComponent value={result} />}
             </div>
-        {`\$${Math.round(cost * 100) / 100}`}
+            {`\$${Math.round(cost * 100) / 100}`}
           </div>
         </Button>
       </div>

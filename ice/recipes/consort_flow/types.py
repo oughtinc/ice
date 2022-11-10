@@ -1,5 +1,11 @@
-from typing import ClassVar, Literal, Sequence, Type
-from pydantic import BaseModel, root_validator, validator
+from collections.abc import Sequence
+from typing import ClassVar
+from typing import Literal
+from typing import Type
+
+from pydantic import BaseModel
+from pydantic import root_validator
+from pydantic import validator
 
 from ice.metrics.gold_standards import ParsedGoldStandardBase
 

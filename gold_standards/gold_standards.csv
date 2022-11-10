@@ -10,7 +10,7 @@ Job application workshop: The job application workshop contains two components, 
 196,smithuis-2013.pdf,https://github.com/brachbach/host-files/raw/main/smithuis-2013.pdf,https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3854704/pdf/1475-2875-12-363.pdf,All,describe_interventions,"The researchers conducted the experiment over 42 weeks by distributing impregnated bed nets (ITNs)  according to the number of family members, to selected villages, which were instructed explicitly about the correct use of the nets.","Finally 20 villages (clusters) were paired, and for each pair one was selected randomly (using a computer generated random number) to receive impregnated bed nets (ITNs), while the other acted as the control village.","Between the 26th and 29th of April 1998, all households in the intervention villages received a number of ITNs, according to the number of family members and were instructed explicitly about the correct use of the nets (Figure 2).","During the study-period (10 May 1998 to 28 February 1999) [42 weeks], 2,408 children visited the clinics with complaints of fever and were confirmed by microscopy to have malaria; 1,102 P. falciparum (46%), 1,257 P. vivax (52%), and 49 mixed i.e. with both species (2%).",,,,4,4,7.0,,,16 June Surge,,,,,,,,,,,,ICE,,,,,iterate,,,,,,,,,,,,,,,,,,
 79,deutschmann-2019.pdf,https://github.com/brachbach/host-files/raw/main/deutschmann-2019.pdf,https://conference.nber.org/conf_papers/f116692.pdf,All,describe_interventions,"The researchers provided small farmers with input loans, crop insurance, training in improved farming practices, and funeral insurance coverage to test maize crop yields.","Participating farmers receive input loans, crop insurance, and training about improved farming practices.","Randomization was conducted by public lottery, and all farmers enrolled in the study also received 10,000 Ksh in funeral insurance coverage, regardless of treatment status.","The procedure for collecting yield data is the following: for treatment farmers, enumerators randomly selected one maize plot that was enrolled in the program (“enrolled plot”) and one maize plot that was not enrolled (“non-enrolled plot”). For control farmers, enumerators randomly selected a random maize plot.",,,,6,6,6.0,,,16 June Surge,,,,,,,,,,,,ICE,,,,,iterate,,GiveWell,,,,,,,,,,,,,,,,
 41,bassi-2018.pdf,https://github.com/brachbach/host-files/raw/main/bassi-2018.pdf,https://conference.nber.org/conf_papers/f109256.pdf,All,describe_interventions,"First, the beliefs of managers on the skills of workers after each job interview are elcitied and the workers’ labor market expectations and realized labor market outcomes are tracked for two years. The intervention has three components:
-i) a screening component, information was collected on the soft skills of workers while they were still enrolled at the VTIs; 
+i) a screening component, information was collected on the soft skills of workers while they were still enrolled at the VTIs;
 ii) a matching component, job interviews were scheduled between workers and firms;
 iii) a signaling component, introducing experimental variation in whether information from the screening assessments was disclosed to both workers and firms during the job interview process, through the provision of skills certificates.","We elicit the beliefs of managers on the skills of workers after each job interview, and track the workers’ labor market expectations and realized labor market outcomes for two years","The intervention we implemented has three components: i) a screening component, whereby information was collected on the soft skills of workers while they were still enrolled at the VTIs; ii) a matching component, whereby job interviews were scheduled between workers and firms; iii) a signaling component, by introducing experimental variation in whether information from the screening assessments was disclosed to both workers and firms during the job interview process, through the provision of skills certificates.",,,,,1,10,,,,16 June Surge,,,,,,,,,,,,ICE,,,,,iterate,,GiveWell,,,,,,,,,,,,,,,,
 80,dicko-2008.pdf,https://github.com/brachbach/host-files/raw/main/dicko-2008.pdf,https://malariajournal.biomedcentral.com/track/pdf/10.1186/1475-2875-7-123.pdf,intermittent preventive treatment with sulphadoxine-pyrimethamine,adherence,The rate of adherence to treatment is unclear. 88.6% of subjects completed the one year follow up. 84% completed the extended follow up.,"Of the 262 subjects enrolled, 30 subjects (11.4%) did not complete one year follow up and were equally distributed between the two groups (15 in each group).",An additional 12 subjects (4.6%) did not complete the extended follow- up 7 in treatment group and 5 in the control group (Figure 1).,,,,False,1,4,,,,16 June Surge,,explicit,Other,,,?,0,Yes,,"262 subjects were enrolled, 240 (91.4%) completed one year follow up, and 235 (89.4%) completed the extended follow-up.",completely hallucinated,ICE,,,,,iterate,,,,,,,,,,,,,,,,,,
@@ -1583,13 +1583,13 @@ by therapists and medical doctors.","Patients from multiple sites with a subacut
                 initial sample:
                     size: 4
                     stage: randomized
-            poultry manure: 
-                arm description: poultry manure as a source of 34 kg P2O5 ha-1 
+            poultry manure:
+                arm description: poultry manure as a source of 34 kg P2O5 ha-1
                 initial sample:
                     size: 4
                     stage: randomized
             vermicompost:
-                arm description: vermicompost as a source of 34 kg P2O5 ha-1 
+                arm description: vermicompost as a source of 34 kg P2O5 ha-1
                 initial sample:
                     size: 4
                     stage: randomized
@@ -1616,7 +1616,7 @@ by therapists and medical doctors.","Patients from multiple sites with a subacut
                 initial sample:
                     size: 4
                     stage: randomized
-            poultry manure: 
+            poultry manure:
                 arm description: poultry manure as a source of 75 kg S ha-1
                 initial sample:
                     size: 4
@@ -1650,7 +1650,7 @@ by therapists and medical doctors.","Patients from multiple sites with a subacut
                     size: 3
                     stage: randomized
             75% RDF through poultry manure and 25% RDF through chemical fertilizers:
-                arm description: 34 kg P2O5 ha-1 and 5 kg S ha-1, 75% through poultry manure and 25% RDF through chemical fertilizers 
+                arm description: 34 kg P2O5 ha-1 and 5 kg S ha-1, 75% through poultry manure and 25% RDF through chemical fertilizers
                 initial sample:
                     size: 3
                     stage: randomized
@@ -1799,13 +1799,13 @@ by therapists and medical doctors.","Patients from multiple sites with a subacut
         experiment description: randomised, double-blind, placebo-controlled trial, of tenofovir in 17 drug-treatment clinics in Bangkok, Thailand
         arms:
             tenofovir:
-                arm description: daily oral tenofovir 300 mg 
+                arm description: daily oral tenofovir 300 mg
                 initial sample:
                     size: 1204
                     stage: randomized
             placebo:
                 arm description: tablet similar in shape, colour, and taste to tenofovir
-                initial sample: 
+                initial sample:
                     size: 1209
                     stage: randomized","In this randomised, double-blind, placebo-controlled trial, we enrolled volunteers from 17 drug-treatment clinics in Bangkok, Thailand. Participants were eligible if they were aged 20–60 years, were HIV-negative, and reported injecting drugs during the previous year. We randomly assigned participants (1:1; blocks of four) to either tenofovir or placebo using a computer-generated randomisation sequence. Participants chose either daily directly observed treatment or monthly visits and could switch at monthly visits. Participants received monthly HIV testing and individualised risk-reduction and adherence counselling, blood safety assessments every 3 months, and were off ered condoms and methadone treatment. The primary effi cacy endpoint was HIV infection, analysed by modifi ed intention-to-treat analysis. This trial is registered with ClinicalTrials.gov, number NCT00119106.","Between June 9, 2005, and July 22, 2010, we enrolled 2413 participants, assigning 1204 to tenofovir and 1209 to placebo. Two participants had HIV at enrolment and 50 became infected during follow-up: 17 in the tenofovir group (an incidence of 0·35 per 100 person-years) and 33 in the placebo group (0·68 per 100 person-years), indicating a 48·9% reduction in HIV incidence (95% CI 9·6–72·2; p=0·01). The occurrence of serious adverse events was much the same between the two groups (p=0·35). Nausea was more common in participants in the tenofovir group than in the placebo group (p=0·002). ","We randomly assigned participants in a one-to-one ratio to receive daily oral tenofovir 300 mg or placebo in blocks of four using a computer-generated randomisation sequence. The statistician who generated the sequence was not otherwise involved in the conduct of the trial, but was involved in the fi nal analysis. When a participant completed the consent process, study staff assigned them the next sequential randomisation number. Tenofovir and placebo tablets were similar in shape, colour, and taste. Participants and study staff were masked to drug assignment. Data were locked on Jan 18, 2013, at which point PAM and MM were unmasked (other investigators were unmasked individually as needed to help with the analysis). ",,,,,,,,,,,,,,,,,,,,,,,,,,validation,,,,,,,,,,,,,Figure 1,Y,1,2,5,completely textbook
 958,fleming-1986.pdf,https://github.com/brachbach/host-files/raw/main/fleming-1986.pdf,,,experiments_arms,"experiments:
@@ -1818,7 +1818,7 @@ by therapists and medical doctors.","Patients from multiple sites with a subacut
                     size: 40
                     stage: targeted
             Group 2:
-                arm description: chloroquine 600 mg base once, followed by proguanil 100 mg per day; 
+                arm description: chloroquine 600 mg base once, followed by proguanil 100 mg per day;
                 initial sample:
                     size: 40
                     stage: targeted
@@ -2134,12 +2134,12 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
                     size: 120
                     stage: randomized",We aim to conduct a proof-of-concept trial of the efficacy of a brief group-based psychological intervention delivered via videoconferencing for adults in Australia distressed by the pandemic.,"In this single-blind, parallel, randomised controlled trial, adults who screened positive for COVID-related psychologi- cal distress across Australia were randomly allocated to ei- ther a 6-session group-based program based on behavioural principles (n = 120) or enhanced usual care (EUC, n = 120).","The adaptation, led by the senior author of PM+ (K.S.D.), was conducted over 8 weeks, and involved six focus groups with people affected by the pandemic who discussed the major mental health concerns during the pandemic and opinions about the interven- tion. The intervention comprised 6 × 60-min sessions that were delivered to groups of four participants on a videoconferencing platform by a Masters or Doctoral level clinical psychologist. ",The EUC arm comprised emailing participants a resource package comprising handouts detailing the strategies taught in the intervention. They were provided with instructions to work in a self-paced manner over 6 weeks.,There were 120 participants randomized to the inter-vention and 120 to EUC.,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,1,2,,
 973,bures-2016.pdf,https://github.com/brachbach/host-files/raw/main/bures-2016.pdf,,,experiments_arms,"experiments:
-   improved application technique for gluing lung defects: 
+   improved application technique for gluing lung defects:
         experiment description: in-vitro repair of superficial lung defects for for alveolar air leaks
         arms:
             study group:
                 arm description: A square silicone frame was placed around the site that needed glue.
-                initial sample: 
+                initial sample:
                     size: 10
                     stage: randomized
             control group:
@@ -2157,7 +2157,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
                     size: 40
                     stage: randomized
             placebo:
-                arm description: placebo nasal spray contain all the intervention nasal spray ingredients except oxytocin 
+                arm description: placebo nasal spray contain all the intervention nasal spray ingredients except oxytocin
                 initial sample:
                     size: 39
                     stage: randomized","The current study investigated effects of intranasal oxytocin administration on resting-state functional connectivity between amygdala and medial prefrontal cortex (mPFC), as two central regions involved in social-cognitive and affective processing.","This resulted in a total of 79 for the analysis presented in this paper, comprising 40 young (M = 22.7 years, SD = 3.02) and 39 older (M = 71.2 years, SD = 5.19) white, English-speaking adults.","For the 79 participants whose resting-state functional connectivity data was analyzed, 22 young (50% female) and 18 older (56% female) participants were randomly assigned to self-administer via a nasal spray 24 IUs (one puff per nostril) of oxytocin. Eighteen young (50% female) and 21 older (62% female) participants self- administered a placebo that contained all ingredients with the exception of the oxytocin at the start of the full study visit. "," In a double-blind design, 79 participants were randomly assigned to self-administer either intranasal oxytocin or placebo before undergoing resting-state functional magnetic resonance imaging. ",,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,1,2,,
@@ -2167,7 +2167,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
         arms:
             VAS:
                 arm description: 0.5 mL vitamin A for 6-11 months and 1mL Vitamin A for 12-23 months
-                initial sample: 
+                initial sample:
                     size: 3787
                     stage: randomized
             Placebo:
@@ -2180,7 +2180,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
         experiment description: a double-blind, placebo-controlled trial testing the effects of three antimalarial regimens on incidence of malaria in infants in moderate-transmission sites
         arms:
             sulfadoxine plus pyrimethamine:
-                arm description: tablet containing 250 mg sulfadoxine plus 12.5 mg pyrimethamine 
+                arm description: tablet containing 250 mg sulfadoxine plus 12.5 mg pyrimethamine
                 initial sample:
                     size: 319
                     stage: randomized
@@ -2195,7 +2195,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
                     size: 320
                     stage: randomized
             placebo:
-                arm description: placebo tablets identical in appearance to sulfadoxine-pyrimethamine and chlorproguanil-dapsone 
+                arm description: placebo tablets identical in appearance to sulfadoxine-pyrimethamine and chlorproguanil-dapsone
                 initial sample:
                     size: 320
                     stage: randomized
@@ -2203,7 +2203,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
         experiment description: a double-blind, placebo-controlled trial testing the effects of three antimalarial regimens on incidence of malaria in infants in low-transmission sites
         arms:
             sulfadoxine plus pyrimethamine:
-                arm description: tablet containing 250 mg sulfadoxine plus 12.5 mg pyrimethamine 
+                arm description: tablet containing 250 mg sulfadoxine plus 12.5 mg pyrimethamine
                 initial sample:
                     size: 283
                     stage: randomized
@@ -2259,7 +2259,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
     protein-energy oral supplementation:
         experiment description: trial to validate a nutritional intervention programme for elderly malnourished people living in nursing homes
         arms:
-            no supplements assigned (A): 
+            no supplements assigned (A):
                 arm description: patients with high nourishment scores who received no supplements.
                 initial sample:
                     size: 19
@@ -2307,7 +2307,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
 981,matsumoto-2020.pdf,https://github.com/brachbach/host-files/raw/main/matsumoto-2020.pdf,,,experiments_arms,"experiments:
     induction of microbial polyamine production:
         experiment description: randomized trial to test the effect of ingesting bacteria that produce polyamines on atherosclerosis risk
-        arms: 
+        arms:
             Bifal + Arg YG:
                 arm description: consumption of yogurt containing Bifal and Arg
                 initial sample:
@@ -2356,7 +2356,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
         experiment description: a trial to test the effects of vitamin A supplementation on child morbidity
         arms:
             retinol:
-                arm description:  gelatin capsules containing 200 000 IU retinol equivalent as retinyl palmitate (vitamin A) in peanut oil once every 4 months             
+                arm description:  gelatin capsules containing 200 000 IU retinol equivalent as retinyl palmitate (vitamin A) in peanut oil once every 4 months
                 initial sample:
                     size:  596
                     stage: randomized
@@ -2422,7 +2422,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
                     size: 11
                     stage: analyzed
 ","To overcome these pitfalls, we used a double-blind, placebo-controlled design, excluded competitive athletes and those with psychiatric disorders and used 600 mg testosterone enanthate (TE)/week. Forty-three eugonadal men, 19-40 yr, were randomized to 1 of 4 groups: Group I, placebo, no exercise; Group II, TE, no exercise; Group III, placebo, exercise; Group IV, TE plus exercise. ","Ten subjects in group I, 10 in group II, 9 in group III, and 11 in group IV completed the study.
-","600 mg testosterone enanthate (TE)/week in sesame 3mL oil or placebo (3 mL sesame oil alone) by intramuscular injection in the gluteal region every week in the Clinical Research Center (CRC) to assure compliance. 
+","600 mg testosterone enanthate (TE)/week in sesame 3mL oil or placebo (3 mL sesame oil alone) by intramuscular injection in the gluteal region every week in the Clinical Research Center (CRC) to assure compliance.
 ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,1,4,,
 987,wirz-2011.pdf,https://github.com/brachbach/host-files/raw/main/wirz-2011.pdf,,,experiments_arms,"experiments:
     prolonged automated walking training:
@@ -2715,7 +2715,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected
 ","To overcome these pitfalls, we used a double-blind, placebo-controlled design, excluded competitive athletes and those with psychiatric disorders and used 600 mg testosterone enanthate (TE)/week. Forty-three eugonadal men, 19-40 yr, were randomized to 1 of 4 groups: Group I, placebo, no exercise; Group II, TE, no exercise; Group III, placebo, exercise; Group IV, TE plus exercise. ","Ten subjects in group I, 10 in group II, 9 in group III, and 11 in group IV completed the study.
-","600 mg testosterone enanthate (TE)/week in sesame 3mL oil or placebo (3 mL sesame oil alone) by intramuscular injection in the gluteal region every week in the Clinical Research Center (CRC) to assure compliance. 
+","600 mg testosterone enanthate (TE)/week in sesame 3mL oil or placebo (3 mL sesame oil alone) by intramuscular injection in the gluteal region every week in the Clinical Research Center (CRC) to assure compliance.
 ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,1,4,,
 1075,sullivan-2009.pdf,https://github.com/brachbach/host-files/raw/main/sullivan-2009.pdf,,,consort_flow,"experiments:
     stretching for hamstring flexibility:
@@ -3856,7 +3856,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
                 Allocated to arm:
                     n: 12
                     quotes:
-                        - Twenty four participants were randomized 1:1 in blocks of 6 to receive 80 μg AMA1-C1/ Alhydrogel® (Alum group) or 80 μg AMA1-C1/Alhydrogel® + CPG 7909 (Alum+CPG group). 
+                        - Twenty four participants were randomized 1:1 in blocks of 6 to receive 80 μg AMA1-C1/ Alhydrogel® (Alum group) or 80 μg AMA1-C1/Alhydrogel® + CPG 7909 (Alum+CPG group).
                 Received allocated intervention: Gold standard not yet collected
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected
@@ -3864,7 +3864,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
                 Allocated to arm:
                     n: 12
                     quotes:
-                        - Twenty four participants were randomized 1:1 in blocks of 6 to receive 80 μg AMA1-C1/ Alhydrogel® (Alum group) or 80 μg AMA1-C1/Alhydrogel® + CPG 7909 (Alum+CPG group). 
+                        - Twenty four participants were randomized 1:1 in blocks of 6 to receive 80 μg AMA1-C1/ Alhydrogel® (Alum group) or 80 μg AMA1-C1/Alhydrogel® + CPG 7909 (Alum+CPG group).
                 Received allocated intervention: Gold standard not yet collected
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected
@@ -3901,7 +3901,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
                 Allocated to arm:
                     n: 1204
                     quotes:
-                        - Between June 9, 2005, and July 22, 2010, we enrolled 2413 participants, assigning 1204 to tenofovir and 1209 to placebo. 
+                        - Between June 9, 2005, and July 22, 2010, we enrolled 2413 participants, assigning 1204 to tenofovir and 1209 to placebo.
                 Received allocated intervention: Gold standard not yet collected
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected
@@ -3909,7 +3909,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
                 Allocated to arm:
                     n: 1209
                     quotes:
-                        - Between June 9, 2005, and July 22, 2010, we enrolled 2413 participants, assigning 1204 to tenofovir and 1209 to placebo. 
+                        - Between June 9, 2005, and July 22, 2010, we enrolled 2413 participants, assigning 1204 to tenofovir and 1209 to placebo.
                 Received allocated intervention: Gold standard not yet collected
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected
@@ -4323,7 +4323,7 @@ Fig. 3 is most important",,1,4,3,"1. # of participants not monotonically decreas
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected
 ","To overcome these pitfalls, we used a double-blind, placebo-controlled design, excluded competitive athletes and those with psychiatric disorders and used 600 mg testosterone enanthate (TE)/week. Forty-three eugonadal men, 19-40 yr, were randomized to 1 of 4 groups: Group I, placebo, no exercise; Group II, TE, no exercise; Group III, placebo, exercise; Group IV, TE plus exercise. ","Ten subjects in group I, 10 in group II, 9 in group III, and 11 in group IV completed the study.
-","600 mg testosterone enanthate (TE)/week in sesame 3mL oil or placebo (3 mL sesame oil alone) by intramuscular injection in the gluteal region every week in the Clinical Research Center (CRC) to assure compliance. 
+","600 mg testosterone enanthate (TE)/week in sesame 3mL oil or placebo (3 mL sesame oil alone) by intramuscular injection in the gluteal region every week in the Clinical Research Center (CRC) to assure compliance.
 ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,1,4,,
 1160,sullivan-2009.pdf,https://github.com/brachbach/host-files/raw/main/sullivan-2009.pdf,,,consort_flow_with_adherence,"experiments:
     stretching for hamstring flexibility:
@@ -5429,7 +5429,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
                 Allocated to arm:
                     n: 12
                     quotes:
-                        - Twenty four participants were randomized 1:1 in blocks of 6 to receive 80 μg AMA1-C1/ Alhydrogel® (Alum group) or 80 μg AMA1-C1/Alhydrogel® + CPG 7909 (Alum+CPG group). 
+                        - Twenty four participants were randomized 1:1 in blocks of 6 to receive 80 μg AMA1-C1/ Alhydrogel® (Alum group) or 80 μg AMA1-C1/Alhydrogel® + CPG 7909 (Alum+CPG group).
                 Received allocated intervention: Gold standard not yet collected
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected
@@ -5437,7 +5437,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
                 Allocated to arm:
                     n: 12
                     quotes:
-                        - Twenty four participants were randomized 1:1 in blocks of 6 to receive 80 μg AMA1-C1/ Alhydrogel® (Alum group) or 80 μg AMA1-C1/Alhydrogel® + CPG 7909 (Alum+CPG group). 
+                        - Twenty four participants were randomized 1:1 in blocks of 6 to receive 80 μg AMA1-C1/ Alhydrogel® (Alum group) or 80 μg AMA1-C1/Alhydrogel® + CPG 7909 (Alum+CPG group).
                 Received allocated intervention: Gold standard not yet collected
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected
@@ -5544,7 +5544,7 @@ But maybe we should just identify when that's the case in a study, and do it tha
                 Allocated to arm:
                     n: Not mentioned
                     quotes: []
-                Received allocated intervention: 
+                Received allocated intervention:
                     description: 76% of the participants in the intervention groups engaged in relaxation or park walking during their lunch break at least eight times. On average, they engaged in park walking/relaxation 8.65 out of ten times during the intervention period.
                     quotes:
                       - During the spring RCT, 76% of the participants in the intervention groups engaged in relaxation or park walking during their lunch break at least eight times. On average, participants engaged in park walking/relaxation for 8.5 out of ten times during the intervention period.
@@ -5600,10 +5600,10 @@ But maybe we should just identify when that's the case in a study, and do it tha
         assigning to arms and after:
             Arm 1 (Control Arm):
                 Allocated to arm: Not mentioned
-                Received allocated intervention: 
+                Received allocated intervention:
                     description: 29 participants across all groups dropped out of the study after randomization
                     quotes:
-                        - A total of 1603 workers registered for the survey task on MTurk. Of those, one refused consent and 29 dropped out of the study. An additional 55 workers were rejected from Arm 2, 189 were rejected from Arm 3, and 210 were rejected from Arm 4, yielding the analytic sample of 1119 (which included 19 usable surveys where the worker did not submit to MTurk for payment; see Fig. 3). 
+                        - A total of 1603 workers registered for the survey task on MTurk. Of those, one refused consent and 29 dropped out of the study. An additional 55 workers were rejected from Arm 2, 189 were rejected from Arm 3, and 210 were rejected from Arm 4, yielding the analytic sample of 1119 (which included 19 usable surveys where the worker did not submit to MTurk for payment; see Fig. 3).
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected
             Arm 2 (Bot/VPN Check):
@@ -5611,23 +5611,23 @@ But maybe we should just identify when that's the case in a study, and do it tha
                 Received allocated intervention:
                   description: 29 participants across all groups dropped out of the study after randomization
                   quotes:
-                      - A total of 1603 workers registered for the survey task on MTurk. Of those, one refused consent and 29 dropped out of the study. An additional 55 workers were rejected from Arm 2, 189 were rejected from Arm 3, and 210 were rejected from Arm 4, yielding the analytic sample of 1119 (which included 19 usable surveys where the worker did not submit to MTurk for payment; see Fig. 3). 
+                      - A total of 1603 workers registered for the survey task on MTurk. Of those, one refused consent and 29 dropped out of the study. An additional 55 workers were rejected from Arm 2, 189 were rejected from Arm 3, and 210 were rejected from Arm 4, yielding the analytic sample of 1119 (which included 19 usable surveys where the worker did not submit to MTurk for payment; see Fig. 3).
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected
             Arm 3 (Truthfulness/Attention Check):
                 Allocated to arm: Not mentioned
-                Received allocated intervention: 
+                Received allocated intervention:
                   description: 29 participants across all groups dropped out of the study after randomization
                   quotes:
-                      - A total of 1603 workers registered for the survey task on MTurk. Of those, one refused consent and 29 dropped out of the study. An additional 55 workers were rejected from Arm 2, 189 were rejected from Arm 3, and 210 were rejected from Arm 4, yielding the analytic sample of 1119 (which included 19 usable surveys where the worker did not submit to MTurk for payment; see Fig. 3). 
+                      - A total of 1603 workers registered for the survey task on MTurk. Of those, one refused consent and 29 dropped out of the study. An additional 55 workers were rejected from Arm 2, 189 were rejected from Arm 3, and 210 were rejected from Arm 4, yielding the analytic sample of 1119 (which included 19 usable surveys where the worker did not submit to MTurk for payment; see Fig. 3).
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected
             Arm 4 (Stringent Arm - All Checks):
                 Allocated to arm: Not mentioned
-                Received allocated intervention: 
+                Received allocated intervention:
                   description: 29 participants across all groups dropped out of the study after randomization
                   quotes:
-                      - A total of 1603 workers registered for the survey task on MTurk. Of those, one refused consent and 29 dropped out of the study. An additional 55 workers were rejected from Arm 2, 189 were rejected from Arm 3, and 210 were rejected from Arm 4, yielding the analytic sample of 1119 (which included 19 usable surveys where the worker did not submit to MTurk for payment; see Fig. 3). 
+                      - A total of 1603 workers registered for the survey task on MTurk. Of those, one refused consent and 29 dropped out of the study. An additional 55 workers were rejected from Arm 2, 189 were rejected from Arm 3, and 210 were rejected from Arm 4, yielding the analytic sample of 1119 (which included 19 usable surveys where the worker did not submit to MTurk for payment; see Fig. 3).
                 -> Attrition: Gold standard not yet collected
                 Analysed: Gold standard not yet collected","We conducted a single-stage, randomized controlled trial with equal allocation to each of four study arms: Arm 1 (Control Arm), Arm 2 (Bot/VPN Check), Arm 3 (Truthfulness/Attention Check), and Arm 4 (Stringent Arm -All Checks).",'-Arm 1 was a control arm that contained no additional quality-control procedures beyond the standard eligibility requirements (see Participants). -Arm 2 was a bot/VPN check that asked participants to select the telephone number they call in the event of an emergency and to correctly identify a drawn image of an eggplant.,'-Arm 3 was a truthfulness/attention check that asked participants if they had done business with Latveria (a country that exists only in the Marvel Comic Universe) and then required them to pass two attention-check questions.,-Arm 4 was a stringent arm that combined the checks from Arms 2 and 3.,"Sample size We recruited 1100 participants (with replacement in some arms, see Design). Our a priori power analysis indicated that using a fixed effects ANOVA to detect an overall difference in means between four study arms, this sample would allow detection of a difference with effect size f = 0.10 (F = 2.61) at power 0.80, two-tailed alpha 0.05. With equal allocation, each arm was planned to have 275 subjects.",,,,,,,,,,,,,,,,,,,,,,,,validation,,,,,,,,,"Crowdsourced psychological and other biobehavioral research using platforms like Amazon’s Mechanical Turk (MTurk) is increasingly common – but has proliferated more rapidly than studies to establish data quality best practices. Thus, this study investigated whether outcome scores for three common screening tools would be significantly different among MTurk workers who were subject to different sets of quality control checks.",,,,"Fig. 1, Fig. 2, Fig. 3
 

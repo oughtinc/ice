@@ -1,9 +1,13 @@
-from typing import Sequence
-from typing_extensions import assert_never
-from ice.formatter.transform.value import ValueTransform
-from ice.formatter.multi import StopSentinel, stop
-from ice.recipes.experiments_and_arms.types import ReasoningStage, PassageWithReasoning
 from collections import Counter
+from collections.abc import Sequence
+
+from typing_extensions import assert_never
+
+from ice.formatter.multi import stop
+from ice.formatter.multi import StopSentinel
+from ice.formatter.transform.value import ValueTransform
+from ice.recipes.experiments_and_arms.types import PassageWithReasoning
+from ice.recipes.experiments_and_arms.types import ReasoningStage
 
 
 def start_last_example(
@@ -18,11 +22,7 @@ def start_last_example(
     ), "Final reasoning required alongside helpfulness"
 
     state: ReasoningStage = (
-        "reasoning"
-        if not reasoning
-        else "helpfulness"
-        if not helpfulness
-        else "answer"
+        "reasoning" if not reasoning else "helpfulness" if not helpfulness else "answer"
     )
 
     match state:
@@ -43,6 +43,7 @@ def start_last_example(
             }
         case _:
             assert_never(state)
+
 
 def get_part(response: str, pre_part: str, post_part: str) -> str:
     split = response.split(pre_part)

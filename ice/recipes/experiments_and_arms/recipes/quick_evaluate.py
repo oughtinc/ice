@@ -1,14 +1,16 @@
-
-from ice.recipe import recipe
-from ice.recipes.experiments_and_arms.prompts.quick_evaluate import get_grade, make_quick_eval_prompt
-from ice.recipes.experiments_and_arms.types import ExperimentsArms
-from ice.formatter.multi import format_multi
 from ice.apis.openai import openai_complete
+from ice.formatter.multi import format_multi
+from ice.recipe import recipe
+from ice.recipes.experiments_and_arms.prompts.quick_evaluate import get_grade
+from ice.recipes.experiments_and_arms.prompts.quick_evaluate import (
+    make_quick_eval_prompt,
+)
+from ice.recipes.experiments_and_arms.types import ExperimentsArms
 
 
-
-
-async def quick_evaluate(gs: ExperimentsArms, generated: ExperimentsArms) -> tuple[str, str]:
+async def quick_evaluate(
+    gs: ExperimentsArms, generated: ExperimentsArms
+) -> tuple[str, str]:
     """Quickly evaluate the generated experiments and arms against the gold standard.
 
     Args:

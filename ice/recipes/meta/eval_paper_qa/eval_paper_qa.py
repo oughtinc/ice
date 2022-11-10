@@ -1,32 +1,33 @@
+import importlib
 import json
+
+from collections.abc import Callable
+from collections.abc import Iterable
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Callable, Iterable, Sequence, Type
+from typing import Any
+from typing import Type
 
 from pydantic import BaseModel
-from ice.evaluation.evaluation_report import latest_commit_hash
+from ruamel.yaml import YAML
+from structlog.stdlib import get_logger
 
-from ice.metrics.gold_standards import (
-    GoldStandard,
-    ParsedGoldStandardType,
-    get_gold_standard,
-    load_papers,
-)
+from ice.evaluation.evaluation_report import latest_commit_hash
+from ice.metrics.gold_standards import get_gold_standard
+from ice.metrics.gold_standards import GoldStandard
+from ice.metrics.gold_standards import load_papers
+from ice.metrics.gold_standards import ParsedGoldStandardType
 from ice.paper import Paper
 from ice.recipe import recipe
-from ice.recipes.meta.eval_paper_qa.types import (
-    AnswerEvalMethod,
-    AnswerType_contra,
-    ClassificationEvalMethod,
-    PaperQaGoldStandard,
-    PaperQaMethod,
-    SequenceGenerationEvaluation,
-)
+from ice.recipes.meta.eval_paper_qa.types import AnswerEvalMethod
+from ice.recipes.meta.eval_paper_qa.types import AnswerType_contra
+from ice.recipes.meta.eval_paper_qa.types import ClassificationEvalMethod
+from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
+from ice.recipes.meta.eval_paper_qa.types import PaperQaMethod
+from ice.recipes.meta.eval_paper_qa.types import SequenceGenerationEvaluation
 from ice.recipes.meta.eval_text_classification import BinaryClassificationMetrics
 from ice.trace import trace
 from ice.utils import map_async
-from structlog.stdlib import get_logger
-from ruamel.yaml import YAML
-import importlib
 
 yaml = YAML(typ="safe")
 log = get_logger()

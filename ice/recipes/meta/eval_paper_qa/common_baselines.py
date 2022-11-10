@@ -1,24 +1,23 @@
+from collections.abc import Callable
+from collections.abc import Sequence
 from functools import partial
+from typing import Literal
+from typing import overload
+
 from ice.apis.openai import TooLongRequestError
 from ice.formatter.transform.value import numbered_list
-from typing import Callable, Sequence, overload, Literal
 from ice.paper import Paper
 from ice.recipe import recipe
 from ice.recipes.meta.eval_paper_qa.quick_list import quick_list
-
-from ice.recipes.meta.eval_paper_qa.types import (
-    PaperQaAnswer,
-    PaperQaGoldStandard,
-    PaperQaMethod,
-)
-from ice.recipes.meta.eval_paper_qa.utils import (
-    convert_demonstration_example,
-    identify_gs_str,
-)
+from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer
+from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
+from ice.recipes.meta.eval_paper_qa.types import PaperQaMethod
+from ice.recipes.meta.eval_paper_qa.utils import convert_demonstration_example
+from ice.recipes.meta.eval_paper_qa.utils import identify_gs_str
 from ice.recipes.primer.paper_qa import answer_for_paper
 from ice.recipes.primer.qa import answer
+from ice.recipes.program_search.nodes.answer.answer import demonstration_answer
 from ice.recipes.program_search.nodes.answer.answer import (
-    demonstration_answer,
     demonstration_answer_with_reasoning,
 )
 from ice.recipes.program_search.nodes.answer.types import Demonstration
@@ -171,7 +170,6 @@ async def cheating_few_shot_qa_baseline(
         support_candidates=gold_support,
         support_labels=[True for _ in gold_support],
     )
-
 
 
 # Refactoring notes

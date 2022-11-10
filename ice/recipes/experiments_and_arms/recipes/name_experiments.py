@@ -1,37 +1,56 @@
-from typing import Sequence, TypeVar, cast
+from collections.abc import Sequence
+from typing import cast
+from typing import TypeVar
+
 from ice.apis.openai import openai_complete
-from ice.formatter.transform.dependent import CountWord, plural_transform
+from ice.formatter.transform.dependent import CountWord
+from ice.formatter.transform.dependent import plural_transform
 from ice.formatter.transform.value import numbered_list
 from ice.paper import Paper
+from ice.recipe import Recipe
+from ice.recipe import recipe
 from ice.recipes.experiments_and_arms.golds import get_ea_gs
+from ice.recipes.experiments_and_arms.num_utils import strip_enumeration_prefix
 from ice.recipes.experiments_and_arms.prompts.can_name_exps import (
     CAN_WE_NAME_EXPERIMENTS_BEST_CHOICE,
+)
+from ice.recipes.experiments_and_arms.prompts.can_name_exps import (
     CAN_WE_NAME_EXPERIMENTS_CHOICES,
+)
+from ice.recipes.experiments_and_arms.prompts.can_name_exps import (
     CAN_WE_NAME_EXPERIMENTS_REASONING_STOP,
+)
+from ice.recipes.experiments_and_arms.prompts.can_name_exps import (
     get_can_we_name_experiments_helpfulness,
+)
+from ice.recipes.experiments_and_arms.prompts.can_name_exps import (
     get_can_we_name_experiments_reasoning,
+)
+from ice.recipes.experiments_and_arms.prompts.can_name_exps import (
     make_can_we_name_experiments_prompt,
 )
+from ice.recipes.experiments_and_arms.prompts.name_exps import get_name_exps_reasoning
+from ice.recipes.experiments_and_arms.prompts.name_exps import make_name_exps_from_count
 from ice.recipes.experiments_and_arms.prompts.name_exps import (
     NAME_EXPERIMENTS_REASONING_STOP,
-    get_name_exps_reasoning,
-    make_name_exps_from_count,
 )
 from ice.recipes.experiments_and_arms.prompts.passages_to_keep import (
     keep_most_helpful_paragraphs,
 )
 from ice.recipes.experiments_and_arms.prompts.quick_list import make_quick_list_prompt
-from ice.recipes.experiments_and_arms.recipes.best_passages import rate_helpfulness_with_reasoning
+from ice.recipes.experiments_and_arms.recipes.best_passages import (
+    rate_helpfulness_with_reasoning,
+)
 from ice.recipes.experiments_and_arms.recipes.cluster import best_answer_by_clustering
 from ice.recipes.experiments_and_arms.recipes.consensus import best_answer_by_consensus
 from ice.recipes.experiments_and_arms.recipes.count_experiments import count_experiments
 from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
     answer_with_best_reasoning,
 )
-from ice.recipe import Recipe, recipe
 from ice.recipes.experiments_and_arms.types import PassageWithReasoning
-from ice.trace import Recorder, recorder, trace
-from ice.recipes.experiments_and_arms.num_utils import strip_enumeration_prefix
+from ice.trace import Recorder
+from ice.trace import recorder
+from ice.trace import trace
 
 
 async def first(exps: Sequence[PassageWithReasoning[str]]) -> PassageWithReasoning[str]:
@@ -55,6 +74,7 @@ def make_reduce_to_best_answer(num_experiments: int):
         )
 
     return reduce_to_best_answer
+
 
 @trace
 async def best_paras_for_naming_experiments(paper: Paper):
@@ -132,7 +152,9 @@ async def name_experiments(
         final_answer_processor=lambda resp: cast(str, resp["choices"][0]["text"]),
     )
 
-    standardized_answer = await convert_answer_to_standardized_format(experiment_names.final_answer)
+    standardized_answer = await convert_answer_to_standardized_format(
+        experiment_names.final_answer
+    )
 
     assert experiment_names.final_answer is not None
     return (
@@ -145,7 +167,7 @@ async def name_experiments(
         if standardized_answer
         else [],
         paragraphs_to_keep,
-        [str(p) for p in paragraphs]
+        [str(p) for p in paragraphs],
     )
 
 

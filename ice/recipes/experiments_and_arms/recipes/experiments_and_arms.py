@@ -1,19 +1,23 @@
 import json
-from typing import Sequence
-from ice.paper import Paper
-from ice.recipe import Recipe, recipe
-from ice.recipes.experiments_and_arms.recipes.name_experiments import name_experiments
-from ice.recipes.experiments_and_arms.recipes.name_arms import name_arms
-from ice.recipes.experiments_and_arms.recipes.quick_evaluate import quick_evaluate
-from ice.recipes.experiments_and_arms.types import ExperimentsArms, Experiment, Arm
-from ice.recipes.experiments_and_arms.golds import get_ea_gs
-from ice.recipes.experiment_arms import ExperimentArms
-from ice.utils import map_async
+
+from collections.abc import Sequence
 from functools import partial
-from ice.trace import recorder, trace
+
 from ice.evaluation.evaluate_recipe_result import RecipeResult
-
-
+from ice.paper import Paper
+from ice.recipe import Recipe
+from ice.recipe import recipe
+from ice.recipes.experiment_arms import ExperimentArms
+from ice.recipes.experiments_and_arms.golds import get_ea_gs
+from ice.recipes.experiments_and_arms.recipes.name_arms import name_arms
+from ice.recipes.experiments_and_arms.recipes.name_experiments import name_experiments
+from ice.recipes.experiments_and_arms.recipes.quick_evaluate import quick_evaluate
+from ice.recipes.experiments_and_arms.types import Arm
+from ice.recipes.experiments_and_arms.types import Experiment
+from ice.recipes.experiments_and_arms.types import ExperimentsArms
+from ice.trace import recorder
+from ice.trace import trace
+from ice.utils import map_async
 
 
 @trace

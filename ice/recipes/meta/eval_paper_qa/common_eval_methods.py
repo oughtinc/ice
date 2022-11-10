@@ -1,6 +1,7 @@
+from collections.abc import Sequence
 
-from typing import Sequence
-from ice.recipes.meta.eval_text_classification import BinaryClassificationMetrics, fuzzy_text_classification_metrics
+from ice.recipes.meta.eval_text_classification import BinaryClassificationMetrics
+from ice.recipes.meta.eval_text_classification import fuzzy_text_classification_metrics
 from ice.recipes.meta.matching.match import match
 
 

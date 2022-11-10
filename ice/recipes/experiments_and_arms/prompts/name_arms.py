@@ -1,16 +1,20 @@
-from ice.formatter.multi import StopSentinel, stop, format_multi
-from ice.formatter.transform.value import ValueTransform, numbered_list
-from typing import Callable, Sequence, Sized
-from ice.formatter.transform.dependent import (
-    CountWord,
-    DependentTransform,
-    plural_transform,
-)
-from ice.formatter.transform.positional import OrdinalWord
-from ice.recipes.experiments_and_arms.num_utils import extract_nums
-from structlog.stdlib import get_logger
-from ice.recipes.experiments_and_arms.prompts.utils import get_part
+from collections.abc import Callable
+from collections.abc import Sequence
+from collections.abc import Sized
 
+from structlog.stdlib import get_logger
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
+from ice.formatter.multi import StopSentinel
+from ice.formatter.transform.dependent import CountWord
+from ice.formatter.transform.dependent import DependentTransform
+from ice.formatter.transform.dependent import plural_transform
+from ice.formatter.transform.positional import OrdinalWord
+from ice.formatter.transform.value import numbered_list
+from ice.formatter.transform.value import ValueTransform
+from ice.recipes.experiments_and_arms.num_utils import extract_nums
+from ice.recipes.experiments_and_arms.prompts.utils import get_part
 from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
 
 log = get_logger()
@@ -40,9 +44,7 @@ In summary, the trial arms for this experiment in particular were:
 """.strip()
 
 
-NAME_ARMS_EXAMPLES: list[
-    dict[str, ValueTransform[Sequence[str]] | str | int]
-] = [
+NAME_ARMS_EXAMPLES: list[dict[str, ValueTransform[Sequence[str]] | str | int]] = [
     dict(
         paragraphs=numbered_list(
             [
@@ -81,9 +83,7 @@ NAME_ARMS_EXAMPLES: list[
     ),
 ]
 
-NAME_ARMS_SHARED: dict[
-    str, OrdinalWord | DependentTransform[int | Sized]
-] = dict(
+NAME_ARMS_SHARED: dict[str, OrdinalWord | DependentTransform[int | Sized]] = dict(
     ordinal=OrdinalWord(capitalize=True, finally_case="Finally"),
     maybe_plural_excerpts=plural_transform(
         key="paragraphs", singular_case="", plural_case="s"
@@ -95,12 +95,12 @@ NAME_ARMS_SHARED: dict[
 )
 
 
-
 NAME_ARMS_REASONING_STOP = ("\n\nIn summary",)
 
 
 def make_name_arms_from_exps(
-    experiments: Sequence[str], experiment_in_question: str,
+    experiments: Sequence[str],
+    experiment_in_question: str,
 ) -> Callable[[int], MultipartReasoningPrompt]:
     def make_name_experiments_prompt_func(num_shots: int) -> MultipartReasoningPrompt:
         def name_experiments_prompt(

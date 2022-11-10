@@ -1,7 +1,11 @@
-from typing import Protocol, Sequence, Mapping, TypeVar, Generic
-from ice.paper import Paper
+from collections.abc import Mapping
+from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Generic
+from typing import Protocol
+from typing import TypeVar
 
+from ice.paper import Paper
 from ice.recipes.meta.eval_text_classification import BinaryClassificationMetrics
 
 AnswerType_contra = TypeVar("AnswerType_contra", contravariant=True)

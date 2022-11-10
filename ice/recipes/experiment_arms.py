@@ -45,10 +45,14 @@ class ExperimentArms(Recipe):
             )
         return qa_result
 
-    async def get_arm_descriptions(self, paper: Paper, arms: list[Arm], experiment: str) -> list[str]:
+    async def get_arm_descriptions(
+        self, paper: Paper, arms: list[Arm], experiment: str
+    ) -> list[str]:
         arm_descriptions = await map_async(
             arms,
-            lambda arm_to_describe: self.describe_arm(paper, arms, arm_to_describe, experiment),
+            lambda arm_to_describe: self.describe_arm(
+                paper, arms, arm_to_describe, experiment
+            ),
             max_concurrency=self.max_concurrency(),
         )
         return arm_descriptions

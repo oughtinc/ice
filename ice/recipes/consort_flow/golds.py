@@ -1,35 +1,35 @@
 import itertools
-from typing import Callable, Literal, Sequence
-from fastapi import Path
 
+from collections.abc import Callable
+from collections.abc import Sequence
+from pathlib import Path
+from typing import Literal
+
+from fastapi import Path
 from pydantic import BaseModel
-from ice.cache import diskcache
-from ice.metrics.gold_standards import (
-    GoldStandard,
-    GoldStandardSplit,
-    get_gold_standard,
-    get_gold_standards,
-    retrieve_gold_standards_df,
-)
 from tqdm import tqdm
+
+from ice.cache import diskcache
+from ice.metrics.gold_standards import get_gold_standard
+from ice.metrics.gold_standards import get_gold_standards
+from ice.metrics.gold_standards import GoldStandard
+from ice.metrics.gold_standards import GoldStandardSplit
+from ice.metrics.gold_standards import retrieve_gold_standards_df
 from ice.paper import Paper
-from ice.recipes.consort_flow.types import ConsortFlow, SampleSize
+from ice.recipes.consort_flow.types import ConsortFlow
+from ice.recipes.consort_flow.types import SampleSize
 from ice.recipes.experiments_and_arms.golds import get_ea_gs
 from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
-from ice.recipes.program_search.nodes.select.dynamic import (
-    SelectionExample,
-    best_negative_example,
-    first_positive_example,
-    make_examples,
-)
-from ice.recipes.program_search.nodes.select.prompts import (
-    RenderableSelectionExample,
-    render_selection_example,
-)
-from ice.recipes.program_search.types import Selection, sentences
-from pathlib import Path
-
-from ice.utils import map_async, reduce_async
+from ice.recipes.program_search.nodes.select.dynamic import best_negative_example
+from ice.recipes.program_search.nodes.select.dynamic import first_positive_example
+from ice.recipes.program_search.nodes.select.dynamic import make_examples
+from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
+from ice.recipes.program_search.nodes.select.prompts import render_selection_example
+from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
+from ice.recipes.program_search.types import Selection
+from ice.recipes.program_search.types import sentences
+from ice.utils import map_async
+from ice.utils import reduce_async
 
 
 def get_consort_gs(document_id: str) -> GoldStandard[ConsortFlow] | None:
@@ -40,7 +40,9 @@ def get_consort_gs(document_id: str) -> GoldStandard[ConsortFlow] | None:
     )
 
 
-def consort_gs_split(split: GoldStandardSplit, question_short_name: str) -> Sequence[GoldStandard[ConsortFlow]]:
+def consort_gs_split(
+    split: GoldStandardSplit, question_short_name: str
+) -> Sequence[GoldStandard[ConsortFlow]]:
     golds = get_gold_standards(
         question_short_name=question_short_name, model_type=ConsortFlow
     )
@@ -67,13 +69,12 @@ def paper_to_allocation_gold_standards(
         for arm in (exp.arms or [])
     ]
 
+
 # def paper_to_experiments_gold_standard(paper: Paper) -> Sequence[tuple[str, Sequence[Selection], Sequence[str]]]:
 #     gs = get_ea_gs(paper.document_id)
 #     texts = sentences(paper)
 #     if not gs or not gs.parsed_answer:
 #         return []
-    
-
 
 
 class GoldStandardExample(BaseModel):
@@ -96,7 +97,9 @@ def gold_standard_examples(
     ]
 
 
-def download_papers(split: str = "validation", question_short_name: str = "consort_flow"):
+def download_papers(
+    split: str = "validation", question_short_name: str = "consort_flow"
+):
     paper_dir = Path("/code/papers/")  # fixed in container
     doc_ids = {p.document_id for p in consort_gs_split(split, question_short_name)}
     paper_files = [f for f in paper_dir.iterdir() if f.name in doc_ids]
@@ -110,11 +113,11 @@ async def gold_standard_examples_except(
     document_ids_to_exclude: Sequence[str],
     require_quotes: bool = True,
     limit: int | None = None,
-    decontextualize: bool = False
+    decontextualize: bool = False,
 ) -> Sequence[GoldStandardExample]:
     blocklist_ids = set(document_ids_to_exclude)
     papers = [p for p in download_papers() if p.document_id not in blocklist_ids]
-    papers = papers[:(limit or len(papers))]
+    papers = papers[: (limit or len(papers))]
     if decontextualize:
         papers = [(await paper_decontext(p)) for p in papers]
     gses = gold_standard_examples(papers)
@@ -164,9 +167,14 @@ def narrow_examples(
 
 
 async def selection_examples_for_paper(
-    paper: Paper, max_examples: int = 5, limit_papers: int | None = None, decontextualize: bool = False
+    paper: Paper,
+    max_examples: int = 5,
+    limit_papers: int | None = None,
+    decontextualize: bool = False,
 ) -> list[RenderableSelectionExample]:
-    golds = await gold_standard_examples_except([paper.document_id], limit=limit_papers, decontextualize=decontextualize)
+    golds = await gold_standard_examples_except(
+        [paper.document_id], limit=limit_papers, decontextualize=decontextualize
+    )
     examples = await select_examples(golds, n=5, step=5, max_existing=3)
     return [
         render_selection_example(question=question, example=example)

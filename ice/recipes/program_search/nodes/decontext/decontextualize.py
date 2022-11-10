@@ -1,28 +1,45 @@
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Protocol, Sequence
-from ice.apis.openai import TooLongRequestError
-from ice.paper import Paper, Paragraph
-
-from ice.recipes.program_search.types import Decontext, Selection, sentences
-from ice.recipes.program_search.nodes.decontext.prompts import decontext_prompt
-from ice.recipe import Recipe, recipe
 from itertools import count
+from typing import Protocol
+
 from tqdm import tqdm
 
+from ice.apis.openai import TooLongRequestError
+from ice.paper import Paper
+from ice.paper import Paragraph
+from ice.recipe import Recipe
+from ice.recipe import recipe
+from ice.recipes.program_search.nodes.decontext.prompts import decontext_prompt
+from ice.recipes.program_search.types import Decontext
+from ice.recipes.program_search.types import Selection
+from ice.recipes.program_search.types import sentences
 
-async def local_decontext(texts: Sequence[Selection], to_decontext: Selection, questions: Sequence[str] | None = None) -> Decontext:
+
+async def local_decontext(
+    texts: Sequence[Selection],
+    to_decontext: Selection,
+    questions: Sequence[str] | None = None,
+) -> Decontext:
     context = " ".join((str(text) for text in texts))
     prompt = decontext_prompt(context, passage=str(to_decontext), questions=questions)
     decontext = await recipe.agent().complete(prompt=prompt, stop="\n\n")
-    return Decontext(p=to_decontext.p, start=to_decontext.start, end=to_decontext.end, questions=questions, out=decontext.strip())
+    return Decontext(
+        p=to_decontext.p,
+        start=to_decontext.start,
+        end=to_decontext.end,
+        questions=questions,
+        out=decontext.strip(),
+    )
+
 
 async def _decontext(context: Sequence[str], passage: str):
     try:
         prompt = decontext_prompt(" ".join(context), passage=passage)
         return await recipe.agent().complete(prompt=prompt, stop="\n\n")
     except TooLongRequestError:
-        return await _decontext(context[-(len(context) - 1):], passage)
-    
+        return await _decontext(context[-(len(context) - 1) :], passage)
+
 
 async def autoregressive_decontext(
     texts: Sequence[Selection], k: int = 15
@@ -46,7 +63,11 @@ async def autoregressive_decontext(
         decontext = await _decontext(context, str(text))
         output.append(
             Decontext(
-                p=text.p, start=text.start, end=text.end, questions=None, out=decontext.strip()
+                p=text.p,
+                start=text.start,
+                end=text.end,
+                questions=None,
+                out=decontext.strip(),
             )
         )
     return output

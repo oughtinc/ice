@@ -1,15 +1,16 @@
-from typing import Sequence
-from ice.formatter.multi import format_multi, stop
+from collections.abc import Sequence
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
 from ice.formatter.transform.dependent import plural_transform
 from ice.formatter.transform.positional import OrdinalWord
-from ice.formatter.transform.value import non_literal, numbered_list
+from ice.formatter.transform.value import non_literal
+from ice.formatter.transform.value import numbered_list
 from ice.recipes.experiments_and_arms.prompts.utils import get_part
-from ice.recipes.experiments_and_arms.types import (
-    ExperimentsArms,
-    Experiment,
-    Arm,
-    Sample,
-)
+from ice.recipes.experiments_and_arms.types import Arm
+from ice.recipes.experiments_and_arms.types import Experiment
+from ice.recipes.experiments_and_arms.types import ExperimentsArms
+from ice.recipes.experiments_and_arms.types import Sample
 
 SCHRIER: dict[str, ExperimentsArms] = {
     "gold_standard": ExperimentsArms(
@@ -133,6 +134,7 @@ def to_exps(result: ExperimentsArms) -> Sequence[str]:
             ret_val.append(exp.name)
     return ret_val
 
+
 def display_result(result: ExperimentsArms, as_gs: bool) -> str:
     lines: list[str] = []
     for exp in result.experiments:
@@ -143,8 +145,6 @@ def display_result(result: ExperimentsArms, as_gs: bool) -> str:
             lines.append(f"\t{arm.name}: {exp.description}" if as_gs else arm.name)
         lines.append("\n")
     return "\n".join(lines).strip()
-
-
 
 
 EXAMPLES = [

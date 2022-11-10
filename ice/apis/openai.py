@@ -1,4 +1,5 @@
-from typing import Mapping
+from collections.abc import Mapping
+
 import httpx
 
 from httpx import Response
@@ -12,7 +13,8 @@ from tenacity.wait import wait_random_exponential
 
 from ice.cache import diskcache
 from ice.settings import settings
-from ice.trace import trace, recorder
+from ice.trace import recorder
+from ice.trace import trace
 
 log = get_logger()
 
@@ -97,7 +99,9 @@ def raise_if_too_long_error(prompt: object, response: Response) -> None:
     wait=wait_random_exponential(min=1),
     after=log_attempt_number,
 )
-async def _post(endpoint: str, json: dict, timeout: float | None = None, cache_id: int = 0) -> dict | TooLongRequestError:
+async def _post(
+    endpoint: str, json: dict, timeout: float | None = None, cache_id: int = 0
+) -> dict | TooLongRequestError:
     """Send a POST request to the OpenAI API and return the JSON response."""
     cache_id  # unused
 
@@ -121,8 +125,10 @@ async def _post(endpoint: str, json: dict, timeout: float | None = None, cache_i
 
 # TODO: support more model types for conversion
 
+
 def get_davinci_equivalent_tokens(response: dict) -> int:
     return (response.get("usage") or dict()).get("total_tokens", 0)
+
 
 @trace
 async def openai_complete(
@@ -141,27 +147,21 @@ async def openai_complete(
 ) -> dict:
     """Send a completion request to the OpenAI API and return the JSON response."""
     params = {
-            "prompt": prompt,
-            "stop": stop,
-            "top_p": top_p,
-            "temperature": temperature,
-            "model": model,
-            "echo": echo,
-            "max_tokens": max_tokens,
-            "logprobs": logprobs,
-            "n": n,
-        }
+        "prompt": prompt,
+        "stop": stop,
+        "top_p": top_p,
+        "temperature": temperature,
+        "model": model,
+        "echo": echo,
+        "max_tokens": max_tokens,
+        "logprobs": logprobs,
+        "n": n,
+    }
     if logit_bias:
         params["logit_bias"] = logit_bias  # type: ignore[assignment]
 
-    response = await _post(
-        "completions",
-        json=params,
-        cache_id=cache_id
-    )
+    response = await _post("completions", json=params, cache_id=cache_id)
     if isinstance(response, TooLongRequestError):
         raise response
     record(davinci_equivalent_tokens=get_davinci_equivalent_tokens(response))
     return response
-
-

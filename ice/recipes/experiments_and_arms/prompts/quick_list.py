@@ -1,4 +1,5 @@
-from ice.formatter.multi import format_multi, stop
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
 from ice.formatter.transform.value import numbered_list
 
 PREAMBLE = "Convert the following model outputs into numbered lists:"
@@ -26,7 +27,7 @@ EXAMPLES = [
     dict(
         answer=numbered_list(["a control group", "an intervention group"]),
         separated=numbered_list(["a control group", "an intervention group"]),
-    )
+    ),
 ]
 
 TEMPLATE = """Answer: {answer}
@@ -35,6 +36,9 @@ Convert to a numbered list:
 
 {separated}"""
 
+
 def make_quick_list_prompt(answer: str):
-    examples = format_multi(TEMPLATE, EXAMPLES + [dict(answer=answer, separated=stop(""))])
+    examples = format_multi(
+        TEMPLATE, EXAMPLES + [dict(answer=answer, separated=stop(""))]
+    )
     return "\n\n".join([PREAMBLE] + list(examples))

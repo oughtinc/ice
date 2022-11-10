@@ -1,22 +1,25 @@
-from itertools import chain
-from ice.trace import trace
-from typing import Callable, Sequence, TypeVar
+from collections.abc import Callable
+from collections.abc import Sequence
 from enum import Enum
+from itertools import chain
+from typing import TypeVar
+
 from more_itertools import windowed
-from ice.apis.openai import TooLongRequestError
 from structlog.stdlib import get_logger
+
+from ice.apis.openai import TooLongRequestError
+from ice.recipe import recipe
 from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
-    reason_select_and_answer,
     answer_with_best_reasoning,
 )
-from ice.recipe import recipe
-from ice.utils import window_dropping
-
-from ice.recipes.experiments_and_arms.types import (
-    MultipartReasoningPrompt,
-    PassageWithReasoning,
+from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
+    reason_select_and_answer,
 )
+from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
+from ice.recipes.experiments_and_arms.types import PassageWithReasoning
+from ice.trace import trace
 from ice.utils import map_async
+from ice.utils import window_dropping
 
 log = get_logger()
 

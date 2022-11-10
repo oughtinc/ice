@@ -4,8 +4,8 @@ import os
 from abc import ABCMeta
 from asyncio import create_task
 from collections.abc import Callable
-from functools import partial
 from contextvars import ContextVar
+from functools import partial
 from functools import wraps
 from inspect import getdoc
 from inspect import getsource
@@ -170,7 +170,9 @@ def trace(fn):
                         name=fn.__name__ if hasattr(fn, "__name__") else repr(fn),
                         doc=getdoc(fn),
                         args=arg_dict,
-                        source=getsource(fn.func) if isinstance(fn, partial) else getsource(fn),
+                        source=getsource(fn.func)
+                        if isinstance(fn, partial)
+                        else getsource(fn),
                     ),
                     f"{parent_id}.children.{id}": True,
                 }

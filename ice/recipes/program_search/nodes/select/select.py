@@ -1,21 +1,27 @@
-from typing import Mapping, Protocol, Sequence, cast
-from typing_extensions import reveal_type
-from ice.apis.openai import TooLongRequestError, openai_complete
-from ice.paper import Paper
-from ice.recipe import Recipe, recipe
-from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
-from ice.recipes.program_search.utils.find_examples import matches
-from ice.utils import reduce_async, window_dropping
-from structlog.stdlib import get_logger
-from ice.recipes.program_search.nodes.prune.prune import prune
+from collections.abc import Mapping
+from collections.abc import Sequence
+from typing import cast
+from typing import Protocol
+
 import numpy as np
 
-from ice.recipes.program_search.nodes.select.prompts import (
-    RenderableSelectionExample,
-    get_selections,
-    make_selection_prompt,
-    render_selection_example,
-)
+from structlog.stdlib import get_logger
+from typing_extensions import reveal_type
+
+from ice.apis.openai import openai_complete
+from ice.apis.openai import TooLongRequestError
+from ice.paper import Paper
+from ice.recipe import Recipe
+from ice.recipe import recipe
+from ice.recipes.program_search.nodes.prune.prune import prune
+from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
+from ice.recipes.program_search.nodes.select.prompts import get_selections
+from ice.recipes.program_search.nodes.select.prompts import make_selection_prompt
+from ice.recipes.program_search.nodes.select.prompts import render_selection_example
+from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
+from ice.recipes.program_search.utils.find_examples import matches
+from ice.utils import reduce_async
+from ice.utils import window_dropping
 
 log = get_logger()
 
@@ -92,7 +98,10 @@ async def maybe_binary_prune(question: str, existing: list[str], max_to_keep=8):
 
 
 async def select_reduce(
-    question: str, texts: Sequence[Sequence[str]], do_prune: bool = False, examples: list[RenderableSelectionExample] | None = None
+    question: str,
+    texts: Sequence[Sequence[str]],
+    do_prune: bool = False,
+    examples: list[RenderableSelectionExample] | None = None,
 ) -> Sequence[str]:
     """Select texts that answer the question by reducing over `select`
 
@@ -122,7 +131,11 @@ async def select_reduce(
 
 
 async def windowed_select(
-    question: str, texts: Sequence[str], n: int, step: int, examples: list[RenderableSelectionExample] | None = None
+    question: str,
+    texts: Sequence[str],
+    n: int,
+    step: int,
+    examples: list[RenderableSelectionExample] | None = None,
 ) -> Sequence[bool]:
     """Select texts that answer the question via
 
@@ -136,8 +149,11 @@ async def windowed_select(
         Sequence[str]: Selected texts.
     """
     windowed_texts = window_dropping(texts, n, step)
-    selections = set(await select_reduce(question, windowed_texts, do_prune=True, examples=examples))
+    selections = set(
+        await select_reduce(question, windowed_texts, do_prune=True, examples=examples)
+    )
     return [t in selections for t in texts]
+
 
 def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str]:
     return [t for t, s in zip(texts, selections) if s]
@@ -149,7 +165,6 @@ def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str
 #     accuracy = (tp + fp) / (tp + tn + fn + fp) if any((tp, tn, fn, fp)) else 0
 #     f1 = 2 * (precision * recall) / (precision + recall) if precision or recall else 0
 #     return dict(tp=tp, tn=tn, fn=fn, fp=fp, recall=recall, precision=precision, f1=f1, accuracy=accuracy)
-
 
 
 # async def select_metrics(texts: Sequence[str], selections: Sequence[bool], golds: Sequence[str]):
@@ -172,10 +187,6 @@ def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str
 #         return sum(values) if values else 0
 #     tp, tn, fn, fp = map(agg, ("tp", "tn", "fn", "fp"))
 #     return calc_metrics(tp=tp, tn=tn, fp=fp, fn=fn)
-
-
-
-
 
 
 # Meta-methods

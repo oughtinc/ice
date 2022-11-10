@@ -1,7 +1,8 @@
+from collections.abc import Iterable
 
-from typing import Iterable
 from ice.formatter.transform.value import numbered_list
-from ice.metrics.gold_standards import GoldStandard, load_paper
+from ice.metrics.gold_standards import GoldStandard
+from ice.metrics.gold_standards import load_paper
 from ice.recipes.experiments_and_arms.types import ExperimentsArms
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 
@@ -23,7 +24,10 @@ def experiments_questions_and_answers(
     gold_support = gold.quotes
     paper = load_paper(gold.document_id)
     yield PaperQaGoldStandard(
-        paper=paper, question=question, gold_answer=gold_answer, gold_support=gold_support
+        paper=paper,
+        question=question,
+        gold_answer=gold_answer,
+        gold_support=gold_support,
     )
 
 
@@ -50,5 +54,8 @@ def arms_questions_and_answers(
         else:
             question = f"What were the different trial arms (subgroups of participants) in the {experiment.name} ({experiment.description}) experiment?"
         yield PaperQaGoldStandard(
-            paper=paper, question=question, gold_answer=gold_answer, gold_support=gold.quotes
+            paper=paper,
+            question=question,
+            gold_answer=gold_answer,
+            gold_support=gold.quotes,
         )

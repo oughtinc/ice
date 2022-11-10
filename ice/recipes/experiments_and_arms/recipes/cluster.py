@@ -1,12 +1,11 @@
-from ice.recipe import recipe
+from collections.abc import Sequence
+
 from ice.apis.openai import openai_complete
-from typing import Sequence
+from ice.recipe import recipe
 from ice.recipes.experiments_and_arms.num_utils import strip_enumeration_prefix
-from ice.recipes.experiments_and_arms.prompts.cluster import (
-    build_count_prompt,
-    build_final_prompt,
-    build_cluster_prompt,
-)
+from ice.recipes.experiments_and_arms.prompts.cluster import build_cluster_prompt
+from ice.recipes.experiments_and_arms.prompts.cluster import build_count_prompt
+from ice.recipes.experiments_and_arms.prompts.cluster import build_final_prompt
 
 
 async def best_answer_by_clustering(question: str, candidates: Sequence[str]) -> str:

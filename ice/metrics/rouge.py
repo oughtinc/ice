@@ -1,9 +1,11 @@
-from typing import Mapping, Sequence
+from collections.abc import Mapping
+from collections.abc import Sequence
+
 from anyio.to_thread import run_sync
 from pydantic import BaseModel
 from rouge_metric import PyRouge
-from ice.cache import diskcache
 
+from ice.cache import diskcache
 from ice.metrics.base import Metric
 from ice.metrics.base import Sample
 
@@ -79,4 +81,3 @@ async def matches(
         for hyp, scores in rouge_scores.items()
         if scores.rouge_l.r >= lcs_threshold
     }
-

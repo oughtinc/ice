@@ -1,4 +1,3 @@
-from enum import Enum
 import itertools
 import os
 import threading as td
@@ -10,6 +9,7 @@ from collections.abc import Callable
 from collections.abc import Coroutine
 from collections.abc import Iterable
 from collections.abc import Sequence
+from enum import Enum
 from functools import cache
 from random import Random
 from typing import Any
@@ -17,9 +17,9 @@ from typing import Generic
 from typing import TypeVar
 
 import anyio
-from more_itertools import windowed
 import tqdm
 
+from more_itertools import windowed
 from structlog.stdlib import get_logger
 from transformers import GPT2TokenizerFast
 

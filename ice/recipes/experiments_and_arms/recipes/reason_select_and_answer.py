@@ -1,14 +1,17 @@
-from ice.trace import trace
-from ice.apis.openai import TooLongRequestError, openai_complete
-from ice.recipes.experiments_and_arms.types import (
-    MultipartReasoningPrompt,
-    PassageWithReasoning,
-)
-from typing import Awaitable, Sequence, Callable, TypeVar
-from ice.paper import Paragraph
-from ice.recipe import recipe
+from collections.abc import Awaitable
+from collections.abc import Callable
+from collections.abc import Sequence
+from typing import TypeVar
+
 from structlog.stdlib import get_logger
 
+from ice.apis.openai import openai_complete
+from ice.apis.openai import TooLongRequestError
+from ice.paper import Paragraph
+from ice.recipe import recipe
+from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
+from ice.recipes.experiments_and_arms.types import PassageWithReasoning
+from ice.trace import trace
 from ice.utils import map_async
 
 log = get_logger()
@@ -270,6 +273,7 @@ async def answer_with_best_reasoning(
     Returns:
         T2: Final answer.
     """
+
     async def sample(cache_id: int):
         return await reason_select_and_answer(
             texts,

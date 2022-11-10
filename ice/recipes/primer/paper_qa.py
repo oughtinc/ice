@@ -1,4 +1,5 @@
-from typing import Sequence
+from collections.abc import Sequence
+
 from ice.paper import Paper
 from ice.paper import Paragraph
 from ice.recipe import recipe

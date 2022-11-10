@@ -1,15 +1,21 @@
 from ast import Mult
-from typing import Callable, runtime_checkable, Protocol
-from ice.formatter.transform.positional import PositionalTransform, OrdinalWord
-from ice.formatter.transform.dependent import (
-    DependentTransform,
-    plural_transform,
-    CountWord,
-)
-from ice.formatter.transform.value import ValueTransform, numbered_list
-from ice.formatter.multi import format_multi, stop, StopSentinel
-from typing import Sequence
-from ice.recipes.experiments_and_arms.prompts.utils import get_part, start_last_example
+from collections.abc import Callable
+from collections.abc import Sequence
+from typing import Protocol
+from typing import runtime_checkable
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
+from ice.formatter.multi import StopSentinel
+from ice.formatter.transform.dependent import CountWord
+from ice.formatter.transform.dependent import DependentTransform
+from ice.formatter.transform.dependent import plural_transform
+from ice.formatter.transform.positional import OrdinalWord
+from ice.formatter.transform.positional import PositionalTransform
+from ice.formatter.transform.value import numbered_list
+from ice.formatter.transform.value import ValueTransform
+from ice.recipes.experiments_and_arms.prompts.utils import get_part
+from ice.recipes.experiments_and_arms.prompts.utils import start_last_example
 from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
 
 
@@ -153,6 +159,7 @@ def make_can_we_name_experiments_prompt(
             instructions = """The following excerpts are from a research papers that conducted different numbers of experiments. Experiments are separate studies on distinct populations. Each experiment may have multiple trial arms, which describe the different treatment or control conditions participants were in. Do the following excerpts describe what this experiment was? Don't confuse describing the experiment with describing trial arms in a single experiment."""
             parts = [instructions] + list(shots)
             return "\n\n".join(parts)
+
         return can_we_name_experiments_prompt
 
     return from_num_shot

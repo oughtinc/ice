@@ -1,7 +1,10 @@
-from itertools import chain
-from typing import Iterable, Sequence, Mapping
+from collections.abc import Iterable
+from collections.abc import Mapping
+from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import cached_property
+from itertools import chain
+
 import numpy as np
 
 from ice.metrics.rouge import matches
