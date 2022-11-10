@@ -162,7 +162,7 @@ async def windowed_select(
     return [t in selections for t in texts]
 
 
-async def windowed_select_using_elicit_prompt(
+async def windowed_select_using_elicit_prompt( # Best recall [use this]
     question: str,
     texts: Sequence[str],
     examples: list[RenderableSelectionExample] | None = None,
