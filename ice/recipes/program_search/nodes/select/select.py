@@ -167,7 +167,7 @@ async def windowed_select_using_elicit_prompt( # Best recall [use this]
     texts: Sequence[str],
     examples: list[RenderableSelectionExample] | None = None,
     perplexity_threshold: float = 3.0,
-) -> Sequence[str]:
+) -> Sequence[tuple[str, float]]:
     """Select texts that answer the question via
 
     Args:
@@ -196,8 +196,12 @@ async def windowed_select_using_elicit_prompt( # Best recall [use this]
         completion=completion,
     )
 
-    return [t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold]
+    return [(t, p[1]) for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold]
     # Lower perplexity means more likely to be "not mentioned in excerpt"
+
+def remove_lowest_perplexity(results: Sequence[tuple[str, float]]):
+    drop = min(range(len(results)), key=lambda idx: results[idx][1])
+    return list(results[0:drop]) + list(results[drop + 1:])
 
 def to_paragraphs(paper: Paper) -> Sequence[str]:
     return [str(p) for p in paper.paragraphs]
@@ -242,7 +246,7 @@ def _create_example_prompts(
 
     return prompts, completions
 
-async def windowed_select_using_elicit_prompt_few_shot(
+async def select_using_elicit_prompt_few_shot(
     question: str,
     texts: Sequence[str],
     examples: list[RenderableSelectionExample] | None = None,
@@ -307,6 +311,9 @@ SELECTION_PROMPT = """"""
 def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str]:
     return [t for t, s in zip(texts, selections) if s]
 
+def as_bool(selections: Sequence[str], texts: Sequence[str]) -> Sequence[bool]:
+    selections_set = set(selections)
+    return [t in selections_set for t in texts]
 
 
 

@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from functools import partial
 
 from ice.formatter.transform.value import numbered_list
 from ice.metrics.gold_standards import GoldStandard
@@ -30,6 +31,7 @@ def experiments_questions_and_answers(
         gold_support=gold_support,
     )
 
+experiments_questions_and_answers_str = partial(experiments_questions_and_answers, consolidate=True)
 
 def arms_questions_and_answers(
     gold: GoldStandard[ExperimentsArms], consolidate: bool = False
@@ -59,3 +61,5 @@ def arms_questions_and_answers(
             gold_answer=gold_answer,
             gold_support=gold.quotes,
         )
+
+arms_questions_and_answers_str = partial(arms_questions_and_answers, consolidate=True)

@@ -21,6 +21,7 @@ from ice.recipes.program_search.nodes.answer.answer import (
     demonstration_answer_with_reasoning,
 )
 from ice.recipes.program_search.nodes.answer.types import Demonstration
+from ice.recipes.program_search.nodes.select.select import as_bool
 from ice.utils import map_async
 
 
@@ -127,6 +128,7 @@ async def cheating_few_shot_qa_baseline(
     gold_support: Sequence[str] | None,
     enumerate_answer: bool,
     few_shot_demonstration_func: Callable[[str], Sequence[PaperQaGoldStandard]],
+    selections: Sequence[str] | None = None,
     paper_division_func: Callable[[Paper], Sequence[str]] | None = None,
     reasoning: bool = False,
 ):
@@ -152,23 +154,31 @@ async def cheating_few_shot_qa_baseline(
         )
         for g in demonstration_examples
     ]
-    assert gold_support
-    if paper_division_func:
+    if paper_division_func and gold_support:
         gold_support = await identify_gs_str(paper_division_func(paper), gold_support)
-    assert gold_support  # somehow required here to satisfy mypy ???
+    support = gold_support or selections
+    assert support
     answer = await _demonstration_answer(
         question=question,
-        texts=gold_support,
+        texts=support,
         demonstrations=demonstrations,
         reasoning=reasoning,
     )
 
     if enumerate_answer:
         answer = await quick_list(question, answer)
+    if paper_division_func:
+        support_candidates = paper_division_func(paper)
+        support_labels = as_bool(support, support_candidates)
+    else:
+        # TODO pickup here
+        pass
+
+
     return PaperQaAnswer(
         answer=answer,
-        support_candidates=gold_support,
-        support_labels=[True for _ in gold_support],
+        support_candidates=support,
+        support_labels=as_bool(support, paper_division_func(paper)),
     )
 
 

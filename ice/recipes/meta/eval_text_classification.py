@@ -14,6 +14,7 @@ from ice.metrics.rouge import matches
 class BinaryClassificationMetrics:
     ground_truth: Sequence[bool]
     predictions: Sequence[bool]
+    scores: Sequence[bool] | None = None
 
     def __post_init__(self):
         assert len(self.ground_truth) == len(

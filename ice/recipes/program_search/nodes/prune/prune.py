@@ -47,7 +47,7 @@ def logprobs_greater_than_none(
 
 
 async def prune(question: str, texts: list[str], max_to_keep: int) -> list[str]:
-    # TODO: Compare first logprob method to completeion parse method
+    # TODO: Compare first logprob method to completion parse method
     if max_to_keep > 5:
         log.warning(
             "The OpenAI API only returns the top 5 logprobs, so we cannot keep more than 5 candidates via logprobs.",
