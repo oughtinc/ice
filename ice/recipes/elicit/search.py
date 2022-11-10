@@ -25,10 +25,12 @@ def make_request_body(
 async def elicit_search(
     question: str = "What is the effect of creatine on cognition?",
     num_papers: int = 4,
+    endpoint: str = ELICIT_SEARCH_ENDPOINT,
 ):
     """
     Search Elicit for papers related to a question.
     """
+    print(f"Searching for query {question}")
     filters = None
     # filters = dict(
     #     has_pdf=True,
@@ -39,7 +41,7 @@ async def elicit_search(
     )
     response = send_elicit_request(
         request_body=request_body,
-        endpoint=ELICIT_SEARCH_ENDPOINT,
+        endpoint=endpoint,
     )
     return response
 

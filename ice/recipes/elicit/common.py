@@ -22,7 +22,9 @@ ELICIT_AUTH_TOKEN = os.getenv("ELICIT_AUTH_TOKEN", config.get("ELICIT_AUTH_TOKEN
 
 if not ELICIT_AUTH_TOKEN:
     raise Exception(
-        "ELICIT_AUTH_TOKEN not found. Please look it up by checking idToken in cookies for elicit.org and add it to .env."
+        """ELICIT_AUTH_TOKEN not found. Please look it up by checking idToken in cookies for elicit.org and add it to .env.
+
+Troubleshooting: the token should NOT start with Bearer, it should just be a string of letters and numbers."""
     )
 
 
@@ -68,7 +70,7 @@ def send_elicit_request(*, request_body, endpoint: str):
     assert ELICIT_AUTH_TOKEN is not None, "ELICIT_AUTH_TOKEN is not set"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": ELICIT_AUTH_TOKEN,
+        "Authorization": f"Bearer {ELICIT_AUTH_TOKEN}",
     }
     chunks = []
     with httpx.stream(
@@ -79,7 +81,6 @@ def send_elicit_request(*, request_body, endpoint: str):
         timeout=40,
     ) as r:
         for chunk in r.iter_text():
-            print(chunk)
             chunks.append(chunk)
     joined = "".join(chunks)
     split_on_newlines = joined.split("\n")
