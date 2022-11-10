@@ -13,9 +13,6 @@ from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
     reason_select_and_answer,
     answer_with_best_reasoning,
 )
-from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
-    sample_reason_select_and_answer,
-)
 from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
 from ice.recipes.experiments_and_arms.types import PassageWithReasoning
 from ice.trace import trace

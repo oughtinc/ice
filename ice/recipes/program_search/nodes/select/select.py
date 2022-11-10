@@ -25,6 +25,7 @@ from ice.recipes.program_search.nodes.select.prompts import make_selection_promp
 from ice.recipes.program_search.nodes.select.prompts import render_selection_example
 from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
 from ice.recipes.program_search.utils.find_examples import matches
+from ice.recipes.find_best_few_shot_prompt import best_few_shot
 from ice.utils import reduce_async
 from ice.utils import window_dropping
 
@@ -220,6 +221,27 @@ def _create_example_prompt(
 
     return prompt+" "+completion
 
+def _create_example_prompts(
+    example: PaperQaGoldStandard,
+) -> Sequence[str]:
+    paragraphs = to_paragraphs(example.paper)
+    relevant_paragraphs = example.gold_support
+    prompts = [
+        baseline_elicit_answer._excerpt_prompt(
+            qa_question=example.question,
+            excerpt=paragraph,
+            answer_prefix=None,
+        )
+        for paragraph in paragraphs
+    ]
+    completions = [
+        example.gold_answer if isinstance(example.gold_answer, str) else example.gold_answer[0] if paragraph in relevant_paragraphs else baseline_elicit_answer.NA_PHRASE
+        for paragraph in paragraphs
+    ]
+    completions = [" "+c.strip() for c in completions]
+
+    return prompts, completions
+
 async def windowed_select_using_elicit_prompt_few_shot(
     question: str,
     texts: Sequence[str],
@@ -228,12 +250,20 @@ async def windowed_select_using_elicit_prompt_few_shot(
 ) -> Sequence[str]:
     random.shuffle(examples)
 
-    prompts = [
-        _create_example_prompt(example, positive=is_positive)
-        for example, is_positive in zip(examples, cycle([False, True]))
-    ]
+    prompts = sum([_create_example_prompts(e)[0] for e in examples], [])
+    completions = sum([_create_example_prompts(e)[1] for e in examples], [])
 
-    few_shot = "\n\n".join(prompts[:2]) # 2 shot prompt
+    few_shot_prompts = await best_few_shot(
+        examples_prompts=prompts,
+        examples_completions=completions,
+        n_shots=2,
+        split_string="\n\n",
+        prefix="Examples:\n\n",
+        max_permutations=6,
+        max_test_size=1,
+    )
+
+    few_shot_prompt = min(few_shot_prompts, key=lambda p: p[1])[0]
 
     #gold_support
 
@@ -250,7 +280,7 @@ async def windowed_select_using_elicit_prompt_few_shot(
     """
 
     prompts = [
-        few_shot + "\n\n" +
+        few_shot_prompt + "\n\n" +
         baseline_elicit_answer._excerpt_prompt(
             qa_question=question,
             excerpt=text,
@@ -260,8 +290,6 @@ async def windowed_select_using_elicit_prompt_few_shot(
     ]
 
     completion = " " + baseline_elicit_answer.NA_PHRASE
-    print(prompts[0])
-    exit()
 
     prompt_perplexities = await best_completion(
         prompts=prompts,

@@ -239,28 +239,28 @@ async def eval_experiments_qa_baseline():
     )
 
 
-async def non_cheating_experiments(paper: Paper, question: str, *args, **kwargs):
-    paras_kept, all_paras = await best_paras_for_naming_experiments(paper=paper)
-    answer = await few_shot_qa_with_support(
-        paper=paper,
-        question=question,
-        support_labels=paras_kept,
-        support_candidates=all_paras,
-        enumerate_answer=True,
-        gold_support_func=partial(experiments_gold_support_func, consolidate=True),
-        reasoning=True,
-    )
-    return answer
+# async def non_cheating_experiments(paper: Paper, question: str, *args, **kwargs):
+#     paras_kept, all_paras = await best_paras_for_naming_experiments(paper=paper)
+#     answer = await few_shot_qa_with_support(
+#         paper=paper,
+#         question=question,
+#         support_labels=paras_kept,
+#         support_candidates=all_paras,
+#         enumerate_answer=True,
+#         gold_support_func=partial(experiments_gold_support_func, consolidate=True),
+#         reasoning=True,
+#     )
+#     return answer
 
 
-async def eval_non_cheating_exps():
-    return await eval_method(
-        method=non_cheating_experiments,
-        question_and_answer_func=experiments_questions_and_answers,
-        split="validation",
-        question_short_name="experiments_arms",
-        get_gs=get_ea_gs,
-    )
+# async def eval_non_cheating_exps():
+#     return await eval_method(
+#         method=non_cheating_experiments,
+#         question_and_answer_func=experiments_questions_and_answers,
+#         split="validation",
+#         question_short_name="experiments_arms",
+#         get_gs=get_ea_gs,
+#     )
 
 
 # recipe.main(eval_experiments_qa_baseline)
