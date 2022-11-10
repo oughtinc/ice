@@ -25,3 +25,11 @@ class OughtInferenceAgent(Agent):
             )
             response.raise_for_status()
         return response.json()["results"][0]["score"]
+
+    @retry(wait=wait_random_exponential(), stop=stop_after_attempt(8))
+    async def embeddings(self, documents: list[str]) -> list[list[float]]:
+        async with httpx.AsyncClient() as client:
+            client.headers["x-api-key"] = settings.OUGHT_INFERENCE_API_KEY
+            response = await client.post(self.url, json=dict(documents=documents))
+            response.raise_for_status()
+        return response.json()["embeddings"]
