@@ -20,6 +20,7 @@ from ice.recipes.primer.qa import answer
 from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
 from ice.recipes.program_search.nodes.prune.prune import prune
 from ice.recipes.program_search.nodes.select.select import (
+    filter_by_perplexity_threshold,
     remove_lowest_perplexity,
     select_using_elicit_prompt_few_shot,
     windowed_select_using_elicit_prompt,
@@ -158,9 +159,11 @@ async def cheating_few_shot_qa_arms_paragraph_reasoning_baseline(
 async def elicit_baseline_into_answer(paper: Paper, question: str, gold_support=None):
     gold_support  # unused
     texts = _to_paragraphs(paper)
-    selections = await windowed_select_using_elicit_prompt(
+    texts_with_perplexities = await windowed_select_using_elicit_prompt(
         question=question, texts=texts
     )
+    selections = filter_by_perplexity_threshold(texts_with_perplexities)
+    
     while selections:
         try:
             relevant_str = "\n\n".join([s[0] for s in selections])
@@ -173,6 +176,7 @@ async def elicit_baseline_into_answer(paper: Paper, question: str, gold_support=
                 answer=answer_as_list,
                 support_candidates=texts,
                 support_labels=[text in selection_set for text in texts],
+                support_scores=[t[1] for t in texts_with_perplexities]
             )
         except TooLongRequestError:
             selections = remove_lowest_perplexity(selections)
@@ -186,6 +190,10 @@ async def elicit_baseline_prune_then_answer(
     selections = await windowed_select_using_elicit_prompt(
         question=question, texts=texts
     )
+    texts_with_perplexities = await windowed_select_using_elicit_prompt(
+        question=question, texts=texts
+    )
+    selections = filter_by_perplexity_threshold(texts_with_perplexities)
     while selections:
         try:
             pruned = await prune(
@@ -203,6 +211,7 @@ async def elicit_baseline_prune_then_answer(
                 answer=answer_as_list,
                 support_candidates=texts,
                 support_labels=[text in selection_set for text in texts],
+                support_scores=[t[1] for t in texts_with_perplexities]
             )
         except TooLongRequestError:
             selections = remove_lowest_perplexity(selections)

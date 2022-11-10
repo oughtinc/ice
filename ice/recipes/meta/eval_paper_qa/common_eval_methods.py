@@ -6,10 +6,16 @@ from ice.recipes.meta.matching.match import match
 
 
 async def eval_text_classification(
-    candidates: Sequence[str], predictions: Sequence[bool], ground_truth: Sequence[str]
+    candidates: Sequence[str],
+    predictions: Sequence[bool],
+    ground_truth: Sequence[str],
+    scores: Sequence[float] | None = None,
 ) -> BinaryClassificationMetrics:
     return await fuzzy_text_classification_metrics(
-        texts=candidates, predictions=predictions, ground_truth=ground_truth
+        texts=candidates,
+        predictions=predictions,
+        ground_truth=ground_truth,
+        scores=scores,
     )
 
 

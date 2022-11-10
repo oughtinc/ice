@@ -4,6 +4,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import cached_property
 from itertools import chain
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import roc_auc_score, roc_curve
 
 import numpy as np
 
@@ -14,7 +16,7 @@ from ice.metrics.rouge import matches
 class BinaryClassificationMetrics:
     ground_truth: Sequence[bool]
     predictions: Sequence[bool]
-    scores: Sequence[bool] | None = None
+    scores: Sequence[float] | None = None
 
     def __post_init__(self):
         assert len(self.ground_truth) == len(
@@ -65,7 +67,13 @@ class BinaryClassificationMetrics:
     def accuracy(self):
         return (self._gt_array == self._pred_array).mean() if self.ground_truth else 0
 
-    def as_dict(self) -> dict[str, int | float]:
+    @cached_property
+    def auroc(self):
+        if not self.scores:
+            return None
+        return roc_auc_score(y_true=self._gt_array, y_score=self.scores)
+
+    def as_dict(self) -> dict[str, int | float | None]:
         return dict(
             tp=int(self.tp),
             tn=int(self.tn),
@@ -75,6 +83,7 @@ class BinaryClassificationMetrics:
             precision=float(self.precision),
             f1=float(self.f1),
             accuracy=float(self.accuracy),
+            auroc=self.auroc and float(self.auroc),
         )
 
     def __str__(self):
@@ -88,9 +97,11 @@ class BinaryClassificationMetrics:
         cls, metrics: Iterable["BinaryClassificationMetrics"]
     ) -> "BinaryClassificationMetrics":
         ms = list(metrics)
+        do_scores = all((m.scores is not None for m in ms))
         return cls(
             ground_truth=list(chain(*(m.ground_truth for m in ms))),
             predictions=list(chain(*(m.predictions for m in ms))),
+            scores=list(chain(*(m.scores or [] for m in ms))) if do_scores else None,
         )
 
 
@@ -113,6 +124,7 @@ async def fuzzy_text_classification_metrics(
     texts: Sequence[str],
     predictions: Sequence[bool],
     ground_truth: Sequence[str],
+    scores: Sequence[float] | None = None,
     lcs_threshold: float = 0.7,
 ) -> BinaryClassificationMetrics:
     """Because labeled ground truths are often partial excerpts, use Rouge lcs-recall of ground truth to generate labels.
@@ -126,4 +138,6 @@ async def fuzzy_text_classification_metrics(
         BinaryClassificationMetrics: Metrics
     """
     gt_labels = await label_texts(texts, ground_truth, lcs_threshold=lcs_threshold)
-    return BinaryClassificationMetrics(ground_truth=gt_labels, predictions=predictions)
+    return BinaryClassificationMetrics(
+        ground_truth=gt_labels, predictions=predictions, scores=scores
+    )

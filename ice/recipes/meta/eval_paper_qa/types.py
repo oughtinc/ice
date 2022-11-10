@@ -24,6 +24,7 @@ class PaperQaAnswer(Generic[AnswerType_contra]):
     answer: AnswerType_contra
     support_candidates: Sequence[str]
     support_labels: Sequence[bool]
+    support_scores: Sequence[float] | None = None
 
 
 @dataclass
@@ -72,5 +73,6 @@ class ClassificationEvalMethod(Protocol):
         candidates: Sequence[str],
         predictions: Sequence[bool],
         ground_truth: Sequence[str],
+        scores: Sequence[float] | None = None,
     ) -> BinaryClassificationMetrics:
         ...
