@@ -4,6 +4,7 @@ import os
 from abc import ABCMeta
 from asyncio import create_task
 from collections.abc import Callable
+from functools import partial
 from contextvars import ContextVar
 from functools import wraps
 from inspect import getdoc
@@ -76,7 +77,10 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(o, dict):
             return {repr(k): v for k, v in o.items()}
         if hasattr(o, "dict") and callable(o.dict):
-            return compress(o.dict())
+            try:
+                return compress(o.dict())
+            except TypeError:
+                return repr(o)
         if isfunction(o):
             return dict(class_name=o.__class__.__name__, name=o.__name__)
         try:
@@ -163,10 +167,10 @@ def trace(fn):
                     id: dict(
                         parent=parent_id,
                         start=monotonic_ns(),
-                        name=fn.__name__,
+                        name=fn.__name__ if hasattr(fn, "__name__") else repr(fn),
                         doc=getdoc(fn),
                         args=arg_dict,
-                        source=getsource(fn),
+                        source=getsource(fn.func) if isinstance(fn, partial) else getsource(fn),
                     ),
                     f"{parent_id}.children.{id}": True,
                 }

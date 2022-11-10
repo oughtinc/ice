@@ -83,19 +83,6 @@ async def rouge_distractor_scores(
 SelectionT_co = TypeVar("SelectionT_co", bound=Selection, covariant=True)
 
 
-@diskcache()
-async def identify_gs_str(
-    candidates: Sequence[str], gs_quotes: Sequence[str], lcs_threshold: float = 0.7
-) -> Sequence[str]:
-    positive_selections = set[str]()
-    for gs_quote in gs_quotes:
-        gs_matches = await matches(
-            hypotheses=candidates, references=[gs_quote], lcs_threshold=lcs_threshold
-        )
-        for candidate in gs_matches:
-            positive_selections.add(candidate)
-    return [cand for cand in candidates if cand in positive_selections]
-
 
 async def mark_gs(
     selections: Sequence[SelectionT_co],

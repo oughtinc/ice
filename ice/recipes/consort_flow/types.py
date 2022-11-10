@@ -1,5 +1,7 @@
-from typing import Literal, Sequence, Type
+from typing import ClassVar, Literal, Sequence, Type
 from pydantic import BaseModel, root_validator, validator
+
+from ice.metrics.gold_standards import ParsedGoldStandardBase
 
 NOT_YET_COLLECTED = "Gold standard not yet collected"
 
@@ -130,7 +132,8 @@ class Experiment(BaseModel):
         )
 
 
-class ConsortFlow(BaseModel):
+class ConsortFlow(ParsedGoldStandardBase):
+    question_short_name: ClassVar[str] = "consort_flow"
     experiments: list[Experiment]
 
     @validator("experiments", pre=True)

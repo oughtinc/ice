@@ -11,6 +11,9 @@ from ice.recipes.program_search.nodes.answer.types import (
     Demonstration,
     DemonstrationWithReasoning,
 )
+from structlog.stdlib import get_logger
+
+log = get_logger()
 
 INSTRUCTIONS = "Answer the question based on the excerpts provided."
 FEW_SHOT_INSTRUCTIONS = (
@@ -96,6 +99,27 @@ async def demonstration_answer(
     return await recipe.agent().complete(prompt=prompt, stop="\n\n---")
 
 
+async def _get_reasoning(initial_prompt: str, completion: str):
+    try:
+        return completion.split("Final answer:")[1].strip()
+    except IndexError:
+        lines = completion.splitlines()
+        if not len(lines) == 1:
+            raise ValueError("Unexpected response")
+        new_prompt = initial_prompt + " " + lines[0].strip() + "\n\n" + "Final answer:"
+        new_completion = await openai_complete(
+            prompt=new_prompt, stop="\n\n---", max_tokens=200
+        )
+        log.warning(
+            "Final answer not included in initial response",
+            initial_response=completion,
+            initial_prompt=initial_prompt,
+            new_prompt=new_prompt,
+            new_final_answer=new_completion,
+        )
+    return new_completion["choices"][0]["text"].strip()
+
+
 async def demonstration_answer_with_reasoning(
     question: str, texts: Sequence[str], demonstrations: Sequence[Demonstration]
 ):
@@ -109,10 +133,9 @@ async def demonstration_answer_with_reasoning(
             prompt=prompt,
             stop="\n\n---",
             max_tokens=max_tokens,
-            logit_bias=SUPPRESS_EOT,
         )
         try:
-            answer = completion["choices"][0]["text"].split("Final answer:")[1].strip()
+            answer: str = completion["choices"][0]["text"]
             break
         except IndexError:
             finish_reason = completion["choices"][0]["finish_reason"]
@@ -121,7 +144,7 @@ async def demonstration_answer_with_reasoning(
             else:
                 raise
 
-    return answer
+    return await _get_reasoning(prompt, answer)
 
 
 recipe.main(simple_answer)

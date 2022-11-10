@@ -1,6 +1,7 @@
-from typing import NewType, Literal, Generic, TypeVar, Sequence, runtime_checkable, Protocol
+from typing import ClassVar, NewType, Literal, Generic, TypeVar, Sequence, runtime_checkable, Protocol
 from pydantic import BaseModel, root_validator, validator
 from pydantic.generics import GenericModel
+from ice.metrics.gold_standards import ParsedGoldStandardBase
 from ice.paper import Paragraph
 
 
@@ -49,7 +50,8 @@ class Experiment(BaseModel):
         return v
 
 
-class ExperimentsArms(BaseModel):
+class ExperimentsArms(ParsedGoldStandardBase):
+    question_short_name: ClassVar[str] = "experiments_arms"
     experiments: list[Experiment]
 
     @validator("experiments", pre=True)

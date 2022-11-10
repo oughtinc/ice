@@ -63,14 +63,14 @@ class BinaryClassificationMetrics:
 
     def as_dict(self) -> dict[str, int | float]:
         return dict(
-            tp=self.tp,
-            tn=self.tn,
-            fp=self.fp,
-            fn=self.fn,
-            recall=self.recall,
-            precision=self.precision,
-            f1=self.f1,
-            accuracy=self.accuracy,
+            tp=int(self.tp),
+            tn=int(self.tn),
+            fp=int(self.fp),
+            fn=int(self.fn),
+            recall=float(self.recall),
+            precision=float(self.precision),
+            f1=float(self.f1),
+            accuracy=float(self.accuracy),
         )
 
     def __str__(self):
