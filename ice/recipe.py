@@ -104,7 +104,11 @@ class RecipeHelper:
             raise TypeError("recipe.main must be given an async function")
 
         # Trace all globals defined in main's module.
-        g = main.__globals__
+        try:
+            g = main.__globals__
+        except AttributeError:
+            # Perhaps this is a functools.partial
+            g = main.func.__globals__
         for name, value in g.items():
             if getattr(value, "__module__", None) == main.__module__:
                 g[name] = trace(value)
