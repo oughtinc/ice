@@ -18,14 +18,15 @@ CSVS_PATH = Path(__file__).parent.parent.parent / "data" / "evaluation_csvs"
 
 async def summarize_experiment_evals(results_file: str):
     data_df = pd.read_csv(results_file)
+    # data_df["recipe"] = "In-app QA"
 
     eval_dfs = [
-        df for _, df in data_df.groupby(["technique", "elicit_commit"], dropna=False)
+        df for _, df in data_df.groupby(["recipe", "elicit_commit"], dropna=False)
     ]
     dashboard_row_dfs = []
     experiment_evaluations_dfs = []
 
-    for technique_df in eval_dfs:
+    for recipe_df in eval_dfs:
         recipe_results_for_evaluation = [
             RecipeResult(
                 question_short_name=row.question_short_name,
@@ -45,11 +46,11 @@ async def summarize_experiment_evals(results_file: str):
                 if pd.isna(row.get("failure_modes"))
                 else row.failure_modes.split(","),
             )
-            for _, row in technique_df.iterrows()
+            for _, row in recipe_df.iterrows()
         ]
 
         evaluation_report = EvaluationReport(
-            technique_name=technique_df["technique"].iloc[0],
+            technique_name=recipe_df["recipe"].iloc[0],
             results=await map_async(
                 recipe_results_for_evaluation, EvaluatedRecipeResult.from_recipe_result
             ),
@@ -66,14 +67,14 @@ async def summarize_experiment_evals(results_file: str):
 
     if len(eval_dfs) > 1:
         dashboard_rows_df = pd.concat(dashboard_row_dfs)
-        techniques_str = " ".join(data_df.technique.unique())
+        recipes_str = " ".join(data_df.recipe.unique())
         dashboard_rows_df.to_csv(
-            CSVS_PATH / f"dashboard_rows {techniques_str} {start_time}.csv"
+            CSVS_PATH / f"dashboard_rows {recipes_str} {start_time}.csv"
         )
 
         experiment_evaluations_df = pd.concat(experiment_evaluations_dfs)
         experiment_evaluations_df.to_csv(
-            CSVS_PATH / f"experiment_evaluations {techniques_str} {start_time}.csv"
+            CSVS_PATH / f"experiment_evaluations {recipes_str} {start_time}.csv"
         )
 
 

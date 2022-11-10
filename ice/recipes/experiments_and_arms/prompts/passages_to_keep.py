@@ -135,5 +135,4 @@ async def keep_most_helpful_paragraphs(
         best_paras = best_paras | set((await get_best_paras([next_para])))
     return [p for p in best_paras]
 
-
 recipe.main(keep_most_helpful_paragraphs)

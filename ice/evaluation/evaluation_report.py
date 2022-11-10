@@ -1,5 +1,3 @@
-import subprocess
-
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,14 +13,11 @@ from ice.evaluation.evaluate_recipe_result import EvaluatedRecipeResult
 from ice.evaluation.utils import precision_score
 from ice.evaluation.utils import recall_score
 from ice.evaluation.utils import start_time
+from ice.utils import latest_commit_hash
 
 CSVS_PATH = Path(__file__).parent / "../../data/evaluation_csvs/"
 
 SUBSTANTIVELY_CORRECT_MIN_ANSWER_RATING = 4
-
-
-def latest_commit_hash():
-    return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode("utf-8").strip()
 
 
 def as_percent(decimal: float | None) -> str | None:
@@ -426,6 +421,9 @@ class EvaluationReport(BaseModel):
                 "excerpts": result.evaluated_excerpts.excerpts,
                 "gs_quotes": result.evaluated_excerpts.gold_standards_str(),
                 "answer": result.answer,
+                "gs_answer": result.gold_standard.answer
+                if result.gold_standard
+                else None,
                 "answer_rating": result.answer_rating,
                 "failure_modes": result.failure_modes,
             }

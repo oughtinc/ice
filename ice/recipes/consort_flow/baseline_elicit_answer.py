@@ -66,8 +66,11 @@ Make sure everything you say is supported by the excerpt. \
 The excerpt may cite other papers; \
 answer about the paper you're reading the excerpt from, not the papers that it cites. \
 Answer in one phrase or sentence:
+
 Paper excerpt: {excerpt}
+
 Question: {qa_question}
+
 {full_answer_prefix}"""
 
 

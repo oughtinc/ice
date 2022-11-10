@@ -1,5 +1,7 @@
 from collections.abc import Mapping
 from collections.abc import Sequence
+from itertools import cycle
+import random
 from typing import cast
 from typing import Protocol
 
@@ -13,6 +15,9 @@ from ice.apis.openai import TooLongRequestError
 from ice.paper import Paper
 from ice.recipe import Recipe
 from ice.recipe import recipe
+from ice.recipes.best_completion import best_completion
+from ice.recipes.consort_flow import baseline_elicit_answer
+from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 from ice.recipes.program_search.nodes.prune.prune import prune
 from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
 from ice.recipes.program_search.nodes.select.prompts import get_selections
@@ -20,6 +25,7 @@ from ice.recipes.program_search.nodes.select.prompts import make_selection_promp
 from ice.recipes.program_search.nodes.select.prompts import render_selection_example
 from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
 from ice.recipes.program_search.utils.find_examples import matches
+from ice.recipes.find_best_few_shot_prompt import best_few_shot
 from ice.utils import reduce_async
 from ice.utils import window_dropping
 
@@ -30,6 +36,7 @@ log = get_logger()
 #     async def __call__(self, question: str, texts: list[str], examples: list[Example]) -> list[int]:
 #         pass
 
+random.seed(314)
 
 def last_token_logprob(openai_response: dict) -> float:
     return openai_response["choices"][0]["logprobs"]["token_logprobs"][-1]
@@ -155,38 +162,154 @@ async def windowed_select(
     return [t in selections for t in texts]
 
 
+async def windowed_select_using_elicit_prompt( # Best recall [use this]
+    question: str,
+    texts: Sequence[str],
+    examples: list[RenderableSelectionExample] | None = None,
+    perplexity_threshold: float = 3.0,
+) -> Sequence[str]:
+    """Select texts that answer the question via
+
+    Args:
+        question (str): The question to select texts for.
+        texts (Sequence[str]): Texts to consider for selection.
+        n (int): Number of texts to consider at each step.
+        step (int): Overlap between windows. (if n == step, partition the document; if step < n, window with step size).
+
+    Returns:
+        Sequence[str]: Selected texts.
+    """
+
+    prompts = [
+        baseline_elicit_answer._excerpt_prompt(
+            qa_question=question,
+            excerpt=text,
+            answer_prefix=None,
+        )
+        for text in texts
+    ]
+
+    completion = " " + baseline_elicit_answer.NA_PHRASE
+
+    prompt_perplexities = await best_completion(
+        prompts=prompts,
+        completion=completion,
+    )
+
+    return [t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold]
+    # Lower perplexity means more likely to be "not mentioned in excerpt"
+
+def to_paragraphs(paper: Paper) -> Sequence[str]:
+    return [str(p) for p in paper.paragraphs]
+
+def _create_example_prompt(
+    example: PaperQaGoldStandard,
+    positive: bool,
+):
+    paragraphs = to_paragraphs(example.paper)
+    relevant_paragraphs = example.gold_support
+    irrelevant_paragraphs = [p for p in paragraphs if not p in relevant_paragraphs]
+    relevant_paragraph, irrelevant_paragraph = random.choice(relevant_paragraphs), random.choice(irrelevant_paragraphs)
+    prompt = baseline_elicit_answer._excerpt_prompt(
+        qa_question=example.question,
+        excerpt=relevant_paragraph if positive else irrelevant_paragraph,
+        answer_prefix=None,
+    )
+    completion = example.gold_answer if isinstance(example.gold_answer, str) else example.gold_answer[0]
+
+    completion = completion.strip() if positive else baseline_elicit_answer.NA_PHRASE
+
+    return prompt+" "+completion
+
+def _create_example_prompts(
+    example: PaperQaGoldStandard,
+) -> Sequence[str]:
+    paragraphs = to_paragraphs(example.paper)
+    relevant_paragraphs = example.gold_support
+    prompts = [
+        baseline_elicit_answer._excerpt_prompt(
+            qa_question=example.question,
+            excerpt=paragraph,
+            answer_prefix=None,
+        )
+        for paragraph in paragraphs
+    ]
+    completions = [
+        example.gold_answer if isinstance(example.gold_answer, str) else example.gold_answer[0] if paragraph in relevant_paragraphs else baseline_elicit_answer.NA_PHRASE
+        for paragraph in paragraphs
+    ]
+    completions = [" "+c.strip() for c in completions]
+
+    return prompts, completions
+
+async def windowed_select_using_elicit_prompt_few_shot(
+    question: str,
+    texts: Sequence[str],
+    examples: list[RenderableSelectionExample] | None = None,
+    perplexity_threshold: float = 3.0,
+) -> Sequence[str]:
+    random.shuffle(examples)
+
+    prompts = sum([_create_example_prompts(e)[0] for e in examples], [])
+    completions = sum([_create_example_prompts(e)[1] for e in examples], [])
+
+    few_shot_prompts = await best_few_shot(
+        examples_prompts=prompts,
+        examples_completions=completions,
+        n_shots=2,
+        split_string="\n\n",
+        prefix="Examples:\n\n",
+        max_permutations=6,
+        max_test_size=1,
+    )
+
+    few_shot_prompt = min(few_shot_prompts, key=lambda p: p[1])[0]
+
+    #gold_support
+
+    """Select texts that answer the question via
+
+    Args:
+        question (str): The question to select texts for.
+        texts (Sequence[str]): Texts to consider for selection.
+        n (int): Number of texts to consider at each step.
+        step (int): Overlap between windows. (if n == step, partition the document; if step < n, window with step size).
+
+    Returns:
+        Sequence[str]: Selected texts.
+    """
+
+    prompts = [
+        few_shot_prompt + "\n\n" +
+        baseline_elicit_answer._excerpt_prompt(
+            qa_question=question,
+            excerpt=text,
+            answer_prefix=None,
+        )
+        for text in texts
+    ]
+
+    completion = " " + baseline_elicit_answer.NA_PHRASE
+
+    prompt_perplexities = await best_completion(
+        prompts=prompts,
+        completion=completion,
+    )
+
+    return [t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold]
+    # Lower perplexity means more likely to be "not mentioned in excerpt"
+
+# Few-shot prompt
+
+SELECTION_PROMPT = """"""
+
+
 def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str]:
     return [t for t, s in zip(texts, selections) if s]
 
 
-# def calc_metrics(*, tp, tn, fp, fn) -> Mapping[str, int | float]:
-#     recall = tp / (tp + fn) if tp or fn else 0
-#     precision = tp / (tp + fp) if tp or fp else 0
-#     accuracy = (tp + fp) / (tp + tn + fn + fp) if any((tp, tn, fn, fp)) else 0
-#     f1 = 2 * (precision * recall) / (precision + recall) if precision or recall else 0
-#     return dict(tp=tp, tn=tn, fn=fn, fp=fp, recall=recall, precision=precision, f1=f1, accuracy=accuracy)
 
 
-# async def select_metrics(texts: Sequence[str], selections: Sequence[bool], golds: Sequence[str]):
-#     # TODO: better typing
-#     assert len(texts) == len(selections)
-#     gt_labels = await label_texts(texts, golds)
-#     gt_array = np.array(gt_labels, dtype=bool)
-#     label_array = np.array(selections, dtype=bool)
-#     assert gt_array.shape == label_array.shape
-#     tp = (gt_array & label_array).sum()
-#     tn = (~gt_array & ~label_array).sum()
-#     fn = (gt_array & ~label_array).sum()
-#     fp = (~gt_array & label_array).sum()
-#     return calc_metrics(tp=tp, tn=tn, fp=fp, fn=fn)
-
-# def aggregate_select_metrics(metrics: Sequence[Mapping]) -> Mapping:
-#     # TODO: better typing
-#     def agg(key: str) -> int:
-#         values = [m[key] for m in metrics if key in m]
-#         return sum(values) if values else 0
-#     tp, tn, fn, fp = map(agg, ("tp", "tn", "fn", "fp"))
-#     return calc_metrics(tp=tp, tn=tn, fp=fp, fn=fn)
 
 
 # Meta-methods

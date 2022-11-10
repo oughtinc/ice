@@ -27,6 +27,8 @@ async def completion_perplexity(
     """Calculate the perplexity of a completion given a prompt."""
     if not completion[0].isspace():
         log.warning("Completion does not start with whitespace!", completion=completion)
+    
+    log.info("Calling GPT-3", num_tokens=n_tokens(prompt + completion))
     response = await openai_complete(
         prompt=prompt + completion,
         max_tokens=0,
@@ -41,8 +43,6 @@ async def completion_perplexity(
 
     logits = choices[0]["logprobs"]["token_logprobs"]
 
-    assert len(logits) == n_tokens(prompt + completion)
-
     completion_logits = logits[n_tokens(prompt) :]
 
     perplexity = math.exp(-sum(completion_logits) / len(completion_logits))
@@ -54,15 +54,13 @@ async def best_completion(
     prompts: list[str] = PROMPTS,
     completion: str = COMPLETION,
 ) -> list[tuple[str, float]]:
-    """Returns a sorted list of completions and their perplexities."""
+    """Returns a list of prompts and their perplexities."""
     perplexities = await map_async(
         input_list=prompts,
         fn=partial(completion_perplexity, completion=completion),
         max_concurrency=10,
     )
-    prompt_list = list(zip(prompts, perplexities))
-
-    return sorted(prompt_list, key=lambda x: x[1])
+    return list(zip(prompts, perplexities))
 
 
 recipe.main(best_completion)
