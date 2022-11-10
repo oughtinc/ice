@@ -1,7 +1,5 @@
-
-
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 from ice.formatter.transform.value import numbered_list
 

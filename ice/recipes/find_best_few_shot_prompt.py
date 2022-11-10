@@ -3,11 +3,11 @@ from random import sample
 from typing import Any
 
 from structlog.stdlib import get_logger
+from tqdm import tqdm
 
 from ice.recipe import recipe
 from ice.recipes.best_completion import completion_perplexity
 from ice.utils import map_async
-from tqdm import tqdm
 
 EXAMPLES_PROMPTS = [
     "Complete this math problem: 2 + 2 =",
@@ -28,11 +28,7 @@ def remaining_prompts(
     prompts_and_completions: list[tuple[str, str]],
     used_prompts_and_completions: list[tuple[str, str]],
 ) -> list[tuple[str, str]]:
-    return [
-        p
-        for p in prompts_and_completions
-        if not p in used_prompts_and_completions
-    ]
+    return [p for p in prompts_and_completions if not p in used_prompts_and_completions]
 
 
 async def tuple_completion_perplexity(
@@ -60,13 +56,11 @@ async def eval_prompt(
 
     return sum(perplexities) / len(perplexities)
 
+
 def _permuations(l: list[Any], n_shots: int, max: int = 10000):
     for _ in range(max):
         yield sample(l, n_shots)
 
-
-    
-        
 
 async def best_few_shot(
     examples_prompts: list[str] = EXAMPLES_PROMPTS,
@@ -116,7 +110,9 @@ async def best_few_shot(
             prompt,
             await eval_prompt(prompt, remaining_prompts_and_completions, split_string),
         )
-        for prompt, remaining_prompts_and_completions in tqdm(all_prompts, desc="Evaluating prompts")
+        for prompt, remaining_prompts_and_completions in tqdm(
+            all_prompts, desc="Evaluating prompts"
+        )
     ]
 
     return scored_prompts  # The prompt with the lowest perplexity is the best few-shot prompt.

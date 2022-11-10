@@ -1,27 +1,29 @@
+from collections.abc import Iterable
+from collections.abc import Sequence
 from functools import partial
 from itertools import chain
+
 from ice.formatter.transform.value import numbered_list
 from ice.metrics.gold_standards import GoldStandard
-from typing import Iterable, Sequence
 from ice.paper import Paper
+from ice.recipe import recipe
 from ice.recipes.experiments_and_arms.golds import get_ea_gs
-#from ice.recipes.experiments_and_arms.recipes.name_experiments import (
+from ice.recipes.experiments_and_arms.types import ExperimentsArms
+from ice.recipes.meta.eval_paper_qa.eval_paper_qa import cheating_few_shot_qa_baseline
+from ice.recipes.meta.eval_paper_qa.eval_paper_qa import cheating_qa_baseline
+from ice.recipes.meta.eval_paper_qa.eval_paper_qa import eval_method
+from ice.recipes.meta.eval_paper_qa.eval_paper_qa import few_shot_qa_with_support
+from ice.recipes.meta.eval_paper_qa.eval_paper_qa import paper_qa_baseline
+from ice.recipes.meta.eval_paper_qa.eval_paper_qa import search_qa_baseline
+from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer
+from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
+from ice.recipes.meta.eval_paper_qa.utils import download_paper
+from ice.recipes.meta.eval_paper_qa.utils import download_papers
+
+# from ice.recipes.experiments_and_arms.recipes.name_experiments import (
 #     NameExperiments,
 #     best_paras_for_naming_experiments,
 # )
-from ice.recipes.experiments_and_arms.types import ExperimentsArms
-from ice.recipes.meta.eval_paper_qa.eval_paper_qa import (
-    cheating_few_shot_qa_baseline,
-    cheating_qa_baseline,
-    eval_method,
-    few_shot_qa_with_support,
-    paper_qa_baseline,
-    search_qa_baseline,
-)
-from ice.recipe import recipe
-
-from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer, PaperQaGoldStandard
-from ice.recipes.meta.eval_paper_qa.utils import download_paper, download_papers
 
 
 def experiments_questions_and_answers(
@@ -41,7 +43,10 @@ def experiments_questions_and_answers(
     gold_support = gold.quotes
     paper = download_paper(gold.document_id)
     yield PaperQaGoldStandard(
-        paper=paper, question=question, gold_answer=gold_answer, gold_support=gold_support
+        paper=paper,
+        question=question,
+        gold_answer=gold_answer,
+        gold_support=gold_support,
     )
 
 
@@ -68,7 +73,10 @@ def arms_questions_and_answers(
         else:
             question = f"What were the different trial arms (subgroups of participants) in the {experiment.name} ({experiment.description}) experiment?"
         yield PaperQaGoldStandard(
-            paper=paper, question=question, gold_answer=gold_answer, gold_support=gold.quotes
+            paper=paper,
+            question=question,
+            gold_answer=gold_answer,
+            gold_support=gold.quotes,
         )
 
 
@@ -83,6 +91,7 @@ async def cheating_eval_experiments_qa_baseline():
         get_gs=get_ea_gs,  # TODO: make native version
     )
 
+
 async def search_eval_experiments_qa_baseline():
     # Test search recipes with a baseline generation method
     method = partial(
@@ -91,7 +100,7 @@ async def search_eval_experiments_qa_baseline():
     )
     return await eval_method(
         method=method,
-        question_and_answer_func=experiments_questions_and_answers,#,experiments_questions_and_answers,
+        question_and_answer_func=experiments_questions_and_answers,  # ,experiments_questions_and_answers,
         split="validation",
         question_short_name="experiments_arms",
         get_gs=get_ea_gs,  # TODO: make native version
@@ -159,15 +168,17 @@ async def cheating_eval_experiments_with_demonstrations():
         get_gs=get_ea_gs,
     )
 
+
 def to_paragraphs(paper: Paper) -> Sequence[str]:
     return [str(p) for p in paper.paragraphs]
+
 
 async def cheating_paragraph_eval_experiments_with_demonstrations():
     method = partial(
         cheating_few_shot_qa_baseline,
         enumerate_answer=True,
         gold_support_func=experiments_gold_support_func,
-        paper_division_func=to_paragraphs
+        paper_division_func=to_paragraphs,
     )
     return await eval_method(
         method=method,
@@ -176,7 +187,6 @@ async def cheating_paragraph_eval_experiments_with_demonstrations():
         question_short_name="experiments_arms",
         get_gs=get_ea_gs,
     )
-
 
 
 async def cheating_eval_experiments_with_reasoning_demonstrations():
@@ -194,6 +204,7 @@ async def cheating_eval_experiments_with_reasoning_demonstrations():
         get_gs=get_ea_gs,
     )
 
+
 async def cheating_paragraph_eval_experiments_with_reasoning_demonstrations():
     method = partial(
         cheating_few_shot_qa_baseline,
@@ -209,7 +220,6 @@ async def cheating_paragraph_eval_experiments_with_reasoning_demonstrations():
         question_short_name="experiments_arms",
         get_gs=get_ea_gs,
     )
-
 
 
 async def cheating_eval_arms_with_reasoning_demonstrations():

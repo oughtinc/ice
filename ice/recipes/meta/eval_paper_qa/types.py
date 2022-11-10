@@ -1,8 +1,11 @@
-from typing import Protocol, Sequence, Mapping
-from ice.paper import Paper
+from collections.abc import Mapping
+from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Protocol
 
+from ice.paper import Paper
 from ice.recipes.meta.eval_text_classification import BinaryClassificationMetrics
+
 
 @dataclass
 class PaperQaGoldStandard:
@@ -11,11 +14,13 @@ class PaperQaGoldStandard:
     gold_answer: Sequence[str] | str
     gold_support: Sequence[str]
 
+
 @dataclass
 class PaperQaAnswer:
     answer: str | Sequence[str]
     support_candidates: Sequence[str]
     support_labels: Sequence[bool]
+
 
 @dataclass
 class SequenceGenerationEvaluation:

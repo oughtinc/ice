@@ -1,16 +1,17 @@
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence, TypedDict
+from typing import TypedDict
+
 from ice.apis.openai import openai_complete
-from ice.formatter.multi import format_multi, stop
-from ice.recipe import recipe
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
 from ice.formatter.transform.value import numbered_list
+from ice.recipe import recipe
 from ice.recipes.program_search.nodes.answer.generate_reasoning.prompts import (
     add_reasoning,
 )
-from ice.recipes.program_search.nodes.answer.types import (
-    Demonstration,
-    DemonstrationWithReasoning,
-)
+from ice.recipes.program_search.nodes.answer.types import Demonstration
+from ice.recipes.program_search.nodes.answer.types import DemonstrationWithReasoning
 
 INSTRUCTIONS = "Answer the question based on the excerpts provided."
 FEW_SHOT_INSTRUCTIONS = (

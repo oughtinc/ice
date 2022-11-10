@@ -1,7 +1,8 @@
+import random
+
 from collections.abc import Mapping
 from collections.abc import Sequence
 from itertools import cycle
-import random
 from typing import cast
 from typing import Protocol
 
@@ -17,6 +18,7 @@ from ice.recipe import Recipe
 from ice.recipe import recipe
 from ice.recipes.best_completion import best_completion
 from ice.recipes.consort_flow import baseline_elicit_answer
+from ice.recipes.find_best_few_shot_prompt import best_few_shot
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 from ice.recipes.program_search.nodes.prune.prune import prune
 from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
@@ -25,7 +27,6 @@ from ice.recipes.program_search.nodes.select.prompts import make_selection_promp
 from ice.recipes.program_search.nodes.select.prompts import render_selection_example
 from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
 from ice.recipes.program_search.utils.find_examples import matches
-from ice.recipes.find_best_few_shot_prompt import best_few_shot
 from ice.utils import reduce_async
 from ice.utils import window_dropping
 
@@ -37,6 +38,7 @@ log = get_logger()
 #         pass
 
 random.seed(314)
+
 
 def last_token_logprob(openai_response: dict) -> float:
     return openai_response["choices"][0]["logprobs"]["token_logprobs"][-1]
@@ -162,7 +164,7 @@ async def windowed_select(
     return [t in selections for t in texts]
 
 
-async def windowed_select_using_elicit_prompt( # Best recall [use this]
+async def windowed_select_using_elicit_prompt(  # Best recall [use this]
     question: str,
     texts: Sequence[str],
     examples: list[RenderableSelectionExample] | None = None,
@@ -196,11 +198,15 @@ async def windowed_select_using_elicit_prompt( # Best recall [use this]
         completion=completion,
     )
 
-    return [t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold]
+    return [
+        t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold
+    ]
     # Lower perplexity means more likely to be "not mentioned in excerpt"
+
 
 def to_paragraphs(paper: Paper) -> Sequence[str]:
     return [str(p) for p in paper.paragraphs]
+
 
 def _create_example_prompt(
     example: PaperQaGoldStandard,
@@ -209,17 +215,24 @@ def _create_example_prompt(
     paragraphs = to_paragraphs(example.paper)
     relevant_paragraphs = example.gold_support
     irrelevant_paragraphs = [p for p in paragraphs if not p in relevant_paragraphs]
-    relevant_paragraph, irrelevant_paragraph = random.choice(relevant_paragraphs), random.choice(irrelevant_paragraphs)
+    relevant_paragraph, irrelevant_paragraph = random.choice(
+        relevant_paragraphs
+    ), random.choice(irrelevant_paragraphs)
     prompt = baseline_elicit_answer._excerpt_prompt(
         qa_question=example.question,
         excerpt=relevant_paragraph if positive else irrelevant_paragraph,
         answer_prefix=None,
     )
-    completion = example.gold_answer if isinstance(example.gold_answer, str) else example.gold_answer[0]
+    completion = (
+        example.gold_answer
+        if isinstance(example.gold_answer, str)
+        else example.gold_answer[0]
+    )
 
     completion = completion.strip() if positive else baseline_elicit_answer.NA_PHRASE
 
-    return prompt+" "+completion
+    return prompt + " " + completion
+
 
 def _create_example_prompts(
     example: PaperQaGoldStandard,
@@ -235,12 +248,17 @@ def _create_example_prompts(
         for paragraph in paragraphs
     ]
     completions = [
-        example.gold_answer if isinstance(example.gold_answer, str) else example.gold_answer[0] if paragraph in relevant_paragraphs else baseline_elicit_answer.NA_PHRASE
+        example.gold_answer
+        if isinstance(example.gold_answer, str)
+        else example.gold_answer[0]
+        if paragraph in relevant_paragraphs
+        else baseline_elicit_answer.NA_PHRASE
         for paragraph in paragraphs
     ]
-    completions = [" "+c.strip() for c in completions]
+    completions = [" " + c.strip() for c in completions]
 
     return prompts, completions
+
 
 async def windowed_select_using_elicit_prompt_few_shot(
     question: str,
@@ -265,7 +283,7 @@ async def windowed_select_using_elicit_prompt_few_shot(
 
     few_shot_prompt = min(few_shot_prompts, key=lambda p: p[1])[0]
 
-    #gold_support
+    # gold_support
 
     """Select texts that answer the question via
 
@@ -280,8 +298,9 @@ async def windowed_select_using_elicit_prompt_few_shot(
     """
 
     prompts = [
-        few_shot_prompt + "\n\n" +
-        baseline_elicit_answer._excerpt_prompt(
+        few_shot_prompt
+        + "\n\n"
+        + baseline_elicit_answer._excerpt_prompt(
             qa_question=question,
             excerpt=text,
             answer_prefix=None,
@@ -296,8 +315,11 @@ async def windowed_select_using_elicit_prompt_few_shot(
         completion=completion,
     )
 
-    return [t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold]
+    return [
+        t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold
+    ]
     # Lower perplexity means more likely to be "not mentioned in excerpt"
+
 
 # Few-shot prompt
 
@@ -306,10 +328,6 @@ SELECTION_PROMPT = """"""
 
 def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str]:
     return [t for t, s in zip(texts, selections) if s]
-
-
-
-
 
 
 # Meta-methods

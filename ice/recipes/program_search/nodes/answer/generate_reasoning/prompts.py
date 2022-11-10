@@ -1,12 +1,11 @@
-from typing import Sequence
-from ice.formatter.multi import format_multi
-from more_itertools import circular_shifts
-from ice.recipe import recipe
+from collections.abc import Sequence
 
-from ice.recipes.program_search.nodes.answer.types import (
-    Demonstration,
-    DemonstrationWithReasoning,
-)
+from more_itertools import circular_shifts
+
+from ice.formatter.multi import format_multi
+from ice.recipe import recipe
+from ice.recipes.program_search.nodes.answer.types import Demonstration
+from ice.recipes.program_search.nodes.answer.types import DemonstrationWithReasoning
 from ice.utils import map_async
 
 
@@ -43,7 +42,8 @@ def make_reasoning_prompt(demonstrations: Sequence[Demonstration]) -> str:
             INSTRUCTIONS,
             "\n\n---\n\n".join(examples),
             PRE_GENERATION.format(
-                question=first_example["question"], texts=first_example["texts"].transform()
+                question=first_example["question"],
+                texts=first_example["texts"].transform(),
             ),
         ]
     )
@@ -57,7 +57,6 @@ async def add_reasoning(
 
     async def answer_for_prompt(prompt: str):
         return await recipe.agent().complete(prompt=prompt, stop="\n\n")
-
 
     completions = [(await answer_for_prompt(prompt)) for prompt in prompts]
 

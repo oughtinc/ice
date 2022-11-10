@@ -1,8 +1,11 @@
 import re
-from ice.recipe import recipe
-from typing import Sequence
-from ice.formatter.multi import format_multi, stop
+
+from collections.abc import Sequence
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
 from ice.formatter.transform.value import numbered_list
+from ice.recipe import recipe
 
 PREAMBLE = "For each question, convert the part of the answer that answers the question into a numbered list."
 

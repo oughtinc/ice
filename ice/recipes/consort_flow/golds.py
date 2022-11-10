@@ -16,7 +16,8 @@ from ice.metrics.gold_standards import GoldStandard
 from ice.metrics.gold_standards import GoldStandardSplit
 from ice.metrics.gold_standards import retrieve_gold_standards_df
 from ice.paper import Paper
-from ice.recipes.consort_flow.types import ConsortFlow, SampleSize
+from ice.recipes.consort_flow.types import ConsortFlow
+from ice.recipes.consort_flow.types import SampleSize
 from ice.recipes.experiments_and_arms.golds import get_ea_gs
 from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
 from ice.recipes.program_search.nodes.select.dynamic import best_negative_example
@@ -39,7 +40,9 @@ def get_consort_gs(document_id: str) -> GoldStandard[ConsortFlow] | None:
     )
 
 
-def consort_gs_split(split: GoldStandardSplit, question_short_name: str) -> Sequence[GoldStandard[ConsortFlow]]:
+def consort_gs_split(
+    split: GoldStandardSplit, question_short_name: str
+) -> Sequence[GoldStandard[ConsortFlow]]:
     golds = get_gold_standards(
         question_short_name=question_short_name, model_type=ConsortFlow
     )
@@ -66,13 +69,12 @@ def paper_to_allocation_gold_standards(
         for arm in (exp.arms or [])
     ]
 
+
 # def paper_to_experiments_gold_standard(paper: Paper) -> Sequence[tuple[str, Sequence[Selection], Sequence[str]]]:
 #     gs = get_ea_gs(paper.document_id)
 #     texts = sentences(paper)
 #     if not gs or not gs.parsed_answer:
 #         return []
-    
-
 
 
 class GoldStandardExample(BaseModel):
@@ -95,7 +97,9 @@ def gold_standard_examples(
     ]
 
 
-def download_papers(split: str = "validation", question_short_name: str = "consort_flow"):
+def download_papers(
+    split: str = "validation", question_short_name: str = "consort_flow"
+):
     paper_dir = Path("/code/papers/")  # fixed in container
     doc_ids = {p.document_id for p in consort_gs_split(split, question_short_name)}
     paper_files = [f for f in paper_dir.iterdir() if f.name in doc_ids]

@@ -38,7 +38,9 @@ from ice.recipes.experiments_and_arms.prompts.passages_to_keep import (
     keep_most_helpful_paragraphs,
 )
 from ice.recipes.experiments_and_arms.prompts.quick_list import make_quick_list_prompt
-from ice.recipes.experiments_and_arms.recipes.best_passages import rate_helpfulness_with_reasoning
+from ice.recipes.experiments_and_arms.recipes.best_passages import (
+    rate_helpfulness_with_reasoning,
+)
 from ice.recipes.experiments_and_arms.recipes.cluster import best_answer_by_clustering
 from ice.recipes.experiments_and_arms.recipes.consensus import best_answer_by_consensus
 from ice.recipes.experiments_and_arms.recipes.count_experiments import count_experiments
@@ -72,6 +74,7 @@ def make_reduce_to_best_answer(num_experiments: int):
         )
 
     return reduce_to_best_answer
+
 
 @trace
 async def best_paras_for_naming_experiments(paper: Paper):
@@ -149,7 +152,9 @@ async def name_experiments(
         final_answer_processor=lambda resp: cast(str, resp["choices"][0]["text"]),
     )
 
-    standardized_answer = await convert_answer_to_standardized_format(experiment_names.final_answer)
+    standardized_answer = await convert_answer_to_standardized_format(
+        experiment_names.final_answer
+    )
 
     assert experiment_names.final_answer is not None
     return (
@@ -162,7 +167,7 @@ async def name_experiments(
         if standardized_answer
         else [],
         paragraphs_to_keep,
-        [str(p) for p in paragraphs]
+        [str(p) for p in paragraphs],
     )
 
 

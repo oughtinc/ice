@@ -28,9 +28,9 @@ from ice.recipes.experiments_and_arms.prompts.passages_to_keep import (
     keep_most_helpful_paragraphs,
 )
 from ice.recipes.experiments_and_arms.prompts.utils import plurality_greedy
+from ice.recipes.experiments_and_arms.recipes.best_passages import initial_passages
 from ice.recipes.experiments_and_arms.recipes.best_passages import (
     rate_helpfulness_with_reasoning,
-    initial_passages,
 )
 from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
     answer_with_best_reasoning,
