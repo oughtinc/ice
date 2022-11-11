@@ -4,8 +4,9 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import cached_property
 from itertools import chain
-from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import precision_recall_curve, PrecisionRecallDisplay
 from sklearn.metrics import roc_auc_score, roc_curve
+import matplotlib.pyplot as plt
 
 import numpy as np
 
@@ -72,6 +73,28 @@ class BinaryClassificationMetrics:
         if not self.scores:
             return None
         return roc_auc_score(y_true=self._gt_array, y_score=self.scores)
+
+    def save_pr_curve(self, filename: str):
+        if not self.scores:
+            return None
+        prd = PrecisionRecallDisplay.from_predictions(
+            y_true=self._gt_array, y_pred=self.scores
+        )
+        prd.plot()
+        plt.savefig(filename)
+
+    def pr_thresholds(self, n: int | None = 20):
+        if not self.scores:
+            return None
+        precisions, recalls, thresholds = precision_recall_curve(
+            y_true=self._gt_array, probas_pred=self.scores
+        )
+        n = min(n or len(thresholds), len(thresholds))
+        idxs = np.linspace(0, len(thresholds), n, endpoint=False).astype(int)
+        return {
+            float(t): dict(p=float(p), r=float(r))
+            for p, r, t in zip(precisions[idxs], recalls[idxs], thresholds[idxs])
+        }
 
     def as_dict(self) -> dict[str, int | float | None]:
         return dict(

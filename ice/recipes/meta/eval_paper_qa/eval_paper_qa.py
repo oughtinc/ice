@@ -120,7 +120,7 @@ async def eval_paper_qa_method(
     return (
         sum(scores) / len(scores) if scores else 0,
         results,
-        aggregated_metrics.as_dict(),
+        aggregated_metrics,
     )
 
 
@@ -143,6 +143,7 @@ class _PaperQaArgs(BaseModel):
 class PaperQaEvalConfig(BaseModel):
     name: str
     results_json: str | None = None
+    pr_curve: str | None = None
     args: _PaperQaArgs
 
 
@@ -152,7 +153,7 @@ def ensure_dir(path: str) -> str:
 
 
 async def run_from_config(config: PaperQaEvalConfig) -> dict:
-    score, results, metrics = await eval_paper_qa_method(
+    score, results, agg_metrics = await eval_paper_qa_method(
         method=load_object(config.args.method),
         split=config.args.split,
         gold_standard_type=load_object(config.args.gold_standard_type),
@@ -160,16 +161,20 @@ async def run_from_config(config: PaperQaEvalConfig) -> dict:
         answer_eval_method=load_object(config.args.answer_eval_method),
         classification_eval_method=load_object(config.args.classification_eval_method),
     )
+    metrics = agg_metrics.as_dict()
     results_line = dict(
         config=config.dict(),
         ice_commit=latest_commit_hash(),
         score=score,
         results=[r.as_dict() for r in results],
         metrics=metrics,
+        pr_thresholds=agg_metrics.pr_thresholds(),
     )
     if config.results_json:
         with open(ensure_dir(config.results_json), "w") as r:
             r.writelines([json.dumps(results_line, indent=2, sort_keys=True)])
+    if config.pr_curve:
+        agg_metrics.save_pr_curve(config.pr_curve)
     return results_line
 
 
