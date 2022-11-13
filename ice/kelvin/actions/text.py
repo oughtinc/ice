@@ -34,7 +34,7 @@ class AddTextRowAction(Action):
         new_row_text = self.params[0].value
         new_card_id = generate_id()
         new_row = TextRow(text=new_row_text)
-        new_card = TextCard(id=new_card_id, rows=card.rows + [new_row])
+        new_card = TextCard(id=new_card_id, rows=card.rows + [new_row], prev_id=card.id)
         new_view = CardView(
             card_id=new_card_id,
             selected_rows={},
@@ -82,7 +82,7 @@ class EditTextRowAction(Action):
             for row in card.rows
         ]
 
-        new_card = TextCard(id=generate_id(), rows=new_rows)
+        new_card = TextCard(id=generate_id(), rows=new_rows, prev_id=card.id)
 
         new_focused_row_index = next(
             (i for i, row in enumerate(new_rows) if row.id == row_id), None

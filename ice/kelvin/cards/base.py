@@ -12,3 +12,5 @@ class Card(BaseModel):
     id: str = Field(default_factory=generate_id)
     kind: str
     rows: list[CardRow]
+    prev_id: str | None = None
+    next_id: str | None = None

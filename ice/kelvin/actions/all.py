@@ -3,6 +3,7 @@ from typing import cast
 from ice.kelvin.actions.base import Action
 from ice.kelvin.actions.clear import ClearAction
 from ice.kelvin.actions.elicit import VespaSearchAction
+from ice.kelvin.actions.elicit import ViewPaperAction
 from ice.kelvin.actions.lm import GenerationAction
 from ice.kelvin.actions.text import AddTextRowAction
 from ice.kelvin.actions.text import EditTextRowAction
@@ -14,6 +15,7 @@ ACTION_TYPE_UNION = (
     | EditTextRowAction
     | GenerationAction
     | VespaSearchAction
+    | ViewPaperAction
     | ClearAction
 )
 ACTION_CLASSES = [
@@ -21,6 +23,7 @@ ACTION_CLASSES = [
     EditTextRowAction,
     GenerationAction,
     VespaSearchAction,
+    ViewPaperAction,
     ClearAction,
 ]
 

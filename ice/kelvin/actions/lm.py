@@ -33,7 +33,11 @@ class GenerationAction(Action):
         command = self.params[1].value
         new_row = TextRow(text=f"Result of '{command}' on '{context}'")
         agent = OpenAIAgent()
-        prompt = f'''Context:
+
+        if context == "NO_CONTEXT":
+            prompt = command
+        else:
+            prompt = f'''Context:
 """
 {context}
 """
@@ -51,7 +55,7 @@ Result:
         else:
             results = result_str.split("\n")
         new_rows = [TextRow(text=result.lstrip(" -*")) for result in results]
-        new_card = TextCard(rows=new_rows)
+        new_card = TextCard(rows=new_rows, prev_id=card.id)
         new_view = CardView(card_id=new_card.id, selected_rows={new_row.id: True})
         return CardWithView(card=new_card, view=new_view)
 
@@ -91,4 +95,18 @@ Result:
                     ],
                 )
                 actions += [lm_action, show_more_action]
+            else:
+                lm_action = cls(
+                    label="Run language model command",
+                    params=[
+                        ActionParam(
+                            name="context",
+                            kind="TextParam",
+                            label="Context",
+                            value="NO_CONTEXT",
+                        ),
+                        ActionParam(name="command", kind="TextParam", label="Command"),
+                    ],
+                )
+                actions += [lm_action]
         return actions

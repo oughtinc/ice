@@ -39,6 +39,8 @@ type TextCard = {
   kind: "TextCard";
   id: string;
   rows: TextRow[];
+  prev_id: string;
+  next_id: string;
 };
 
 type PaperRow = {
@@ -54,12 +56,16 @@ type PaperCard = {
   kind: "PaperCard";
   id: string;
   rows: PaperRow[];
+  prev_id: string;
+  next_id: string;
 };
 
 type ActionCard = {
   kind: "ActionCard";
   id: string;
   rows: Action[];
+  prev_id: string;
+  next_id: string;
 };
 
 type Card = TextCard | ActionCard | PaperCard;

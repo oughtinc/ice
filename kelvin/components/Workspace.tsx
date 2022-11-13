@@ -3,7 +3,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import Action from "./Action";
 import ActionForm from "./ActionForm";
 import CardRow from "./CardRow";
-import { Pane, Panes, usePaneSwitch } from "./Panes";
+import { Pane, Panes } from "./Panes";
 import SelectionList from "./SelectionList";
 import StatusBar from "./StatusBar";
 import { useWorkspace } from "/contexts/workspaceContext";
@@ -15,11 +15,14 @@ import {
 } from "/utils/workspace";
 
 const useActionHotkeys = (actions, executeActionAndDeselectAll, actionToPrepare) => {
+  // Todo: This should be stored in workspace
   const labelFromKey = {
     a: "Add bullet point to card",
     c: "Clear card",
     e: "Edit text",
     m: "Run language model",
+    p: "Search papers",
+    v: "View paper",
   };
 
   const actionMatchesLabel = (action, label) => {
@@ -41,11 +44,20 @@ const useActionHotkeys = (actions, executeActionAndDeselectAll, actionToPrepare)
     );
   }
 
+  const assignedKeys = new Set();
   const actionKeys = actions.map(action => {
     const key = Object.keys(labelFromKey).find(key =>
       actionMatchesLabel(action, labelFromKey[key]),
     );
-    return key;
+    if (key) {
+      if (assignedKeys.has(key)) {
+        return null;
+      } else {
+        assignedKeys.add(key);
+        return key;
+      }
+    }
+    return null;
   });
 
   return { actionKeys };
@@ -57,11 +69,16 @@ const Workspace = () => {
     executeAction,
     setSelectedCardRows,
     setFocusedCardRow,
+    setCardViewCard,
     activeRequestCount,
     error,
   } = useWorkspace();
 
-  const [baseActivePane, setActivePane, LEFT_PANE, RIGHT_PANE] = usePaneSwitch();
+  const LEFT_PANE = "left";
+  const RIGHT_PANE = "right";
+
+  const [baseActivePane, setActivePane] = useState(RIGHT_PANE);
+
   const [selectedActions, setSelectedActions] = useState({});
   const [actionFocusIndex, setActionFocusIndex] = useState(0);
   const [actionToPrepare, setActionToPrepare] = useState(null);
@@ -72,6 +89,7 @@ const Workspace = () => {
   const cardFocusIndex = getFocusIndex(workspace) || 0;
 
   const activePane = card && !card.rows.length && actions ? RIGHT_PANE : baseActivePane;
+  // const activePane = baseActivePane;
 
   const executeActionAndDeselectAll = action => {
     if (action.params.every(param => param.value !== null)) {
@@ -97,6 +115,29 @@ const Workspace = () => {
       }
     },
     [activePane, setSelectedCardRows, setActivePane, LEFT_PANE],
+  );
+
+  useHotkeys(
+    "left, h",
+    () => {
+      if (card && card.prev_id) {
+        setCardViewCard(card.prev_id);
+      }
+    },
+    {},
+    [setCardViewCard, card],
+  );
+
+  useHotkeys(
+    "right, l",
+    () => {
+      if (card && card.next_id) {
+        console.log(card.next_id);
+        setCardViewCard(card.next_id);
+      }
+    },
+    {},
+    [setCardViewCard, card],
   );
 
   useEffect(() => {

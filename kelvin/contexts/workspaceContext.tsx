@@ -7,7 +7,7 @@ import {
   updateWorkspace,
 } from "../api";
 import { Workspace } from "../types";
-import { getCurrentCardWithView } from "/utils/workspace";
+import { getCurrentCard, getCurrentCardWithView } from "/utils/workspace";
 
 type State = {
   workspace: Workspace | null;
@@ -29,7 +29,8 @@ type ReducerAction =
       type: "SET_SELECTED_CARD_ROWS";
       payload: (rows: Record<string, boolean>) => Record<string, boolean>;
     }
-  | { type: "UPDATE_AVAILABLE_ACTIONS_SUCCESS"; payload: Action[] };
+  | { type: "UPDATE_AVAILABLE_ACTIONS_SUCCESS"; payload: Action[] }
+  | { type: "SET_CARDVIEW_CARD_ID"; payload: string };
 
 const initialState: State = {
   workspace: null,
@@ -57,6 +58,12 @@ const reducer = (draft: State, action: ReducerAction) => {
       break;
     case "EXECUTE_ACTION_SUCCESS":
       draft.activeRequestCount--;
+      const currentCard = getCurrentCard(draft.workspace);
+      if (currentCard) {
+        currentCard.next_id = action.payload.card.id;
+      } else {
+        console.warn("No current card in EXECUTE_ACTION_SUCCESS");
+      }
       const { card, view } = action.payload;
       const newWorkspace = {
         cards: [...draft.workspace!.cards, card],
@@ -73,6 +80,10 @@ const reducer = (draft: State, action: ReducerAction) => {
     case "UPDATE_AVAILABLE_ACTIONS_SUCCESS":
       draft.activeRequestCount--;
       draft.workspace.available_actions = action.payload;
+      break;
+    case "SET_CARDVIEW_CARD_ID":
+      draft.workspace.view.card_id = action.payload;
+      draft.workspace.view.selected_rows = {};
       break;
     default:
       return;
@@ -173,6 +184,11 @@ export function WorkspaceProvider({ children }) {
     updateAvailableActions();
   };
 
+  const setCardViewCard = cardId => {
+    dispatch({ type: "SET_CARDVIEW_CARD_ID", payload: cardId });
+    updateAvailableActions();
+  };
+
   return (
     <WorkspaceContext.Provider
       value={{
@@ -180,6 +196,7 @@ export function WorkspaceProvider({ children }) {
         updateWorkspaceData,
         setSelectedCardRows,
         setFocusedCardRow,
+        setCardViewCard,
         executeAction,
       }}
     >

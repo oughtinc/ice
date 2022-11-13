@@ -9,13 +9,12 @@ from ice.kelvin.actions.base import ActionParam
 from ice.kelvin.cards.base import Card
 from ice.kelvin.cards.paper import PaperCard
 from ice.kelvin.cards.paper import PaperRow
+from ice.kelvin.cards.text import TextCard
+from ice.kelvin.cards.text import TextRow
 from ice.kelvin.utils import truncate_text
 from ice.kelvin.view import CardView
 from ice.kelvin.view import CardWithView
 from ice.recipes.elicit.vespa_search import vespa_search
-
-# from ice.kelvin.cards.text import TextCard
-# from ice.kelvin.cards.text import TextRow
 
 log = get_logger()
 
@@ -54,7 +53,7 @@ class VespaSearchAction(Action):
                     raw_data=fields,
                 )
             )
-        new_card = PaperCard(rows=rows)
+        new_card = PaperCard(rows=rows, prev_id=card.id)
         return CardWithView(
             card=new_card, view=CardView(card_id=new_card.id, selected_rows={})
         )
@@ -132,73 +131,68 @@ class VespaSearchAction(Action):
 #         return actions
 
 
-# class ViewPaperAction(Action):
+class ViewPaperAction(Action):
 
-#     kind: Literal["ViewPaperAction"] = "ViewPaperAction"
-#     params: list[ActionParam] = [
-#         ActionParam(name="paperRowId", kind="IdParam", label="Paper")
-#     ]
-#     label: str = "View paper"
+    kind: Literal["ViewPaperAction"] = "ViewPaperAction"
+    params: list[ActionParam] = [
+        ActionParam(name="paperRowId", kind="IdParam", label="Paper")
+    ]
+    label: str = "View paper"
 
-#     def validate_input(self, card: Card) -> None:
-#         if not card.kind == "PaperCard":
-#             raise ValueError("ViewPaperAction can only be applied to paper cards")
+    def validate_input(self, card: Card) -> None:
+        if not card.kind == "PaperCard":
+            raise ValueError("ViewPaperAction can only be applied to paper cards")
 
-#     def execute(self, card: Card) -> CardWithView:
-#         new_row_text = self.params[0].value
-#         new_row = TextRow(text=new_row_text)
-#         new_rows = card.rows + [new_row]
+    def execute(self, card: Card) -> CardWithView:
+        new_row_text = self.params[0].value
+        new_row = TextRow(text=new_row_text)
+        new_rows = card.rows + [new_row]
 
-#         # Get the paper
-#         paper_id = self.params[0].value
-#         paper = next((row for row in card.rows if row.id == paper_id), None)
-#         if not paper:
-#             raise ValueError(f"Execute couldn't find paper for id {paper_id}")
+        # Get the paper
+        paper_id = self.params[0].value
+        paper = next((row for row in card.rows if row.id == paper_id), None)
+        if not paper:
+            raise ValueError(f"Execute couldn't find paper for id {paper_id}")
 
-#         # Get each paragraph from the paper
-#         abstract = paper.raw_data["abstract"]
-#         body = paper.raw_data["body"]["value"]
-#         text_bullets = []
-#         MAX_BULLET_LEN = 200  # chars
-#         for paragraph in abstract["paragraphs"] + body["paragraphs"]:
-#             bullet = ""
-#             for sentence in paragraph["sentences"]:
-#                 bullet += f"{sentence} "
-#                 if len(bullet) >= MAX_BULLET_LEN:
-#                     text_bullets.append(bullet)
-#                     bullet = ""
-#             if bullet:
-#                 text_bullets.append(bullet)
-#                 bullet = ""
+        # Get paper info
+        abstract = paper.raw_data["abstract"]
+        text_bullets = [
+            f"Title: {paper.title}",
+            "Authors: " + ", ".join(paper.authors),
+            f"Year: {paper.year}",
+            f"Citations: {paper.citations}",
+            f"DOI: {paper.raw_data['doi']}",
+            f"Abstract: {abstract}",
+        ]
 
-#         # Convert to card & view
-#         new_rows = [TextRow(text=text) for text in text_bullets]
-#         new_card = TextCard(rows=new_rows)
-#         new_view = CardView(
-#             card_id=new_card.id,
-#             selected_rows={},
-#         )
+        # Convert to card & view
+        new_rows = [TextRow(text=text) for text in text_bullets]
+        new_card = TextCard(rows=new_rows, prev_id=card.id)
+        new_view = CardView(
+            card_id=new_card.id,
+            selected_rows={},
+        )
 
-#         return CardWithView(card=new_card, view=new_view)
+        return CardWithView(card=new_card, view=new_view)
 
-#     @classmethod
-#     def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
-#         actions: list[Action] = []
-#         if card_with_view.card.kind == "PaperCard":
-#             for row in card_with_view.get_marked_rows():
-#                 paper_id = row.id
-#                 title = row.title
-#                 short_title = truncate_text(title, max_length=80)
-#                 action = cls(
-#                     label=f'View paper "{short_title}"',
-#                     params=[
-#                         ActionParam(
-#                             name="paperRowId",
-#                             kind="IdParam",
-#                             label="Paper",
-#                             value=paper_id,
-#                         )
-#                     ],
-#                 )
-#                 actions.append(action)
-#         return actions
+    @classmethod
+    def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
+        actions: list[Action] = []
+        if card_with_view.card.kind == "PaperCard":
+            for row in card_with_view.get_marked_rows():
+                paper_id = row.id
+                title = row.title
+                short_title = truncate_text(title, max_length=80)
+                action = cls(
+                    label=f'View paper "{short_title}"',
+                    params=[
+                        ActionParam(
+                            name="paperRowId",
+                            kind="IdParam",
+                            label="Paper",
+                            value=paper_id,
+                        )
+                    ],
+                )
+                actions.append(action)
+        return actions

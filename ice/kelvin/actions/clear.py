@@ -38,5 +38,5 @@ class ClearAction(Action):
     @classmethod
     def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
         if card_with_view.card.rows:
-            return [cls()]
+            return [cls(prev_id=card_with_view.card.id)]
         return []
