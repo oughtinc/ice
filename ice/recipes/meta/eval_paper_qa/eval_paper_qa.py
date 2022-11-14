@@ -1,37 +1,41 @@
+from collections.abc import Callable
+from collections.abc import Iterable
+from collections.abc import Mapping
+from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, Iterable, Mapping, Sequence, Protocol
+from typing import Any
+from typing import Protocol
+
 from ice.apis.openai import TooLongRequestError
 from ice.formatter.transform.value import numbered_list
-from ice.metrics.gold_standards import GoldStandard, ModelType
+from ice.metrics.gold_standards import GoldStandard
+from ice.metrics.gold_standards import ModelType
 from ice.paper import Paper
 from ice.recipe import recipe
 from ice.recipes.meta.eval_paper_qa.quick_list import quick_list
-from ice.recipes.meta.eval_paper_qa.utils import download_papers
 from ice.recipes.meta.eval_paper_qa.quick_question_driven_eval import quick_eval
+from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer
+from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
+from ice.recipes.meta.eval_paper_qa.types import PaperQaMethod
+from ice.recipes.meta.eval_paper_qa.types import SequenceGenerationEvaluation
+from ice.recipes.meta.eval_paper_qa.utils import download_papers
+from ice.recipes.meta.eval_text_classification import BinaryClassificationMetrics
+from ice.recipes.meta.eval_text_classification import fuzzy_text_classification_metrics
 from ice.recipes.meta.matching.match import match
-from ice.recipes.meta.eval_text_classification import (
-    BinaryClassificationMetrics,
-    fuzzy_text_classification_metrics,
-)
 from ice.recipes.primer.paper_qa import answer_for_paper
-from ice.recipes.meta.eval_paper_qa.types import (
-    PaperQaAnswer,
-    PaperQaGoldStandard,
-    SequenceGenerationEvaluation,
-    PaperQaMethod,
-)
 from ice.recipes.primer.qa import answer
+from ice.recipes.program_search.nodes.answer.answer import Demonstration
+from ice.recipes.program_search.nodes.answer.answer import demonstration_answer
 from ice.recipes.program_search.nodes.answer.answer import (
-    Demonstration,
-    demonstration_answer,
     demonstration_answer_with_reasoning,
 )
 from ice.recipes.program_search.nodes.select.select import (
     windowed_select_using_elicit_prompt,
     windowed_select_using_scibert,
 )
-from ice.recipes.program_search.utils.find_examples import identify_gs_str, mark_gs
+from ice.recipes.program_search.utils.find_examples import identify_gs_str
+from ice.recipes.program_search.utils.find_examples import mark_gs
 from ice.trace import trace
 from ice.utils import map_async
 
@@ -140,13 +144,14 @@ async def search_qa_baseline(
         examples=examples,
     )
     relevant_str = "\n\n".join(relevant_excerpts)
-    response = ""#await answer(context=relevant_str, question=question)
+    response = ""  # await answer(context=relevant_str, question=question)
     assert gold_support
     return PaperQaAnswer(
         answer=response,
         support_candidates=excerpts,
         support_labels=[e in relevant_excerpts for e in excerpts],
     )
+
 
 async def convert_demonstration_example(
     example: PaperQaGoldStandard,
@@ -321,7 +326,7 @@ async def eval_method(
                 ground_truth=qa_details.gold_support,
             )
             return SequenceGenerationEvaluation(
-                correct=True,#correct,
+                correct=True,  # correct,
                 detail="",
                 metrics=metrics,
                 generated_answer=answer.answer,

@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from tqdm import tqdm
 
@@ -7,6 +7,7 @@ from ice.metrics.gold_standards import get_gold_standards
 from ice.paper import Paper
 
 _paper_dir = Path("/code/papers/")  # fixed in container
+
 
 def download_paper(document_id: str) -> Paper:
     paper_path = Path(_paper_dir, document_id)

@@ -20,8 +20,6 @@ from ice.trace import trace
 from ice.utils import map_async
 
 
-
-
 @trace
 async def experiments_and_arms(
     paper: Paper, record=recorder

@@ -1,5 +1,7 @@
-from typing import Sequence
-from ice.formatter.multi import format_multi, stop
+from collections.abc import Sequence
+
+from ice.formatter.multi import format_multi
+from ice.formatter.multi import stop
 from ice.formatter.transform.value import numbered_list
 
 INSTRUCTIONS = """For each pair of lists, can each item in list A be paired with a corresponding item in list B that is substantially similar to it? If so, explain why. If not, explain why not."""
@@ -18,7 +20,9 @@ Let's think it over. {reasoning}
 Final answer: {final_answer}
 """.strip()
 
-YES_ANSWER = "Yes, each item in list A can be paired with a corresponding item in list B."
+YES_ANSWER = (
+    "Yes, each item in list A can be paired with a corresponding item in list B."
+)
 NO_ANSWER = "No, it is not the case that each item in list A can be paired with a corresponding item in list B."
 
 EXAMPLES = [

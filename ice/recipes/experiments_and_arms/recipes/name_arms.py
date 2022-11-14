@@ -36,7 +36,9 @@ from ice.recipes.experiments_and_arms.prompts.passages_to_keep import (
     keep_most_helpful_paragraphs,
 )
 from ice.recipes.experiments_and_arms.prompts.quick_list import make_quick_list_prompt
-from ice.recipes.experiments_and_arms.recipes.best_passages import rate_helpfulness_with_reasoning
+from ice.recipes.experiments_and_arms.recipes.best_passages import (
+    rate_helpfulness_with_reasoning,
+)
 from ice.recipes.experiments_and_arms.recipes.cluster import best_answer_by_clustering
 from ice.recipes.experiments_and_arms.recipes.consensus import best_answer_by_consensus
 from ice.recipes.experiments_and_arms.recipes.count_experiments import count_experiments
@@ -123,7 +125,9 @@ async def name_arms(
 
     assert arm_names.final_answer is not None
 
-    final_answer: str = await convert_answer_to_standardized_format(arm_names.final_answer)
+    final_answer: str = await convert_answer_to_standardized_format(
+        arm_names.final_answer
+    )
 
     return (
         [
@@ -135,6 +139,7 @@ async def name_arms(
         else []
     )
 
+
 @trace
 async def convert_answer_to_standardized_format(answer: str) -> str:
     standardized_answer: str = (
@@ -144,7 +149,6 @@ async def convert_answer_to_standardized_format(answer: str) -> str:
         )
     )["choices"][0]["text"]
     return standardized_answer
-
 
 
 recipe.main(name_arms)

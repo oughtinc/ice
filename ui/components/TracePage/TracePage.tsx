@@ -306,7 +306,9 @@ const isModelCall = ({ name, args }: { name: string; args: Record<string, unknow
 
 const getFormattedName = (snakeCasedName: string) => {
   const spacedName = snakeCasedName.replace(/_/g, " ");
-  const capitalizedAndSpacedName = spacedName ? spacedName[0].toUpperCase() + spacedName.slice(1) : snakeCasedName;
+  const capitalizedAndSpacedName = spacedName
+    ? spacedName[0].toUpperCase() + spacedName.slice(1)
+    : snakeCasedName;
   return capitalizedAndSpacedName;
 };
 
