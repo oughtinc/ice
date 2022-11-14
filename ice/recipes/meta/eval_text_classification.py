@@ -34,19 +34,19 @@ class BinaryClassificationMetrics:
 
     @cached_property
     def tp(self):
-        return (self._gt_array & self._pred_array).sum()
+        return (self._gt_array & self._pred_array).sum().item()
 
     @cached_property
     def tn(self):
-        return (~self._gt_array & ~self._pred_array).sum()
+        return (~self._gt_array & ~self._pred_array).sum().item()
 
     @cached_property
     def fn(self):
-        return (self._gt_array & ~self._pred_array).sum()
+        return (self._gt_array & ~self._pred_array).sum().item()
 
     @cached_property
     def fp(self):
-        return (~self._gt_array & self._pred_array).sum()
+        return (~self._gt_array & self._pred_array).sum().item()
 
     @cached_property
     def recall(self):
@@ -54,7 +54,7 @@ class BinaryClassificationMetrics:
 
     @cached_property
     def precision(self):
-        return self.tp / (self.tp + self.fp) if self.tp or self.fn else 0
+        return self.tp / (self.tp + self.fp) if self.tp or self.fp else 0
 
     @cached_property
     def f1(self):
@@ -66,7 +66,11 @@ class BinaryClassificationMetrics:
 
     @cached_property
     def accuracy(self):
-        return (self._gt_array == self._pred_array).mean() if self.ground_truth else 0
+        return (
+            (self._gt_array == self._pred_array).mean().item()
+            if self.ground_truth
+            else 0
+        )
 
     @cached_property
     def auroc(self):

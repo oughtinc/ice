@@ -1,6 +1,9 @@
 from collections.abc import Sequence
+from functools import partial
 from itertools import chain
+from typing import Callable
 from ice.apis.openai import TooLongRequestError
+from ice.recipe import recipe
 
 from ice.metrics.gold_standards import load_papers
 from ice.paper import Paper
@@ -16,6 +19,7 @@ from ice.recipes.meta.eval_paper_qa.common_baselines import (
 )
 from ice.recipes.meta.eval_paper_qa.quick_list import quick_list
 from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer, PaperQaGoldStandard
+from ice.recipes.meta.eval_paper_qa.utils import convert_demonstration_example
 from ice.recipes.primer.qa import answer
 from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
 from ice.recipes.program_search.nodes.prune.prune import prune
@@ -23,7 +27,7 @@ from ice.recipes.program_search.nodes.select.select import (
     filter_by_perplexity_threshold,
     remove_lowest_perplexity,
     select_using_elicit_prompt_few_shot,
-    windowed_select_using_elicit_prompt,
+    select_results_using_elicit_prompt,
 )
 
 
@@ -159,11 +163,12 @@ async def cheating_few_shot_qa_arms_paragraph_reasoning_baseline(
 async def elicit_baseline_into_answer(paper: Paper, question: str, gold_support=None):
     gold_support  # unused
     texts = _to_paragraphs(paper)
-    texts_with_perplexities = await windowed_select_using_elicit_prompt(
+    texts_with_perplexities = await select_results_using_elicit_prompt(
         question=question, texts=texts
     )
-    selections = filter_by_perplexity_threshold(texts_with_perplexities)
-    
+    # ~ .78 recall, .10 precision @ threshold=1.07
+    selections = filter_by_perplexity_threshold(texts_with_perplexities, threshold=1.16)
+
     while selections:
         try:
             relevant_str = "\n\n".join([s[0] for s in selections])
@@ -176,10 +181,68 @@ async def elicit_baseline_into_answer(paper: Paper, question: str, gold_support=
                 answer=answer_as_list,
                 support_candidates=texts,
                 support_labels=[text in selection_set for text in texts],
-                support_scores=[t[1] for t in texts_with_perplexities]
+                support_scores=[t[1] for t in texts_with_perplexities],
             )
         except TooLongRequestError:
             selections = remove_lowest_perplexity(selections)
+    return PaperQaAnswer(
+        answer=["The question is not answered in the text."],
+        support_candidates=texts,
+        support_labels=[False for text in texts],
+        support_scores=[t[1] for t in texts_with_perplexities],
+    )
+
+
+async def _few_shot_elicit_into_answer(
+    paper: Paper,
+    question: str,
+    gold_support: None,
+    few_shot_demonstration_func: Callable[[str, bool], Sequence[PaperQaGoldStandard]],
+):
+    gold_support  # unused
+    texts = _to_paragraphs(paper)
+    supporting_examples = few_shot_demonstration_func(paper.document_id, True)
+    paragraph_supporting_examples = [
+        await convert_demonstration_example(example, _to_paragraphs)
+        for example in supporting_examples
+    ]
+    texts_with_perplexities = await select_using_elicit_prompt_few_shot(
+        question=question, texts=texts, examples=paragraph_supporting_examples
+    )
+    selections = filter_by_perplexity_threshold(texts_with_perplexities, threshold=1.16)
+
+    while selections:
+        try:
+            relevant_str = "\n\n".join([s[0] for s in selections])
+            answer = await answer_like_elicit_qa(
+                question=question, passage=relevant_str
+            )
+            answer_as_list = await quick_list(question=question, answer=answer)
+            selection_set = set([s[0] for s in selections])
+            return PaperQaAnswer(
+                answer=answer_as_list,
+                support_candidates=texts,
+                support_labels=[text in selection_set for text in texts],
+                support_scores=[t[1] for t in texts_with_perplexities],
+            )
+        except TooLongRequestError:
+            selections = remove_lowest_perplexity(selections)
+    return PaperQaAnswer(
+        answer=["The question is not answered in the text."],
+        support_candidates=texts,
+        support_labels=[False for text in texts],
+        support_scores=[t[1] for t in texts_with_perplexities],
+    )
+
+
+few_shot_arms_into_answer = partial(
+    _few_shot_elicit_into_answer,
+    few_shot_demonstration_func=arms_few_shot_demonstration,
+)
+few_shot_experiments_into_answer = partial(
+    _few_shot_elicit_into_answer,
+    few_shot_demonstration_func=experiments_few_shot_demonstration,
+)
 
 
 async def elicit_baseline_prune_then_answer(
@@ -187,13 +250,14 @@ async def elicit_baseline_prune_then_answer(
 ):
     gold_support  # unused
     texts = _to_paragraphs(paper)
-    selections = await windowed_select_using_elicit_prompt(
+    selections = await select_results_using_elicit_prompt(
         question=question, texts=texts
     )
-    texts_with_perplexities = await windowed_select_using_elicit_prompt(
+    texts_with_perplexities = await select_results_using_elicit_prompt(
         question=question, texts=texts
     )
-    selections = filter_by_perplexity_threshold(texts_with_perplexities)
+    # ~ .78 recall, .10 precision @ threshold=1.07
+    selections = filter_by_perplexity_threshold(texts_with_perplexities, threshold=1.16)
     while selections:
         try:
             pruned = await prune(
@@ -211,10 +275,16 @@ async def elicit_baseline_prune_then_answer(
                 answer=answer_as_list,
                 support_candidates=texts,
                 support_labels=[text in selection_set for text in texts],
-                support_scores=[t[1] for t in texts_with_perplexities]
+                support_scores=[t[1] for t in texts_with_perplexities],
             )
         except TooLongRequestError:
             selections = remove_lowest_perplexity(selections)
+    return PaperQaAnswer(
+        answer=["The question is not answered in the text."],
+        support_candidates=texts,
+        support_labels=[False for _ in texts],
+        support_scores=[t[1] for t in texts_with_perplexities],
+    )
 
 
 async def decontext_elicit_baseline_prune_then_answer(
@@ -231,10 +301,13 @@ async def elicit_baseline_then_demonstration_answer(
 ):
     gold_support  # unused
     texts = _to_paragraphs(paper)
-    selections = await windowed_select_using_elicit_prompt(
+    selections = await select_results_using_elicit_prompt(
         question=question, texts=texts
+    )
 
-    )   
+
 # while selections:
 #     try:
 #         return await cheating_few_shot_qa_baseline()
+
+recipe.main(elicit_baseline_into_answer)

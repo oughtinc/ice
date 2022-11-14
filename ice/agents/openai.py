@@ -123,7 +123,7 @@ class OpenAIAgent(Agent):
 
         abs_probs = {choice: lookup_prob(choice) for choice in choices}
         Z = sum(abs_probs.values())
-        if Z < 0.8:
+        if Z < 0.6:
             log.warning(f"{1-Z} of unaccounted probability in classify")
             log.warning(choice_prefix)
             log.warning(str(prediction))

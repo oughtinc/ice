@@ -28,7 +28,6 @@ async def completion_perplexity(
     if not completion[0].isspace():
         log.warning("Completion does not start with whitespace!", completion=completion)
     
-    log.info("Calling GPT-3", num_tokens=n_tokens(prompt + completion))
     response = await openai_complete(
         prompt=prompt + completion,
         max_tokens=0,

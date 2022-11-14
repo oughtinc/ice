@@ -49,7 +49,7 @@ def arms_questions_and_answers(
             gold_answer = (
                 numbered_list(gold_answer).transform()
                 + "\n\n"
-                + f"{len(gold_answer)} arm{'s' if len(gold_answer) > 1 else ''} in total)"
+                + f"({len(gold_answer)} arm{'s' if len(gold_answer) > 1 else ''} in total)"
             )
         if len(all_exps) > 1:
             question = f"""This paper studied multiple experiments: {all_exps}. For the {experiment.name} experiment specifically, what were the different trial arms (subgroups of participants)?""".strip()

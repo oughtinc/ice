@@ -1,6 +1,6 @@
 from math import factorial
-from random import sample
-from typing import Any
+import random
+from typing import Any, Iterator, Sequence, TypeVar
 
 from structlog.stdlib import get_logger
 
@@ -8,6 +8,8 @@ from ice.recipe import recipe
 from ice.recipes.best_completion import completion_perplexity
 from ice.utils import map_async
 from tqdm import tqdm
+
+import numpy as np
 
 EXAMPLES_PROMPTS = [
     "Complete this math problem: 2 + 2 =",
@@ -25,14 +27,10 @@ log = get_logger()
 
 
 def remaining_prompts(
-    prompts_and_completions: list[tuple[str, str]],
-    used_prompts_and_completions: list[tuple[str, str]],
-) -> list[tuple[str, str]]:
-    return [
-        p
-        for p in prompts_and_completions
-        if not p in used_prompts_and_completions
-    ]
+    prompts_and_completions: Sequence[tuple[str, str]],
+    used_prompts_and_completions: Sequence[tuple[str, str]],
+) -> Sequence[tuple[str, str]]:
+    return [p for p in prompts_and_completions if not p in used_prompts_and_completions]
 
 
 async def tuple_completion_perplexity(
@@ -60,15 +58,23 @@ async def eval_prompt(
 
     return sum(perplexities) / len(perplexities)
 
-def _permuations(l: list[Any], n_shots: int, max: int = 10000):
+
+# Brake on going completely out of control here
+MAX_PERMUTATIONS = 10_000
+
+T = TypeVar("T")
+
+
+def _random_permutations(
+    l: list[T], n_shots: int, rng: np.random.Generator, max=MAX_PERMUTATIONS
+) -> Iterator[Sequence[T]]:
     for _ in range(max):
-        yield sample(l, n_shots)
+        copy = l.copy()
+        rng.shuffle(copy)  # type: ignore[arg-type]
+        yield copy[:n_shots]
 
 
-    
-        
-
-async def best_few_shot(
+async def score_few_shot(
     examples_prompts: list[str] = EXAMPLES_PROMPTS,
     examples_completions: list[str] = EXAMPLES_COMPLETIONS,
     n_shots: int = 1,
@@ -76,7 +82,24 @@ async def best_few_shot(
     prefix: str = "",
     max_permutations: int = 10,
     max_test_size: int = 10,
+    seed: int = 0,
 ) -> list[tuple[str, float]]:
+    """Given some prompts divided into
+
+    Args:
+        examples_prompts (list[str], optional): _description_. Defaults to EXAMPLES_PROMPTS.
+        examples_completions (list[str], optional): _description_. Defaults to EXAMPLES_COMPLETIONS.
+        n_shots (int, optional): _description_. Defaults to 1.
+        split_string (str, optional): _description_. Defaults to "\n\n".
+        prefix (str, optional): _description_. Defaults to "".
+        max_permutations (int, optional): _description_. Defaults to 10.
+        max_test_size (int, optional): _description_. Defaults to 10.
+
+    Returns:
+        list[tuple[str, float]]: _description_
+    """
+
+    rng = np.random.default_rng(seed)
 
     assert len(examples_prompts) == len(examples_completions)
 
@@ -97,29 +120,31 @@ async def best_few_shot(
 
     all_prompts: list[tuple[str, list[tuple[str, str]]]] = []
 
-    for prompt_perm in _permuations(prompts_and_completions, n_shots):
+    for prompt_perm in _random_permutations(prompts_and_completions, n_shots, rng):
         prompt = prefix + split_string.join([p + c for p, c in prompt_perm])
         remaining_prompts_and_completions = remaining_prompts(
-            prompts_and_completions, list(prompt_perm)
+            prompts_and_completions, prompt_perm
         )
 
-        test_prompts_and_completions = sample(
-            remaining_prompts_and_completions, k=test_size
-        )
+        test_prompts_and_completions: list[tuple[str, str]] = [tuple(c) for c in rng.choice(  # type: ignore[misc]
+            remaining_prompts_and_completions, size=test_size, replace=False
+        )]
 
         all_prompts.append((prompt, test_prompts_and_completions))
 
-    all_prompts = sample(all_prompts, k=n_perms)
+    all_prompts = [tuple(c) for c in rng.choice(all_prompts, size=n_perms, replace=False)]
 
     scored_prompts = [
         (
             prompt,
             await eval_prompt(prompt, remaining_prompts_and_completions, split_string),
         )
-        for prompt, remaining_prompts_and_completions in tqdm(all_prompts, desc="Evaluating prompts")
+        for prompt, remaining_prompts_and_completions in tqdm(
+            all_prompts, desc="Evaluating prompts"
+        )
     ]
 
     return scored_prompts  # The prompt with the lowest perplexity is the best few-shot prompt.
 
 
-recipe.main(best_few_shot)
+recipe.main(score_few_shot)
