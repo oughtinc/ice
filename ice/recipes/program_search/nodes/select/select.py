@@ -150,7 +150,7 @@ async def windowed_select(
     n: int,
     step: int,
     examples: list[RenderableSelectionExample] | None = None,
-) -> Sequence[str]:
+) -> Sequence[bool]:
     """Select texts that answer the question via
 
     Args:
@@ -172,19 +172,9 @@ async def windowed_select(
 async def windowed_select_using_elicit_prompt(  # Best recall [use this]
     question: str,
     texts: Sequence[str],
-    examples: list[RenderableSelectionExample] | None = None,
-    perplexity_threshold: float = 14.0,
-) -> Sequence[str]:
-    """Select texts that answer the question via
-
-    Args:
-        question (str): The question to select texts for.
-        texts (Sequence[str]): Texts to consider for selection.
-        n (int): Number of texts to consider at each step.
-        step (int): Overlap between windows. (if n == step, partition the document; if step < n, window with step size).
-
-    Returns:
-        Sequence[str]: Selected texts.
+) -> Sequence[tuple[str, float]]:
+    """Select texts that answer the question via perplexity of the "not mentioned"
+    response to an elicit-like question-answering prompt
     """
 
     prompts = [
@@ -203,10 +193,23 @@ async def windowed_select_using_elicit_prompt(  # Best recall [use this]
         completion=completion,
     )
 
-    return [
-        t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold
-    ]
+    return [(t, p[1]) for t, p in zip(texts, prompt_perplexities)]
     # Lower perplexity means more likely to be "not mentioned in excerpt"
+
+
+def filter_by_perplexity_threshold(
+    results: Sequence[tuple[str, float]], threshold: float = 3.0
+):
+    return [r for r in results if r[1] > threshold]
+
+def remove_lowest_perplexity(results: Sequence[tuple[str, float]]):
+    drop = min(range(len(results)), key=lambda idx: results[idx][1])
+    return list(results[0:drop]) + list(results[drop + 1 :])
+
+
+def to_paragraphs(paper: Paper) -> Sequence[str]:
+    return [str(p) for p in paper.paragraphs]
+
 
 def _create_example_prompt(
     example: PaperQaGoldStandard,
@@ -259,16 +262,8 @@ def _create_example_prompts(
 
     return prompts, completions
 
-def _get_relevant_paragraphs(
-    example: PaperQaGoldStandard,
-) -> Sequence[str]:
-    paragraphs = to_paragraphs(example.paper)
-    relevant_paragraphs = example.gold_support
-    irrelevant_paragraphs = [p for p in paragraphs if not p in relevant_paragraphs]
-    return relevant_paragraphs, irrelevant_paragraphs
 
-
-async def windowed_select_using_elicit_prompt_few_shot(
+async def select_using_elicit_prompt_few_shot(
     question: str,
     texts: Sequence[str],
     examples: list[RenderableSelectionExample] | None = None,
@@ -324,14 +319,13 @@ async def windowed_select_using_elicit_prompt_few_shot(
         completion=completion,
     )
 
-    return [t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold]
+    return [
+        t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold
+    ]
+    # Lower perplexity means more likely to be "not mentioned in excerpt"
 
-def _get_relevant_paragraphs(
-    example: PaperQaGoldStandard,
-) -> Sequence[str]:
-    paragraphs = to_paragraphs(example.paper)
-    relevant_paragraphs = example.gold_support
-    return relevant_paragraphs
+
+# Few-shot prompt
 
 def _get_irrelevant_paragraphs(
     example: PaperQaGoldStandard,
@@ -358,7 +352,7 @@ async def windowed_select_using_scibert(
 ) -> Sequence[str]:
     random.seed(42)
     relevant_examples = [e for e in examples if e.question == question]
-    relevant_paragraphs = sum([_get_relevant_paragraphs(e) for e in relevant_examples], [])
+    relevant_paragraphs = sum([e.gold_support for e in relevant_examples], [])
     irrelevant_paragraphs = sum([_get_irrelevant_paragraphs(e) for e in relevant_examples], [])
 
     relevant_paragraphs = random.choices(
@@ -380,15 +374,9 @@ async def windowed_select_using_scibert(
 
     return [t for t, c in zip(texts, classifications) if c]
 
-
-
-# Few-shot prompt
-
-SELECTION_PROMPT = """"""
-
-
-def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str]:
-    return [t for t, s in zip(texts, selections) if s]
+def as_bool(selections: Sequence[str], texts: Sequence[str]) -> Sequence[bool]:
+    selections_set = set(selections)
+    return [t in selections_set for t in texts]
 
 
 # Meta-methods

@@ -1,29 +1,38 @@
+from collections.abc import Callable
 from collections.abc import Sequence
 from pathlib import Path
 
 from tqdm import tqdm
 
+from ice.cache import diskcache
 from ice.metrics.gold_standards import get_gold_standards
+from ice.metrics.rouge import matches
 from ice.paper import Paper
-
-_paper_dir = Path("/code/papers/")  # fixed in container
-
-
-def download_paper(document_id: str) -> Paper:
-    paper_path = Path(_paper_dir, document_id)
-    return Paper.load(paper_path)
+from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 
 
-def download_papers(
-    split: str = "validation", question_short_name: str = "consort_flow"
-):
-    doc_ids = {
-        gs.document_id
-        for gs in get_gold_standards(question_short_name=question_short_name)
-        if gs.split == split
-    }
-    paper_files = [f for f in _paper_dir.iterdir() if f.name in doc_ids]
-    return [
-        Paper.load(f)
-        for f in tqdm(paper_files, desc="Loading papers for gold standards")
-    ]
+@diskcache()
+async def identify_gs_str(
+    candidates: Sequence[str], gs_quotes: Sequence[str], lcs_threshold: float = 0.7
+) -> Sequence[str]:
+    positive_selections = set[str]()
+    for gs_quote in gs_quotes:
+        gs_matches = await matches(
+            hypotheses=candidates, references=[gs_quote], lcs_threshold=lcs_threshold
+        )
+        for candidate in gs_matches:
+            positive_selections.add(candidate)
+    return [cand for cand in candidates if cand in positive_selections]
+
+
+async def convert_demonstration_example(
+    example: PaperQaGoldStandard,
+    paper_division_func: Callable[[Paper], Sequence[str]],
+) -> PaperQaGoldStandard:
+    paper_parts = paper_division_func(example.paper)
+    return PaperQaGoldStandard(
+        paper=example.paper,
+        question=example.question,
+        gold_answer=example.gold_answer,
+        gold_support=(await identify_gs_str(paper_parts, example.gold_support)),
+    )

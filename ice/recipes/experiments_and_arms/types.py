@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from typing import ClassVar
 from typing import Generic
 from typing import Literal
 from typing import NewType
@@ -11,6 +12,7 @@ from pydantic import root_validator
 from pydantic import validator
 from pydantic.generics import GenericModel
 
+from ice.metrics.gold_standards import ParsedGoldStandardBase
 from ice.paper import Paragraph
 
 
@@ -59,7 +61,8 @@ class Experiment(BaseModel):
         return v
 
 
-class ExperimentsArms(BaseModel):
+class ExperimentsArms(ParsedGoldStandardBase):
+    question_short_name: ClassVar[str] = "experiments_arms"
     experiments: list[Experiment]
 
     @validator("experiments", pre=True)

@@ -4,6 +4,9 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import cached_property
 from itertools import chain
+from sklearn.metrics import precision_recall_curve, PrecisionRecallDisplay
+from sklearn.metrics import roc_auc_score, roc_curve
+import matplotlib.pyplot as plt
 
 import numpy as np
 
@@ -14,6 +17,7 @@ from ice.metrics.rouge import matches
 class BinaryClassificationMetrics:
     ground_truth: Sequence[bool]
     predictions: Sequence[bool]
+    scores: Sequence[float] | None = None
 
     def __post_init__(self):
         assert len(self.ground_truth) == len(
@@ -64,16 +68,45 @@ class BinaryClassificationMetrics:
     def accuracy(self):
         return (self._gt_array == self._pred_array).mean() if self.ground_truth else 0
 
-    def as_dict(self) -> dict[str, int | float]:
+    @cached_property
+    def auroc(self):
+        if not self.scores:
+            return None
+        return roc_auc_score(y_true=self._gt_array, y_score=self.scores)
+
+    def save_pr_curve(self, filename: str):
+        if not self.scores:
+            return None
+        prd = PrecisionRecallDisplay.from_predictions(
+            y_true=self._gt_array, y_pred=self.scores
+        )
+        prd.plot()
+        plt.savefig(filename)
+
+    def pr_thresholds(self, n: int | None = 20):
+        if not self.scores:
+            return None
+        precisions, recalls, thresholds = precision_recall_curve(
+            y_true=self._gt_array, probas_pred=self.scores
+        )
+        n = min(n or len(thresholds), len(thresholds))
+        idxs = np.linspace(0, len(thresholds), n, endpoint=False).astype(int)
+        return {
+            float(t): dict(p=float(p), r=float(r))
+            for p, r, t in zip(precisions[idxs], recalls[idxs], thresholds[idxs])
+        }
+
+    def as_dict(self) -> dict[str, int | float | None]:
         return dict(
-            tp=self.tp,
-            tn=self.tn,
-            fp=self.fp,
-            fn=self.fn,
-            recall=self.recall,
-            precision=self.precision,
-            f1=self.f1,
-            accuracy=self.accuracy,
+            tp=int(self.tp),
+            tn=int(self.tn),
+            fp=int(self.fp),
+            fn=int(self.fn),
+            recall=float(self.recall),
+            precision=float(self.precision),
+            f1=float(self.f1),
+            accuracy=float(self.accuracy),
+            auroc=self.auroc and float(self.auroc),
         )
 
     def __str__(self):
@@ -87,9 +120,11 @@ class BinaryClassificationMetrics:
         cls, metrics: Iterable["BinaryClassificationMetrics"]
     ) -> "BinaryClassificationMetrics":
         ms = list(metrics)
+        do_scores = all((m.scores is not None for m in ms))
         return cls(
             ground_truth=list(chain(*(m.ground_truth for m in ms))),
             predictions=list(chain(*(m.predictions for m in ms))),
+            scores=list(chain(*(m.scores or [] for m in ms))) if do_scores else None,
         )
 
 
@@ -112,6 +147,7 @@ async def fuzzy_text_classification_metrics(
     texts: Sequence[str],
     predictions: Sequence[bool],
     ground_truth: Sequence[str],
+    scores: Sequence[float] | None = None,
     lcs_threshold: float = 0.7,
 ) -> BinaryClassificationMetrics:
     """Because labeled ground truths are often partial excerpts, use Rouge lcs-recall of ground truth to generate labels.
@@ -125,4 +161,6 @@ async def fuzzy_text_classification_metrics(
         BinaryClassificationMetrics: Metrics
     """
     gt_labels = await label_texts(texts, ground_truth, lcs_threshold=lcs_threshold)
-    return BinaryClassificationMetrics(ground_truth=gt_labels, predictions=predictions)
+    return BinaryClassificationMetrics(
+        ground_truth=gt_labels, predictions=predictions, scores=scores
+    )

@@ -3,12 +3,12 @@ from collections.abc import Sequence
 from enum import Enum
 from typing import TypeVar
 
-from ice.cache import diskcache
+from typing import Mapping, Sequence, TypeVar
+from ice.recipes.program_search.types import Selection
 from ice.metrics.base import Sample
 from ice.metrics.nubia import Nubia
 from ice.metrics.nubia import NubiaResponse
 from ice.metrics.rouge import matches
-from ice.metrics.rouge import Rouge
 from ice.metrics.rouge import rouge_texts
 from ice.metrics.rouge import RougeResult
 from ice.recipe import recipe
@@ -88,20 +88,6 @@ async def rouge_distractor_scores(
 
 
 SelectionT_co = TypeVar("SelectionT_co", bound=Selection, covariant=True)
-
-
-@diskcache()
-async def identify_gs_str(
-    candidates: Sequence[str], gs_quotes: Sequence[str], lcs_threshold: float = 0.7
-) -> Sequence[str]:
-    positive_selections = set[str]()
-    for gs_quote in gs_quotes:
-        gs_matches = await matches(
-            hypotheses=candidates, references=[gs_quote], lcs_threshold=lcs_threshold
-        )
-        for candidate in gs_matches:
-            positive_selections.add(candidate)
-    return [cand for cand in candidates if cand in positive_selections]
 
 
 async def mark_gs(

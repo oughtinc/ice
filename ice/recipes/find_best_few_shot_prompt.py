@@ -56,7 +56,6 @@ async def eval_prompt(
 
     return sum(perplexities) / len(perplexities)
 
-
 def _permuations(l: list[Any], n_shots: int, max: int = 10000):
     for _ in range(max):
         yield sample(l, n_shots)

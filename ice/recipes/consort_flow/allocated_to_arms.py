@@ -11,7 +11,7 @@ from typing import Protocol
 
 from ice.formatter.transform.value import numbered_list
 from ice.metrics.gold_standards import GoldStandard
-from ice.metrics.gold_standards import ModelType
+from ice.metrics.gold_standards import ParsedGoldStandardType
 from ice.paper import Paper
 from ice.recipe import Recipe
 from ice.recipe import recipe
@@ -254,8 +254,8 @@ class DecontextAndSelect(Recipe):
 
             decomp_correct = await quick_eval(
                 question=question,
-                gold=gold_answer,
-                generated=answer,
+                ground_truth=gold_answer,
+                prediction=answer,
             )
             evals.append(decomp_correct)
         return evals

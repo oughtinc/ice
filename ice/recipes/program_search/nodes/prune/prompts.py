@@ -5,8 +5,6 @@ from collections.abc import Sequence
 from typing import cast
 from typing import TypedDict
 
-import numpy as np
-
 from ice.formatter.multi import format_multi
 from ice.formatter.multi import stop
 from ice.formatter.multi import StopSentinel
