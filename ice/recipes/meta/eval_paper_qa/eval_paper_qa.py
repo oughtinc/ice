@@ -29,12 +29,14 @@ from ice.recipes.program_search.nodes.answer.answer import (
 )
 from ice.recipes.program_search.nodes.select.select import (
     windowed_select_using_elicit_prompt,
-    windowed_select_using_elicit_prompt_few_shot,
+    windowed_select_using_scibert,
 )
 from ice.recipes.program_search.utils.find_examples import identify_gs_str, mark_gs
 from ice.trace import trace
 from ice.utils import map_async
 
+def to_paragraphs(paper: Paper) -> Sequence[str]:
+    return [str(p) for p in paper.paragraphs]
 
 async def eval_unstructured_list(
     ground_truth: Sequence[str], predictions: Sequence[str]
@@ -117,9 +119,6 @@ async def cheating_qa_baseline(
         support_labels=[True for _ in gold_support],
     )
 
-def to_paragraphs(paper: Paper) -> Sequence[str]:
-    return [str(p) for p in paper.paragraphs]
-
 async def search_qa_baseline(
     paper: Paper,
     question: str,
@@ -135,10 +134,9 @@ async def search_qa_baseline(
         fn=partial(convert_demonstration_example, paper_division_func=to_paragraphs),
     )
 
-    relevant_excerpts = await windowed_select_using_elicit_prompt_few_shot(
+    relevant_excerpts = await windowed_select_using_scibert(
         question=question,
         texts=excerpts,
-        perplexity_threshold=2.0,
         examples=examples,
     )
     relevant_str = "\n\n".join(relevant_excerpts)

@@ -24,6 +24,9 @@ from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer, PaperQaGoldStand
 from ice.recipes.meta.eval_paper_qa.utils import download_paper, download_papers
 
 
+def to_paragraphs(paper: Paper) -> Sequence[str]:
+    return [str(p) for p in paper.paragraphs]
+
 def experiments_questions_and_answers(
     gold: GoldStandard[ExperimentsArms], consolidate: bool = False
 ) -> Iterable[PaperQaGoldStandard]:
@@ -95,6 +98,7 @@ async def search_eval_experiments_qa_baseline():
         split="validation",
         question_short_name="experiments_arms",
         get_gs=get_ea_gs,  # TODO: make native version
+        max_concurrency=1,
     )
 
 
@@ -159,9 +163,6 @@ async def cheating_eval_experiments_with_demonstrations():
         get_gs=get_ea_gs,
     )
 
-def to_paragraphs(paper: Paper) -> Sequence[str]:
-    return [str(p) for p in paper.paragraphs]
-
 async def cheating_paragraph_eval_experiments_with_demonstrations():
     method = partial(
         cheating_few_shot_qa_baseline,
@@ -208,6 +209,7 @@ async def cheating_paragraph_eval_experiments_with_reasoning_demonstrations():
         split="validation",
         question_short_name="experiments_arms",
         get_gs=get_ea_gs,
+        max_concurrency=10,
     )
 
 

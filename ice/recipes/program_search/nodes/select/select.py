@@ -26,11 +26,15 @@ from ice.recipes.program_search.nodes.select.prompts import render_selection_exa
 from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
 from ice.recipes.program_search.utils.find_examples import matches
 from ice.recipes.find_best_few_shot_prompt import best_few_shot
+from ice.recipes.embeddings_classify import classify_documents
 from ice.utils import reduce_async
 from ice.utils import window_dropping
 
 log = get_logger()
 
+
+def to_paragraphs(paper: Paper) -> Sequence[str]:
+    return [str(p) for p in paper.paragraphs]
 
 # class Select(Protocol):
 #     async def __call__(self, question: str, texts: list[str], examples: list[Example]) -> list[int]:
@@ -166,7 +170,7 @@ async def windowed_select_using_elicit_prompt( # Best recall [use this]
     question: str,
     texts: Sequence[str],
     examples: list[RenderableSelectionExample] | None = None,
-    perplexity_threshold: float = 3.0,
+    perplexity_threshold: float = 14.0,
 ) -> Sequence[str]:
     """Select texts that answer the question via
 
@@ -198,9 +202,6 @@ async def windowed_select_using_elicit_prompt( # Best recall [use this]
 
     return [t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold]
     # Lower perplexity means more likely to be "not mentioned in excerpt"
-
-def to_paragraphs(paper: Paper) -> Sequence[str]:
-    return [str(p) for p in paper.paragraphs]
 
 def _create_example_prompt(
     example: PaperQaGoldStandard,
@@ -242,12 +243,22 @@ def _create_example_prompts(
 
     return prompts, completions
 
+def _get_relevant_paragraphs(
+    example: PaperQaGoldStandard,
+) -> Sequence[str]:
+    paragraphs = to_paragraphs(example.paper)
+    relevant_paragraphs = example.gold_support
+    irrelevant_paragraphs = [p for p in paragraphs if not p in relevant_paragraphs]
+    return relevant_paragraphs, irrelevant_paragraphs
+
+
 async def windowed_select_using_elicit_prompt_few_shot(
     question: str,
     texts: Sequence[str],
     examples: list[RenderableSelectionExample] | None = None,
     perplexity_threshold: float = 3.0,
 ) -> Sequence[str]:
+
     random.shuffle(examples)
 
     prompts = sum([_create_example_prompts(e)[0] for e in examples], [])
@@ -297,7 +308,61 @@ async def windowed_select_using_elicit_prompt_few_shot(
     )
 
     return [t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold]
-    # Lower perplexity means more likely to be "not mentioned in excerpt"
+
+def _get_relevant_paragraphs(
+    example: PaperQaGoldStandard,
+) -> Sequence[str]:
+    paragraphs = to_paragraphs(example.paper)
+    relevant_paragraphs = example.gold_support
+    return relevant_paragraphs
+
+def _get_irrelevant_paragraphs(
+    example: PaperQaGoldStandard,
+) -> Sequence[str]:
+    paragraphs = to_paragraphs(example.paper)
+    relevant_paragraphs = example.gold_support
+    irrelevant_paragraphs = [p for p in paragraphs if not p in relevant_paragraphs]
+    return irrelevant_paragraphs
+
+def _preprocess_bert(
+    text: str,
+) -> str:
+    return "[CLS] " + text.replace("\n", " ").replace(".", ". [SEP]")
+
+def _preprocess_bert_list(
+    text: Sequence[str],
+) -> Sequence[str]:
+    return [_preprocess_bert(t) for t in text]
+
+async def windowed_select_using_scibert(
+    question: str,
+    texts: Sequence[str],
+    examples: list[RenderableSelectionExample] | None = None,
+) -> Sequence[str]:
+    random.seed(42)
+    relevant_examples = [e for e in examples if e.question == question]
+    relevant_paragraphs = sum([_get_relevant_paragraphs(e) for e in relevant_examples], [])
+    irrelevant_paragraphs = sum([_get_irrelevant_paragraphs(e) for e in relevant_examples], [])
+
+    relevant_paragraphs = random.choices(
+        relevant_paragraphs,
+        k=50,
+    )
+
+    irrelevant_paragraphs = random.choices(
+        irrelevant_paragraphs,
+        k=50,
+    ) 
+
+    classifications = await classify_documents(
+        documents=_preprocess_bert_list(texts),
+        relevant_documents=_preprocess_bert_list(relevant_paragraphs),
+        irrelevant_documents=_preprocess_bert_list(irrelevant_paragraphs),
+        alpha=0.85,
+    )
+
+    return [t for t, c in zip(texts, classifications) if c]
+
 
 # Few-shot prompt
 
