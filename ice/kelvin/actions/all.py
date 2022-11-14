@@ -7,7 +7,7 @@ from ice.kelvin.actions.elicit import ViewPaperAction
 from ice.kelvin.actions.lm import GenerationAction
 from ice.kelvin.actions.text import AddTextRowAction
 from ice.kelvin.actions.text import EditTextRowAction
-from ice.kelvin.view import CardWithView
+from ice.kelvin.models import Frontier
 
 
 ACTION_TYPE_UNION = (
@@ -28,8 +28,8 @@ ACTION_CLASSES = [
 ]
 
 
-def get_available_actions(card_with_view: CardWithView) -> list[Action]:
+def get_available_actions(frontier: Frontier) -> list[Action]:
     available_actions: list[Action] = []
     for action_class in ACTION_CLASSES:
-        available_actions += cast(Action, action_class).instantiate(card_with_view)
+        available_actions += cast(Action, action_class).instantiate(frontier)
     return available_actions

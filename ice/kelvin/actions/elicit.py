@@ -6,14 +6,13 @@ from structlog import get_logger
 
 from ice.kelvin.actions.base import Action
 from ice.kelvin.actions.base import ActionParam
-from ice.kelvin.cards.base import Card
-from ice.kelvin.cards.paper import PaperCard
-from ice.kelvin.cards.paper import PaperRow
-from ice.kelvin.cards.text import TextCard
-from ice.kelvin.cards.text import TextRow
+from ice.kelvin.models import Card
+from ice.kelvin.models import Frontier
+from ice.kelvin.models import PartialFrontier
+from ice.kelvin.models import View
+from ice.kelvin.rows import PaperRow
+from ice.kelvin.rows import TextRow
 from ice.kelvin.utils import truncate_text
-from ice.kelvin.view import CardView
-from ice.kelvin.view import CardWithView
 from ice.recipes.elicit.vespa_search import vespa_search
 
 log = get_logger()
@@ -26,10 +25,7 @@ class VespaSearchAction(Action):
     ]
     label: str = "Search papers"
 
-    def validate_input(self, card: Card) -> None:
-        pass
-
-    def execute(self, card: Card) -> CardWithView:
+    def execute(self, frontier) -> PartialFrontier:
         query = self.params[0].value
         search_result = asyncio.run(vespa_search(query=query, num_hits=20))
 
@@ -53,82 +49,40 @@ class VespaSearchAction(Action):
                     raw_data=fields,
                 )
             )
-        new_card = PaperCard(rows=rows, prev_id=card.id)
-        return CardWithView(
-            card=new_card, view=CardView(card_id=new_card.id, selected_rows={})
+        old_card = frontier.focus_path_head()
+        new_card = Card(rows=rows, prev_id=old_card.id)
+        new_frontier = frontier.update_focus_path_head(
+            new_head_card=new_card, new_view=View()
         )
+        return new_frontier
 
     @classmethod
-    def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
-        actions: list[Action] = [cls(label="Search papers")]
-        if card_with_view.card.kind == "TextCard":
-            for row in card_with_view.get_marked_rows():
-                query = row.text
-                short_query = truncate_text(query, max_length=20)
-                action = cls(
-                    label=f'Search papers for "{short_query}"',
-                    params=[
-                        ActionParam(
-                            name="query", kind="TextParam", label="Query", value=query
-                        )
-                    ],
-                )
-                actions.append(action)
-        return actions
+    def _instantiate_from_query(cls, query: str) -> Action:
+        short_query = truncate_text(query, max_length=20)
+        action = cls(
+            label=f'Search papers for "{short_query}"',
+            params=[
+                ActionParam(name="query", kind="TextParam", label="Query", value=query)
+            ],
+        )
+        return action
 
-
-# class ElicitSearchAction(Action):
-
-#     kind: Literal["ElicitSearchAction"] = "ElicitSearchAction"
-#     params: list[ActionParam] = [
-#         ActionParam(name="query", kind="TextParam", label="Query")
-#     ]
-#     label: str = "Search papers"
-
-#     def validate_input(self, card: Card) -> None:
-#         pass
-
-#     def execute(self, card: Card) -> CardWithView:
-#         query = self.params[0].value
-#         search_result = asyncio.run(elicit_search(question=query, num_papers=5))
-
-#         rows = []
-#         for (paper_id, paper_fields) in search_result.get("papers", {}).items():
-#             title = paper_fields.get("title", None)
-#             authors = paper_fields.get("authors", [])
-#             year = paper_fields.get("year", None)
-#             citations = paper_fields.get("citationCount", None)
-#             rows.append(
-#                 PaperRow(
-#                     title=title,
-#                     authors=authors,
-#                     year=year,
-#                     citations=citations,
-#                     raw_data=paper_fields,
-#                 )
-#             )
-
-#         new_card = PaperCard(rows=rows)
-#         new_view = CardView(card_id=new_card.id, selected_rows={})
-#         return CardWithView(card=new_card, view=new_view)
-
-#     @classmethod
-#     def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
-#         actions: list[Action] = [cls(label="Search papers")]
-#         if card_with_view.card.kind == "TextCard":
-#             for row in card_with_view.get_marked_rows():
-#                 query = row.text
-#                 short_query = truncate_text(query, max_length=20)
-#                 action = cls(
-#                     label=f'Search papers for "{short_query}"',
-#                     params=[
-#                         ActionParam(
-#                             name="query", kind="TextParam", label="Query", value=query
-#                         )
-#                     ],
-#                 )
-#                 actions.append(action)
-#         return actions
+    @classmethod
+    def instantiate(cls, frontier: Frontier) -> list[Action]:
+        marked_rows = frontier.get_marked_rows()
+        base_actions = [cls(label="Search papers")]
+        if not marked_rows:
+            return base_actions
+        elif len(marked_rows) == 1:
+            marked_row = marked_rows[0]
+            if isinstance(marked_row, TextRow):
+                return base_actions + [cls._instantiate_from_query(marked_row.text)]
+            elif isinstance(marked_row, PaperRow):
+                if marked_row.title:
+                    return base_actions + [
+                        cls._instantiate_from_query(marked_row.title)
+                    ]
+        return []
 
 
 class ViewPaperAction(Action):
@@ -139,14 +93,9 @@ class ViewPaperAction(Action):
     ]
     label: str = "View paper"
 
-    def validate_input(self, card: Card) -> None:
-        if not card.kind == "PaperCard":
-            raise ValueError("ViewPaperAction can only be applied to paper cards")
+    def execute(self, frontier: Frontier) -> PartialFrontier:
 
-    def execute(self, card: Card) -> CardWithView:
-        new_row_text = self.params[0].value
-        new_row = TextRow(text=new_row_text)
-        new_rows = card.rows + [new_row]
+        card = frontier.focus_path_head()
 
         # Get the paper
         paper_id = self.params[0].value
@@ -161,28 +110,26 @@ class ViewPaperAction(Action):
             "Authors: " + ", ".join(paper.authors),
             f"Year: {paper.year}",
             f"Citations: {paper.citations}",
-            f"DOI: {paper.raw_data['doi']}",
+            f"DOI: {paper.raw_data.get('doi')}",
             f"Abstract: {abstract}",
         ]
 
         # Convert to card & view
         new_rows = [TextRow(text=text) for text in text_bullets]
-        new_card = TextCard(rows=new_rows, prev_id=card.id)
-        new_view = CardView(
-            card_id=new_card.id,
-            selected_rows={},
+        new_card = Card(rows=new_rows, prev_id=card.id)
+        new_frontier = frontier.update_focus_path_head(
+            new_head_card=new_card, new_view=View()
         )
-
-        return CardWithView(card=new_card, view=new_view)
+        return new_frontier
 
     @classmethod
-    def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
+    def instantiate(cls, frontier: Frontier) -> list[Action]:
         actions: list[Action] = []
-        if card_with_view.card.kind == "PaperCard":
-            for row in card_with_view.get_marked_rows():
+        for row in frontier.get_marked_rows():
+            if row.kind == "Paper":
                 paper_id = row.id
                 title = row.title
-                short_title = truncate_text(title, max_length=80)
+                short_title = truncate_text(title or "(not title)", max_length=80)
                 action = cls(
                     label=f'View paper "{short_title}"',
                     params=[

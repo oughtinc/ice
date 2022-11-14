@@ -5,9 +5,9 @@ from pydantic import BaseModel
 from pydantic import Field
 from structlog import get_logger
 
-from ice.kelvin.cards.base import Card
+from ice.kelvin.models import Frontier
+from ice.kelvin.models import PartialFrontier
 from ice.kelvin.utils import generate_id
-from ice.kelvin.view import CardWithView
 
 log = get_logger()
 
@@ -45,17 +45,17 @@ class ActionParamText(ActionParam):
 
 
 class Action(BaseModel):
+    id: str = Field(default_factory=generate_id)
     kind: str
     params: list[ActionParam]
-    id: str = Field(default_factory=generate_id)
     label: str
 
-    def validate_input(self, card: Card) -> None:
-        raise NotImplementedError
+    def validate_input(self, frontier: Frontier) -> None:
+        pass
 
-    def execute(self, card: Card) -> CardWithView:
+    def execute(self, frontier: Frontier) -> PartialFrontier:
         raise NotImplementedError
 
     @classmethod
-    def instantiate(cls, card_with_view: CardWithView) -> list["Action"]:
+    def instantiate(cls, frontier: Frontier) -> list["Action"]:
         raise NotImplementedError

@@ -7,61 +7,8 @@ import { Pane, Panes } from "./Panes";
 import SelectionList from "./SelectionList";
 import StatusBar from "./StatusBar";
 import { useWorkspace } from "/contexts/workspaceContext";
-import {
-  getCurrentActions,
-  getCurrentCard,
-  getFocusIndex,
-  getSelectedCardRows,
-} from "/utils/workspace";
-
-const useActionHotkeys = (actions, executeActionAndDeselectAll, actionToPrepare) => {
-  // Todo: This should be stored in workspace
-  const labelFromKey = {
-    a: "Add bullet point to card",
-    c: "Clear card",
-    e: "Edit text",
-    m: "Run language model",
-    p: "Search papers",
-    v: "View paper",
-  };
-
-  const actionMatchesLabel = (action, label) => {
-    return action.label.toLowerCase().startsWith(label.toLowerCase());
-  };
-
-  for (const [key, label] of Object.entries(labelFromKey)) {
-    useHotkeys(
-      key,
-      () => {
-        if (!actionToPrepare) {
-          const action = actions.find(action => actionMatchesLabel(action, label));
-          if (action) {
-            executeActionAndDeselectAll(action);
-          }
-        }
-      },
-      [actionToPrepare, executeActionAndDeselectAll, actions],
-    );
-  }
-
-  const assignedKeys = new Set();
-  const actionKeys = actions.map(action => {
-    const key = Object.keys(labelFromKey).find(key =>
-      actionMatchesLabel(action, labelFromKey[key]),
-    );
-    if (key) {
-      if (assignedKeys.has(key)) {
-        return null;
-      } else {
-        assignedKeys.add(key);
-        return key;
-      }
-    }
-    return null;
-  });
-
-  return { actionKeys };
-};
+import useActionHotkeys from "/hooks/useActionHotkeys";
+import { getAvailableActions, getCurrentCard, getFocusIndex, getFocusPath } from "/utils/workspace";
 
 const Workspace = () => {
   const {
@@ -69,7 +16,7 @@ const Workspace = () => {
     executeAction,
     setSelectedCardRows,
     setFocusedCardRow,
-    setCardViewCard,
+    setFocusPathHeadCardId,
     activeRequestCount,
     error,
   } = useWorkspace();
@@ -78,14 +25,12 @@ const Workspace = () => {
   const RIGHT_PANE = "right";
 
   const [baseActivePane, setActivePane] = useState(RIGHT_PANE);
-
-  const [selectedActions, setSelectedActions] = useState({});
   const [actionFocusIndex, setActionFocusIndex] = useState(0);
   const [actionToPrepare, setActionToPrepare] = useState(null);
 
   const card = getCurrentCard(workspace);
-  const actions = getCurrentActions(workspace) || [];
-  const selectedCardRows = getSelectedCardRows(workspace);
+  const actions = getAvailableActions(workspace) || [];
+  const selectedCardRows = getFocusPath(workspace)?.view?.selected_row_ids;
   const cardFocusIndex = getFocusIndex(workspace) || 0;
 
   const activePane = card && !card.rows.length && actions ? RIGHT_PANE : baseActivePane;
@@ -109,7 +54,6 @@ const Workspace = () => {
       if (activePane === LEFT_PANE) {
         setSelectedCardRows(() => ({}));
       } else {
-        setSelectedActions(() => ({}));
         setActivePane(LEFT_PANE);
         setActionToPrepare(null);
       }
@@ -121,11 +65,11 @@ const Workspace = () => {
     "left, h",
     () => {
       if (card && card.prev_id) {
-        setCardViewCard(card.prev_id);
+        setFocusPathHeadCardId(card.prev_id);
       }
     },
     {},
-    [setCardViewCard, card],
+    [setFocusPathHeadCardId, card],
   );
 
   useHotkeys(
@@ -133,18 +77,22 @@ const Workspace = () => {
     () => {
       if (card && card.next_id) {
         console.log(card.next_id);
-        setCardViewCard(card.next_id);
+        setFocusPathHeadCardId(card.next_id);
       }
     },
     {},
-    [setCardViewCard, card],
+    [setFocusPathHeadCardId, card],
   );
 
   useEffect(() => {
     setActionFocusIndex(0);
   }, [cardFocusIndex, actions]);
 
-  const { actionKeys } = useActionHotkeys(actions, executeActionAndDeselectAll, actionToPrepare);
+  const { actionKeys } = useActionHotkeys({
+    actions,
+    executeActionAndDeselectAll,
+    actionToPrepare,
+  });
 
   return (
     <Panes>
@@ -157,7 +105,7 @@ const Workspace = () => {
           setSelected={setSelectedCardRows}
           onEnter={() => setActivePane(RIGHT_PANE)}
           active={activePane === LEFT_PANE}
-          renderItem={row => <CardRow cardKind={card?.kind} row={row} />}
+          renderItem={row => <CardRow row={row} />}
           focusIndex={cardFocusIndex}
           setFocusIndex={setFocusedCardRow}
         />
@@ -171,8 +119,8 @@ const Workspace = () => {
             multiselect={false}
             items={actions}
             keys={actionKeys}
-            selected={selectedActions}
-            setSelected={setSelectedActions}
+            selected={{}}
+            setSelected={() => {}}
             onEnter={executeActionAndDeselectAll}
             active={activePane === RIGHT_PANE}
             renderItem={action => <Action {...action} />}

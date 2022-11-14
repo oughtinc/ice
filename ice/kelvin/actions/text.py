@@ -1,16 +1,16 @@
+from typing import cast
 from typing import Literal
 
 from pydantic import Field
 
 from ice.kelvin.actions.base import Action
 from ice.kelvin.actions.base import ActionParam
-from ice.kelvin.cards.base import Card
-from ice.kelvin.cards.text import TextCard
-from ice.kelvin.cards.text import TextRow
-from ice.kelvin.utils import generate_id
+from ice.kelvin.models import Card
+from ice.kelvin.models import Frontier
+from ice.kelvin.models import PartialFrontier
+from ice.kelvin.models import View
+from ice.kelvin.rows import TextRow
 from ice.kelvin.utils import truncate_text
-from ice.kelvin.view import CardView
-from ice.kelvin.view import CardWithView
 
 
 class AddTextRowAction(Action):
@@ -22,32 +22,26 @@ class AddTextRowAction(Action):
     ]
     label: str = "Add bullet point to card"
 
-    def validate_input(self, card: Card) -> None:
-        """Check that the card kind is TextCard."""
-        if not card.kind == "TextCard":
-            raise ValueError(
-                f"Unsupported card kind for AddTextRowAction: {card.kind}",
-            )
-
-    def execute(self, card: Card) -> CardWithView:
+    def execute(self, frontier: Frontier) -> PartialFrontier:
         """Create a new text card with the added row and return it with a new view."""
+        card = frontier.focus_path_head()
         new_row_text = self.params[0].value
-        new_card_id = generate_id()
-        new_row = TextRow(text=new_row_text)
-        new_card = TextCard(id=new_card_id, rows=card.rows + [new_row], prev_id=card.id)
-        new_view = CardView(
-            card_id=new_card_id,
-            selected_rows={},
-            focused_row_index=len(card.rows),
+        new_rows = card.rows + [TextRow(text=new_row_text)]
+        new_card = Card(rows=new_rows, prev_id=card.id)
+        new_frontier = frontier.update_focus_path_head(
+            new_head_card=new_card,
+            new_view=View(
+                focused_row_index=len(new_rows) - 1,
+            ),
         )
-
-        return CardWithView(card=new_card, view=new_view)
+        return new_frontier
 
     @classmethod
-    def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
-        if not card_with_view.card.kind == "TextCard":
-            return []
-        return [cls()]
+    def instantiate(cls, frontier: Frontier) -> list[Action]:
+        row_kinds = frontier.get_marked_row_kinds()
+        if row_kinds in ({"Text"}, set()):
+            return [cls()]
+        return []
 
 
 class EditTextRowAction(Action):
@@ -62,18 +56,20 @@ class EditTextRowAction(Action):
     )
     label: str = "Edit text"
 
-    def validate_input(self, card: Card) -> None:
-        """Check that the card kind is TextCard and the row_id is valid."""
-        if not card.kind == "TextCard":
-            raise ValueError(
-                f"Unsupported card kind for EditTextRowAction: {card.kind}",
-            )
+    def validate_input(self, frontier: Frontier) -> None:
+        """Check that the row  id is in focus path head and is a text row."""
         row_id = self.params[1].value
-        if row_id not in {row.id for row in card.rows}:
-            raise ValueError(f"Invalid row id: {row_id}")
+        frontier_rows = frontier.focus_path_head().rows
+        row_ids = {row.id for row in frontier_rows}
+        if row_id not in row_ids:
+            raise ValueError(f"Row id {row_id} not in focus path head")
+        row_kinds = {row.kind for row in frontier_rows}
+        if row_kinds != {"Text"}:
+            raise ValueError(f"Row id {row_id} is not a text row")
 
-    def execute(self, card: Card) -> CardWithView:
-        """Create a new text card with the edited row and return it with a new view."""
+    def execute(self, frontier: Frontier) -> PartialFrontier:
+        """Create a new card with the edited row and return it."""
+        card = frontier.focus_path_head()
         new_row_text = self.params[0].value
         row_id = self.params[1].value
 
@@ -82,27 +78,28 @@ class EditTextRowAction(Action):
             for row in card.rows
         ]
 
-        new_card = TextCard(id=generate_id(), rows=new_rows, prev_id=card.id)
+        new_card = Card(rows=new_rows, prev_id=card.id)
 
         new_focused_row_index = next(
             (i for i, row in enumerate(new_rows) if row.id == row_id), None
         )
 
-        new_view = CardView(
-            card_id=new_card.id,
-            selected_rows={},
-            focused_row_index=new_focused_row_index,
+        new_frontier = frontier.update_focus_path_head(
+            new_head_card=new_card,
+            new_view=View(
+                focused_row_index=new_focused_row_index,
+            ),
         )
-
-        return CardWithView(card=new_card, view=new_view)
+        return new_frontier
 
     @classmethod
-    def instantiate(cls, card_with_view: CardWithView) -> list[Action]:
-        if not card_with_view.card.kind == "TextCard":
+    def instantiate(cls, frontier: Frontier) -> list[Action]:
+        row_kinds = frontier.get_marked_row_kinds()
+        if not row_kinds == {"Text"}:
             return []
         actions: list[Action] = []
-        for row in card_with_view.get_marked_rows():
-            previous_text = row.text
+        for row in frontier.get_marked_rows():
+            previous_text = cast(TextRow, row).text
             truncated_text = truncate_text(previous_text, max_length=20)
             actions.append(
                 cls(

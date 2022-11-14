@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { Action as ActionType } from "/types";
 
-const ActionForm = ({ partialAction, onSubmit }) => {
+const ActionForm = ({
+  partialAction,
+  onSubmit,
+}: {
+  partialAction: ActionType;
+  onSubmit: (action: ActionType) => void;
+}) => {
   const { kind, params, label } = partialAction;
   const [formValues, setFormValues] = useState({});
   const firstInputRef = useRef(null); // create a ref to store the first input

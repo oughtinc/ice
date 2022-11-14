@@ -58,11 +58,11 @@ const UnknownRow = ({ row }) => {
   return <pre>{JSON.stringify(row, null, 2)}</pre>;
 };
 
-const CardRow = ({ cardKind, row }) => {
-  switch (cardKind) {
-    case "TextCard":
+const CardRow = ({ row }) => {
+  switch (row.kind) {
+    case "Text":
       return <TextRow row={row} />;
-    case "PaperCard":
+    case "Paper":
       return <PaperRow row={row} />;
     default:
       return <UnknownRow row={row} />;

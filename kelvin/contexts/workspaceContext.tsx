@@ -4,10 +4,9 @@ import {
   executeAction as apiExecuteAction,
   getAvailableActions,
   getInitialWorkspace,
-  updateWorkspace,
 } from "../api";
-import { Workspace } from "../types";
-import { getCurrentCard, getCurrentCardWithView } from "/utils/workspace";
+import { PartialFrontier, Workspace } from "../types";
+import { getFocusPath, getFrontier, updateWorkspace } from "/utils/workspace";
 
 type State = {
   workspace: Workspace | null;
@@ -19,18 +18,17 @@ type ReducerAction =
   | { type: "FETCH_REQUEST" }
   | { type: "FETCH_FAILURE"; payload: Error }
   | { type: "FETCH_WORKSPACE_SUCCESS"; payload: Workspace }
-  | { type: "UPDATE_WORKSPACE_SUCCESS"; payload: Workspace }
-  | { type: "EXECUTE_ACTION_SUCCESS"; payload: Workspace }
+  | { type: "EXECUTE_ACTION_SUCCESS"; payload: PartialFrontier }
   | {
       type: "SET_FOCUSED_ROW_INDEX";
       payload: number;
     }
   | {
-      type: "SET_SELECTED_CARD_ROWS";
+      type: "SET_SELECTED_ROW_IDS";
       payload: (rows: Record<string, boolean>) => Record<string, boolean>;
     }
   | { type: "UPDATE_AVAILABLE_ACTIONS_SUCCESS"; payload: Action[] }
-  | { type: "SET_CARDVIEW_CARD_ID"; payload: string };
+  | { type: "SET_FOCUS_PATH_HEAD_CARD_ID"; payload: string };
 
 const initialState: State = {
   workspace: null,
@@ -52,54 +50,44 @@ const reducer = (draft: State, action: ReducerAction) => {
       draft.activeRequestCount--;
       draft.workspace = action.payload;
       break;
-    case "UPDATE_WORKSPACE_SUCCESS":
-      draft.activeRequestCount--;
-      draft.workspace = action.payload;
-      break;
     case "EXECUTE_ACTION_SUCCESS":
       draft.activeRequestCount--;
-      const currentCard = getCurrentCard(draft.workspace);
-      if (currentCard) {
-        currentCard.next_id = action.payload.card.id;
-      } else {
-        console.warn("No current card in EXECUTE_ACTION_SUCCESS");
-      }
-      const { card, view } = action.payload;
-      const newWorkspace = {
-        cards: [...draft.workspace!.cards, card],
-        view,
-      };
-      draft.workspace = newWorkspace;
-      break;
-    case "SET_SELECTED_CARD_ROWS":
-      draft.workspace.view.selected_rows = action.payload(draft.workspace.view.selected_rows);
-      break;
-    case "SET_FOCUSED_ROW_INDEX":
-      draft.workspace.view.focused_row_index = action.payload;
+      console.log("EXECUTE_ACTION_SUCCESS", action.payload); // not getting text prop here
+      draft.workspace = updateWorkspace(draft.workspace, action.payload);
       break;
     case "UPDATE_AVAILABLE_ACTIONS_SUCCESS":
       draft.activeRequestCount--;
       draft.workspace.available_actions = action.payload;
       break;
-    case "SET_CARDVIEW_CARD_ID":
-      draft.workspace.view.card_id = action.payload;
-      draft.workspace.view.selected_rows = {};
+    case "SET_SELECTED_ROW_IDS": {
+      const focus_path = getFocusPath(draft.workspace);
+      focus_path.view.selected_row_ids = action.payload(focus_path.view.selected_row_ids);
+      console.log("selected_row_ids", focus_path.view.selected_row_ids);
       break;
+    }
+    case "SET_FOCUSED_ROW_INDEX": {
+      const focus_path = getFocusPath(draft.workspace);
+      focus_path.view.focused_row_index = action.payload;
+      break;
+    }
+    case "SET_FOCUS_PATH_HEAD_CARD_ID": {
+      const focus_path = getFocusPath(draft.workspace);
+      focus_path.head_card_id = action.payload;
+      focus_path.view.focused_row_index = 0;
+      break;
+    }
     default:
       return;
   }
 };
 
-// create a context object with a default value of the initial state
 const WorkspaceContext = createContext(initialState);
 
-// create a custom hook that returns the context value
 export function useWorkspace() {
   const workspace = useContext(WorkspaceContext);
   return workspace;
 }
 
-// create a provider component that uses the reducer and dispatches actions
 export function WorkspaceProvider({ children }) {
   const [state, dispatch] = useImmerReducer(reducer, initialState);
   const stateRef = useRef(state);
@@ -112,7 +100,6 @@ export function WorkspaceProvider({ children }) {
     stateRef.current = state;
   }, [state]);
 
-  // create a function that dispatches a fetch request action
   const fetchWorkspace = () => {
     dispatch({ type: "FETCH_REQUEST" });
     getInitialWorkspace()
@@ -124,27 +111,14 @@ export function WorkspaceProvider({ children }) {
       });
   };
 
-  // create a function that dispatches an update workspace action
-  const updateWorkspaceData = workspace => {
-    dispatch({ type: "FETCH_REQUEST" });
-    updateWorkspace({ workspace })
-      .then(data => {
-        dispatch({ type: "UPDATE_WORKSPACE_SUCCESS", payload: data });
-      })
-      .catch(err => {
-        dispatch({ type: "FETCH_FAILURE", payload: err });
-      });
-  };
-
   const executeAction = action => {
     dispatch({ type: "FETCH_REQUEST" });
-    const cardWithView = getCurrentCardWithView(stateRef.current.workspace);
-    if (!cardWithView) {
+    const frontier = getFrontier(stateRef.current.workspace);
+    if (!frontier) {
       return;
     }
-    const { card, view } = cardWithView;
-    console.log("executeAction", { card, view, action });
-    apiExecuteAction({ card, view, action })
+    console.log("executeAction", action, frontier);
+    apiExecuteAction({ action, frontier })
       .then(data => {
         dispatch({ type: "EXECUTE_ACTION_SUCCESS", payload: data });
         updateAvailableActions();
@@ -156,12 +130,12 @@ export function WorkspaceProvider({ children }) {
 
   const updateAvailableActions = () => {
     dispatch({ type: "FETCH_REQUEST" });
-    const cardWithView = getCurrentCardWithView(stateRef.current.workspace);
-    if (!cardWithView) {
+    const frontier = getFrontier(stateRef.current.workspace);
+    if (!frontier) {
       return;
     }
-    const { card, view } = cardWithView;
-    getAvailableActions({ card, view })
+    console.log("updateAvailableActions", frontier);
+    getAvailableActions({ frontier })
       .then(data => {
         dispatch({ type: "UPDATE_AVAILABLE_ACTIONS_SUCCESS", payload: data });
       })
@@ -171,21 +145,25 @@ export function WorkspaceProvider({ children }) {
   };
 
   const setSelectedCardRows = rowUpdateFn => {
-    dispatch({ type: "SET_SELECTED_CARD_ROWS", payload: rowUpdateFn });
+    dispatch({ type: "SET_SELECTED_ROW_IDS", payload: rowUpdateFn });
     updateAvailableActions();
   };
 
   const setFocusedCardRow = rowIndexOrUpdateFn => {
-    const rowIndex =
-      typeof rowIndexOrUpdateFn === "function"
-        ? rowIndexOrUpdateFn(stateRef.current.workspace.view.focused_row_index)
-        : rowIndexOrUpdateFn;
-    dispatch({ type: "SET_FOCUSED_ROW_INDEX", payload: rowIndex });
+    if (typeof rowIndexOrUpdateFn === "function") {
+      const workspace = stateRef.current.workspace;
+      const focus_path = workspace.paths[workspace.focus_path_id];
+      const rowIndex = rowIndexOrUpdateFn(focus_path.view.focused_row_index);
+      dispatch({ type: "SET_FOCUSED_ROW_INDEX", payload: rowIndex });
+    } else {
+      const rowIndex = rowIndexOrUpdateFn;
+      dispatch({ type: "SET_FOCUSED_ROW_INDEX", payload: rowIndex });
+    }
     updateAvailableActions();
   };
 
-  const setCardViewCard = cardId => {
-    dispatch({ type: "SET_CARDVIEW_CARD_ID", payload: cardId });
+  const setFocusPathHeadCardId = cardId => {
+    dispatch({ type: "SET_FOCUS_PATH_HEAD_CARD_ID", payload: cardId });
     updateAvailableActions();
   };
 
@@ -193,10 +171,9 @@ export function WorkspaceProvider({ children }) {
     <WorkspaceContext.Provider
       value={{
         ...state,
-        updateWorkspaceData,
         setSelectedCardRows,
         setFocusedCardRow,
-        setCardViewCard,
+        setFocusPathHeadCardId,
         executeAction,
       }}
     >
