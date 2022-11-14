@@ -1,0 +1,42 @@
+- name: Arms end-to-end
+  results_json: "experiments/results/consort/arms_search_1_then_generate.json"
+  args:
+    split: validation
+    gold_standard_type: ice.recipes.experiments_and_arms.types.ExperimentsArms
+    gold_standard_to_trials: ice.recipes.consort_flow.generate_questions.arms_questions_and_answers_str
+    method: ice.recipes.meta.eval_paper_qa.common_baselines.paper_qa_baseline_str_answer
+    answer_eval_method: ice.recipes.meta.eval_paper_qa.quick_question_driven_eval.quick_eval
+    classification_eval_method: ice.recipes.meta.eval_paper_qa.common_eval_methods.eval_text_classification
+- name: Arms end-to-end with enumeration step at end
+  results_json: "experiments/results/consort/arms_search_1_then_generate_then_enumerate.json"
+  args:
+    gold_standard_to_trials: ice.recipes.consort_flow.generate_questions.arms_questions_and_answers
+    method: ice.recipes.meta.eval_paper_qa.common_baselines.paper_qa_baseline_list_answer
+    answer_eval_method: ice.recipes.meta.eval_paper_qa.common_eval_methods.eval_sequence_gen
+- name: Arms end-to-end with Elicit-style QA for search
+  results_json: "experiments/results/consort/arms_search_elicit_prompt_multi_then_answer_then_enumerate.json"
+  pr_curve: "experiments/results/consort/arms_search_elicit_pr.png"
+  args:
+    method: ice.recipes.consort_flow.baselines.elicit_baseline_into_answer
+- name: Arms few-shot Elicit-style QA for search
+  results_json: "experiments/results/consort/arms_few_shot_elicit_multi_then_answer_then_enumerate.json"
+  pr_curve: "experiments/results/consort/arms_few_shot_elicit_pr.png"
+  args:
+    method: ice.recipes.consort_flow.baselines.few_shot_arms_into_answer
+- name: Arms baseline select, prune, then answer
+  results_json: "experiments/results/consort/arms_search_many_prune_then_answer.json"
+  args:
+    method: ice.recipes.consort_flow.baselines.elicit_baseline_prune_then_answer
+
+#   results_json: "experiments/results/consort/cheating_experiments_qa_fewshot_baseline.json"
+#   args:
+#     method: ice.recipes.consort_flow.baselines.cheating_few_shot_qa_experiments_baseline
+# - name: Experiments qa few-shot baseline (using gold standard paragraphs)
+#   results_json: "experiments/results/consort/cheating_few_shot_qa_experiments_paragraph_baseline.json"
+#   args:
+#     method: ice.recipes.consort_flow.baselines.cheating_few_shot_qa_experiments_paragraph_baseline
+# - name: Experiments qa few-shot reasoning baseline (using gold standard excerpts + paragraphs + reasoning)
+#   results_json: "experiments/results/consort/cheating_few_shot_qa_experiments_paragraph_reasoning_baseline.json"
+#   args:
+#     method: ice.recipes.consort_flow.baselines.cheating_few_shot_qa_experiments_paragraph_reasoning_baseline
+
