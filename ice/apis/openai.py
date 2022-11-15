@@ -165,3 +165,25 @@ async def openai_complete(
         raise response
     record(davinci_equivalent_tokens=get_davinci_equivalent_tokens(response))
     return response
+
+@diskcache()
+async def openai_embeddings(
+    input: Union[str, list[str]],
+    model: str = "text-similarity-ada-001",
+) -> Union[list[float], list[list[float]]]:
+    """Send a embeddings request to the OpenAI API and return the JSON response."""
+    response = await _post(
+        "embeddings",
+        json={
+            "input": input if isinstance(input, list) else [input],
+            "model": model,
+        },
+    )
+
+    if not response:
+        raise ValueError("OpenAI API returned an empty response.")
+    
+    if isinstance(input, str):
+        return response['data'][0]['embedding']
+    
+    return [response['data'][i]['embedding'] for i in range(len(input))]
