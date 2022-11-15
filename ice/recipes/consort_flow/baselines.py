@@ -25,6 +25,7 @@ from ice.recipes.program_search.nodes.select.select import (
     select_using_elicit_prompt_few_shot,
     windowed_select_using_elicit_prompt,
 )
+from ice.utils import n_tokens
 
 
 def experiments_few_shot_demonstration(
@@ -187,34 +188,29 @@ async def elicit_baseline_prune_then_answer(
 ):
     gold_support  # unused
     texts = _to_paragraphs(paper)
-    selections = await windowed_select_using_elicit_prompt(
-        question=question, texts=texts
-    )
     texts_with_perplexities = await windowed_select_using_elicit_prompt(
         question=question, texts=texts
     )
-    selections = filter_by_perplexity_threshold(texts_with_perplexities)
-    while selections:
-        try:
-            pruned = await prune(
-                question=question,
-                texts=[s[0] for s in selections],
-                max_to_keep=len(selections) // 2 if len(selections) > 10 else 5,
-            )
-            relevant_str = "\n\n".join(pruned)
-            answer = await answer_like_elicit_qa(
-                question=question, passage=relevant_str
-            )
-            answer_as_list = await quick_list(question=question, answer=answer)
-            selection_set = set(pruned)
-            return PaperQaAnswer(
-                answer=answer_as_list,
-                support_candidates=texts,
-                support_labels=[text in selection_set for text in texts],
-                support_scores=[t[1] for t in texts_with_perplexities]
-            )
-        except TooLongRequestError:
-            selections = remove_lowest_perplexity(selections)
+
+    pruned = await prune(
+        question=question,
+        texts_with_perplexities=texts_with_perplexities,
+        max_to_keep=7,
+    )
+    relevant_str = "\n\n".join(pruned)
+    # answer = await answer_like_elicit_qa(
+    #     question=question, passage=relevant_str
+    # )
+    answer = "test"
+    #answer_as_list = await quick_list(question=question, answer=answer)
+    answer_as_list = ["test"]
+    selection_set = set(pruned)
+    return PaperQaAnswer(
+        answer=answer_as_list,
+        support_candidates=texts,
+        support_labels=[text in selection_set for text in texts],
+        support_scores=[t[1] for t in texts_with_perplexities]
+    )
 
 
 async def decontext_elicit_baseline_prune_then_answer(

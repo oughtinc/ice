@@ -186,7 +186,7 @@ async def windowed_select_using_elicit_prompt(  # Best recall [use this]
         for text in texts
     ]
 
-    completion = " " + baseline_elicit_answer.NA_PHRASE
+    completion = f" The answer to the question is {baseline_elicit_answer.NA_PHRASE}"
 
     prompt_perplexities = await best_completion(
         prompts=prompts,
@@ -198,9 +198,15 @@ async def windowed_select_using_elicit_prompt(  # Best recall [use this]
 
 
 def filter_by_perplexity_threshold(
-    results: Sequence[tuple[str, float]], threshold: float = 3.0
+    results: Sequence[tuple[str, float]], threshold: float = 1.0730326568139106
 ):
     return [r for r in results if r[1] > threshold]
+
+def top_n_by_perplexity(
+    results: list[tuple[str, float]], n: int = 20
+):
+    top_n_results = list(sorted(results, key=lambda r: r[1], reverse=True))[:n]
+    return [r for r in results if r in top_n_results]
 
 def remove_lowest_perplexity(results: Sequence[tuple[str, float]]):
     drop = min(range(len(results)), key=lambda idx: results[idx][1])
@@ -255,7 +261,7 @@ def _create_example_prompts(
         if isinstance(example.gold_answer, str)
         else example.gold_answer[0]
         if paragraph in relevant_paragraphs
-        else baseline_elicit_answer.NA_PHRASE
+        else f"The answer to the question is {baseline_elicit_answer.NA_PHRASE}"
         for paragraph in paragraphs
     ]
     completions = [" " + c.strip() for c in completions]

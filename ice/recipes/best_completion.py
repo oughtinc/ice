@@ -41,10 +41,24 @@ async def completion_perplexity(
     if not choices:
         raise ValueError("No choices returned from OpenAI API")
 
-    logits = choices[0]["logprobs"]["token_logprobs"]
+    choice = choices[0]
 
-    completion_logits = logits[n_tokens(prompt) :]
+    tokens = choice["logprobs"]["tokens"]
 
+    logits = choice["logprobs"]["token_logprobs"]
+
+    completion_logits = []
+
+    current_completion = ""
+
+    for token, logit in reversed(list(zip(tokens, logits))):
+        current_completion = token + current_completion
+
+        if not current_completion in completion:
+            break
+
+        completion_logits.append(logit)
+    
     perplexity = math.exp(-sum(completion_logits) / len(completion_logits))
 
     return perplexity

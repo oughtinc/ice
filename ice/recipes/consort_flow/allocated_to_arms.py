@@ -35,7 +35,6 @@ from ice.recipes.program_search.nodes.decontext.decontextualize import (
 from ice.recipes.program_search.nodes.decontext.decontextualize import local_decontext
 from ice.recipes.program_search.nodes.decontext.decontextualize import PaperDecontext
 from ice.recipes.program_search.nodes.prune.prune import prune
-from ice.recipes.program_search.nodes.select.select import as_strings
 from ice.recipes.program_search.nodes.select.select import windowed_select
 from ice.recipes.program_search.types import Decontext
 from ice.recipes.program_search.types import Selection
@@ -220,7 +219,7 @@ class DecontextAndSelect(Recipe):
             examples=examples,
         )
         metrics = await select_metrics(list(paper.sentences()), selections, gold or [])
-        answer = await simple_answer(question, as_strings(selections, texts))
+        #answer = await simple_answer(question, as_strings(selections, texts))
         return answer, metrics
 
     async def run(self, paper: Paper):
