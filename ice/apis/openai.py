@@ -1,4 +1,5 @@
 from collections.abc import Mapping
+from typing import Union
 
 import httpx
 
