@@ -24,6 +24,7 @@ from ice.recipes.program_search.nodes.select.select import (
     remove_lowest_perplexity,
     select_using_elicit_prompt_few_shot,
     windowed_select_using_elicit_prompt,
+    windowed_select_using_monot5,
 )
 from ice.utils import n_tokens
 
@@ -188,7 +189,11 @@ async def elicit_baseline_prune_then_answer(
 ):
     gold_support  # unused
     texts = _to_paragraphs(paper)
-    texts_with_perplexities = await windowed_select_using_elicit_prompt(
+    # texts_with_perplexities = await windowed_select_using_elicit_prompt(
+    #     question=question, texts=texts
+    # )
+
+    texts_with_perplexities = await windowed_select_using_monot5(
         question=question, texts=texts
     )
 
@@ -229,7 +234,6 @@ async def elicit_baseline_then_demonstration_answer(
     texts = _to_paragraphs(paper)
     selections = await windowed_select_using_elicit_prompt(
         question=question, texts=texts
-
     )   
 # while selections:
 #     try:

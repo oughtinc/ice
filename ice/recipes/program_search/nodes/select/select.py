@@ -29,6 +29,7 @@ from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionE
 from ice.recipes.program_search.utils.find_examples import matches
 from ice.recipes.find_best_few_shot_prompt import best_few_shot
 from ice.recipes.embeddings_classify import classify_documents
+from ice.agents import OughtInferenceAgent
 from ice.utils import reduce_async
 from ice.utils import window_dropping
 
@@ -43,6 +44,8 @@ def to_paragraphs(paper: Paper) -> Sequence[str]:
 #         pass
 
 random.seed(314)
+
+monot5 = OughtInferenceAgent("mono-t5-base-qa")
 
 
 def last_token_logprob(openai_response: dict) -> float:
@@ -176,7 +179,12 @@ async def windowed_select_using_elicit_prompt(  # Best recall [use this]
     """Select texts that answer the question via perplexity of the "not mentioned"
     response to an elicit-like question-answering prompt
     """
-
+    original_question = question
+    if "?" in question:
+        question = question.split("?")[0].strip()+"?"
+    if "." in question:
+        question = question.split(".")[-1].strip()
+    context = original_question.replace(question, "").replace("  ", " ").strip()
     prompts = [
         baseline_elicit_answer._excerpt_prompt(
             qa_question=question,
@@ -195,6 +203,21 @@ async def windowed_select_using_elicit_prompt(  # Best recall [use this]
 
     return [(t, p[1]) for t, p in zip(texts, prompt_perplexities)]
     # Lower perplexity means more likely to be "not mentioned in excerpt"
+
+async def windowed_select_using_monot5(
+    question: str,
+    texts: Sequence[str],
+) -> Sequence[tuple[str, float]]:
+    if "?" in question:
+        question = question.split("?")[0].strip()+"?"
+    if "." in question:
+        question = question.split(".")[-1].strip()
+    scores = await monot5.search(
+        documents=texts,
+        query=question,
+    )
+
+    return [(t, s) for t, s in zip(texts, scores)]
 
 
 def filter_by_perplexity_threshold(
