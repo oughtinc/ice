@@ -92,3 +92,41 @@ export function updateWorkspace(workspace: Workspace, partialFrontier: PartialFr
   // Return the updated workspace
   return updatedWorkspace;
 }
+
+// A helper function that counts the number of cards in a linked list starting from a given card
+function countSuccessorCards({
+  card,
+  cards,
+}: {
+  card: Card | null;
+  cards: Record<CardId, Card>;
+}): number {
+  let count = 0;
+  let current = card;
+  while (current) {
+    count++;
+    current = current.next_id ? cards[current.next_id] : null;
+  }
+  return count;
+}
+
+// A function that takes a card and computes its position in the sequence
+export function cardPosition({ card, cards }: { card: Card; cards: Record<CardId, Card> }): {
+  total: number;
+  index: number;
+} {
+  const successors = countSuccessorCards({ card, cards });
+
+  // Count the number of cards before the current card
+  let predecessors = 0;
+  let current = card.prev_id ? cards[card.prev_id] : null;
+  while (current) {
+    predecessors++;
+    current = current.prev_id ? cards[current.prev_id] : null;
+  }
+
+  const total = predecessors + successors;
+
+  // Return the total and the index
+  return { total, index: predecessors };
+}

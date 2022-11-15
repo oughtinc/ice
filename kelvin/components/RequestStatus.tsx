@@ -1,4 +1,10 @@
-const StatusBar = ({ activeRequestCount, error }: { activeRequestCount: number; error: Error }) => {
+const RequestStatus = ({
+  activeRequestCount,
+  error,
+}: {
+  activeRequestCount: number;
+  error: Error;
+}) => {
   let message, color, icon;
   if (activeRequestCount > 0) {
     message = "Loading...";
@@ -41,13 +47,10 @@ const StatusBar = ({ activeRequestCount, error }: { activeRequestCount: number; 
     );
   }
   return (
-    <div
-      className={`fixed bottom-0 left-0 right-0 h-10 px-4 py-2 flex items-center ${color} bg-gray-100`}
-      aria-live="polite"
-    >
-      {icon} {message} {activeRequestCount > 1 && `(${activeRequestCount} requests)`}
-    </div>
+    <span className={color}>
+      {message} {activeRequestCount > 1 && `(${activeRequestCount} requests)`}
+    </span>
   );
 };
 
-export default StatusBar;
+export default RequestStatus;

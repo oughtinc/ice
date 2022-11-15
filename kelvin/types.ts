@@ -57,8 +57,8 @@ export interface PaperRow extends Row {
 export type Card = {
   id: CardId;
   rows: Row[];
-  nextId: CardId | null;
-  prevId: CardId | null;
+  next_id: CardId | null;
+  prev_id: CardId | null;
 };
 
 export type View = {

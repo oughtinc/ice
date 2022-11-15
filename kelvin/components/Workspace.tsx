@@ -4,11 +4,17 @@ import Action from "./Action";
 import ActionForm from "./ActionForm";
 import CardRow from "./CardRow";
 import { Pane, Panes } from "./Panes";
+import RequestStatus from "./RequestStatus";
 import SelectionList from "./SelectionList";
-import StatusBar from "./StatusBar";
 import { useWorkspace } from "/contexts/workspaceContext";
 import useActionHotkeys from "/hooks/useActionHotkeys";
-import { getAvailableActions, getCurrentCard, getFocusIndex, getFocusPath } from "/utils/workspace";
+import {
+  cardPosition,
+  getAvailableActions,
+  getCurrentCard,
+  getFocusIndex,
+  getFocusPath,
+} from "/utils/workspace";
 
 const Workspace = () => {
   const {
@@ -28,9 +34,10 @@ const Workspace = () => {
   const [actionFocusIndex, setActionFocusIndex] = useState(0);
   const [actionToPrepare, setActionToPrepare] = useState(null);
 
+  const focusPath = getFocusPath(workspace);
   const card = getCurrentCard(workspace);
   const actions = getAvailableActions(workspace) || [];
-  const selectedCardRows = getFocusPath(workspace)?.view?.selected_row_ids;
+  const selectedCardRows = focusPath?.view?.selected_row_ids;
   const cardFocusIndex = getFocusIndex(workspace) || 0;
 
   const activePane = card && !card.rows.length && actions ? RIGHT_PANE : baseActivePane;
@@ -94,9 +101,20 @@ const Workspace = () => {
     actionToPrepare,
   });
 
+  const { total: totalCards, index: cardIndex } = workspace
+    ? cardPosition({ card, cards: workspace.cards })
+    : { totalCards: 0, cardIndex: 0 };
+
   return (
     <Panes>
-      <Pane active={activePane === LEFT_PANE}>
+      <Pane
+        active={activePane === LEFT_PANE}
+        status={
+          <span>
+            {focusPath?.label} v{cardIndex + 1}/{totalCards}
+          </span>
+        }
+      >
         <SelectionList
           name="Card"
           multiselect={true}
@@ -110,7 +128,10 @@ const Workspace = () => {
           setFocusIndex={setFocusedCardRow}
         />
       </Pane>
-      <Pane active={activePane === RIGHT_PANE}>
+      <Pane
+        active={activePane === RIGHT_PANE}
+        status={<RequestStatus activeRequestCount={activeRequestCount} error={error} />}
+      >
         {actionToPrepare ? (
           <ActionForm partialAction={actionToPrepare} onSubmit={executeActionAndDeselectAll} />
         ) : (
@@ -129,9 +150,9 @@ const Workspace = () => {
           />
         )}
       </Pane>
-      <StatusBar activeRequestCount={activeRequestCount} error={error} />
     </Panes>
   );
 };
 
+/* <StatusBar activeRequestCount={activeRequestCount} error={error} /> */
 export default Workspace;
