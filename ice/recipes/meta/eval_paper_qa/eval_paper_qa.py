@@ -74,6 +74,8 @@ async def eval_paper_qa_method(
             scores=answer.support_scores,
         )
         return SequenceGenerationEvaluation(
+            question=qa_details.question,
+            document_id=paper.document_id,
             correct=correct,
             detail=detail,
             metrics=metrics,

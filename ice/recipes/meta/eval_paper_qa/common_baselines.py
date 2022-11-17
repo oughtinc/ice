@@ -122,7 +122,7 @@ async def _demonstration_answer(
         )
 
 
-async def cheating_few_shot_qa_baseline(
+async def preselected_few_shot_qa_baseline(
     paper: Paper,
     question: str,
     gold_support: Sequence[str] | None,

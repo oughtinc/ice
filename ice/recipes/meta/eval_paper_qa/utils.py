@@ -34,5 +34,6 @@ async def convert_demonstration_example(
         paper=example.paper,
         question=example.question,
         gold_answer=example.gold_answer,
+        short_gold_answer=example.short_gold_answer,
         gold_support=(await identify_gs_str(paper_parts, example.gold_support)),
     )

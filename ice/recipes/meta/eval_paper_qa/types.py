@@ -16,6 +16,7 @@ class PaperQaGoldStandard(Generic[AnswerType_contra]):
     paper: Paper
     question: str
     gold_answer: AnswerType_contra
+    short_gold_answer: AnswerType_contra
     gold_support: Sequence[str]
 
 
@@ -29,6 +30,8 @@ class PaperQaAnswer(Generic[AnswerType_contra]):
 
 @dataclass
 class SequenceGenerationEvaluation(Generic[AnswerType_contra]):
+    document_id: str
+    question: str
     correct: bool
     detail: str
     metrics: BinaryClassificationMetrics
@@ -38,6 +41,8 @@ class SequenceGenerationEvaluation(Generic[AnswerType_contra]):
 
     def as_dict(self):
         return dict(
+            document_id=self.document_id,
+            question=self.question,
             correct=self.correct,
             detail=self.detail,
             metrics=self.metrics.as_dict(),

@@ -1,7 +1,6 @@
 from collections.abc import Mapping
 from collections.abc import Sequence
 from itertools import cycle
-import random
 from typing import cast
 from typing import Protocol
 from anyio import ExceptionGroup
@@ -16,10 +15,13 @@ from ice.apis.openai import TooLongRequestError
 from ice.paper import Paper
 from ice.recipe import Recipe
 from ice.recipe import recipe
-from ice.recipes.best_completion import best_completion
+from ice.recipes.best_completion import best_completion, completion_perplexity
 from ice.recipes.consort_flow import baseline_elicit_answer
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 from ice.recipes.program_search.nodes.answer.types import Demonstration
+from ice.recipes.program_search.types import (
+    remove_highest_perplexity,
+)
 from ice.recipes.program_search.nodes.prune.prune import prune
 from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
 from ice.recipes.program_search.nodes.select.prompts import get_selections
@@ -28,7 +30,7 @@ from ice.recipes.program_search.nodes.select.prompts import render_selection_exa
 from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
 from ice.recipes.program_search.utils.find_examples import matches
 from ice.recipes.find_best_few_shot_prompt import score_few_shot
-from ice.utils import reduce_async
+from ice.utils import map_async, n_tokens, reduce_async
 from ice.utils import window_dropping
 
 log = get_logger()
@@ -191,11 +193,6 @@ def filter_by_perplexity_threshold(
     return [r for r in results if r[1] > threshold]
 
 
-def remove_lowest_perplexity(results: Sequence[tuple[str, float]]):
-    drop = min(range(len(results)), key=lambda idx: results[idx][1])
-    return list(results[0:drop]) + list(results[drop + 1 :])
-
-
 def to_paragraphs(paper: Paper) -> Sequence[str]:
     return [str(p) for p in paper.nonempty_paragraphs()]
 
@@ -219,8 +216,13 @@ async def elicit_negative_few_shot_example(
         return None
     if max_examples:
         while len(most_relevant_not_actually_relevant) > max_examples:
-            most_relevant_not_actually_relevant = remove_lowest_perplexity(
-                most_relevant_not_actually_relevant
+            scored_support = await _score_support(
+                question=example.question,
+                answer=example.short_gold_answer,
+                support_candidates=[t[0] for t in most_relevant_not_actually_relevant],
+            )
+            most_relevant_not_actually_relevant = remove_highest_perplexity(
+                scored_support
             )
 
     return baseline_elicit_answer.convert_to_non_answer(
@@ -232,8 +234,27 @@ async def elicit_negative_few_shot_example(
     )
 
 
-async def noisy_positive_few_shot_example(
-    example: PaperQaGoldStandard, threshold: float = 1.16, max_examples: int | None = 4
+async def _score_support(
+    question: str, answer: str, support_candidates: Sequence[str]
+) -> Sequence[tuple[str, float]]:
+    async def get_perplexity(support: str) -> tuple[str, float]:
+        return support, await completion_perplexity(
+            prompt=baseline_elicit_answer.elicit_qa_prompt(
+                qa_question=question, excerpt=support
+            ),
+            completion=" " + answer.strip(),
+        )
+
+    perplexities = await map_async(support_candidates, get_perplexity)
+    # Lower is better in this case
+    return perplexities
+
+
+async def positive_few_shot_example(
+    example: PaperQaGoldStandard,
+    threshold: float = 1.16,
+    max_examples: int | None = 4,
+    add_noise: bool = False,
 ) -> Demonstration:
     paragraphs = to_paragraphs(example.paper)
     gold_support = set(example.gold_support)
@@ -243,26 +264,29 @@ async def noisy_positive_few_shot_example(
     search_results = await select_results_using_elicit_prompt(
         question=example.question, texts=paragraphs
     )
-    most_relevant_all = filter_by_perplexity_threshold(search_results, threshold=threshold)
+    most_relevant_all = filter_by_perplexity_threshold(
+        search_results, threshold=threshold
+    )
     most_relevant = most_relevant_all
     most_relevant_texts = {t[0] for t in most_relevant}
     noisy_support = [
-        p for p in paragraphs if p in most_relevant_texts or p in gold_support
+        p
+        for p in paragraphs
+        if p in most_relevant_texts and add_noise or p in gold_support
     ]
-    while (
-        max_examples
-        and most_relevant
-        and len(noisy_support) > max_examples
-    ):
-        scored_noisy_support = [tp for tp in most_relevant_all if tp[0] in noisy_support]
-        most_relevant = remove_lowest_perplexity(scored_noisy_support)
+
+    while max_examples and most_relevant and len(noisy_support) > max_examples:
+        scored_noisy_support = await _score_support(
+            question=example.question,
+            answer=example.short_gold_answer,
+            support_candidates=noisy_support,
+        )
+        most_relevant = remove_highest_perplexity(scored_noisy_support)
         most_relevant_texts = {t[0] for t in most_relevant}
-        noisy_support = [
-            p for p in paragraphs if p in most_relevant_texts
-        ]
+        noisy_support = [p for p in paragraphs if p in most_relevant_texts]
 
     return Demonstration(
-        question=example.question, texts=noisy_support, answer=example.gold_answer
+        question=example.question, texts=noisy_support, answer=example.short_gold_answer
     )
 
 
@@ -272,19 +296,26 @@ async def select_using_elicit_prompt_few_shot(
     examples: Sequence[PaperQaGoldStandard],
     n_shots: int = 5,
     seed: int = 0,
+    include_negative: bool = False,
 ) -> Sequence[tuple[str, float]]:
     _examples = list(examples)
-    random.seed(seed)
-    random.shuffle(_examples)
+    rng = np.random.default_rng(seed)
+    rng.shuffle(_examples)  # type: ignore[arg-type]
 
     example_separator = "\n\n---\n\n"
 
-    demonstrations_or_none = [
-        (await noisy_positive_few_shot_example(example, max_examples=1))
-        if idx % 2 == 0
-        else (await elicit_negative_few_shot_example(example, max_examples=1))
-        for idx, example in enumerate(examples)
-    ]
+    if include_negative:
+        demonstrations_or_none = [
+            (await elicit_negative_few_shot_example(example, max_examples=1))
+            if idx % 3 == 0  # more positive than negative examples
+            else (await positive_few_shot_example(example, max_examples=1))
+            for idx, example in enumerate(examples)
+        ]
+    else:
+        demonstrations_or_none = [
+            await positive_few_shot_example(example, max_examples=1)
+            for example in examples
+        ]
     demonstrations = [d for d in demonstrations_or_none if d is not None]
 
     prompts_and_completions = baseline_elicit_answer.make_few_shot_examples(
@@ -298,8 +329,8 @@ async def select_using_elicit_prompt_few_shot(
             n_shots=n_shots,
             split_string=example_separator,
             prefix="",
-            max_permutations=20,
-            max_test_size=4,
+            max_permutations=10,  # TODO: tune these a bit
+            max_test_size=5,
             seed=seed,
         )
     except ExceptionGroup as es:
@@ -326,7 +357,6 @@ async def select_using_elicit_prompt_few_shot(
             )
         else:
             raise
- 
 
     best_few_shot_prompt = min(few_shot_prompts, key=lambda p: p[1])[0]
 
@@ -342,12 +372,26 @@ async def select_using_elicit_prompt_few_shot(
 
     completion = " " + baseline_elicit_answer.COMBINED_NA_PHRASE
 
+    if any((n_tokens(prompt + " " + completion) > 4_095 for prompt in prompts)):
+        if not n_shots:
+            raise ValueError("Prompt would be too long, cannot shorten")
+        return await select_using_elicit_prompt_few_shot(
+            question=question,
+            texts=texts,
+            examples=examples,
+            n_shots=n_shots - 1,
+            seed=seed,
+        )
+
     prompt_perplexities = await best_completion(
         prompts=prompts,
         completion=completion,
     )
 
-    return prompt_perplexities
+    return [
+        (text, prompt_perplexity[1])
+        for text, prompt_perplexity in zip(texts, prompt_perplexities)
+    ]
     # Lower perplexity means more likely to be "not mentioned in excerpt"
 
 

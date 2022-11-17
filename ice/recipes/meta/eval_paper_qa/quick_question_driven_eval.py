@@ -1,6 +1,7 @@
 import math
 
 from ice.apis.openai import openai_complete
+from ice.contrib.ought_private.openai.alpha import alpha_complete
 from ice.formatter.multi import format_multi
 from ice.formatter.multi import stop
 
@@ -25,7 +26,7 @@ EXAMPLES = [
     ),
 ]
 
-INSTRUCTIONS = """For each question, identify whether the student's answer was "Correct" or "Incorrect"."""
+INSTRUCTIONS = """For each question, identify whether the student's answer was "Correct" or "Incorrect". Grade generously---if an answer is mostly correct, count it as correct."""
 
 EXAMPLE_FORMAT = """
 Question: {question}
@@ -77,7 +78,7 @@ async def quick_eval(
     prompt = make_quick_eval_prompt(
         question=question, gold=ground_truth, generated=str(prediction)
     )
-    response = await openai_complete(prompt=prompt, max_tokens=1, logprobs=5)
+    response = await alpha_complete(prompt=prompt, max_tokens=1, logprobs=5)
     return (
         correct_or_incorrect(response["choices"][0]["logprobs"]["top_logprobs"][-1]),
         "",

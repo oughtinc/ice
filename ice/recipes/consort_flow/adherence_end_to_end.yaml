@@ -1,0 +1,39 @@
+- name: "1. adherence baseline (a): Search for top paragraph, then answer based on that paragraph."
+  results_json: "experiments/results/consort/adherence/01_baseline.json"
+  args:
+    split: validation
+    gold_standard_type: ice.recipes.consort_flow.types.ConsortFlow
+    gold_standard_to_trials: ice.recipes.consort_flow.generate_questions.adherence_questions_and_answers
+    method: ice.recipes.meta.eval_paper_qa.common_baselines.paper_qa_baseline_str_answer
+    answer_eval_method: ice.recipes.meta.eval_paper_qa.quick_question_driven_eval.quick_eval
+    classification_eval_method: ice.recipes.meta.eval_paper_qa.common_eval_methods.eval_text_classification
+- name: "2. adherence: Classify each paragraph, then use as many paragraphs classified as relevant as fit into the prompt, answer based on those paragraphs."
+  results_json: "experiments/results/consort/adherence/02_elicit_style_classification_then_answer.json"
+  pr_curve: "experiments/results/consort/adherence/adherence_search_elicit_pr.png"
+  args:
+    method: ice.recipes.consort_flow.baselines.zero_shot_adherence_into_answer
+- name: "3. adherence: Classify as in (2), prune with handwritten few-shot reasoning prompt (keeping at most 7 paragraphs), then answer based on the remaining paragraphs."
+  results_json: "experiments/results/consort/adherence/03_elicit_style_classification_pruning_then_answer.json"
+  args:
+    method: ice.recipes.consort_flow.baselines.elicit_prune_adherence_reasoning_answer
+- name: "4. adherence: Use automatically generated few-shot classification variant, then answer based on those paragraphs."
+  results_json: "experiments/results/consort/adherence/04_few_shot_classification_then_answer.json"
+  pr_curve: "experiments/results/consort/adherence/adherence_few_shot_pr.png"
+  args:
+    method: ice.recipes.consort_flow.baselines.few_shot_adherence_into_answer
+- name: "5. adherence: Classify as in (4), prune with handwritten few-shot reasoning prompt (keeping at most 7 paragraphs), then answer based on the remaining paragraphs."
+  results_json: "experiments/results/consort/adherence/05_few_shot_classification_pruning_then_answer.json"
+  args:
+    method: ice.recipes.consort_flow.baselines.few_shot_adherence_prune_reasoning_answer
+- name: "6: adherence: Classify as in (2), don't prune, answer based with automatically-generated few-shot examples."
+  results_json: "experiments/results/consort/adherence/06_few_shot_classification_then_answer_with_few_shot.json"
+  args:
+    method: ice.recipes.consort_flow.baselines.zero_shot_adherence_few_shot_answer
+- name: "7. adherence: Classify as in (2), don't prune, decontext selections, then answer based on the decontexted paragraphs."
+  results_json: "experiments/results/consort/adherence/07_few_shot_classification_decontext_then_answer.json"
+  args:
+    method: ice.recipes.consort_flow.baselines.zero_shot_adherence_decontext_then_answer
+- name: "8. adherence: Classify as in (2), don't prune, decontext selections, then answer with automatically-generated few-shot examples."
+  results_json: "experiments/results/consort/adherence/08_zero_shot_classification_decontext_with_few_shot.json"
+  args:
+    method: ice.recipes.consort_flow.baselines.zero_shot_adherence_decontext_few_shot_answer

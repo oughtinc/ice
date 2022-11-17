@@ -78,3 +78,12 @@ T = t.TypeVar("T")
 
 class Beam(GenericModel, t.Generic[T]):
     ...
+
+def remove_lowest_perplexity(results: t.Sequence[tuple[str, float]]):
+    drop = min(range(len(results)), key=lambda idx: results[idx][1])
+    return list(results[0:drop]) + list(results[drop + 1 :])
+
+
+def remove_highest_perplexity(results: t.Sequence[tuple[str, float]]):
+    drop = max(range(len(results)), key=lambda idx: results[idx][1])
+    return list(results[0:drop]) + list(results[drop + 1 :])
