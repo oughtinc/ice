@@ -1,5 +1,4 @@
 from math import factorial
-import random
 from typing import Any, Iterator, Sequence, TypeVar
 
 from structlog.stdlib import get_logger
@@ -126,13 +125,20 @@ async def score_few_shot(
             prompts_and_completions, prompt_perm
         )
 
-        test_prompts_and_completions: list[tuple[str, str]] = [tuple(c) for c in rng.choice(  # type: ignore[misc]
-            remaining_prompts_and_completions, size=test_size, replace=False
-        )]
+        test_prompt_completion_idxs = rng.choice(
+            range(len(remaining_prompts_and_completions)), size=test_size, replace=False
+        )
+
+        test_prompts_and_completions = [
+            remaining_prompts_and_completions[idx]
+            for idx in test_prompt_completion_idxs
+        ]
 
         all_prompts.append((prompt, test_prompts_and_completions))
 
-    all_prompts = [tuple(c) for c in rng.choice(all_prompts, size=n_perms, replace=False)]
+    all_prompts_idxs = rng.choice(range(len(all_prompts)), size=n_perms, replace=False)
+
+    all_prompts = [all_prompts[idx] for idx in all_prompts_idxs]
 
     scored_prompts = [
         (
