@@ -31,7 +31,7 @@ async def answer_like_elicit_qa(
     )
 
     response = await openai_complete(
-        prompt,
+        prompt, stop=None
     )
 
     choices = response.get("choices")
