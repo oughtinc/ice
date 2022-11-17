@@ -42,7 +42,19 @@ async def completion_perplexity(
 
     logits = choices[0]["logprobs"]["token_logprobs"]
 
-    completion_logits = logits[n_tokens(prompt) :]
+    tokens = choices[0]["logprobs"]["tokens"]
+    completion_tokens: list[str] = []
+    for token in reversed(tokens):
+        if completion.endswith("".join(completion_tokens)):
+            completion_tokens = [token] + completion_tokens
+        else:
+            break
+
+    completion_tokens = completion_tokens[1:] if completion == "".join(completion_tokens[1:]) else completion_tokens
+    if completion != "".join(completion_tokens):
+        print("".join(completion_tokens), completion)
+
+    completion_logits = logits[-len(completion_tokens) :]
 
     perplexity = math.exp(-sum(completion_logits) / len(completion_logits))
 
