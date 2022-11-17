@@ -114,7 +114,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     const poll = async () => {
       let delay = 1_000;
       try {
-        const urlPrefix = recipes[traceId] ? "https://oughtinc.github.io/static" : "";
+        const urlPrefix = recipes[traceId] ? "https://oughtinc.github.io/static" : "/api";
         const url = `${urlPrefix}/traces/${traceId}.jsonl`;
         const offset = traceOffsetRef.current;
         const contentLength = await getContentLength(url);

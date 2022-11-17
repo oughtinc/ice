@@ -1,26 +1,16 @@
-import { readdir } from "fs/promises";
-import { GetServerSideProps } from "next";
 import Link from "next/link";
-import { basename, extname } from "path";
+import {useEffect, useState} from "react";
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  let filenames: string[] = [];
-  try {
-    filenames = await readdir("public/traces");
-  } catch {}
-
-  const traceIds = filenames.flatMap(filename => {
-    const ext = extname(filename);
-    return ext === ".jsonl" ? [basename(filename, ext)] : [];
-  });
-
-  return { props: { traceIds } };
-};
-
-export default function TraceListPage({ traceIds }: { traceIds: string[] }) {
+export default function TraceListPage() {
+  const [traces, setTraces] = useState<string[]>([]);
+  useEffect(() => {
+    fetch("/api/traces/")
+      .then(res => res.json())
+      .then(setTraces);
+  }, []);
   return (
     <div className="m-8 flex flex-col space-y-4">
-      {traceIds.map(traceId => (
+      {traces.map(traceId => (
         <Link key={traceId} className="font-mono" href={`/traces/${traceId}`}>
           {traceId}
         </Link>
