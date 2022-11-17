@@ -10,8 +10,6 @@ services:
       # When mounting /code, don't clobber generated directories.
       # https://stackoverflow.com/a/37898591
       - /code/.venv/
-      - /code/ui/node_modules/
       - ./:/code
     ports:
-      - "3000:3000"
       - "8935:8935"
