@@ -16,6 +16,9 @@ async def list_traces():
 @router.get("/{trace_id}.jsonl")
 async def get_trace(trace_id: str, Range: str | None = Header(None)):
     path = trace_dir / f"{trace_id}.jsonl"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Trace not found")
+
     if Range is None:
         return FileResponse(path)
 
