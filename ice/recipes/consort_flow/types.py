@@ -55,7 +55,7 @@ class Reason(BaseModel):
 
 
 class SampleSizeWithReasons(SampleSize):
-    reasons: Literal["Not mentioned"] | Sequence[Reason]
+    reasons: Literal["Not mentioned"] | Sequence[Reason] | None = None
 
     @validator("reasons", pre=True)
     def validate_reasons(cls, v):
@@ -139,9 +139,10 @@ class Experiment(BaseModel):
 
 
 class ConsortFlow(ParsedGoldStandardBase):
-    question_short_name: ClassVar[str] = "consort_flow"
+    question_short_name: ClassVar[str] = "consort_flow_v2"
     experiments: list[Experiment]
 
     @validator("experiments", pre=True)
     def validate_experiments(cls, v):
         return _maybe_dict_to_sequence(Experiment, v)
+
