@@ -9,7 +9,7 @@ interface RecipeGroupProps {
   children?: React.ReactNode;
 }
 
-function RecipeGroup({title, recipes, children}: RecipeGroupProps) {
+function RecipeGroup({ title, recipes, children }: RecipeGroupProps) {
   return (
     <>
       <h2 className="text-lg font-semibold mt-8">{title}</h2>
