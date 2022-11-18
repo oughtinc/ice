@@ -2,8 +2,6 @@ import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
 import { isEmpty, isString, last, omit, set } from "lodash";
-import Head from "next/head";
-import { useRouter } from "next/router";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
   createContext,
@@ -23,7 +21,8 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import Separator from "./Separator";
 import Spinner from "./Spinner";
 import { recipes } from "/helpers/recipes";
-import { COLORS } from "/styles/colors";
+import * as COLORS from "/styles/colors.json";
+import { useParams } from "react-router";
 
 const elicitStyle = {
   "hljs-keyword": { color: COLORS.indigo[600] }, // use primary color for keywords
@@ -825,26 +824,21 @@ const Trace = ({ traceId }: { traceId: string }) => {
 const isUlid = (id: string) => /^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$/.test(id);
 
 const useTraceId = () => {
-  const {
-    query: { id },
-  } = useRouter();
-  const traceId = Array.isArray(id) ? id[0] : id;
+  const {traceId} = useParams();
   return traceId && isUlid(traceId) ? traceId : undefined;
 };
 
 export const TracePage = () => {
   const traceId = useTraceId();
+  useEffect(() => {
+    document.title = traceId && recipes[traceId]
+      ? `${recipes[traceId].title} | Interactive Composition Explorer`
+      : "Interactive Composition Explorer";
+  }, []);
 
   return !traceId ? null : (
     <TreeProvider key={traceId} traceId={traceId}>
-      <Head>
-        <title>
-          {traceId && recipes[traceId]
-            ? `${recipes[traceId].title} | Interactive Composition Explorer`
-            : "Interactive Composition Explorer"}
-        </title>
-      </Head>
-      <Trace traceId={traceId} />
+      <Trace traceId={traceId}/>
     </TreeProvider>
   );
 };

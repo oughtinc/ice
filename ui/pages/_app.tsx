@@ -1,7 +1,25 @@
 import "../styles/globals.css";
-import type { AppProps } from "next/app";
 import { css, Global } from "@emotion/react";
 import { ChakraWrapper } from "/components/ChakraWrapper/ChakraWrapper";
+import { createBrowserRouter, RouterProvider, } from "react-router-dom";
+import HomePage from "./HomePage";
+import TraceListPage from "./TraceListPage";
+import { TracePage } from "/components/TracePage/TracePage";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <HomePage/>,
+  },
+  {
+    path: "traces/",
+    element: <TraceListPage/>,
+  },
+  {
+    path: "traces/:traceId",
+    element: <TracePage/>,
+  },
+]);
 
 const GlobalStyles = css`
   // Remove Chakra focus outline is the element is not actually focussed
@@ -60,11 +78,11 @@ const GlobalStyles = css`
   }
 `;
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp() {
   return (
     <ChakraWrapper>
-      <Global styles={GlobalStyles} />
-      <Component {...pageProps} />
+      <Global styles={GlobalStyles}/>
+      <RouterProvider router={router}/>
     </ChakraWrapper>
   );
 }
