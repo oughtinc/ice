@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
@@ -5,7 +7,7 @@ from starlette.responses import FileResponse
 from ice.routes import agents, traces
 from ice.trace import trace_dir
 
-dist_dir = trace_dir.parent.parent / "dist"
+dist_dir = Path(__file__).parent.parent.parent / "ui" / "dist"
 
 app = FastAPI()
 app.include_router(agents.router)
