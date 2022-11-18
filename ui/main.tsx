@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom';
-import "../styles/globals.css";
+import "/styles/globals.css";
 import { css, Global } from "@emotion/react";
 import { ChakraWrapper } from "/components/ChakraWrapper/ChakraWrapper";
 import { createBrowserRouter, RouterProvider, } from "react-router-dom";
