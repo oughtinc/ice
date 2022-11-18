@@ -37,7 +37,7 @@ function RecipeGroup({ title, recipes, children }: RecipeGroupProps) {
 
 export default function HomePage() {
   useEffect(() => {
-    document.title = 'Interactive Composition Explorer (ICE)';
+    document.title = "Interactive Composition Explorer (ICE)";
   }, []);
   return (
     <div className="m-12">

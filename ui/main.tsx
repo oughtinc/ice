@@ -1,9 +1,9 @@
-import React from 'react'
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 import "/styles/globals.css";
 import { css, Global } from "@emotion/react";
 import { ChakraWrapper } from "/components/ChakraWrapper/ChakraWrapper";
-import { createBrowserRouter, RouterProvider, } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "/pages/HomePage";
 import TraceListPage from "/pages/TraceListPage";
 import { TracePage } from "/components/TracePage/TracePage";
@@ -11,15 +11,15 @@ import { TracePage } from "/components/TracePage/TracePage";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomePage/>,
+    element: <HomePage />,
   },
   {
     path: "traces/",
-    element: <TraceListPage/>,
+    element: <TraceListPage />,
   },
   {
     path: "traces/:traceId",
-    element: <TracePage/>,
+    element: <TracePage />,
   },
 ]);
 
@@ -83,9 +83,9 @@ const GlobalStyles = css`
 ReactDOM.render(
   <React.StrictMode>
     <ChakraWrapper>
-      <Global styles={GlobalStyles}/>
-      <RouterProvider router={router}/>
+      <Global styles={GlobalStyles} />
+      <RouterProvider router={router} />
     </ChakraWrapper>
   </React.StrictMode>,
-  document.getElementById('root')
-)
+  document.getElementById("root"),
+);

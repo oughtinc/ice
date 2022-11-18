@@ -824,21 +824,22 @@ const Trace = ({ traceId }: { traceId: string }) => {
 const isUlid = (id: string) => /^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$/.test(id);
 
 const useTraceId = () => {
-  const {traceId} = useParams();
+  const { traceId } = useParams();
   return traceId && isUlid(traceId) ? traceId : undefined;
 };
 
 export const TracePage = () => {
   const traceId = useTraceId();
   useEffect(() => {
-    document.title = traceId && recipes[traceId]
-      ? `${recipes[traceId].title} | Interactive Composition Explorer`
-      : "Interactive Composition Explorer";
+    document.title =
+      traceId && recipes[traceId]
+        ? `${recipes[traceId].title} | Interactive Composition Explorer`
+        : "Interactive Composition Explorer";
   }, []);
 
   return !traceId ? null : (
     <TreeProvider key={traceId} traceId={traceId}>
-      <Trace traceId={traceId}/>
+      <Trace traceId={traceId} />
     </TreeProvider>
   );
 };
