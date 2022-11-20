@@ -34,12 +34,13 @@ ICE is a Python library and trace visualizer for language model programs.
    ```sh
    scripts/run-local.sh
    ```
-   
+
 1. Start a `bash` session into the ICE container in another terminal:
+
    ```sh
    docker compose exec ice bash
    ```
-   
+
 1. Go through [the Primer](https://primer.ought.org/).
 
 ## Terminology
