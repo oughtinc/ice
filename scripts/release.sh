@@ -20,6 +20,8 @@ else
     fi
 fi
 
+npm --prefix ui run build
+
 export TAG="v${1}"
 git tag "${TAG}"
 git push origin main "${TAG}"
