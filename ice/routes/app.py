@@ -17,7 +17,9 @@ dist_dir = Path(__file__).parent / "ui"
 app = FastAPI()
 app.include_router(agents.router)
 app.include_router(traces.router)
-app.mount("/api/traces/", StaticFiles(directory=trace_dir), name="static")  # see comment on get_trace
+app.mount(
+    "/api/traces/", StaticFiles(directory=trace_dir), name="static"
+)  # see comment on get_trace
 
 try:
     app.mount("/assets/", StaticFiles(directory=dist_dir / "assets"), name="static")
