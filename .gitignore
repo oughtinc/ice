@@ -14,6 +14,8 @@
 /.git
 /.mypy_cache
 /.pre-commit-home
+/build/
+/dist/
 /data
 /ice/contrib/*/
 /ice/version.py
