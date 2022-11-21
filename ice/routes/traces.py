@@ -18,6 +18,13 @@ async def list_traces():
 
 @router.get("/{trace_id}.jsonl")
 async def get_trace(trace_id: str, Range: str | None = Header(None)):
+    """
+    Return the contents of the trace file with the given trace_id.
+    Uses the Range header to support partial content requests.
+    This route comes before the StaticFiles mounted at /api/traces/ so it takes precedence.
+    We need this because StaticFiles doesn't support Range headers.
+    We still have the StaticFiles to support HEAD requests used for getting Content-length.
+    """
     path = trace_dir / f"{trace_id}.jsonl"
     if not path.exists():
         raise HTTPException(status_code=404, detail="Trace not found")
