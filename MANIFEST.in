@@ -1,2 +1,1 @@
-include LICENSE.md
-include README.md
+recursive-include ice/routes/ui *
