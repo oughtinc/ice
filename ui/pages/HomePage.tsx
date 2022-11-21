@@ -1,7 +1,7 @@
-import Head from "next/head";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import type { Recipe } from "/helpers/recipes";
 import { elicitRecipes, primerRecipes } from "/helpers/recipes";
+import React, { useEffect } from "react";
 
 interface RecipeGroupProps {
   title: string;
@@ -19,7 +19,7 @@ function RecipeGroup({ title, recipes, children }: RecipeGroupProps) {
           if (hidden) return null;
           return (
             <li key={traceId} className="p-2 pl-0">
-              <Link href={`/traces/${traceId}`}>
+              <Link to={`/traces/${traceId}`}>
                 <a className="flex items-center">
                   <div className="flex-1">
                     <h3 className="text-l font-semibold">{title}</h3>
@@ -36,11 +36,11 @@ function RecipeGroup({ title, recipes, children }: RecipeGroupProps) {
 }
 
 export default function HomePage() {
+  useEffect(() => {
+    document.title = "Interactive Composition Explorer (ICE)";
+  }, []);
   return (
     <div className="m-12">
-      <Head>
-        <title>Interactive Composition Explorer (ICE)</title>
-      </Head>
       <h1 className="text-xl font-bold mb-2">Interactive Composition Explorer (ICE)</h1>
       <p>
         <a href="https://github.com/oughtinc/ice">ICE</a> is an open-source Python library and trace
