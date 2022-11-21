@@ -6,6 +6,7 @@ from typing import Annotated
 from typing import Literal
 from typing import Optional
 
+import nltk
 import requests
 
 from nltk.tokenize import sent_tokenize
@@ -21,6 +22,8 @@ log = get_logger()
 PDF_PARSER_URL = "https://test.elicit.org/elicit-previews/james/oug-3083-support-parsing-arbitrary-pdfs-using/parse_pdf"
 
 SectionType = Literal["abstract", "main", "back"]
+
+nltk.download("punkt", quiet=True)
 
 
 def get_full_document_id(document_id: str) -> str:
