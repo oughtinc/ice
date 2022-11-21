@@ -24,7 +24,7 @@ tox -p auto
 
 export TAG="v${1}"
 git tag "${TAG}"
-git push origin master "${TAG}"
+git push origin main "${TAG}"
 rm -rf ./build ./dist
 python -m build --sdist --wheel .
 twine upload ./dist/*.whl dist/*.tar.gz
