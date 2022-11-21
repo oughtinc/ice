@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 
 from structlog import configure
@@ -11,6 +12,19 @@ from structlog.processors import add_log_level
 from structlog.processors import format_exc_info
 from structlog.processors import TimeStamper
 from structlog.types import Processor
+
+# Prevent logging the warning 'None of PyTorch...' at the end of transformers/__init__.py.
+# This depends on this being the first place that transformers is imported.
+# It also assumes that transformers will be imported eventually
+# so importing eagerly it now doesn't have an extra cost.
+previous_verbosity = os.environ.get("TRANSFORMERS_VERBOSITY", None)
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+import transformers
+
+# Allow using the TRANSFORMERS_VERBOSITY env var normally to still work,
+# and avoid suppressing other warnings.
+if previous_verbosity:  # Setting to None raises an error
+    os.environ["TRANSFORMERS_VERBOSITY"] = previous_verbosity
 
 
 def init_logging():
