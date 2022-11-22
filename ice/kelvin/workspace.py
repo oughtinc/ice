@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 from ice.kelvin.actions.all import get_available_actions
 from ice.kelvin.actions.base import Action
+from ice.kelvin.history import Record
 from ice.kelvin.models import Card
 from ice.kelvin.models import CardId
 from ice.kelvin.models import Frontier
@@ -36,7 +37,9 @@ class Workspace(BaseModel):
             paths={initial_path.id: initial_path.hydrate(initial_cards)},
             focus_path_id=initial_path.id,
         )
-        initial_actions = get_available_actions(initial_frontier)
+        initial_actions = get_available_actions(
+            initial_frontier, history=[Record(action=None, card=initial_card)]
+        )
         return cls(
             cards=initial_cards,
             paths={initial_path.id: initial_path},

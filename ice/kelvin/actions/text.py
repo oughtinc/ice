@@ -5,6 +5,7 @@ from pydantic import Field
 
 from ice.kelvin.actions.base import Action
 from ice.kelvin.actions.base import ActionParam
+from ice.kelvin.actions.base import update_row_in_frontier
 from ice.kelvin.models import Card
 from ice.kelvin.models import Frontier
 from ice.kelvin.models import PartialFrontier
@@ -16,32 +17,29 @@ from ice.kelvin.utils import truncate_text
 class AddTextRowAction(Action):
     """An action that adds a new text row to a text card."""
 
-    kind: Literal["AddTextRowAction"] = "AddTextRowAction"
+    kind: Literal["AddReasoning"] = "AddReasoning"
     params: list[ActionParam] = [
         ActionParam(name="row_text", kind="TextParam", label="Text")
     ]
-    label: str = "Add bullet point to card"
+    label: str = "Add note"
 
     def execute(self, frontier: Frontier) -> PartialFrontier:
         """Create a new text card with the added row and return it with a new view."""
         card = frontier.focus_path_head()
         new_row_text = self.params[0].value
-        new_rows = card.rows + [TextRow(text=new_row_text)]
-        new_card = Card(rows=new_rows, prev_id=card.id)
+        new_rows = [TextRow(text=new_row_text)] + card.rows
+        new_card = Card(rows=new_rows, prev_id=card.id, created_by_action=self)
         new_frontier = frontier.update_focus_path_head(
             new_head_card=new_card,
-            new_view=View(
-                focused_row_index=len(new_rows) - 1,
-            ),
+            new_view=View(focused_row_index=0),  # len(new_rows) - 1,
         )
         return new_frontier
 
     @classmethod
     def instantiate(cls, frontier: Frontier) -> list[Action]:
-        row_kinds = frontier.get_marked_row_kinds()
-        if row_kinds in ({"Text"}, set()):
-            return [cls()]
-        return []
+        # row_kinds = frontier.get_marked_row_kinds()
+        # if row_kinds in ({"Text"}, set()):
+        return [cls()]
 
 
 class EditTextRowAction(Action):
@@ -69,27 +67,14 @@ class EditTextRowAction(Action):
 
     def execute(self, frontier: Frontier) -> PartialFrontier:
         """Create a new card with the edited row and return it."""
-        card = frontier.focus_path_head()
-        new_row_text = self.params[0].value
-        row_id = self.params[1].value
 
-        new_rows = [
-            TextRow(id=row.id, text=new_row_text if row.id == row_id else row.text)
-            for row in card.rows
-        ]
-
-        new_card = Card(rows=new_rows, prev_id=card.id)
-
-        new_focused_row_index = next(
-            (i for i, row in enumerate(new_rows) if row.id == row_id), None
+        new_frontier = update_row_in_frontier(
+            frontier=frontier,
+            row_id=self.params[1].value,
+            update_fn=lambda row: TextRow(text=self.params[0].value),
+            action=self,
         )
 
-        new_frontier = frontier.update_focus_path_head(
-            new_head_card=new_card,
-            new_view=View(
-                focused_row_index=new_focused_row_index,
-            ),
-        )
         return new_frontier
 
     @classmethod

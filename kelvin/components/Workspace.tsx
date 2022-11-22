@@ -65,6 +65,7 @@ const Workspace = () => {
         setActionToPrepare(null);
       }
     },
+    { preventDefault: true, enableOnFormTags: true, enableOnContentEditable: true },
     [activePane, setSelectedCardRows, setActivePane, LEFT_PANE],
   );
 
@@ -75,7 +76,7 @@ const Workspace = () => {
         setFocusPathHeadCardId(card.prev_id);
       }
     },
-    {},
+    { preventDefault: true },
     [setFocusPathHeadCardId, card],
   );
 
@@ -87,7 +88,7 @@ const Workspace = () => {
         setFocusPathHeadCardId(card.next_id);
       }
     },
-    {},
+    { preventDefault: true },
     [setFocusPathHeadCardId, card],
   );
 
@@ -135,19 +136,27 @@ const Workspace = () => {
         {actionToPrepare ? (
           <ActionForm partialAction={actionToPrepare} onSubmit={executeActionAndDeselectAll} />
         ) : (
-          <SelectionList
-            name="Actions"
-            multiselect={false}
-            items={actions}
-            keys={actionKeys}
-            selected={{}}
-            setSelected={() => {}}
-            onEnter={executeActionAndDeselectAll}
-            active={activePane === RIGHT_PANE}
-            renderItem={action => <Action {...action} />}
-            focusIndex={actionFocusIndex}
-            setFocusIndex={setActionFocusIndex}
-          />
+          <div className="relative">
+            {activeRequestCount > 0 && (
+              <div className="text-center absolute bottom-5 border left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white text-black p-2">
+                Executing...
+              </div>
+            )}
+            <SelectionList
+              name="Actions"
+              multiselect={false}
+              items={actions}
+              keys={actionKeys}
+              selected={{}}
+              setSelected={() => {}}
+              onEnter={executeActionAndDeselectAll}
+              active={activePane === RIGHT_PANE}
+              renderItem={action => <Action {...action} />}
+              focusIndex={actionFocusIndex}
+              setFocusIndex={setActionFocusIndex}
+              className={activeRequestCount > 0 ? "opacity-50" : ""}
+            />
+          </div>
         )}
       </Pane>
     </Panes>

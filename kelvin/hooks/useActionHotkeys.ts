@@ -3,11 +3,11 @@ import { useHotkeys } from "react-hotkeys-hook";
 const useActionHotkeys = ({ actions, executeActionAndDeselectAll, actionToPrepare }) => {
   // Todo: This should be stored in workspace
   const labelFromKey = {
-    a: "Add bullet point to card",
+    a: "Add note",
     c: "Clear card",
     e: "Edit text",
-    m: "Run language model",
-    p: "Search papers",
+    r: "Run language model",
+    s: "Search papers",
     v: "View paper",
   };
 

@@ -1,4 +1,4 @@
-import { Action, Frontier } from "/types";
+import { Action, Frontier, History } from "/types";
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8935/kelvin";
 
@@ -21,8 +21,15 @@ export async function executeAction({ action, frontier }: { action: Action; fron
   return newFrontier;
 }
 
-export async function getAvailableActions({ frontier }: { frontier: Frontier }) {
-  const requestBody = JSON.stringify(frontier);
+export async function getAvailableActions({
+  frontier,
+  history,
+}: {
+  frontier: Frontier;
+  history: History;
+}) {
+  const requestBody = JSON.stringify({ frontier, history });
+  console.log(requestBody);
   const response = await fetch(`${backendUrl}/actions/available`, {
     method: "POST",
     headers: {

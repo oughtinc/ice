@@ -51,7 +51,19 @@ export interface PaperRow extends Row {
   authors: string[];
   year: number | null;
   citations: number | null;
+  has_full_text: boolean;
+  sections: Record<string, unknown>[] | null;
   raw_data: Record<string, unknown>;
+  is_expanded: boolean;
+}
+
+export interface PaperSectionRow extends Row {
+  kind: "PaperSection";
+  paper: PaperRow;
+  title: string;
+  paragraphs: string[];
+  is_expanded: boolean;
+  preview: string;
 }
 
 export type Card = {
@@ -59,6 +71,7 @@ export type Card = {
   rows: Row[];
   next_id: CardId | null;
   prev_id: CardId | null;
+  created_by_action: Action;
 };
 
 export type View = {
@@ -96,3 +109,10 @@ export type Workspace = {
   focus_path_id: PathId;
   available_actions: Action[];
 };
+
+type Record = {
+  action?: Action;
+  card: Card;
+};
+
+type History = Record[];

@@ -28,7 +28,9 @@ class GenerationAction(Action):
     def execute(self, frontier: Frontier) -> PartialFrontier:
         context = self.params[0].value
         command = self.params[1].value
-        agent = OpenAIAgent()
+        agent = OpenAIAgent(
+            model="text-alpha-002-current",
+        )
 
         if context == "NO_CONTEXT":
             prompt = command
@@ -43,16 +45,20 @@ Command: {command}
 Result:
 
 -'''
+
+        prompt += "<|endofprompt|>"
         log.info("Running prompt", prompt=prompt)
         result_str = asyncio.run(agent.complete(prompt=prompt)).strip()
         log.info("result", result=result_str)
-        if "\n\n" in result_str:
+        if result_str.count("\n\n") > 1:
             results = result_str.split("\n\n")
         else:
             results = result_str.split("\n")
         old_card = frontier.focus_path_head()
-        new_rows = [TextRow(text=result.lstrip(" -*")) for result in results]
-        new_card = Card(rows=new_rows, prev_id=old_card.id)
+        new_rows = [
+            TextRow(text=text) for result in results if (text := result.lstrip(" -*"))
+        ]
+        new_card = Card(rows=new_rows, prev_id=old_card.id, created_by_action=self)
 
         new_frontier = frontier.update_focus_path_head(
             new_head_card=new_card,

@@ -24,11 +24,11 @@ def make_request_body(
 async def elicit_search(
     question: str = "What is the effect of creatine on cognition?",
     num_papers: int = 4,
+    filters: dict | None = None,
 ):
     """
     Search Elicit for papers related to a question.
     """
-    filters = None
     # filters = dict(
     #     has_pdf=True,
     #     study_types=["RCT"] if rct_only else [],

@@ -5,13 +5,12 @@ from faker import Faker
 from ice.agents.base import Agent
 from ice.agents.base import Stop
 
-random.seed(0)
-Faker.seed(0)
-
 
 class FakeAgent(Agent):
     def __init__(self):
         self.fake = Faker()
+        random.seed(0)
+        Faker.seed(0)
 
     async def relevance(self, *, question, context, verbose=False, default=None):
         return random.random()

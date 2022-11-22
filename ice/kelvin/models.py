@@ -44,6 +44,8 @@ action.execute: Frontier -> Frontier
 
 action.instantiate: Frontier -> list[Action]
 """
+from typing import Any
+
 from pydantic import BaseModel
 from pydantic import Field
 
@@ -61,6 +63,16 @@ class Card(BaseModel):
     rows: list[ROW_TYPE_UNION] = Field(default_factory=list)
     next_id: CardId | None = None
     prev_id: CardId | None = None
+    created_by_action: Any = None
+
+    def __str__(self):
+        rows_str = "\n".join([str(row) for row in self.rows])
+        if not rows_str and not self.prev_id and not self.created_by_action:
+            # This is the root card.
+            return f"""<card id="{self.id}">(Initial card)</card>"""
+        return f"""<card id="{self.id}">
+{rows_str}
+</card>"""
 
 
 class View(BaseModel):

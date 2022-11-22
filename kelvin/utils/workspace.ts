@@ -1,4 +1,4 @@
-import { Workspace } from "../types";
+import { History, Workspace } from "../types";
 
 export function getAvailableActions(workspace: Workspace | null) {
   if (!workspace) return null;
@@ -129,4 +129,39 @@ export function cardPosition({ card, cards }: { card: Card; cards: Record<CardId
 
   // Return the total and the index
   return { total, index: predecessors };
+}
+
+export function getHistory(workspace: Workspace | null): History | null {
+  // If the workspace is null, return null
+  if (workspace === null) {
+    return null;
+  }
+
+  // Get the focus path
+  const focusPath = getFocusPath(workspace);
+  if (focusPath === null) {
+    return null;
+  }
+
+  // Get the head card
+  const headCard = workspace.cards[focusPath.head_card_id];
+  if (headCard === null) {
+    return null;
+  }
+
+  // Initialize the history array
+  const history: History = [];
+
+  // Start with the head card and iterate backwards through the linked list
+  let current = headCard;
+  while (current) {
+    // Add the card to the history array
+    history.unshift({ card: current, action: current.created_by_action });
+
+    // Get the previous card
+    current = current.prev_id ? workspace.cards[current.prev_id] : null;
+  }
+
+  // Return the history
+  return history;
 }

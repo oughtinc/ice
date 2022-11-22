@@ -16,7 +16,7 @@ class ClearAction(Action):
 
     def execute(self, frontier: Frontier) -> PartialFrontier:
         prev_card = frontier.focus_path_head()
-        clear_card = Card(prev_id=prev_card.id)
+        clear_card = Card(prev_id=prev_card.id, created_by_action=self)
         new_frontier = frontier.update_focus_path_head(
             new_head_card=clear_card,
             new_view=View(),

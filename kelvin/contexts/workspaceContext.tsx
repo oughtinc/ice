@@ -6,7 +6,7 @@ import {
   getInitialWorkspace,
 } from "../api";
 import { PartialFrontier, Workspace } from "../types";
-import { getFocusPath, getFrontier, updateWorkspace } from "/utils/workspace";
+import { getFocusPath, getFrontier, getHistory, updateWorkspace } from "/utils/workspace";
 
 type State = {
   workspace: Workspace | null;
@@ -135,7 +135,8 @@ export function WorkspaceProvider({ children }) {
       return;
     }
     console.log("updateAvailableActions", frontier);
-    getAvailableActions({ frontier })
+    const history = getHistory(stateRef.current.workspace);
+    getAvailableActions({ frontier, history })
       .then(data => {
         dispatch({ type: "UPDATE_AVAILABLE_ACTIONS_SUCCESS", payload: data });
       })

@@ -37,6 +37,7 @@ ulid-py = "^1.1.0"
 uvicorn = "^0.18.3"
 websockets = "^10.3"
 pyvespa = "^0.30.0"
+lxml = "^4.9.1"
 
 [tool.poetry.dev-dependencies]
 autoflake = "^1.4"
