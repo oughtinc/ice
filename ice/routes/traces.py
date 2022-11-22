@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from starlette.responses import FileResponse
 from starlette.responses import PlainTextResponse
 
-from ice.trace import trace_dir
+from ice.trace import traces_dir
 
 router = APIRouter(prefix="/api/traces", tags=["traces"])
 
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/traces", tags=["traces"])
 async def list_traces():
     # e.g. if trace_dir contains files trace1.jsonl, trace2.jsonl, other.txt,
     # return ["trace1", "trace2"]
-    return [trace.stem for trace in trace_dir.glob("*.jsonl")]
+    return [trace.stem for trace in traces_dir.glob("*.jsonl")]
 
 
 @router.get("/{trace_id}.jsonl")
@@ -25,7 +25,7 @@ async def get_trace(trace_id: str, Range: str | None = Header(None)):
     We need this because StaticFiles doesn't support Range headers.
     We still have the StaticFiles to support HEAD requests used for getting Content-length.
     """
-    path = trace_dir / f"{trace_id}.jsonl"
+    path = traces_dir / f"{trace_id}.jsonl"
     if not path.exists():
         raise HTTPException(status_code=404, detail="Trace not found")
 

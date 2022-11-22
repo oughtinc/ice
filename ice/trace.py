@@ -28,13 +28,53 @@ def make_id() -> str:
     return ulid.new().str
 
 
-trace_id = make_id()
-parent_id_var: ContextVar[str] = ContextVar("id", default=trace_id)
+parent_id_var: ContextVar[str] = ContextVar("id")
+
+traces_dir = Path(__file__).parent.parent / "data" / "traces"
+traces_dir.mkdir(parents=True, exist_ok=True)
 
 
-trace_dir = Path(__file__).parent.parent / "data" / "traces"
-trace_dir.mkdir(parents=True, exist_ok=True)
-trace_file: IO[str] | None = None
+class Trace:
+    BLOCK_LENGTH = 1024 ** 2
+
+    def __init__(self):
+        self.id = make_id()
+        self.dir = traces_dir / self.id
+        self.dir.mkdir()
+        self.file = self._open("trace")
+        self.block_number = 0
+        self.block_file = None
+        self.block_length = 0
+        self.block_lineno = 0
+        self._open_block()
+        print(f"Trace: {_url_prefix()}/traces/{self.id}")
+        parent_id_var.set(self.id)
+
+    def _open(self, name: str) -> IO[str]:
+        return open(self.dir / f"{name}.jsonl", "a")
+
+    def _open_block(self):
+        self.block_file = self._open(f"block_{self.block_number}")
+        self.block_number += 1
+        self.block_length = 0
+        self.block_lineno = 0
+
+    def add_to_block(self, x):
+        address = [self.block_number, self.block_lineno]
+        s = json.dumps(x, cls=JSONEncoder) + "\n"
+        self.block_file.write(s)
+        self.block_length += len(s)
+        if self.block_length > self.BLOCK_LENGTH:
+            self.block_file.write("end")
+            self.block_file.close()
+            self._open_block()
+        else:
+            self.block_file.flush()
+            self.block_lineno += 1
+        return address
+
+
+current_trace: Trace | None = None
 
 
 def _url_prefix():
@@ -44,21 +84,25 @@ def _url_prefix():
 
 
 def enable_trace():
-    global trace_file
-
-    trace_file = (trace_dir / f"{trace_id}.jsonl").open("a")
-
-    print(f"Trace: {_url_prefix()}/traces/{trace_id}")
+    global current_trace
+    current_trace = Trace()
 
 
 def trace_enabled():
-    return trace_file is not None
+    return current_trace is not None
 
 
 def emit(value):
-    if trace_file:
-        json.dump(value, trace_file, cls=JSONEncoder)
-        print(file=trace_file, flush=True)
+    if current_trace:
+        json.dump(value, current_trace.file, cls=JSONEncoder)
+        print(file=current_trace.file, flush=True)
+
+
+def emit_block(x):
+    if current_trace:
+        return current_trace.add_to_block(x)
+    else:
+        return 0, 0
 
 
 def compress(o: object):
@@ -84,7 +128,7 @@ class JSONEncoder(json.JSONEncoder):
         except TypeError:
             return repr(o)
 
-    def iterencode(self, o):
+    def iterencode(self, o, **kwargs):
         try:
             return super().iterencode(o)
         except TypeError:
@@ -149,9 +193,13 @@ def trace(fn):
                         parent=parent_id,
                         start=monotonic_ns(),
                         name=fn.__name__,
-                        doc=getdoc(fn),
-                        args=arg_dict,
-                        source=getsource(fn),
+                        block=emit_block(
+                            dict(
+                                doc=getdoc(fn),
+                                args=arg_dict,
+                                source=getsource(fn),
+                            )
+                        ),
                     ),
                     f"{parent_id}.children.{id}": True,
                 }
@@ -159,11 +207,11 @@ def trace(fn):
 
             if recorder_name:
                 kwargs[recorder_name] = lambda **kwargs: emit(
-                    {f"{id}.records.{make_id()}": kwargs}
+                    {f"{id}.records.{make_id()}": emit_block(kwargs)}
                 )
 
             result = await fn(*args, **kwargs)
-            emit({f"{id}.result": result, f"{id}.end": monotonic_ns()})
+            emit({f"{id}.result": emit_block(result), f"{id}.end": monotonic_ns()})
             return result
 
         return await create_task(inner_wrapper(*args, **kwargs))
