@@ -40,8 +40,6 @@ RUN \
 ENV VIRTUAL_ENV=/code/.venv
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
-RUN python -c "import nltk; nltk.download('punkt')"
-
 COPY . .
 
 CMD ["concurrently", "uvicorn ice.routes.app:app --host 0.0.0.0 --port 8935 --reload"]
