@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from typing import Sequence
 
 from more_itertools import circular_shifts
 
@@ -8,6 +8,18 @@ from ice.recipes.program_search.nodes.answer.types import Demonstration
 from ice.recipes.program_search.nodes.answer.types import DemonstrationWithReasoning
 from ice.utils import map_async
 
+TEST_DEMONSTRATIONS = [
+    Demonstration(
+        question="Did Aristotle use a laptop?",
+        texts=["Arstotle was a Greek philosopher born in 384 BC.", "Laptops were invented in 1984."],
+        answer="No",
+    ),
+    Demonstration(
+        question="Who was the last king of France?",
+        texts=["Louis XVI was the last king of France.", "Louis XVI was executed in 1793."],
+        answer="Louis XVI",
+    ),
+]
 
 INSTRUCTIONS = "My friend came up with the following correct answers for each question but didn't write out his reasoning that supports each answer. Can you write a paragraph explaining why each answer is correct? Be sure to quote the parts of the text that support the answer, explaining why this is the correct conclusion."
 
@@ -19,7 +31,7 @@ Text that contains the answer:
 
 {texts}
 
-Correct answer to the question: {question}
+Correct answer to the question: {answer}
 
 """.strip()
 
@@ -32,7 +44,7 @@ Starting with the first question, {question}, provide a paragraph of reasoning t
 Let's think it over: First, Excerpt 1 says that""".strip()
 
 
-def make_reasoning_prompt(demonstrations: Sequence[Demonstration]) -> str:
+def make_reasoning_prompt(demonstrations: Sequence[Demonstration] = TEST_DEMONSTRATIONS) -> str:
     examples = format_multi(
         DEMONSTRATION_EXAMPLE, [d.as_dict() for d in demonstrations]
     )
@@ -44,14 +56,16 @@ def make_reasoning_prompt(demonstrations: Sequence[Demonstration]) -> str:
             PRE_GENERATION.format(
                 question=first_example["question"],
                 texts=first_example["texts"].transform(),
+                answer=first_example["answer"],
             ),
         ]
     )
 
 
 async def add_reasoning(
-    demonstrations: Sequence[Demonstration],
+    demonstrations: Sequence[Demonstration] = TEST_DEMONSTRATIONS,
 ) -> Sequence[DemonstrationWithReasoning]:
+    print("Called...")
     shifts = circular_shifts(demonstrations)
     prompts = [make_reasoning_prompt(shift) for shift in shifts]
 
@@ -66,6 +80,3 @@ async def add_reasoning(
         )
         for reasoning, d in zip(completions, demonstrations)
     ]
-
-
-recipe.main(add_reasoning)

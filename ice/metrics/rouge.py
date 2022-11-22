@@ -73,9 +73,10 @@ async def rouge_texts(
 
 
 async def matches(
-    hypotheses: Sequence[str], references: Sequence[str], lcs_threshold: float = 0.7
+    hypotheses: Sequence[str], references: Sequence[str], lcs_threshold: float = 0.1
 ):
     rouge_scores = await rouge_texts(hypotheses=hypotheses, references=references)
+
     return {
         hyp: scores
         for hyp, scores in rouge_scores.items()

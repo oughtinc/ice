@@ -72,7 +72,8 @@ class BinaryClassificationMetrics:
     def auroc(self):
         if not self.scores:
             return None
-        return roc_auc_score(y_true=self._gt_array, y_score=self.scores)
+
+        return roc_auc_score(y_true=self._gt_array, y_score=self.scores) if any(self._gt_array) else 0.0
 
     def save_pr_curve(self, filename: str):
         if not self.scores:

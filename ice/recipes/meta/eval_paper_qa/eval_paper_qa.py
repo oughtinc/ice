@@ -29,6 +29,8 @@ from ice.recipes.meta.eval_text_classification import BinaryClassificationMetric
 from ice.trace import trace
 from ice.utils import map_async
 
+from ice.datasets.qasper import get_gold_standard as get_qasper_gold_standard
+
 yaml = YAML(typ="safe")
 log = get_logger()
 
@@ -123,6 +125,73 @@ async def eval_paper_qa_method(
         aggregated_metrics,
     )
 
+async def eval_paper_qasper_qa_method(
+    method: PaperQaMethod[AnswerType_contra],
+    answer_eval_method: AnswerEvalMethod[AnswerType_contra],
+    classification_eval_method: ClassificationEvalMethod,
+    split: str,
+    max_concurrency: int = 10,
+    max_papers: int = 5,
+):
+    papers_gs = list(get_qasper_gold_standard(split, max_papers=max_papers))
+
+    log.info(
+        "Evaluating method on papers",
+        method=method.__class__.__name__,
+        question_short_name="Qasper NLP QA",
+        papers=list(set([p.paper.document_id for p in papers_gs])),
+        total_questions=len(papers_gs),
+    )
+
+    @trace
+    async def run_and_eval_method(
+        qa_details: PaperQaGoldStandard
+    ) -> SequenceGenerationEvaluation[AnswerType_contra]:
+        answer = await method(qa_details.paper, qa_details.question, qa_details.gold_support)
+        # correct, detail = await answer_eval_method(
+        #     question=qa_details.question,
+        #     ground_truth=qa_details.gold_answer,
+        #     prediction=answer.answer,
+        # )
+        metrics = await classification_eval_method(
+            candidates=answer.support_candidates,
+            predictions=answer.support_labels,
+            ground_truth=qa_details.gold_support,
+            scores=answer.support_scores,
+        )
+        return SequenceGenerationEvaluation(
+            correct=True,#correct,
+            detail="",#detail,
+            metrics=metrics,
+            generated_answer=answer.answer,
+            gold_answer=qa_details.gold_answer,
+            support=[
+                text
+                for lab, text in zip(answer.support_labels, answer.support_candidates)
+                if lab
+            ],
+        )
+
+    eval_data: list[PaperQaGoldStandard] = papers_gs
+    gold_supports: list[Sequence[str]] = [gs.gold_support for gs in papers_gs]
+
+    results = await map_async(
+        eval_data, run_and_eval_method, max_concurrency=max_concurrency
+    )
+
+    scores = [r.correct for r in results]
+    metrics = [r.metrics for r in results]
+
+    # only aggregate where there is gold support (somewhat arbitrary choice but more informative)
+    metrics_under_support = [m for m, gs in zip(metrics, gold_supports) if gs]
+    aggregated_metrics = BinaryClassificationMetrics.aggregate(metrics_under_support)
+
+    return (
+        sum(scores) / len(scores) if scores else 0,
+        results,
+        aggregated_metrics,
+    )
+
 
 def load_object(location: str) -> Any:
     parent_module, _, child_name = location.rpartition(".")
@@ -139,12 +208,19 @@ class _PaperQaArgs(BaseModel):
     answer_eval_method: str
     classification_eval_method: str
 
+class _PaperQaArgsQasper(BaseModel):
+    split: str
+    method: str
+    answer_eval_method: str
+    classification_eval_method: str
+    max_papers: int = 5
+
 
 class PaperQaEvalConfig(BaseModel):
     name: str
     results_json: str | None = None
     pr_curve: str | None = None
-    args: _PaperQaArgs
+    args: _PaperQaArgs | _PaperQaArgsQasper
 
 
 def ensure_dir(path: str) -> str:
@@ -177,8 +253,32 @@ async def run_from_config(config: PaperQaEvalConfig) -> dict:
         agg_metrics.save_pr_curve(config.pr_curve)
     return results_line
 
+async def run_from_config_qasper(config: PaperQaEvalConfig) -> dict:
+    score, results, agg_metrics = await eval_paper_qasper_qa_method(
+        method=load_object(config.args.method),
+        split=config.args.split,
+        answer_eval_method=load_object(config.args.answer_eval_method),
+        classification_eval_method=load_object(config.args.classification_eval_method),
+        max_papers=config.args.max_papers,
+    )
+    metrics = agg_metrics.as_dict()
+    results_line = dict(
+        config=config.dict(),
+        ice_commit=latest_commit_hash(),
+        score=score,
+        results=[r.as_dict() for r in results],
+        metrics=metrics,
+        pr_thresholds=agg_metrics.pr_thresholds(),
+    )
+    if config.results_json:
+        with open(ensure_dir(config.results_json), "w") as r:
+            r.writelines([json.dumps(results_line, indent=2, sort_keys=True)])
+    if config.pr_curve:
+        agg_metrics.save_pr_curve(config.pr_curve)
+    return results_line
 
-async def eval_from_config(config_path: str = "/code/ice/recipes/meta/configs/experiments_and_arms.yaml"):
+
+async def eval_from_config(config_path: str = "/code/ice/recipes/meta/configs/qasper.yaml"):
     configs = yaml.load(Path(config_path))
 
     parsed = [PaperQaEvalConfig.parse_obj(configs[0])]
@@ -189,5 +289,15 @@ async def eval_from_config(config_path: str = "/code/ice/recipes/meta/configs/ex
 
     return await map_async(parsed, run_from_config, max_concurrency=1)
 
+async def eval_from_config_qasper(config_path: str = "/code/ice/recipes/meta/configs/qasper.yaml"):
+    configs = yaml.load(Path(config_path))
 
-recipe.main(eval_from_config)
+    parsed = [PaperQaEvalConfig.parse_obj(configs[0])]
+    for prev_idx, config in enumerate(configs[1:]):
+        prev_args = parsed[prev_idx].args.dict()
+        config["args"] = prev_args | config["args"]
+        parsed.append(PaperQaEvalConfig.parse_obj(config))
+
+    return await map_async(parsed, run_from_config_qasper, max_concurrency=1)
+
+recipe.main(eval_from_config_qasper)

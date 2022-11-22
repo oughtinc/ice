@@ -6,7 +6,7 @@ from ice.metrics.gold_standards import GoldStandard
 from ice.metrics.gold_standards import load_paper
 from ice.recipes.experiments_and_arms.types import ExperimentsArms
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
-
+from ice.datasets.qasper import get_gold_standard as get_qasper_gs
 
 def experiments_questions_and_answers(
     gold: GoldStandard[ExperimentsArms], consolidate: bool = False
@@ -63,3 +63,11 @@ def arms_questions_and_answers(
         )
 
 arms_questions_and_answers_str = partial(arms_questions_and_answers, consolidate=True)
+
+def quasper_questions_and_answers_str(
+    gold: GoldStandard[ExperimentsArms], consolidate: bool = False
+) -> Iterable[PaperQaGoldStandard]:
+    yield from get_qasper_gs(
+        split="train",
+        max_questions=5,
+    )

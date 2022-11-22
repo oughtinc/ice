@@ -25,8 +25,10 @@ from ice.recipes.program_search.nodes.select.select import (
     select_using_elicit_prompt_few_shot,
     windowed_select_using_elicit_prompt,
     windowed_select_using_monot5,
+    windowed_select_using_elicit_prompt_CoT,
 )
 from ice.utils import n_tokens
+from ice.datasets.qasper import qasper_support_func
 
 
 def experiments_few_shot_demonstration(
@@ -164,11 +166,12 @@ async def elicit_baseline_into_answer(paper: Paper, question: str, gold_support=
     texts_with_perplexities = await windowed_select_using_elicit_prompt(
         question=question, texts=texts
     )
-    selections = filter_by_perplexity_threshold(texts_with_perplexities)
+
+    selections = texts_with_perplexities.copy()
     
-    while selections:
-        try:
-            relevant_str = "\n\n".join([s[0] for s in selections])
+    while selections: 
+        relevant_str = "\n\n".join([s[0] for s in selections])
+        if n_tokens(relevant_str) < 1000:
             answer = await answer_like_elicit_qa(
                 question=question, passage=relevant_str
             )
@@ -178,23 +181,23 @@ async def elicit_baseline_into_answer(paper: Paper, question: str, gold_support=
                 answer=answer_as_list,
                 support_candidates=texts,
                 support_labels=[text in selection_set for text in texts],
-                support_scores=[t[1] for t in texts_with_perplexities]
+                support_scores=[t[1] for t in texts_with_perplexities],
             )
-        except TooLongRequestError:
-            selections = remove_lowest_perplexity(selections)
+        selections = remove_lowest_perplexity(selections)
 
 
 async def elicit_baseline_prune_then_answer(
     paper: Paper, question: str, gold_support=None
 ):
     gold_support  # unused
+    
     texts = _to_paragraphs(paper)
     # texts_with_perplexities = await windowed_select_using_elicit_prompt(
     #     question=question, texts=texts
     # )
 
-    texts_with_perplexities = await windowed_select_using_monot5(
-        question=question, texts=texts
+    texts_with_perplexities = await windowed_select_using_elicit_prompt_CoT(
+        question=question, texts=texts#, examples=experiments_few_shot_demonstration(paper.document_id, consolidate=False)
     )
 
     pruned = await prune(

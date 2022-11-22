@@ -73,6 +73,36 @@ Question: {qa_question}
 
 {full_answer_prefix}"""
 
+def _excerpt_prompt_CoT(
+    *,
+    qa_question: str,
+    excerpt: str,
+    answer_prefix: Optional[str] = None,
+) -> str:
+    combined_na_phrase = (
+        f"The answer to the question is {NA_PHRASE}"
+        if answer_prefix is None
+        else f"{answer_prefix} {NA_PHRASE}"
+    )
+
+    return f"""Answer the question "{qa_question}" based on the excerpt from a research paper. \
+Try to answer, but say "{combined_na_phrase}" if you don't know how to answer. \
+Include everything that the paper excerpt has to say about the answer. \
+Make sure everything you say is supported by the excerpt. \
+The excerpt may cite other papers; \
+answer about the paper you're reading the excerpt from, not the papers that it cites. \
+Answer in one phrase or sentence:
+
+Paper excerpt: {excerpt}
+
+Question: {qa_question}
+
+Let's think about each sentence in the excerpt and determine whether it answers the question.
+
+First we'll do some reasoning then we'll write "Answer:" followed by the answer.
+
+Reasoning:"""
+
 
 def _process_instruct_answer(text: str) -> Optional[str]:
     text = text.strip()

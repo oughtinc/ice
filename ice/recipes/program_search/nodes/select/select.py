@@ -32,6 +32,7 @@ from ice.recipes.embeddings_classify import classify_documents
 from ice.agents import OughtInferenceAgent
 from ice.utils import reduce_async
 from ice.utils import window_dropping
+from ice.apis.openai import openai_complete
 
 log = get_logger()
 
@@ -179,12 +180,6 @@ async def windowed_select_using_elicit_prompt(  # Best recall [use this]
     """Select texts that answer the question via perplexity of the "not mentioned"
     response to an elicit-like question-answering prompt
     """
-    original_question = question
-    if "?" in question:
-        question = question.split("?")[0].strip()+"?"
-    if "." in question:
-        question = question.split(".")[-1].strip()
-    context = original_question.replace(question, "").replace("  ", " ").strip()
     prompts = [
         baseline_elicit_answer._excerpt_prompt(
             qa_question=question,
@@ -204,6 +199,44 @@ async def windowed_select_using_elicit_prompt(  # Best recall [use this]
     return [(t, p[1]) for t, p in zip(texts, prompt_perplexities)]
     # Lower perplexity means more likely to be "not mentioned in excerpt"
 
+async def _get_batched_prompts(
+    prompts: list[str],
+) -> list[str]:
+    """Return a completion for each prompt"""
+    response = await openai_complete(
+        prompt=prompts,
+        max_tokens=500,
+        temperature=0.0,
+        model="text-davinci-002"
+    )
+
+    return [c["text"].strip() for c in response["choices"]]
+
+async def windowed_select_using_elicit_prompt_CoT(  # Best recall [use this]
+    question: str,
+    texts: Sequence[str],
+) -> Sequence[tuple[str, float]]:
+    """Select texts that answer the question via perplexity of the "not mentioned"
+    response to an elicit-like question-answering prompt
+    """
+    prompts = [
+        baseline_elicit_answer._excerpt_prompt_CoT(
+            qa_question=question,
+            excerpt=text,
+            answer_prefix=None,
+        )
+        for text in texts
+    ]
+
+    NA = f" The answer to the question is {baseline_elicit_answer.NA_PHRASE}"
+
+    completions = await _get_batched_prompts(prompts)
+
+    classifications = [NA in c for c in completions]
+
+    return [(t, c) for t, c in zip(texts, classifications)]
+    # Lower perplexity means more likely to be "not mentioned in excerpt"
+
 async def windowed_select_using_monot5(
     question: str,
     texts: Sequence[str],
@@ -221,7 +254,7 @@ async def windowed_select_using_monot5(
 
 
 def filter_by_perplexity_threshold(
-    results: Sequence[tuple[str, float]], threshold: float = 1.0730326568139106
+    results: Sequence[tuple[str, float]], threshold: float = 0.0
 ):
     return [r for r in results if r[1] > threshold]
 
@@ -284,7 +317,7 @@ def _create_example_prompts(
         if isinstance(example.gold_answer, str)
         else example.gold_answer[0]
         if paragraph in relevant_paragraphs
-        else f"The answer to the question is {baseline_elicit_answer.NA_PHRASE}"
+        else f" The answer to the question is {baseline_elicit_answer.NA_PHRASE}"
         for paragraph in paragraphs
     ]
     completions = [" " + c.strip() for c in completions]
@@ -312,6 +345,7 @@ async def select_using_elicit_prompt_few_shot(
         prefix="Examples:\n\n",
         max_permutations=6,
         max_test_size=1,
+        use_centroid=True,
     )
 
     few_shot_prompt = min(few_shot_prompts, key=lambda p: p[1])[0]
@@ -341,16 +375,14 @@ async def select_using_elicit_prompt_few_shot(
         for text in texts
     ]
 
-    completion = " " + baseline_elicit_answer.NA_PHRASE
+    completion = f" The answer to the question is {baseline_elicit_answer.NA_PHRASE}"
 
     prompt_perplexities = await best_completion(
         prompts=prompts,
         completion=completion,
     )
 
-    return [
-        t for t, p in zip(texts, prompt_perplexities) if p[1] > perplexity_threshold
-    ]
+    return [(t, p[1]) for t, p in zip(texts, prompt_perplexities)]
     # Lower perplexity means more likely to be "not mentioned in excerpt"
 
 

@@ -148,5 +148,4 @@ async def demonstration_answer_with_reasoning(
 
     return await _get_reasoning(prompt, answer)
 
-
-recipe.main(simple_answer)
+recipe.main(add_reasoning)

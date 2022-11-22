@@ -16,9 +16,11 @@ from ice.cache import diskcache
 from ice.settings import settings
 from ice.trace import recorder
 from ice.trace import trace
+from aiolimiter import AsyncLimiter
 
 log = get_logger()
 
+limiter = AsyncLimiter(5)
 
 class RateLimitError(Exception):
     def __init__(self, response: httpx.Response):
@@ -147,6 +149,9 @@ async def openai_complete(
     record=recorder,
 ) -> dict:
     """Send a completion request to the OpenAI API and return the JSON response."""
+    model = "text-ada-001"
+
+    #log.info("Sending completion request to OpenAI API", model=model)
     params = {
         "prompt": prompt,
         "stop": stop,
@@ -170,21 +175,23 @@ async def openai_complete(
 @diskcache()
 async def openai_embeddings(
     input: Union[str, list[str]],
-    model: str = "text-similarity-ada-001",
+    model: str = "ada-test-v2",
 ) -> Union[list[float], list[list[float]]]:
     """Send a embeddings request to the OpenAI API and return the JSON response."""
-    response = await _post(
-        "embeddings",
-        json={
-            "input": input if isinstance(input, list) else [input],
-            "model": model,
-        },
-    )
+    async with limiter:
+        log.info("Calling OpenAI embeddings API...")
+        response = await _post(
+            "embeddings",
+            json={
+                "input": input if isinstance(input, list) else [input],
+                "model": model,
+            },
+        )
 
-    if not response:
-        raise ValueError("OpenAI API returned an empty response.")
-    
-    if isinstance(input, str):
-        return response['data'][0]['embedding']
-    
-    return [response['data'][i]['embedding'] for i in range(len(input))]
+        if not response:
+            raise ValueError("OpenAI API returned an empty response.")
+        
+        if isinstance(input, str):
+            return response['data'][0]['embedding']
+        
+        return [response['data'][i]['embedding'] for i in range(len(input))]

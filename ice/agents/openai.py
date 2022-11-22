@@ -12,7 +12,6 @@ from ice.utils import longest_common_prefix
 
 log = get_logger()
 
-
 class OpenAIAgent(Agent):
     """An agent that uses the OpenAI API to generate answers and predictions."""
 
