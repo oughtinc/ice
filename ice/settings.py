@@ -19,13 +19,13 @@ class Settings(BaseSettings):
     GOLD_STANDARDS_CSV_PATH: str = "gold_standards/gold_standards.csv"
     GS_QUOTE_FOUND_THRESHOLD: float = 0.75
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-
-
-settings = Settings()
 
 OUGHT_ICE_DIR = Path(environ.get("OUGHT_ICE_DIR", Path.home() / ".ought-ice"))
+
+_env_path = OUGHT_ICE_DIR / ".env"
+settings = Settings(
+    _env_file=_env_path if _env_path.exists() else None, _env_file_encoding="utf-8"
+)
+
 CACHE_DIR = OUGHT_ICE_DIR / "cache"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
