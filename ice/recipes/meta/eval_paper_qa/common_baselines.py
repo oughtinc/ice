@@ -121,6 +121,65 @@ async def _demonstration_answer(
             reasoning=reasoning,
         )
 
+async def preselected_few_shot_qa_baseline(
+    paper: Paper,
+    question: str,
+    gold_support: Sequence[str] | None,
+    enumerate_answer: bool,
+    few_shot_demonstration_func: Callable[[str], Sequence[PaperQaGoldStandard]],
+    selections: Sequence[str] | None = None,
+    paper_division_func: Callable[[Paper], Sequence[str]] | None = None,
+    reasoning: bool = False,
+):
+    demonstration_examples = few_shot_demonstration_func(paper.document_id)
+    if paper_division_func:
+        demonstration_examples = await map_async(
+            demonstration_examples,
+            partial(
+                convert_demonstration_example,
+                paper_division_func=paper_division_func,
+            ),
+        )
+    demonstration_examples = [ex for ex in demonstration_examples if ex.gold_support][
+        :3
+    ]
+    demonstrations = [
+        Demonstration(
+            question=g.question,
+            texts=g.gold_support,
+            answer=g.gold_answer
+            if isinstance(g.gold_answer, str)
+            else numbered_list(g.gold_answer).transform(),
+        )
+        for g in demonstration_examples
+    ]
+    if paper_division_func and gold_support:
+        gold_support = await identify_gs_str(paper_division_func(paper), gold_support)
+    support = gold_support or selections
+    assert support
+    answer = await _demonstration_answer(
+        question=question,
+        texts=support,
+        demonstrations=demonstrations,
+        reasoning=reasoning,
+    )
+
+    if enumerate_answer:
+        answer = await quick_list(question, answer)
+    if paper_division_func:
+        support_candidates = paper_division_func(paper)
+        support_labels = as_bool(support, support_candidates)
+    else:
+        # TODO pickup here
+        pass
+
+
+    return PaperQaAnswer(
+        answer=answer,
+        support_candidates=support,
+        support_labels=as_bool(support, paper_division_func(paper)),
+    )
+
 
 async def cheating_few_shot_qa_baseline(
     paper: Paper,

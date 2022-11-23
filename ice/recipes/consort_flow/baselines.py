@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from functools import partial
 from itertools import chain
 from ice.apis.openai import TooLongRequestError
 
@@ -29,6 +30,8 @@ from ice.recipes.program_search.nodes.select.select import (
 )
 from ice.utils import n_tokens
 from ice.datasets.qasper import qasper_support_func
+from ice.datasets.qasper import get_gold_standard as get_qasper_gs
+from ice.recipes.meta.eval_paper_qa.common_baselines import preselected_few_shot_qa_baseline
 
 
 def experiments_few_shot_demonstration(
@@ -169,16 +172,53 @@ async def elicit_baseline_into_answer(paper: Paper, question: str, gold_support=
 
     selections = texts_with_perplexities.copy()
     
-    while selections: 
+    while selections:
         relevant_str = "\n\n".join([s[0] for s in selections])
-        if n_tokens(relevant_str) < 1000:
+        if n_tokens(relevant_str) < 3500:
             answer = await answer_like_elicit_qa(
                 question=question, passage=relevant_str
             )
-            answer_as_list = await quick_list(question=question, answer=answer)
             selection_set = set([s[0] for s in selections])
             return PaperQaAnswer(
-                answer=answer_as_list,
+                answer=answer,
+                support_candidates=texts,
+                support_labels=[text in selection_set for text in texts],
+                support_scores=[t[1] for t in texts_with_perplexities],
+            )
+        selections = remove_lowest_perplexity(selections)
+
+async def elicit_baseline_into_answer_few_shot(paper: Paper, question: str, gold_support=None):
+    gold_support  # unused
+    texts = _to_paragraphs(paper)
+    texts_with_perplexities = await windowed_select_using_elicit_prompt(
+        question=question, texts=texts
+    )
+
+    selections = texts_with_perplexities.copy()
+    
+    GS = get_qasper_gs(
+        split="train",
+        max_papers=100,
+        max_questions_per_paper=1,
+    )
+
+    while selections:
+        relevant_str = "\n\n".join([s[0] for s in selections])
+        if n_tokens(relevant_str) < 500:
+            answer = await preselected_few_shot_qa_baseline(
+                paper=paper,
+                question=question,
+                gold_support=None,
+                enumerate_answer=False,
+                few_shot_demonstration_func=partial(qasper_support_func, GS=list(GS)),
+                selections=selections,
+                paper_division_func=_to_paragraphs,
+                reasoning=True,
+            )
+            answer = answer.answer
+            selection_set = set([s[0] for s in selections])
+            return PaperQaAnswer(
+                answer=answer,
                 support_candidates=texts,
                 support_labels=[text in selection_set for text in texts],
                 support_scores=[t[1] for t in texts_with_perplexities],

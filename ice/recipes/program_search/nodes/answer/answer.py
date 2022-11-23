@@ -121,6 +121,14 @@ async def _get_reasoning(initial_prompt: str, completion: str):
         )
     return new_completion["choices"][0]["text"].strip()
 
+async def complete_increase_max_tokens_if_stopped_early(prompt: str, stop: str, max_tokens: int, increase_by: int, increase_until: int) -> str:
+    completion = await openai_complete(prompt=prompt, stop=stop, max_tokens=max_tokens)
+    try:
+        answer = completion["choices"][0]["text"]
+        return answer
+    except IndexError:
+        finish_reason = completion["choices"][0]
+  
 
 async def demonstration_answer_with_reasoning(
     question: str, texts: Sequence[str], demonstrations: Sequence[Demonstration]
@@ -148,4 +156,5 @@ async def demonstration_answer_with_reasoning(
 
     return await _get_reasoning(prompt, answer)
 
-recipe.main(add_reasoning)
+
+recipe.main(simple_answer)

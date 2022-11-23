@@ -149,7 +149,7 @@ async def openai_complete(
     record=recorder,
 ) -> dict:
     """Send a completion request to the OpenAI API and return the JSON response."""
-    model = "text-ada-001"
+    #model = "text-ada-001"
 
     #log.info("Sending completion request to OpenAI API", model=model)
     params = {

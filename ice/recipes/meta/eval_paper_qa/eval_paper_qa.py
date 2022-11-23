@@ -30,6 +30,7 @@ from ice.trace import trace
 from ice.utils import map_async
 
 from ice.datasets.qasper import get_gold_standard as get_qasper_gold_standard
+from ice.metrics.qasper import token_f1_score
 
 yaml = YAML(typ="safe")
 log = get_logger()
@@ -132,8 +133,9 @@ async def eval_paper_qasper_qa_method(
     split: str,
     max_concurrency: int = 10,
     max_papers: int = 5,
+    max_questions_per_paper: int = 1,
 ):
-    papers_gs = list(get_qasper_gold_standard(split, max_papers=max_papers))
+    papers_gs = list(get_qasper_gold_standard(split, max_papers=max_papers, max_questions_per_paper=max_questions_per_paper))
 
     log.info(
         "Evaluating method on papers",
@@ -148,20 +150,21 @@ async def eval_paper_qasper_qa_method(
         qa_details: PaperQaGoldStandard
     ) -> SequenceGenerationEvaluation[AnswerType_contra]:
         answer = await method(qa_details.paper, qa_details.question, qa_details.gold_support)
-        # correct, detail = await answer_eval_method(
-        #     question=qa_details.question,
-        #     ground_truth=qa_details.gold_answer,
-        #     prediction=answer.answer,
-        # )
+        correct, detail = await answer_eval_method(
+            question=qa_details.question,
+            ground_truth=qa_details.gold_answer,
+            prediction=answer.answer,
+        )
         metrics = await classification_eval_method(
             candidates=answer.support_candidates,
             predictions=answer.support_labels,
             ground_truth=qa_details.gold_support,
             scores=answer.support_scores,
         )
+        f1_score = token_f1_score(answer.answer, qa_details.gold_answer)
         return SequenceGenerationEvaluation(
-            correct=True,#correct,
-            detail="",#detail,
+            correct=correct,
+            detail=detail,
             metrics=metrics,
             generated_answer=answer.answer,
             gold_answer=qa_details.gold_answer,
@@ -170,6 +173,7 @@ async def eval_paper_qasper_qa_method(
                 for lab, text in zip(answer.support_labels, answer.support_candidates)
                 if lab
             ],
+            f1_score=f1_score,
         )
 
     eval_data: list[PaperQaGoldStandard] = papers_gs
@@ -181,6 +185,7 @@ async def eval_paper_qasper_qa_method(
 
     scores = [r.correct for r in results]
     metrics = [r.metrics for r in results]
+    f1 = [r.f1_score for r in results]
 
     # only aggregate where there is gold support (somewhat arbitrary choice but more informative)
     metrics_under_support = [m for m, gs in zip(metrics, gold_supports) if gs]
@@ -190,6 +195,7 @@ async def eval_paper_qasper_qa_method(
         sum(scores) / len(scores) if scores else 0,
         results,
         aggregated_metrics,
+        sum(f1) / len(f1) if f1 else 0,
     )
 
 
@@ -214,6 +220,7 @@ class _PaperQaArgsQasper(BaseModel):
     answer_eval_method: str
     classification_eval_method: str
     max_papers: int = 5
+    max_questions_per_paper: int = 1
 
 
 class PaperQaEvalConfig(BaseModel):
@@ -254,12 +261,13 @@ async def run_from_config(config: PaperQaEvalConfig) -> dict:
     return results_line
 
 async def run_from_config_qasper(config: PaperQaEvalConfig) -> dict:
-    score, results, agg_metrics = await eval_paper_qasper_qa_method(
+    score, results, agg_metrics, f1 = await eval_paper_qasper_qa_method(
         method=load_object(config.args.method),
         split=config.args.split,
         answer_eval_method=load_object(config.args.answer_eval_method),
         classification_eval_method=load_object(config.args.classification_eval_method),
         max_papers=config.args.max_papers,
+        max_questions_per_paper=config.args.max_questions_per_paper,
     )
     metrics = agg_metrics.as_dict()
     results_line = dict(
@@ -269,6 +277,7 @@ async def run_from_config_qasper(config: PaperQaEvalConfig) -> dict:
         results=[r.as_dict() for r in results],
         metrics=metrics,
         pr_thresholds=agg_metrics.pr_thresholds(),
+        qasper_f1_score=f1,
     )
     if config.results_json:
         with open(ensure_dir(config.results_json), "w") as r:
