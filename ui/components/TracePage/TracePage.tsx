@@ -45,20 +45,28 @@ const getContentLength = async (url: string) => {
   return isNaN(length) ? 0 : length;
 };
 
+type BlockAddress = [number, number];
+
 interface CallInfo {
   parent: string;
   start: number;
   name: string;
-  doc: string;
-  args: Record<string, unknown>;
-  source?: string;
+  block: BlockAddress;
   children?: Record<string, CallInfo>;
-  records?: Record<string, CallInfo>;
-  result?: unknown;
+  records?: Record<string, BlockAddress>;
+  result?: BlockAddress;
   end?: number;
 }
 
 type Calls = Record<string, CallInfo>;
+
+type Blocks = Record<number, unknown[]>;
+
+interface CallBlock {
+  doc: string;
+  args: Record<string, unknown>;
+  source?: string;
+}
 
 const MODEL_CALL_NAMES = [
   "relevance",
@@ -73,6 +81,7 @@ const TreeContext = createContext<{
   traceId: string;
   rootId: string;
   calls: Calls;
+  useBlockValue: (block: BlockAddress) => unknown;
   selectedId: string | undefined;
   setSelectedId: Dispatch<SetStateAction<string | undefined>>;
   getExpanded: (id: string) => boolean;
@@ -83,9 +92,15 @@ const TreeContext = createContext<{
 const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
   Object.entries(updates).forEach(([path, value]) => set(calls, path, value));
 
+const urlPrefix = (traceId: string) => {
+  const base = recipes[traceId] ? "https://oughtinc.github.io/static" : "/api";
+  return `${base}/traces/${traceId}`;
+};
+
 const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactNode }) => {
   const traceOffsetRef = useRef(0);
   const [calls, setCalls] = useState<Calls>({});
+  const [blocks, setBlocks] = useState<Blocks>({});
   const [selectedId, setSelectedId] = useState<string>();
   const [rootId, setRootId] = useState<string>("");
   const [expandedById, setExpandedById] = useState<Record<string, boolean>>({});
@@ -113,8 +128,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     const poll = async () => {
       let delay = 1_000;
       try {
-        const urlPrefix = recipes[traceId] ? "https://oughtinc.github.io/static" : "/api";
-        const url = `${urlPrefix}/traces/${traceId}.jsonl`;
+        const url = `${(urlPrefix(traceId))}/trace.jsonl`;
         const offset = traceOffsetRef.current;
         const contentLength = await getContentLength(url);
         if (offset >= contentLength) return;
@@ -180,11 +194,51 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     return (id: string) => focussedIds.includes(id);
   }, [selectedId, calls, rootId]);
 
+  const blockRequests: Record<number, []> = {};
+
+  const useBlockValue = (blockAddress: BlockAddress) => {
+      const [blockNumber, blockLineno] = blockAddress;
+      const block = blocks[blockNumber];
+      if (block) {
+        if (blockLineno < block.length) {
+          return block[blockLineno];
+        }
+        return undefined;  // wait for the other lines
+      }
+
+      if (blockNumber in blockRequests) {
+        return undefined;
+      }
+      blockRequests[blockNumber] = [];
+
+      const url = `${urlPrefix(traceId)}/block_${blockNumber}.jsonl`;
+      const fetchBlock = async () => {
+        const response = await fetch(url);
+        const text = await response.text();
+        const lines = text.split("\n");
+        if (lines[lines.length - 1] === "end") {
+          lines.pop();
+        } else {
+          // TODO poll for the remaining lines
+        }
+        const values = lines.map(line => JSON.parse(line));
+        setBlocks((blocks: Blocks) => ({ ...blocks, [blockNumber]: values }));
+      }
+      fetchBlock();
+    };
+
+  useEffect(() => {
+    if (!isEmpty(blockRequests)) {
+      setBlocks((blocks: Blocks) => ({ ...blocks, ...blockRequests }));
+    }
+  });
+
   return (
     <TreeContext.Provider
       value={{
         traceId,
         calls,
+        useBlockValue,
         rootId,
         selectedId,
         setSelectedId,
@@ -217,19 +271,9 @@ const useCallInfo = (id: string) => {
   };
 };
 
-type SelectedCallInfo = {
-  parent: string;
-  start: number;
-  name: string;
-  doc: string;
-  args: Record<string, unknown>;
-  source?: string;
-  children?: Record<string, CallInfo>;
-  records?: Record<string, CallInfo>;
-  result?: unknown;
-  end?: number;
+interface SelectedCallInfo extends CallInfo {
   id: string;
-};
+}
 
 const useSelectedCallInfo = (): SelectedCallInfo | undefined => {
   const { calls, selectedId } = useTreeContext();
@@ -266,10 +310,11 @@ const useLinks = () => {
   return { getParent, getChildren, getPrior: getSiblingAt(-1), getNext: getSiblingAt(1) };
 };
 
-const isModelCall = ({ name, args }: { name: string; args: Record<string, unknown> }) =>
-  MODEL_CALL_NAMES.includes(name) &&
-  (args as any).self?.class_name &&
-  (args as any).self.class_name.includes("Agent");
+const isModelCall = ({ name }: { name: string }) =>
+  MODEL_CALL_NAMES.includes(name);
+//   TODO &&
+//   (args as any).self?.class_name &&
+//   (args as any).self.class_name.includes("Agent");
 
 const getFormattedName = (snakeCasedName: string) => {
   const spacedName = snakeCasedName.replace(/_/g, " ");
@@ -278,11 +323,10 @@ const getFormattedName = (snakeCasedName: string) => {
 };
 
 const CallName = ({ className, id }: { className?: string; id: string }) => {
-  const { name, args } = useCallInfo(id);
-  const recipeClassName = (args as any).self?.class_name;
+  const { name } = useCallInfo(id);
+  const recipeClassName = null;  // TODO (args as any).self?.class_name;
   const displayName =
     (name === "execute" || name === "run") && recipeClassName ? recipeClassName : name;
-  const modelCall = isModelCall({ name, args });
   return (
     <div className="flex items-center gap-1">
       {recipeClassName && recipeClassName !== displayName ? (
@@ -300,13 +344,16 @@ function lineAnchorId(id: string) {
 }
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
-  const { name, args, children = {}, result, select, selected, focussed } = useCallInfo(id);
+  const { name, children = {}, select, selected, focussed } = useCallInfo(id);
+  // TODO chips directly in the trace
+  const args = {};
+  const result = undefined;
   const { selectedId } = useTreeContext();
   const { getParent } = useLinks();
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
 
-  const modelCall = isModelCall({ name, args });
+  const modelCall = isModelCall({ name });
   const isSiblingWithSelected = selectedId && getParent(id) === getParent(selectedId);
 
   return (
@@ -567,19 +614,21 @@ type DetailPaneContentProps = {
 type Tab = "io" | "src";
 
 const DetailPaneContent = ({ info }: DetailPaneContentProps) => {
-  const { id, doc } = info;
+  const { id, block } = info;
+  const { useBlockValue } = useTreeContext();
+  const blockValue = useBlockValue(block) as CallBlock | undefined;
   const [tab, setTab] = useState<Tab>("io"); // io for inputs and outputs, src for source
 
   return (
     <div className="flex-1 p-6">
-      <TabHeader id={id} doc={doc} />
+      <TabHeader id={id} doc={blockValue?.doc} />
       <TabBar tab={tab} setTab={setTab} />
       <TabContent tab={tab} info={info} />
     </div>
   );
 };
 
-const TabHeader = ({ id, doc }: { id: string; doc: string }) => (
+const TabHeader = ({ id, doc }: { id: string; doc?: string }) => (
   <div className="mb-4">
     <h3 className="text-lg font-semibold text-gray-800">
       <CallName id={id} />
@@ -618,23 +667,23 @@ const TabButton = ({ label, value, tab, setTab }: TabButtonProps) => (
 );
 
 const TabContent = ({ tab, info }: { tab: Tab; info: CallInfo }) => {
-  const { args, records = {}, result, source } = info;
+  const { block, records, result } = info;
 
   return (
     <div className="space-y-4 mt-4">
       {tab === "io" ? (
-        <InputOutputContent args={args} records={records} result={result} />
+        <InputOutputContent block={block} records={records} result={result} />
       ) : (
-        <SourceContent source={source} />
+        <SourceContent block={block} />
       )}
     </div>
   );
 };
 
 type InputOutputContentProps = {
-  args: any;
-  records: any;
-  result: any;
+  block: BlockAddress;
+  records?: Record<string, BlockAddress>;
+  result?: BlockAddress;
 };
 
 const excludeMetadata = (source: Record<string, unknown> | undefined) => {
@@ -644,19 +693,25 @@ const excludeMetadata = (source: Record<string, unknown> | undefined) => {
   );
 };
 
-const InputOutputContent = ({ args, records, result }: InputOutputContentProps) => (
-  <>
-    <Json name="Inputs" value={excludeMetadata(args)} />
-    {!isEmpty(records) && <Json name="Records" value={Object.values(records)} />}
-    <Json name="Outputs" value={result} />
-  </>
-);
-
-type SourceContentProps = {
-  source: string | undefined;
+const InputOutputContent = ({ block, records, result }: InputOutputContentProps) => {
+  const { useBlockValue } = useTreeContext();
+  const blockValue = useBlockValue(block) as CallBlock | undefined;
+  const resultValue = result && useBlockValue(result);
+  return <>
+    <Json name="Inputs" value={excludeMetadata(blockValue?.args)} />
+    {!isEmpty(records) && <Json name="Records" value={Object.values(records).map(useBlockValue).filter(v => v)} />}
+    <Json name="Outputs" value={resultValue} />
+  </>;
 };
 
-const SourceContent = ({ source }: SourceContentProps) => {
+type SourceContentProps = {
+  block: BlockAddress;
+};
+
+const SourceContent = ({ block }: SourceContentProps) => {
+  const { useBlockValue } = useTreeContext();
+  const blockValue = useBlockValue(block) as CallBlock | undefined;
+  const source = blockValue?.source;
   if (!source) {
     return <p>Source code not available</p>;
   }
