@@ -12,4 +12,4 @@ docker compose -f docker-compose.yaml -f docker-compose.$os.yaml up -d
 docker compose exec api bash -c 'LOG_LEVEL=warn TOKENIZERS_PARALLELISM=false poetry run python -m api.eval.main' > ${ICE_DIR}/data/in_app_qa_results/qa_eval_output.csv
 
 cd ${ICE_DIR}
-scripts/summarize-experiment-evals.sh data/in_app_qa_results/qa_eval_output.csv
+python -m ice.evaluation.summarize_experiment_evals data/in_app_qa_results/qa_eval_output.csv
