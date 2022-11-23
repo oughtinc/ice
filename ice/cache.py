@@ -4,19 +4,13 @@ Decorator for caching function results to disk
 import asyncio
 import functools
 import inspect
-
 from pathlib import Path
-from typing import Optional
 
-from ice.settings import settings
+from ice.settings import CACHE_DIR
 from ice.sqlite_shelf import SQLiteShelf
 
 
-def diskcache(cache_dir: Optional[Path] = None):
-
-    if cache_dir is None:
-        cache_dir = settings.CACHE_DIR
-
+def diskcache(cache_dir: Path = CACHE_DIR):
     def get_cache_and_key(func, *args, **kwargs):
         cache_file = (cache_dir / func.__name__).as_posix() + ".sqlite"
         key = repr(inspect.getcallargs(func, *args, **kwargs))
