@@ -23,17 +23,9 @@ ICE is a Python library and trace visualizer for language model programs.
 
 ## Getting started
 
-1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-
 1. Clone the repository: `git clone https://github.com/oughtinc/ice.git && cd ice`
 
 1. Add required secrets to `.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format.
-
-1. Start ICE in its own terminal and leave it running:
-
-   ```sh
-   scripts/run-local.sh
-   ```
 
 1. Go through [the Primer](https://primer.ought.org/).
 
@@ -69,55 +61,3 @@ We welcome community contributions:
 For larger contributions, make an issue for discussion before submitting a PR.
 
 And for even larger contributions, join us - [we're hiring](https://ought.org/careers)!
-
-### Releases
-
-To release a new version of ICE, follow these steps:
-
-1. Update the version number in:
-
-   - `docker-compose*.yml`
-   - `pyproject.toml`
-   - `package.json`
-   - `scripts/run-local.sh`
-
-1. Regenerate the `poetry.lock` file:
-
-   ```sh
-   docker compose exec ice poetry lock --no-update
-   ```
-
-1. Regenerate the `package-lock.json` file:
-
-   ```sh
-   docker compose exec ice npm --prefix ui install --package-lock-only
-   ```
-
-1. Update `CHANGELOG.md`.
-
-1. Commit the changes.
-
-1. Tag the commit with the version number:
-
-   ```sh
-   git tag <version>
-   ```
-
-1. Open a PR and verify that CI passes.
-
-1. Build and push the Docker images:
-
-   ```sh
-   # TODO: Script this, sharing code with scripts/run-local.sh.
-   docker buildx bake -f docker-compose.yml -f docker-compose.build.yml --push
-   docker buildx bake -f docker-compose.yml -f docker-compose.streamlit.yml -f docker-compose.build-streamlit.yml --push
-   docker buildx bake -f docker-compose.yml -f docker-compose.torch.yml -f docker-compose.build-torch.yml --push
-   ```
-
-1. Push the tag:
-
-   ```sh
-   git push --tags
-   ```
-
-1. Merge the PR.

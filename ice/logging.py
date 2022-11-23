@@ -16,10 +16,10 @@ from structlog.types import Processor
 # Prevent logging the warning 'None of PyTorch...' at the end of transformers/__init__.py.
 # This depends on this being the first place that transformers is imported.
 # It also assumes that transformers will be imported eventually
-# so importing eagerly it now doesn't have an extra cost.
+# so eagerly importing it now doesn't have an extra cost.
 previous_verbosity = os.environ.get("TRANSFORMERS_VERBOSITY", None)
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"
-import transformers
+import transformers  # noqa
 
 # Allow using the TRANSFORMERS_VERBOSITY env var normally to still work,
 # and avoid suppressing other warnings.

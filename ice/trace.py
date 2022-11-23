@@ -1,5 +1,4 @@
 import json
-import os
 
 from abc import ABCMeta
 from asyncio import create_task
@@ -13,13 +12,14 @@ from inspect import iscoroutinefunction
 from inspect import isfunction
 from inspect import Parameter
 from inspect import signature
-from pathlib import Path
 from time import monotonic_ns
 from typing import IO
 
 import ulid
 
 from structlog import get_logger
+
+from ice.settings import OUGHT_ICE_DIR
 
 log = get_logger()
 
@@ -30,7 +30,7 @@ def make_id() -> str:
 
 parent_id_var: ContextVar[str] = ContextVar("id")
 
-traces_dir = Path(__file__).parent.parent / "data" / "traces"
+traces_dir = OUGHT_ICE_DIR / "traces"
 traces_dir.mkdir(parents=True, exist_ok=True)
 
 
@@ -78,9 +78,8 @@ current_trace: Trace | None = None
 
 
 def _url_prefix():
-    if codespace := os.environ.get("CODESPACE_NAME"):
-        return f"https://{codespace}-3000.githubpreview.dev"
-    return "http://localhost:3000"
+    # TODO use OUGHT_ICE_HOST/PORT
+    return "http://localhost:8935"
 
 
 def enable_trace():
