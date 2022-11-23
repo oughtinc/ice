@@ -41,7 +41,7 @@ trace_file: IO[str] | None = None
 def _url_prefix():
     if codespace := os.environ.get("CODESPACE_NAME"):
         return f"https://{codespace}-3000.githubpreview.dev"
-    return "http://localhost:3000"
+    return "http://localhost:8935"
 
 
 def enable_trace():
