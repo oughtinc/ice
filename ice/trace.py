@@ -91,15 +91,14 @@ def trace_enabled():
 
 
 def emit(value):
-    if trace_enabled():
-        file = trace_var.get().file
-        json.dump(value, file, cls=JSONEncoder)
-        print(file=file, flush=True)
+    if trc := trace_var.get():
+        json.dump(value, trc.file, cls=JSONEncoder)
+        print(file=trc.file, flush=True)
 
 
 def emit_block(x):
-    if trace_enabled():
-        return trace_var.get().add_to_block(x)
+    if trc := trace_var.get():
+        return trc.add_to_block(x)
     else:
         return 0, 0
 
