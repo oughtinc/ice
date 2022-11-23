@@ -1,4 +1,5 @@
 import json
+import os
 
 from abc import ABCMeta
 from asyncio import create_task
@@ -43,10 +44,7 @@ class Trace:
         self.dir = traces_dir / self.id
         self.dir.mkdir()
         self.file = self._open("trace")
-        self.block_number = 0
-        self.block_file = None
-        self.block_length = 0
-        self.block_lineno = 0
+        self.block_number = -1
         self._open_block()
         print(f"Trace: {_url_prefix()}/traces/{self.id}")
         parent_id_var.set(self.id)
@@ -55,8 +53,8 @@ class Trace:
         return open(self.dir / f"{name}.jsonl", "a")
 
     def _open_block(self):
-        self.block_file = self._open(f"block_{self.block_number}")
         self.block_number += 1
+        self.block_file = self._open(f"block_{self.block_number}")
         self.block_length = 0
         self.block_lineno = 0
 
@@ -71,6 +69,7 @@ class Trace:
             self._open_block()
         else:
             self.block_file.flush()
+            os.fsync(self.block_file.fileno())
             self.block_lineno += 1
         return address
 
