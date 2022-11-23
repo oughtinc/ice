@@ -39,8 +39,7 @@ trace_file: IO[str] | None = None
 
 
 def _url_prefix():
-    if codespace := os.environ.get("CODESPACE_NAME"):
-        return f"https://{codespace}-3000.githubpreview.dev"
+    # TODO use OUGHT_ICE_HOST/PORT
     return "http://localhost:8935"
 
 
