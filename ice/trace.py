@@ -20,7 +20,7 @@ import ulid
 
 from structlog import get_logger
 
-from ice.settings import settings
+from ice.settings import OUGHT_ICE_DIR
 
 log = get_logger()
 
@@ -33,7 +33,7 @@ trace_id = make_id()
 parent_id_var: ContextVar[str] = ContextVar("id", default=trace_id)
 
 
-trace_dir = settings.OUGHT_ICE_DIR / "traces"
+trace_dir = OUGHT_ICE_DIR / "traces"
 trace_dir.mkdir(parents=True, exist_ok=True)
 trace_file: IO[str] | None = None
 

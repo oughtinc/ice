@@ -1,3 +1,4 @@
+from os import environ
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -17,7 +18,6 @@ class Settings(BaseSettings):
     OUGHT_INFERENCE_URL: AnyHttpUrl = "https://inference.elicit.org"
     GOLD_STANDARDS_CSV_PATH: str = "gold_standards/gold_standards.csv"
     GS_QUOTE_FOUND_THRESHOLD: float = 0.75
-    OUGHT_ICE_DIR: Path = Path.home() / ".ought-ice"
 
     class Config:
         env_file = ".env"
@@ -26,5 +26,6 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-CACHE_DIR = settings.OUGHT_ICE_DIR / "cache"
+OUGHT_ICE_DIR = Path(environ.get("OUGHT_ICE_DIR", Path.home() / ".ought-ice"))
+CACHE_DIR = OUGHT_ICE_DIR / "cache"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
