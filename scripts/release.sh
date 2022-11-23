@@ -8,12 +8,6 @@ if [ ! -z "$(git status --porcelain)" ]; then
     exit 1
 fi
 
-if [ $(git rev-parse --abbrev-ref HEAD) != "main" ]; then
-    set +x
-    echo You must be on the main branch to release
-    exit 1
-fi
-
 if [ -z "${1+x}" ]; then
     set +x
     echo Provide a version argument
@@ -30,7 +24,7 @@ npm --prefix ui run build
 
 export TAG="v${1}"
 git tag "${TAG}"
-git push origin main "${TAG}"
+git push origin HEAD "${TAG}"
 rm -rf ./build ./dist
 python -m build --sdist --wheel .
 twine upload ./dist/*.whl dist/*.tar.gz
