@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from statistics import mean
 
 import pandas as pd
+
 from pydantic import BaseModel
 from rich import box
 from rich.table import Table
