@@ -23,11 +23,21 @@ ICE is a Python library and trace visualizer for language model programs.
 
 ## Getting started
 
-1. Clone the repository: `git clone https://github.com/oughtinc/ice.git && cd ice`
+1. Install ICE:
 
-1. Add required secrets to `.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format.
+   ```shell
+   pip install ought-ice
+   ```
 
-1. Go through [the Primer](https://primer.ought.org/).
+1. Set required secrets in `~/.ought-ice/.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format.
+
+1. Start ICE in its own terminal and leave it running:
+
+   ```shell
+   python -m ice.server
+   ```
+
+1. To learn more, go through [the Primer](https://primer.ought.org/).
 
 ## Terminology
 
