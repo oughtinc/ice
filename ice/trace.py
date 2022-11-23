@@ -14,6 +14,7 @@ from inspect import Parameter
 from inspect import signature
 from time import monotonic_ns
 from typing import IO
+from typing import Optional
 
 import ulid
 
@@ -74,7 +75,7 @@ class Trace:
         return address
 
 
-current_trace: Trace | None = None
+trace_var: ContextVar[Optional[Trace]] = ContextVar("trace", default=None)
 
 
 def _url_prefix():
@@ -83,23 +84,23 @@ def _url_prefix():
 
 
 def enable_trace():
-    global current_trace
-    current_trace = Trace()
+    trace_var.set(Trace())
 
 
 def trace_enabled():
-    return current_trace is not None
+    return trace_var.get() is not None
 
 
 def emit(value):
-    if current_trace:
-        json.dump(value, current_trace.file, cls=JSONEncoder)
-        print(file=current_trace.file, flush=True)
+    if trace_enabled():
+        file = trace_var.get().file
+        json.dump(value, file, cls=JSONEncoder)
+        print(file=file, flush=True)
 
 
 def emit_block(x):
-    if current_trace:
-        return current_trace.add_to_block(x)
+    if trace_enabled():
+        return trace_var.get().add_to_block(x)
     else:
         return 0, 0
 
