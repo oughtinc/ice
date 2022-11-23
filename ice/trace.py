@@ -13,13 +13,14 @@ from inspect import iscoroutinefunction
 from inspect import isfunction
 from inspect import Parameter
 from inspect import signature
-from pathlib import Path
 from time import monotonic_ns
 from typing import IO
 
 import ulid
 
 from structlog import get_logger
+
+from ice.settings import settings
 
 log = get_logger()
 
@@ -32,7 +33,7 @@ trace_id = make_id()
 parent_id_var: ContextVar[str] = ContextVar("id", default=trace_id)
 
 
-trace_dir = Path(__file__).parent.parent / "data" / "traces"
+trace_dir = settings.OUGHT_ICE_DIR / "traces"
 trace_dir.mkdir(parents=True, exist_ok=True)
 trace_file: IO[str] | None = None
 

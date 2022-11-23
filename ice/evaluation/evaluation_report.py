@@ -1,6 +1,5 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
-from pathlib import Path
 from statistics import mean
 
 import pandas as pd
@@ -10,12 +9,11 @@ from rich import box
 from rich.table import Table
 
 from ice.evaluation.evaluate_recipe_result import EvaluatedRecipeResult
+from ice.evaluation.utils import CSVS_PATH
 from ice.evaluation.utils import precision_score
 from ice.evaluation.utils import recall_score
 from ice.evaluation.utils import start_time
 from ice.utils import latest_commit_hash
-
-CSVS_PATH = Path(__file__).parent / "../../data/evaluation_csvs/"
 
 SUBSTANTIVELY_CORRECT_MIN_ANSWER_RATING = 4
 

@@ -1,7 +1,6 @@
 import ast
 import asyncio
 
-from pathlib import Path
 from sys import argv
 
 import pandas as pd
@@ -10,10 +9,9 @@ from ice.environment import env
 from ice.evaluation.evaluate_recipe_result import EvaluatedRecipeResult
 from ice.evaluation.evaluate_recipe_result import RecipeResult
 from ice.evaluation.evaluation_report import EvaluationReport
+from ice.evaluation.utils import CSVS_PATH
 from ice.evaluation.utils import start_time
 from ice.utils import map_async
-
-CSVS_PATH = Path(__file__).parent.parent.parent / "data" / "evaluation_csvs"
 
 
 async def summarize_experiment_evals(results_file: str):
