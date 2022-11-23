@@ -128,7 +128,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     const poll = async () => {
       let delay = 1_000;
       try {
-        const url = `${(urlPrefix(traceId))}/trace.jsonl`;
+        const url = `${urlPrefix(traceId)}/trace.jsonl`;
         const offset = traceOffsetRef.current;
         const contentLength = await getContentLength(url);
         if (offset >= contentLength) return;
@@ -197,35 +197,35 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   const blockRequests: Record<number, []> = {};
 
   const useBlockValue = (blockAddress: BlockAddress) => {
-      const [blockNumber, blockLineno] = blockAddress;
-      const block = blocks[blockNumber];
-      if (block) {
-        if (blockLineno < block.length) {
-          return block[blockLineno];
-        }
-        return undefined;  // wait for the other lines
+    const [blockNumber, blockLineno] = blockAddress;
+    const block = blocks[blockNumber];
+    if (block) {
+      if (blockLineno < block.length) {
+        return block[blockLineno];
       }
+      return undefined; // wait for the other lines
+    }
 
-      if (blockNumber in blockRequests) {
-        return undefined;
-      }
-      blockRequests[blockNumber] = [];
+    if (blockNumber in blockRequests) {
+      return undefined;
+    }
+    blockRequests[blockNumber] = [];
 
-      const url = `${urlPrefix(traceId)}/block_${blockNumber}.jsonl`;
-      const fetchBlock = async () => {
-        const response = await fetch(url);
-        const text = await response.text();
-        const lines = text.split("\n");
-        if (lines[lines.length - 1] === "end") {
-          lines.pop();
-        } else {
-          // TODO poll for the remaining lines
-        }
-        const values = lines.map(line => JSON.parse(line));
-        setBlocks((blocks: Blocks) => ({ ...blocks, [blockNumber]: values }));
+    const url = `${urlPrefix(traceId)}/block_${blockNumber}.jsonl`;
+    const fetchBlock = async () => {
+      const response = await fetch(url);
+      const text = await response.text();
+      const lines = text.split("\n");
+      if (lines[lines.length - 1] === "end") {
+        lines.pop();
+      } else {
+        // TODO poll for the remaining lines
       }
-      fetchBlock();
+      const values = lines.map(line => JSON.parse(line));
+      setBlocks((blocks: Blocks) => ({ ...blocks, [blockNumber]: values }));
     };
+    fetchBlock();
+  };
 
   useEffect(() => {
     if (!isEmpty(blockRequests)) {
@@ -310,8 +310,7 @@ const useLinks = () => {
   return { getParent, getChildren, getPrior: getSiblingAt(-1), getNext: getSiblingAt(1) };
 };
 
-const isModelCall = ({ name }: { name: string }) =>
-  MODEL_CALL_NAMES.includes(name);
+const isModelCall = ({ name }: { name: string }) => MODEL_CALL_NAMES.includes(name);
 //   TODO &&
 //   (args as any).self?.class_name &&
 //   (args as any).self.class_name.includes("Agent");
@@ -324,7 +323,7 @@ const getFormattedName = (snakeCasedName: string) => {
 
 const CallName = ({ className, id }: { className?: string; id: string }) => {
   const { name } = useCallInfo(id);
-  const recipeClassName = null;  // TODO (args as any).self?.class_name;
+  const recipeClassName = null; // TODO (args as any).self?.class_name;
   const displayName =
     (name === "execute" || name === "run") && recipeClassName ? recipeClassName : name;
   return (
@@ -697,11 +696,20 @@ const InputOutputContent = ({ block, records, result }: InputOutputContentProps)
   const { useBlockValue } = useTreeContext();
   const blockValue = useBlockValue(block) as CallBlock | undefined;
   const resultValue = result && useBlockValue(result);
-  return <>
-    <Json name="Inputs" value={excludeMetadata(blockValue?.args)} />
-    {!isEmpty(records) && <Json name="Records" value={Object.values(records).map(useBlockValue).filter(v => v)} />}
-    <Json name="Outputs" value={resultValue} />
-  </>;
+  return (
+    <>
+      <Json name="Inputs" value={excludeMetadata(blockValue?.args)} />
+      {!isEmpty(records) && (
+        <Json
+          name="Records"
+          value={Object.values(records)
+            .map(useBlockValue)
+            .filter(v => v)}
+        />
+      )}
+      <Json name="Outputs" value={resultValue} />
+    </>
+  );
 };
 
 type SourceContentProps = {

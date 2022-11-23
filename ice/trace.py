@@ -37,7 +37,7 @@ traces_dir.mkdir(parents=True, exist_ok=True)
 
 
 class Trace:
-    BLOCK_LENGTH = 1024 ** 2
+    BLOCK_LENGTH = 1024**2
 
     def __init__(self):
         self.id = make_id()
