@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Breaking change**: ICE no longer uses Docker.
 - **Breaking change**: Python package dependencies are now listed in `setup.cfg`.
-- **Breaking change**: ICE data is now stored in ~/.ought-ice by default. This can be customized by setting the `OUGHT_ICE_DIR` environment variable.
+- **Breaking change**: ICE data is now stored in `~/.ought-ice` by default. This can be customized by setting the `OUGHT_ICE_DIR` environment variable.
 
 ### Removed
 
