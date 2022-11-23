@@ -1,5 +1,4 @@
 import json
-import os
 
 from abc import ABCMeta
 from asyncio import create_task
