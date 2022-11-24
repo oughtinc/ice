@@ -107,8 +107,8 @@ async def _get_reasoning(initial_prompt: str, completion: str):
     except IndexError:
         lines = completion.splitlines()
         if not len(lines) == 1:
-            raise ValueError("Unexpected response")
-        new_prompt = initial_prompt + " " + lines[0].strip() + "\n\n" + "Final answer:"
+            log.warn("Unexpected response")
+        new_prompt = initial_prompt + " " + completion.strip() + "\n\n" + "Final answer:"
         new_completion = await openai_complete(
             prompt=new_prompt, stop="\n\n---", max_tokens=200
         )

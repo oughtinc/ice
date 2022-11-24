@@ -20,6 +20,8 @@ from ice.recipes.best_completion import best_completion
 from ice.recipes.consort_flow import baseline_elicit_answer
 from ice.recipes.find_best_few_shot_prompt import best_few_shot
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
+from ice.recipes.program_search.nodes.answer.answer import demonstration_answer_with_reasoning
+from ice.recipes.program_search.nodes.answer.types import Demonstration
 from ice.recipes.program_search.nodes.prune.prune import prune
 from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
 from ice.recipes.program_search.nodes.select.prompts import get_selections
@@ -212,31 +214,6 @@ async def _get_batched_prompts(
 
     return [c["text"].strip() for c in response["choices"]]
 
-async def windowed_select_using_elicit_prompt_CoT(  # Best recall [use this]
-    question: str,
-    texts: Sequence[str],
-) -> Sequence[tuple[str, float]]:
-    """Select texts that answer the question via perplexity of the "not mentioned"
-    response to an elicit-like question-answering prompt
-    """
-    prompts = [
-        baseline_elicit_answer._excerpt_prompt_CoT(
-            qa_question=question,
-            excerpt=text,
-            answer_prefix=None,
-        )
-        for text in texts
-    ]
-
-    NA = f" The answer to the question is {baseline_elicit_answer.NA_PHRASE}"
-
-    completions = await _get_batched_prompts(prompts)
-
-    classifications = [NA in c for c in completions]
-
-    return [(t, c) for t, c in zip(texts, classifications)]
-    # Lower perplexity means more likely to be "not mentioned in excerpt"
-
 async def windowed_select_using_monot5(
     question: str,
     texts: Sequence[str],
@@ -323,6 +300,45 @@ def _create_example_prompts(
     completions = [" " + c.strip() for c in completions]
 
     return prompts, completions
+
+def _generate_demonstrations(
+    example: PaperQaGoldStandard
+):
+    paragraphs = to_paragraphs(example.paper)
+    relevant_paragraphs = example.gold_support
+
+    for paragraph in paragraphs:
+        yield Demonstration(
+            question=f"""Is this paragraph relevant to the question "{example.question}"?""",
+            texts=[paragraph],
+            answer = "Yes" if paragraph in relevant_paragraphs else "No",
+        ), (paragraph in relevant_paragraphs)
+
+async def select_using_elicit_prompt_few_shot_CoT(
+    question: str,
+    texts: Sequence[str],
+    examples: list[RenderableSelectionExample] | None = None,
+    perplexity_threshold: float = 3.0,
+) -> Sequence[str]:
+
+    random.shuffle(examples)
+
+    demonstrations = sum([list(_generate_demonstrations(e)) for e in examples], [])
+    positive_demonstrations = [d for d, p in demonstrations if p]
+    negative_demonstrations = [d for d, p in demonstrations if not p]
+
+    demonstrations = positive_demonstrations[:1] + negative_demonstrations[:1] + positive_demonstrations[-2:-1]
+
+    classifications = [(await demonstration_answer_with_reasoning(
+        question=f"""Is this paragraph relevant to the question "{question}"?""",
+        texts=[t],
+        demonstrations=demonstrations,
+    )) for t in texts]
+
+    labels = ["Yes" in c for c in classifications]
+
+    return [(t, int(l)) for t, l in zip(texts, labels)]
+
 
 
 async def select_using_elicit_prompt_few_shot(

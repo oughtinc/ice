@@ -26,7 +26,7 @@ from ice.recipes.program_search.nodes.select.select import (
     select_using_elicit_prompt_few_shot,
     windowed_select_using_elicit_prompt,
     windowed_select_using_monot5,
-    windowed_select_using_elicit_prompt_CoT,
+    select_using_elicit_prompt_few_shot_CoT,
 )
 from ice.utils import n_tokens
 from ice.datasets.qasper import qasper_support_func
@@ -225,6 +225,45 @@ async def elicit_baseline_into_answer_few_shot(paper: Paper, question: str, gold
             )
         selections = remove_lowest_perplexity(selections)
 
+async def elicit_baseline_into_answer_few_shot_search_CoT(paper: Paper, question: str, gold_support=None):
+    gold_support  # unused
+
+    GS = get_qasper_gs(
+        split="train",
+        max_papers=100,
+        max_questions_per_paper=1,
+    )
+
+    texts = _to_paragraphs(paper)
+
+    texts_with_perplexities = await select_using_elicit_prompt_few_shot_CoT(
+        question=question, texts=texts, examples=list(qasper_support_func(document_id=paper.document_id, GS=list(GS)))
+    )
+
+    selections = texts_with_perplexities.copy()
+
+    while selections:
+        relevant_str = "\n\n".join([s[0] for s in selections])
+        if n_tokens(relevant_str) < 500:
+            answer = await preselected_few_shot_qa_baseline(
+                paper=paper,
+                question=question,
+                gold_support=None,
+                enumerate_answer=False,
+                few_shot_demonstration_func=partial(qasper_support_func, GS=list(GS)),
+                selections=selections,
+                paper_division_func=_to_paragraphs,
+                reasoning=True,
+            )
+            answer = answer.answer
+            selection_set = set([s[0] for s in selections])
+            return PaperQaAnswer(
+                answer=answer,
+                support_candidates=texts,
+                support_labels=[text in selection_set for text in texts],
+                support_scores=[t[1] for t in texts_with_perplexities],
+            )
+        selections = remove_lowest_perplexity(selections)
 
 async def elicit_baseline_prune_then_answer(
     paper: Paper, question: str, gold_support=None
@@ -236,7 +275,7 @@ async def elicit_baseline_prune_then_answer(
     #     question=question, texts=texts
     # )
 
-    texts_with_perplexities = await windowed_select_using_elicit_prompt_CoT(
+    texts_with_perplexities = await select_using_elicit_prompt_few_shot_CoT(
         question=question, texts=texts#, examples=experiments_few_shot_demonstration(paper.document_id, consolidate=False)
     )
 
