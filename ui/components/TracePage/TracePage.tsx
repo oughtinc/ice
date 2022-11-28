@@ -313,7 +313,8 @@ const useLinks = () => {
   return { getParent, getChildren, getPrior: getSiblingAt(-1), getNext: getSiblingAt(1) };
 };
 
-const isModelCall = ({ cls, name }: CallInfo) => MODEL_CALL_NAMES.includes(name) && cls?.includes("Agent");
+const isModelCall = ({ cls, name }: CallInfo) =>
+  MODEL_CALL_NAMES.includes(name) && cls?.includes("Agent");
 
 const getFormattedName = (snakeCasedName: string) => {
   const spacedName = snakeCasedName.replace(/_/g, " ");
@@ -420,11 +421,13 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
           <div className="mx-2">
             <CallName className="text-base text-slate-700" id={id} />
             <div className="text-sm text-gray-600 flex items-center">
-              <span className="text-indigo-600">
-                {arg}
-              </span>
+              <span className="text-indigo-600">{arg}</span>
               <span className="px-2">→</span>
-              {shortResult === undefined ? <Spinner size="small" /> : <ResultComponent value={shortResult} />}
+              {shortResult === undefined ? (
+                <Spinner size="small" />
+              ) : (
+                <ResultComponent value={shortResult} />
+              )}
             </div>
           </div>
         </Button>
