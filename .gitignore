@@ -1,6 +1,7 @@
 **/__pycache__
 **/.DS_Store
 **/.vscode
+**/*.egg-info
 **/*.pickle
 **/*.pt
 **/*.sqlite

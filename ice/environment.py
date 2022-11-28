@@ -73,9 +73,7 @@ class CliEnvironment(EnvironmentInterface):
         try:
             nest_asyncio.apply()  # Needed for questionary to work
         except RuntimeError:
-            log.warning(
-                "Nest_asyncio failed to apply. This is expected when using Streamlit."
-            )
+            log.warning("Nest_asyncio failed to apply.")
             pass
         self._console = Console()
 
