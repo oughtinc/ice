@@ -189,6 +189,7 @@ def trace(fn):
                 parent=parent_id,
                 start=monotonic_ns(),
                 name=fn.__name__,
+                arg=get_strings(arg_dict),
                 block=emit_block(
                     dict(
                         doc=getdoc(fn),
@@ -214,7 +215,13 @@ def trace(fn):
                 )
 
             result = await fn(*args, **kwargs)
-            emit({f"{id}.result": emit_block(result), f"{id}.end": monotonic_ns()})
+            emit(
+                {
+                    f"{id}.result": emit_block(result),
+                    f"{id}.shortResult": get_strings(result),
+                    f"{id}.end": monotonic_ns(),
+                }
+            )
             return result
 
         return await create_task(inner_wrapper(*args, **kwargs))
@@ -246,3 +253,42 @@ class TracedABCMeta(ABCMeta):
 
 class TracedABC(metaclass=TracedABCMeta):
     ...
+
+
+def get_first_descendant(value):
+    if value:
+        if isinstance(value, dict):
+            first, *_ = value.values()
+            return get_first_descendant(first)
+        if isinstance(value, (list, tuple)):
+            if isinstance(value[0], str):
+                return [v for v in value if isinstance(v, str)]
+            return get_first_descendant(value[0])
+    return value
+
+
+def get_strings(value) -> list[str]:
+    if isinstance(value, dict):
+        if "value" in value:
+            value = value["value"]
+        else:
+            value = {k: v for k, v in value.items() if k not in ("self", "record")}
+
+    result = get_first_descendant(value)
+
+    if isinstance(result, tuple):
+        result = list(result)
+    if not (result and isinstance(result, list)):
+        result = [f"{result or '()'}"]
+
+    result = get_short_list(result)
+    result = [get_short_string(v) for v in result]
+    return result
+
+
+def get_short_string(string, max_length=35) -> str:
+    return string[:max_length].strip() + "..." if len(string) > max_length else string
+
+
+def get_short_list(lst: list, max_length=3) -> list:
+    return lst[:max_length] + ["..."] if len(lst) > max_length else lst

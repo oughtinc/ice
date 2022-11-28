@@ -53,6 +53,8 @@ interface CallInfo {
   name: string;
   cls?: string;
   block: BlockAddress;
+  arg: string;
+  shortResult?: string[];
   children?: Record<string, CallInfo>;
   records?: Record<string, BlockAddress>;
   result?: BlockAddress;
@@ -341,10 +343,7 @@ function lineAnchorId(id: string) {
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const callInfo = useCallInfo(id);
-  const { children = {}, select, selected, focussed } = callInfo;
-  // TODO chips directly in the trace
-  const args = {};
-  const result = undefined;
+  const { children = {}, select, selected, focussed, arg, shortResult } = callInfo;
   const { selectedId } = useTreeContext();
   const { getParent } = useLinks();
   const childIds = Object.keys(children);
@@ -421,11 +420,11 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
           <div className="mx-2">
             <CallName className="text-base text-slate-700" id={id} />
             <div className="text-sm text-gray-600 flex items-center">
-              <span className="text-indigo-600" title={JSON.stringify(getStrings(args), null, 4)}>
-                {getShortString(getStrings(args)?.[0] || "()")}
+              <span className="text-indigo-600">
+                {arg}
               </span>
               <span className="px-2">→</span>
-              {result === undefined ? <Spinner size="small" /> : <ResultComponent value={result} />}
+              {shortResult === undefined ? <Spinner size="small" /> : <ResultComponent value={shortResult} />}
             </div>
           </div>
         </Button>
@@ -460,57 +459,15 @@ const CallChildren = ({
   );
 };
 
-const isObjectLike = (value: unknown): value is object =>
-  value !== null && typeof value === "object";
-
-const isArrayWithString = (value: unknown): value is unknown[] =>
-  Array.isArray(value) && isString(value[0]);
-
-const getFirstDescendant = (value: unknown): unknown => {
-  if (isObjectLike(value) && !isArrayWithString(value)) {
-    return getFirstDescendant(Object.values(value)[0]);
-  }
-  if (isArrayWithString(value)) {
-    return value.filter(isString);
-  }
-  return value;
-};
-
-const getStrings = (value: any): string[] => {
-  if (isObjectLike(value)) {
-    if ("value" in value) {
-      value = (value as any).value;
-    } else {
-      if ("self" in value) {
-        value = omit(value, "self");
-      }
-      if ("record" in value) {
-        value = omit(value, "record");
-      }
-    }
-  }
-
-  const result = getFirstDescendant(value);
-
-  return Array.isArray(result) ? result : [`${result ?? "()"}`];
-};
-
-const getShortString = (string: any, maxLength: number = 35): string => {
-  return string.length > maxLength ? string.slice(0, maxLength).trim() + "..." : string;
-};
-
-const ResultComponent = ({ value }: { value: any }): JSX.Element => {
-  const strings = getStrings(value);
-
+const ResultComponent = ({ value }: { value: string[] }): JSX.Element => {
   return (
     <>
-      {strings.map((string, idx) => (
+      {value.map((string, idx) => (
         <div
           className="px-[4px] py-[2px] mx-[3px] bg-lightBlue-50 text-lightBlue-600 rounded-4"
           key={idx}
-          title={string}
         >
-          {getShortString(string)}
+          {string}
         </div>
       ))}
     </>
