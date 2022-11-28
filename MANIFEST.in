@@ -1,0 +1,3 @@
+# Include the files created by `npm run build`.
+# The `*` just means include everything under the given directory.
+recursive-include ice/routes/ui *

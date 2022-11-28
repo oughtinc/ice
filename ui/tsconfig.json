@@ -25,5 +25,10 @@
     "target": "es5"
   },
   "exclude": ["node_modules"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "styles/colors.js"]
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ],
+  "include": ["**/*.ts", "**/*.tsx"]
 }

@@ -1,11 +1,7 @@
-# Since these ignore rules are shared between Git and Docker, every rule should take one of three forms:
-# **/SOME_PATTERN
-# /SOME_PATTERN
-# !/SOME_PATTERN
-
 **/__pycache__
 **/.DS_Store
 **/.vscode
+**/*.egg-info
 **/*.pickle
 **/*.pt
 **/*.sqlite
@@ -14,8 +10,12 @@
 /.git
 /.mypy_cache
 /.pre-commit-home
+/build/
 /data
+/dist/
 /ice/contrib/*/
+/ice/routes/ui/
+/ice/version.py
 /papers/*.pdf
 /papers/*.txt
 !/papers/keenan-2018-tiny.txt
@@ -23,4 +23,4 @@
 /store
 /ui/.next/
 /ui/node_modules
-/ui/public/traces/*.jsonl
+/venv/

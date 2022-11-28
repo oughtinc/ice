@@ -8,7 +8,7 @@ import { inputStyles } from "./inputStyles";
 import { tabStyles } from "./tabsStyles";
 import { tagStyles } from "./tagStyles";
 import { textareaStyles } from "./textareaStyles";
-import { COLORS } from "/styles/colors";
+import * as COLORS from "/styles/colors.json";
 
 const emotionCache = createCache({
   key: "emotion-css-cache",
