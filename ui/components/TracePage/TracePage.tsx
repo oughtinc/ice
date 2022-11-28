@@ -61,7 +61,7 @@ interface CallInfo {
 
 type Calls = Record<string, CallInfo>;
 
-type Blocks = Record<number, unknown[]>;
+type Blocks = Record<number, string[]>;
 
 interface CallBlock {
   doc: string;
@@ -202,7 +202,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     const block = blocks[blockNumber];
     if (block) {
       if (blockLineno < block.length) {
-        return block[blockLineno];
+        return JSON.parse(block[blockLineno]);
       }
       return undefined; // wait for the other lines
     }
@@ -222,10 +222,10 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       } else {
         // TODO poll for the remaining lines
       }
-      const values = lines.map(line => JSON.parse(line));
-      setBlocks((blocks: Blocks) => ({ ...blocks, [blockNumber]: values }));
+      setBlocks((blocks: Blocks) => ({ ...blocks, [blockNumber]: lines }));
     };
     fetchBlock();
+    return undefined;
   };
 
   useEffect(() => {
