@@ -226,7 +226,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       }
       setBlocks((blocks: Blocks) => ({
         ...blocks,
-        [blockNumber]: blocks[blockNumber].concat(...lines),
+        [blockNumber]: [...blocks[blockNumber], ...lines],
       }));
     };
     fetchBlock(0);
