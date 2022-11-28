@@ -1,8 +1,9 @@
-- name: Qasper end-to-end with Elicit-style QA for search
-  results_json: "experiments/results/consort/qasper_search_elicit_prompt_multi_then_answer_then_enumerate.json"
+- name: Qasper end-to-end with Elicit-style QA for search with Few-shot answering using CoT mono T5
+  results_json: "experiments/results/consort/qasper_search_elicit_davinci_002_few_shot_CoT_monot5.json"
   args:
-    method: ice.recipes.consort_flow.baselines.elicit_baseline_into_answer
+    method: ice.recipes.consort_flow.baselines.elicit_baseline_into_answer_few_shot
     split: train # Anything other than "train" will use the val set
     answer_eval_method: ice.recipes.meta.eval_paper_qa.quick_question_driven_eval.quick_eval
     classification_eval_method: ice.recipes.meta.eval_paper_qa.common_eval_methods.eval_text_classification
-    max_papers: 1
+    max_papers: 20
+    max_questions_per_paper: 1
