@@ -185,20 +185,25 @@ def trace(fn):
                 else:
                     arg_dict[k] = v
 
+            call_event = dict(
+                parent=parent_id,
+                start=monotonic_ns(),
+                name=fn.__name__,
+                block=emit_block(
+                    dict(
+                        doc=getdoc(fn),
+                        args=arg_dict,
+                        source=getsource(fn),
+                    )
+                ),
+            )
+            self = arg_dict.get("self")
+            if self:
+                call_event["cls"] = self.__class__.__name__
+
             emit(
                 {
-                    id: dict(
-                        parent=parent_id,
-                        start=monotonic_ns(),
-                        name=fn.__name__,
-                        block=emit_block(
-                            dict(
-                                doc=getdoc(fn),
-                                args=arg_dict,
-                                source=getsource(fn),
-                            )
-                        ),
-                    ),
+                    id: call_event,
                     f"{parent_id}.children.{id}": True,
                 }
             )

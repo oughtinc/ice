@@ -51,6 +51,7 @@ interface CallInfo {
   parent: string;
   start: number;
   name: string;
+  cls?: string;
   block: BlockAddress;
   children?: Record<string, CallInfo>;
   records?: Record<string, BlockAddress>;
@@ -310,10 +311,7 @@ const useLinks = () => {
   return { getParent, getChildren, getPrior: getSiblingAt(-1), getNext: getSiblingAt(1) };
 };
 
-const isModelCall = ({ name }: { name: string }) => MODEL_CALL_NAMES.includes(name);
-//   TODO &&
-//   (args as any).self?.class_name &&
-//   (args as any).self.class_name.includes("Agent");
+const isModelCall = ({ cls, name }: CallInfo) => MODEL_CALL_NAMES.includes(name) && cls?.includes("Agent");
 
 const getFormattedName = (snakeCasedName: string) => {
   const spacedName = snakeCasedName.replace(/_/g, " ");
@@ -322,8 +320,7 @@ const getFormattedName = (snakeCasedName: string) => {
 };
 
 const CallName = ({ className, id }: { className?: string; id: string }) => {
-  const { name } = useCallInfo(id);
-  const recipeClassName = null; // TODO (args as any).self?.class_name;
+  const { name, cls: recipeClassName } = useCallInfo(id);
   const displayName =
     (name === "execute" || name === "run") && recipeClassName ? recipeClassName : name;
   return (
@@ -343,7 +340,8 @@ function lineAnchorId(id: string) {
 }
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
-  const { name, children = {}, select, selected, focussed } = useCallInfo(id);
+  const callInfo = useCallInfo(id);
+  const { children = {}, select, selected, focussed } = callInfo;
   // TODO chips directly in the trace
   const args = {};
   const result = undefined;
@@ -352,7 +350,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
 
-  const modelCall = isModelCall({ name });
+  const modelCall = isModelCall(callInfo);
   const isSiblingWithSelected = selectedId && getParent(id) === getParent(selectedId);
 
   return (
