@@ -1,0 +1,30 @@
+name: Deploy app to production
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-frontend-prod:
+    name: Deploy production frontend on Vercel
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ice-prod-frontend
+      url: ${{ steps.vercel-deploy.outputs.frontend_url }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16"
+          registry-url: https://registry.npmjs.org/
+
+      - name: Deploy on Vercel
+        id: vercel-deploy
+        run: |
+          export FRONTEND_URL=$(npx vercel --confirm --prod --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_TEAM_ID }})
+          echo "Deployed to Vercel at: ${FRONTEND_URL}"
+          echo "::set-output name=frontend_url::${FRONTEND_URL}"
