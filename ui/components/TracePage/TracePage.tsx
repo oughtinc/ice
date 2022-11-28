@@ -215,18 +215,18 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     blockRequests[blockNumber] = [];
 
     const url = `${urlPrefix(traceId)}/block_${blockNumber}.jsonl`;
-    const fetchBlock = async () => {
-      const response = await fetch(url);
+    const fetchBlock = async (start: number) => {
+      const response = await fetch(url, {headers: {Range: `bytes=${start}-999999999`}});
       const text = await response.text();
-      const lines = text.split("\n");
+      const lines = text.split("\n").filter(Boolean);
       if (lines[lines.length - 1] === "end") {
         lines.pop();
       } else {
-        // TODO poll for the remaining lines
+        setTimeout(() => fetchBlock(start + text.length), 1_000);
       }
-      setBlocks((blocks: Blocks) => ({ ...blocks, [blockNumber]: lines }));
+      setBlocks((blocks: Blocks) => ({ ...blocks, [blockNumber]: blocks[blockNumber].concat(...lines) }));
     };
-    fetchBlock();
+    fetchBlock(0);
     return undefined;
   };
 
