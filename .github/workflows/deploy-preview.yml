@@ -25,4 +25,4 @@ jobs:
         id: vercel-deploy
         run: |
           export FRONTEND_PREVIEW_URL=$(npx vercel --confirm --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_TEAM_ID }})
-          echo "::set-output name=frontend_url::${FRONTEND_PREVIEW_URL}"
+          echo "frontend_url=${FRONTEND_PREVIEW_URL}" >> $GITHUB_OUTPUT

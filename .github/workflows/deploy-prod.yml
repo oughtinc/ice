@@ -27,4 +27,4 @@ jobs:
         run: |
           export FRONTEND_URL=$(npx vercel --confirm --prod --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_TEAM_ID }})
           echo "Deployed to Vercel at: ${FRONTEND_URL}"
-          echo "::set-output name=frontend_url::${FRONTEND_URL}"
+          echo "frontend_url=${FRONTEND_URL}" >> $GITHUB_OUTPUT
