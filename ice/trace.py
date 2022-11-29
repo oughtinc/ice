@@ -47,7 +47,7 @@ def enable_trace():
 
     trace_file = (trace_dir / f"{trace_id}.jsonl").open("a")
 
-    print(f"Trace: {_url_prefix()}/traces/{trace_id}")
+    print(f"Trace: {_url_prefix()}/#/traces/{trace_id}")
 
 
 def trace_enabled():

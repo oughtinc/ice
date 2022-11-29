@@ -3,12 +3,12 @@ import ReactDOM from "react-dom";
 import "/styles/globals.css";
 import { css, Global } from "@emotion/react";
 import { ChakraWrapper } from "/components/ChakraWrapper/ChakraWrapper";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import HomePage from "/pages/HomePage";
 import TraceListPage from "/pages/TraceListPage";
 import { TracePage } from "/components/TracePage/TracePage";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <HomePage />,

@@ -28,8 +28,8 @@ except RuntimeError:
     )
 
 
-@app.get("/{_full_path:path}")
-async def catch_all(_full_path: str):
+@app.get("/")
+async def catch_all():
     path = dist_dir / "index.html"
     if not path.exists():
         return PlainTextResponse(
