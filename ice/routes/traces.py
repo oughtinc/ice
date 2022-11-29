@@ -41,7 +41,7 @@ async def get_block(trace_id: str, block_id: int, Range: str | None = Header(Non
 
 def get_file(path: Path, Range: str | None):
     if not path.exists():
-        raise HTTPException(status_code=404, detail="Trace not found")
+        raise HTTPException(status_code=404, detail="File not found")
 
     if Range is None:
         return FileResponse(path)
