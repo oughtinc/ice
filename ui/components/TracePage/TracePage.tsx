@@ -87,7 +87,7 @@ const TreeContext = createContext<{
   traceId: string;
   rootId: string;
   calls: Calls;
-  useBlockValue: <T>(block: BlockAddress<T>) => T | undefined;
+  getBlockValue: <T>(block: BlockAddress<T>) => T | undefined;
   selectedId: string | undefined;
   setSelectedId: Dispatch<SetStateAction<string | undefined>>;
   getExpanded: (id: string) => boolean;
@@ -203,7 +203,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
 
   const blockRequests: Record<number, []> = {};
 
-  function useBlockValue<T>(blockAddress: BlockAddress<T>): T | undefined {
+  function getBlockValue<T>(blockAddress: BlockAddress<T>): T | undefined {
     const [blockNumber, blockLineno] = blockAddress;
     const block = blocks[blockNumber];
     if (block) {
@@ -249,7 +249,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       value={{
         traceId,
         calls,
-        useBlockValue,
+        getBlockValue,
         rootId,
         selectedId,
         setSelectedId,
@@ -271,6 +271,10 @@ const useTreeContext = () => {
   if (!context) throw new Error("useTreeContext must be used within a TreeProvider");
   return context;
 };
+
+function useBlockValue<T>(blockAddress: BlockAddress<T>): T | undefined {
+  return useTreeContext().getBlockValue(blockAddress);
+}
 
 const useCallInfo = (id: string) => {
   const { calls, selectedId, setSelectedId, getFocussed } = useTreeContext();
@@ -580,13 +584,11 @@ type Tab = "io" | "src";
 
 const DetailPaneContent = ({ info }: DetailPaneContentProps) => {
   const { id, func } = info;
-  const { useBlockValue } = useTreeContext();
-  const blockValue = useBlockValue(func);
   const [tab, setTab] = useState<Tab>("io"); // io for inputs and outputs, src for source
 
   return (
     <div className="flex-1 p-6">
-      <TabHeader id={id} doc={blockValue?.doc} />
+      <TabHeader id={id} doc={useBlockValue(func)?.doc} />
       <TabBar tab={tab} setTab={setTab} />
       <TabContent tab={tab} info={info} />
     </div>
@@ -653,12 +655,9 @@ const excludeMetadata = (source: Record<string, unknown> | undefined) => {
 };
 
 const InputOutputContent = ({ args, records, result }: InputOutputContentProps) => {
-  const { useBlockValue } = useTreeContext();
-  const argsValue = useBlockValue(args);
-  const resultValue = result && useBlockValue(result);
   return (
     <>
-      <Json name="Inputs" value={excludeMetadata(argsValue)} />
+      <Json name="Inputs" value={excludeMetadata(useBlockValue(args))} />
       {!isEmpty(records) && (
         <Json
           name="Records"
@@ -667,7 +666,7 @@ const InputOutputContent = ({ args, records, result }: InputOutputContentProps) 
             .filter(v => v)}
         />
       )}
-      <Json name="Outputs" value={resultValue} />
+      <Json name="Outputs" value={result && useBlockValue(result)} />
     </>
   );
 };
@@ -677,9 +676,7 @@ type SourceContentProps = {
 };
 
 const SourceContent = ({ func }: SourceContentProps) => {
-  const { useBlockValue } = useTreeContext();
-  const blockValue = useBlockValue(func);
-  const source = blockValue?.source;
+  const source = useBlockValue(func)?.source;
   if (!source) {
     return <p>Source code not available</p>;
   }
