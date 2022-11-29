@@ -124,8 +124,9 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     }
   }, [autoselected, calls, traceId]);
 
+  const isMounted = useRef(true);
+
   useEffect(() => {
-    let mounted = true;
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const poll = async () => {
@@ -150,7 +151,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         const { status } = response;
         if (status !== 206) throw new Error(`Unexpected status: ${status}`);
         const text = await response.text();
-        if (!mounted) return;
+        if (!isMounted.current) return;
 
         const end = text.lastIndexOf("\n") + 1;
         traceOffsetRef.current += end;
@@ -165,7 +166,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       } catch (e) {
         console.warn("fetch failed", e);
       } finally {
-        if (mounted) {
+        if (isMounted.current) {
           timeoutId = setTimeout(poll, delay);
         }
       }
@@ -174,7 +175,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     poll();
 
     return () => {
-      mounted = false;
+      isMounted.current = false;
       clearTimeout(timeoutId);
     };
   }, [traceId]);
@@ -218,6 +219,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     const fetchBlock = async (start: number) => {
       const response = await fetch(url, { headers: { Range: `bytes=${start}-999999999` } });
       const text = await response.text();
+      if (!isMounted.current) return;
       const lines = text.split("\n").filter(Boolean);
       if (lines[lines.length - 1] === "end") {
         lines.pop();
