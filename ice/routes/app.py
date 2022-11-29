@@ -4,6 +4,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 from starlette.responses import PlainTextResponse
 
@@ -15,6 +16,13 @@ logger = logging.getLogger(__name__)
 dist_dir = Path(__file__).parent / "ui"
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(traces.router)
 app.mount(
     "/api/traces/", StaticFiles(directory=trace_dir), name="static"
