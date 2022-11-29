@@ -5,6 +5,7 @@ from abc import ABCMeta
 from asyncio import create_task
 from collections.abc import Callable
 from contextvars import ContextVar
+from functools import lru_cache
 from functools import wraps
 from inspect import getdoc
 from inspect import getsource
@@ -190,12 +191,7 @@ def trace(fn):
                 start=monotonic_ns(),
                 name=fn.__name__,
                 arg=get_strings(arg_dict),
-                func=emit_block(
-                    dict(
-                        doc=getdoc(fn),
-                        source=getsource(fn),
-                    )
-                ),
+                func=emit_block(func_info(fn)),
                 args=emit_block(arg_dict),
             )
             self = arg_dict.get("self")
@@ -292,3 +288,11 @@ def get_short_string(string, max_length=35) -> str:
 
 def get_short_list(lst: list, max_length=3) -> list:
     return lst[:max_length] + ["..."] if len(lst) > max_length else lst
+
+
+@lru_cache()
+def func_info(fn):
+    return dict(
+        doc=getdoc(fn),
+        source=getsource(fn),
+    )
