@@ -52,10 +52,11 @@ interface CallInfo {
   start: number;
   name: string;
   cls?: string;
-  block: BlockAddress;
   arg: string;
   shortResult?: string[];
   children?: Record<string, CallInfo>;
+  func: BlockAddress;
+  args: BlockAddress;
   records?: Record<string, BlockAddress>;
   result?: BlockAddress;
   end?: number;
@@ -65,9 +66,8 @@ type Calls = Record<string, CallInfo>;
 
 type Blocks = Record<number, string[]>;
 
-interface CallBlock {
+interface FuncBlock {
   doc: string;
-  args: Record<string, unknown>;
   source?: string;
 }
 
@@ -576,9 +576,9 @@ type DetailPaneContentProps = {
 type Tab = "io" | "src";
 
 const DetailPaneContent = ({ info }: DetailPaneContentProps) => {
-  const { id, block } = info;
+  const { id, func } = info;
   const { useBlockValue } = useTreeContext();
-  const blockValue = useBlockValue(block) as CallBlock | undefined;
+  const blockValue = useBlockValue(func) as FuncBlock | undefined;
   const [tab, setTab] = useState<Tab>("io"); // io for inputs and outputs, src for source
 
   return (
@@ -629,21 +629,21 @@ const TabButton = ({ label, value, tab, setTab }: TabButtonProps) => (
 );
 
 const TabContent = ({ tab, info }: { tab: Tab; info: CallInfo }) => {
-  const { block, records, result } = info;
+  const { func, args, records, result } = info;
 
   return (
     <div className="space-y-4 mt-4">
       {tab === "io" ? (
-        <InputOutputContent block={block} records={records} result={result} />
+        <InputOutputContent args={args} records={records} result={result} />
       ) : (
-        <SourceContent block={block} />
+        <SourceContent func={func} />
       )}
     </div>
   );
 };
 
 type InputOutputContentProps = {
-  block: BlockAddress;
+  args: BlockAddress;
   records?: Record<string, BlockAddress>;
   result?: BlockAddress;
 };
@@ -655,13 +655,13 @@ const excludeMetadata = (source: Record<string, unknown> | undefined) => {
   );
 };
 
-const InputOutputContent = ({ block, records, result }: InputOutputContentProps) => {
+const InputOutputContent = ({ args, records, result }: InputOutputContentProps) => {
   const { useBlockValue } = useTreeContext();
-  const blockValue = useBlockValue(block) as CallBlock | undefined;
+  const argsValue = useBlockValue(args) as Record<string, unknown> | undefined;
   const resultValue = result && useBlockValue(result);
   return (
     <>
-      <Json name="Inputs" value={excludeMetadata(blockValue?.args)} />
+      <Json name="Inputs" value={excludeMetadata(argsValue)} />
       {!isEmpty(records) && (
         <Json
           name="Records"
@@ -676,13 +676,13 @@ const InputOutputContent = ({ block, records, result }: InputOutputContentProps)
 };
 
 type SourceContentProps = {
-  block: BlockAddress;
+  func: BlockAddress;
 };
 
-const SourceContent = ({ block }: SourceContentProps) => {
+const SourceContent = ({ func }: SourceContentProps) => {
   const { useBlockValue } = useTreeContext();
-  const blockValue = useBlockValue(block) as CallBlock | undefined;
-  const source = blockValue?.source;
+  const funcValue = useBlockValue(func) as FuncBlock | undefined;
+  const source = funcValue?.source;
   if (!source) {
     return <p>Source code not available</p>;
   }

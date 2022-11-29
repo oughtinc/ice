@@ -190,13 +190,13 @@ def trace(fn):
                 start=monotonic_ns(),
                 name=fn.__name__,
                 arg=get_strings(arg_dict),
-                block=emit_block(
+                func=emit_block(
                     dict(
                         doc=getdoc(fn),
-                        args=arg_dict,
                         source=getsource(fn),
                     )
                 ),
+                args=emit_block(arg_dict),
             )
             self = arg_dict.get("self")
             if self:
