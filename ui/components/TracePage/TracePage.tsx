@@ -47,7 +47,13 @@ const getContentLength = async (url: string) => {
 
 type BlockAddress = [number, number];
 
-interface CallInfo {
+type InputOutputContentProps = {
+  args: BlockAddress;
+  records?: Record<string, BlockAddress>;
+  result?: BlockAddress;
+};
+
+interface CallInfo extends InputOutputContentProps {
   parent: string;
   start: number;
   name: string;
@@ -56,9 +62,6 @@ interface CallInfo {
   shortResult?: string[];
   children?: Record<string, CallInfo>;
   func: BlockAddress;
-  args: BlockAddress;
-  records?: Record<string, BlockAddress>;
-  result?: BlockAddress;
   end?: number;
 }
 
@@ -642,12 +645,6 @@ const TabContent = ({ tab, info }: { tab: Tab; info: CallInfo }) => {
   );
 };
 
-type InputOutputContentProps = {
-  args: BlockAddress;
-  records?: Record<string, BlockAddress>;
-  result?: BlockAddress;
-};
-
 const excludeMetadata = (source: Record<string, unknown> | undefined) => {
   if (source === undefined) return undefined;
   return Object.fromEntries(
@@ -681,8 +678,8 @@ type SourceContentProps = {
 
 const SourceContent = ({ func }: SourceContentProps) => {
   const { useBlockValue } = useTreeContext();
-  const funcValue = useBlockValue(func) as FuncBlock | undefined;
-  const source = funcValue?.source;
+  const blockValue = useBlockValue(func) as FuncBlock | undefined;
+  const source = blockValue?.source;
   if (!source) {
     return <p>Source code not available</p>;
   }
