@@ -3,8 +3,8 @@ import logging
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 from starlette.responses import PlainTextResponse
 
