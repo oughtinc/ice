@@ -19,7 +19,7 @@ Text that contains the answer:
 
 {texts}
 
-Correct answer to the question: {question}
+Correct answer to the question: {answer}
 
 """.strip()
 
