@@ -25,6 +25,7 @@ from structlog import get_logger
 from ice.server import ensure_server_running
 from ice.settings import OUGHT_ICE_DIR
 from ice.settings import server_url
+from ice.settings import settings
 
 log = get_logger()
 
@@ -58,7 +59,8 @@ class Trace:
         self.block_number = -1  # so that it starts at _open_block below
         self._open_block()
         self._lock = threading.Lock()
-        ensure_server_running()
+        if not settings.OUGHT_ICE_NO_START_SERVER:
+            ensure_server_running()
         print(f"Trace: {server_url()}/traces/{self.id}")
         parent_id_var.set(self.id)
 

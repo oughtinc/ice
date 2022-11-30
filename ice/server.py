@@ -31,7 +31,7 @@ def ensure_server_running():
     if is_server_running():
         return
 
-    print("Starting server...")
+    print("Starting server, set OUGHT_ICE_NO_START_SERVER to disable.")
     subprocess.Popen(
         [sys.executable, "-m", "ice.server", "start"],
         env=os.environ,
