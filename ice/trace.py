@@ -23,6 +23,7 @@ import ulid
 from structlog import get_logger
 
 from ice.server import ensure_server_running
+from ice.server import is_server_running
 from ice.settings import OUGHT_ICE_DIR
 from ice.settings import server_url
 from ice.settings import settings
@@ -59,10 +60,31 @@ class Trace:
         self.block_number = -1  # so that it starts at _open_block below
         self._open_block()
         self._lock = threading.Lock()
+        parent_id_var.set(self.id)
+        print(f"Trace: {self.url}")
+        threading.Thread(target=self._server_and_browser).start()
+
+    @property
+    def url(self) -> str:
+        return f"{server_url()}/traces/{self.id}"
+
+    def _server_and_browser(self):
+        is_running = None
         if not settings.OUGHT_ICE_NO_START_SERVER:
             ensure_server_running()
-        print(f"Trace: {server_url()}/traces/{self.id}")
-        parent_id_var.set(self.id)
+            is_running = True
+
+        if settings.OUGHT_ICE_NO_BROWSER:
+            return
+
+        is_running = is_running or is_server_running()
+        if not is_running:
+            return
+
+        import webbrowser
+
+        print("Opening trace in browser, set OUGHT_ICE_NO_BROWSER=1 to disable.")
+        webbrowser.open(self.url)
 
     def _open(self, name: str) -> IO[str]:
         return open(self.dir / f"{name}.jsonl", "a")
