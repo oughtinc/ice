@@ -38,6 +38,13 @@ traces_dir.mkdir(parents=True, exist_ok=True)
 
 
 class Trace:
+    """
+    Manages storing trace data to disk.
+    All data is stored under self.dir.
+    The primary metadata is stored in self.file, named trace.jsonl.
+    Potentially large values which will be lazily loaded are stored in block_*.jsonl.
+    Each block file is appended to until its size exceeds BLOCK_LENGTH.
+    """
     BLOCK_LENGTH = 1024**2
 
     def __init__(self):
@@ -45,7 +52,7 @@ class Trace:
         self.dir = traces_dir / self.id
         self.dir.mkdir()
         self.file = self._open("trace")
-        self.block_number = -1
+        self.block_number = -1  # so that it starts at _open_block below
         self._open_block()
         self._lock = threading.Lock()
         print(f"Trace: {_url_prefix()}/traces/{self.id}")
@@ -61,6 +68,9 @@ class Trace:
         self.block_lineno = 0
 
     def add_to_block(self, x):
+        """
+        Write the value x to the current block file as a single JSON line.
+        """
         s = json.dumps(x, cls=JSONEncoder) + "\n"
         with self._lock:
             address = [self.block_number, self.block_lineno]
@@ -130,7 +140,7 @@ class JSONEncoder(json.JSONEncoder):
 
     def iterencode(self, o, **kwargs):
         try:
-            return super().iterencode(o)
+            return super().iterencode(o, **kwargs)
         except TypeError:
             return self.default(o)
 
@@ -265,6 +275,10 @@ def get_first_descendant(value):
 
 
 def get_strings(value) -> list[str]:
+    """
+    Represent the given value as a short list of short strings
+    that can be stored directly in the central trace file and loaded eagerly in the UI.
+    """
     if isinstance(value, dict):
         if "value" in value:
             value = value["value"]
