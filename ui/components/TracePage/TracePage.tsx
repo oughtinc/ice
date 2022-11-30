@@ -211,7 +211,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
 
   // Placeholders for this render cycle to avoid fetching the same block multiple times.
   // This gets updated during rendering, which is why we don't use state.
-  const blockRequests: Record<number, []> = {};
+  const blockRequests = useRef<Set<number>>(new Set());
 
   function getBlockValue<T>(blockAddress: BlockAddress<T>): T | undefined {
     const [blockNumber, blockLineno] = blockAddress;
@@ -223,11 +223,11 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       return undefined; // wait for the other lines
     }
 
-    if (blockNumber in blockRequests) {
+    if (blockRequests.current.has(blockNumber)) {
       // This block has already been requested.
       return undefined;
     }
-    blockRequests[blockNumber] = [];
+    blockRequests.current.add(blockNumber);
 
     const url = `${urlPrefix(traceId)}/block_${blockNumber}.jsonl`;
     const fetchBlock = async (start: number) => {
@@ -247,20 +247,13 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       if (lines.length) {
         setBlocks((blocks: Blocks) => ({
           ...blocks,
-          [blockNumber]: [...blocks[blockNumber], ...lines],
+          [blockNumber]: [...(blocks[blockNumber] ?? []), ...lines],
         }));
       }
     };
     fetchBlock(0);
     return undefined;
   }
-
-  useEffect(() => {
-    if (!isEmpty(blockRequests)) {
-      // Store the placeholders in state so that the next render knows that the blocks are being requested.
-      setBlocks((blocks: Blocks) => ({ ...blocks, ...blockRequests }));
-    }
-  });
 
   return (
     <TreeContext.Provider
