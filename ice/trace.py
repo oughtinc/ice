@@ -23,6 +23,7 @@ import ulid
 from structlog import get_logger
 
 from ice.settings import OUGHT_ICE_DIR
+from ice.settings import server_url
 
 log = get_logger()
 
@@ -56,7 +57,7 @@ class Trace:
         self.block_number = -1  # so that it starts at _open_block below
         self._open_block()
         self._lock = threading.Lock()
-        print(f"Trace: {_url_prefix()}/traces/{self.id}")
+        print(f"Trace: {server_url()}/traces/{self.id}")
         parent_id_var.set(self.id)
 
     def _open(self, name: str) -> IO[str]:
@@ -88,11 +89,6 @@ class Trace:
 
 
 trace_var: ContextVar[Optional[Trace]] = ContextVar("trace", default=None)
-
-
-def _url_prefix():
-    # TODO use OUGHT_ICE_HOST/PORT
-    return "http://localhost:8935"
 
 
 def enable_trace():
