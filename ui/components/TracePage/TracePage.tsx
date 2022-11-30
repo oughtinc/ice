@@ -45,34 +45,42 @@ const getContentLength = async (url: string) => {
   return isNaN(length) ? 0 : length;
 };
 
-type BlockAddress<T> = [number, number];
-
+// Detailed values of a function call to show in the sidebar.
 type InputOutputContentProps = {
+  // Call arguments, i.e. inputs
   args: BlockAddress<Record<string, unknown>>;
-  records?: Record<string, BlockAddress<unknown>>;
+  // The full return value
   result?: BlockAddress<unknown>;
+  // Arbitrary optional additional data
+  records?: Record<string, BlockAddress<unknown>>;
 };
 
 interface CallInfo extends InputOutputContentProps {
-  parent: string;
-  start: number;
-  name: string;
-  cls?: string;
-  arg: string;
-  shortResult?: string[];
-  children?: Record<string, CallInfo>;
-  func: BlockAddress<FuncBlock>;
-  end?: number;
+  parent: string;  // outer call ID
+  start: number;   // start time
+  name: string;    // function name
+  cls?: string;    // class name for methods
+  arg: string;     // short representation of args
+  shortResult?: string[];  // short representation of return value
+  children?: Calls;  // nested calls
+  func: BlockAddress<FuncBlock>;  // long info about the function itself
+  end?: number;    // end time
 }
-
-type Calls = Record<string, CallInfo>;
-
-type Blocks = Record<number, string[]>;
 
 interface FuncBlock {
   doc: string;
   source?: string;
 }
+
+type Calls = Record<string, CallInfo>;
+
+// Mapping from block number (identifies the filename) to a list of lines.
+// Each line is a JSON string.
+type Blocks = Record<number, string[]>;
+
+// Describes where to load a value of type T from Blocks.
+// Represents [block number, line number].
+type BlockAddress<T> = [number, number];
 
 const MODEL_CALL_NAMES = [
   "relevance",
@@ -201,6 +209,8 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     return (id: string) => focussedIds.includes(id);
   }, [selectedId, calls, rootId]);
 
+  // Placeholders for this render cycle to avoid fetching the same block multiple times.
+  // This gets updated during rendering, which is why we don't use state.
   const blockRequests: Record<number, []> = {};
 
   function getBlockValue<T>(blockAddress: BlockAddress<T>): T | undefined {
@@ -214,6 +224,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     }
 
     if (blockNumber in blockRequests) {
+      // This block has already been requested.
       return undefined;
     }
     blockRequests[blockNumber] = [];
@@ -222,17 +233,23 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     const fetchBlock = async (start: number) => {
       const response = await fetch(url, { headers: { Range: `bytes=${start}-999999999` } });
       const text = await response.text();
+
       if (!isMounted.current) return;
+
       const lines = text.split("\n").filter(Boolean);
       if (lines[lines.length - 1] === "end") {
         lines.pop();
       } else {
+        // This block is incomplete, schedule polling for the rest.
         setTimeout(() => fetchBlock(start + text.length), 1_000);
       }
-      setBlocks((blocks: Blocks) => ({
-        ...blocks,
-        [blockNumber]: [...blocks[blockNumber], ...lines],
-      }));
+
+      if (lines.length) {
+        setBlocks((blocks: Blocks) => ({
+          ...blocks,
+          [blockNumber]: [...blocks[blockNumber], ...lines],
+        }));
+      }
     };
     fetchBlock(0);
     return undefined;
@@ -240,6 +257,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
 
   useEffect(() => {
     if (!isEmpty(blockRequests)) {
+      // Store the placeholders in state so that the next render knows that the blocks are being requested.
       setBlocks((blocks: Blocks) => ({ ...blocks, ...blockRequests }));
     }
   });
