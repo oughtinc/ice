@@ -56,15 +56,15 @@ type InputOutputContentProps = {
 };
 
 interface CallInfo extends InputOutputContentProps {
-  parent: string;  // outer call ID
-  start: number;   // start time
-  name: string;    // function name
-  cls?: string;    // class name for methods
-  arg: string;     // short representation of args
-  shortResult?: string[];  // short representation of return value
-  children?: Calls;  // nested calls
-  func: BlockAddress<FuncBlock>;  // long info about the function itself
-  end?: number;    // end time
+  parent: string; // outer call ID
+  start: number; // start time
+  name: string; // function name
+  cls?: string; // class name for methods
+  arg: string; // short representation of args
+  shortResult?: string[]; // short representation of return value
+  children?: Calls; // nested calls
+  func: BlockAddress<FuncBlock>; // long info about the function itself
+  end?: number; // end time
 }
 
 interface FuncBlock {

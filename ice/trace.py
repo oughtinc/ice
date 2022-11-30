@@ -45,6 +45,7 @@ class Trace:
     Potentially large values which will be lazily loaded are stored in block_*.jsonl.
     Each block file is appended to until its size exceeds BLOCK_LENGTH.
     """
+
     BLOCK_LENGTH = 1024**2
 
     def __init__(self):
