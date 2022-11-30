@@ -280,18 +280,20 @@ def get_strings(value) -> list[str]:
     Represent the given value as a short list of short strings
     that can be stored directly in the central trace file and loaded eagerly in the UI.
     """
+    if isinstance(value, dict) and "value" in value:
+        value = value["value"]
+
     if isinstance(value, dict):
-        if "value" in value:
-            value = value["value"]
-        else:
-            value = {k: v for k, v in value.items() if k not in ("self", "record")}
+        value = {k: v for k, v in value.items() if k not in ("self", "record")}
 
     result = get_first_descendant(value)
 
     if isinstance(result, tuple):
         result = list(result)
     if not (result and isinstance(result, list)):
-        result = [f"{result or '()'}"]
+        if result in (None, (), "", [], {}):
+            result = '()'
+        result = [str(result)]
 
     result = get_short_list(result)
     result = [get_short_string(v) for v in result]
