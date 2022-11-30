@@ -70,7 +70,6 @@ class Trace:
             self._open_block()
         else:
             self.block_file.flush()
-            os.fsync(self.block_file.fileno())
             self.block_lineno += 1
         return address
 
