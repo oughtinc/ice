@@ -292,7 +292,7 @@ def get_strings(value) -> list[str]:
         result = list(result)
     if not (result and isinstance(result, list)):
         if result in (None, (), "", [], {}):
-            result = '()'
+            result = "()"
         result = [str(result)]
 
     result = get_short_list(result)

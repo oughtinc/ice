@@ -1,5 +1,6 @@
-from ice import trace
 import pytest
+
+from ice import trace
 
 
 @pytest.mark.anyio
@@ -16,7 +17,9 @@ async def test_trace_blocks():
     assert trace.emit_block("baz") == [1, 0]
     assert trace.emit_block("quux") == [1, 1]
 
-    assert (current_trace.dir / "block_0.jsonl").read_text() == f'"foo"\n"bar"\n"{long}"\nend'
+    assert (
+        current_trace.dir / "block_0.jsonl"
+    ).read_text() == f'"foo"\n"bar"\n"{long}"\nend'
 
 
 def test_get_strings():
@@ -62,15 +65,12 @@ def test_get_strings():
         "b"
     ]
     assert trace.get_strings({"self": "foo", "record": "bar"}) == ["()"]
-    assert (
-        trace.get_strings(
-            {
-                "x": "y",
-                "value": {"self": "foo", "record": "bar", "a": "b", "c": "d"},
-            }
-        )
-        == ["b"]
-    )
+    assert trace.get_strings(
+        {
+            "x": "y",
+            "value": {"self": "foo", "record": "bar", "a": "b", "c": "d"},
+        }
+    ) == ["b"]
 
     # Non-strings are filtered out
     assert trace.get_strings(["a", "b", 3, None, "c"]) == ["a", "b", "c"]
