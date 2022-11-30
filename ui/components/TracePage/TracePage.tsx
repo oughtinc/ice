@@ -652,7 +652,7 @@ const TabContent = ({ tab, info }: { tab: Tab; info: CallInfo }) => {
       {tab === "io" ? (
         <InputOutputContent args={args} records={records} result={result} />
       ) : (
-        <SourceContent func={func} />
+        <SourceContent source={useBlockValue(func)?.source} />
       )}
     </div>
   );
@@ -683,11 +683,10 @@ const InputOutputContent = ({ args, records, result }: InputOutputContentProps) 
 };
 
 type SourceContentProps = {
-  func: BlockAddress<FuncBlock>;
+  source: string | undefined;
 };
 
-const SourceContent = ({ func }: SourceContentProps) => {
-  const source = useBlockValue(func)?.source;
+const SourceContent = ({ source }: SourceContentProps) => {
   if (!source) {
     return <p>Source code not available</p>;
   }
