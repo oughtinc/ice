@@ -1,11 +1,45 @@
+import os
 import sys
+import time
+import subprocess
 
 import httpx
-import uvicorn
 
-from ice.routes.app import is_server_running
 from ice.settings import server_url
 from ice.settings import settings
+
+
+def is_server_running():
+    from ice.routes.app import PING_RESPONSE
+
+    try:
+        response = httpx.get(server_url() + "/ping")
+        return response.text == PING_RESPONSE
+    except httpx.HTTPError:
+        return False
+
+
+def wait_until_server_running():
+    start_time = time.time()
+    while not is_server_running():
+        if time.time() - start_time > 10:
+            raise TimeoutError("Server didn't start within 5 seconds")
+        time.sleep(0.1)
+
+
+def ensure_server_running():
+    if is_server_running():
+        return
+
+    print("Starting server...")
+    subprocess.Popen(
+        [sys.executable, "-m", "ice.server", "start"],
+        env=os.environ,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    wait_until_server_running()
+    print("Server started!")
 
 
 def stop():
@@ -30,6 +64,8 @@ def stop():
 
 
 def start():
+    import uvicorn
+
     params_by_name = {p.name: p for p in uvicorn.main.params}
     params_by_name["app"].default = "ice.routes.app:app"
     params_by_name["host"].default = settings.OUGHT_ICE_HOST
