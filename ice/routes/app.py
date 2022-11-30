@@ -5,6 +5,7 @@ import signal
 from pathlib import Path
 
 import httpx
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
@@ -33,6 +34,7 @@ except RuntimeError:
 
 
 PING_RESPONSE = "ought-ice says pong"
+
 
 @app.get("/ping")
 async def ping():

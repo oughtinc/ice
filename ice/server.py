@@ -10,7 +10,9 @@ from ice.settings import settings
 
 def stop():
     if not is_server_running():
-        print(f"Server at {server_url()} is not running, maybe set OUGHT_ICE_HOST/PORT?")
+        print(
+            f"Server at {server_url()} is not running, maybe set OUGHT_ICE_HOST/PORT?"
+        )
         sys.exit(0)
 
     url = server_url() + "/stop"
@@ -39,7 +41,9 @@ def start():
 def main():
     if sys.argv[1:2] == ["stop"]:
         if sys.argv[2:]:
-            print("The stop command takes no arguments, but you can set OUGHT_ICE_HOST/PORT environment variables.")
+            print(
+                "The stop command takes no arguments, but you can set OUGHT_ICE_HOST/PORT environment variables."
+            )
             sys.exit(1)
         stop()
         sys.exit(0)
