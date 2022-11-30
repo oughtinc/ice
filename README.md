@@ -44,14 +44,6 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
 
 1. Set required secrets in `~/.ought-ice/.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format.
 
-1. Install the UI Node dependencies and build the UI:
-
-   ```shell
-   cd ui
-   npm install .
-   npm run build
-   ```
-
 1. Start ICE in its own terminal and leave it running:
 
    ```shell
@@ -69,6 +61,9 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
    source venv/bin/activate
    pip install --upgrade pip
    pip install -e . --config-settings editable_mode=compat
+   cd ui
+   npm install .
+   npm run dev
    ```
 
 ## Terminology
