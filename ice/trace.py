@@ -1,5 +1,5 @@
 import json
-import os
+import threading
 
 from abc import ABCMeta
 from asyncio import create_task
@@ -47,6 +47,7 @@ class Trace:
         self.file = self._open("trace")
         self.block_number = -1
         self._open_block()
+        self._lock = threading.Lock()
         print(f"Trace: {_url_prefix()}/traces/{self.id}")
         parent_id_var.set(self.id)
 
@@ -60,17 +61,18 @@ class Trace:
         self.block_lineno = 0
 
     def add_to_block(self, x):
-        address = [self.block_number, self.block_lineno]
         s = json.dumps(x, cls=JSONEncoder) + "\n"
-        self.block_file.write(s)
-        self.block_length += len(s)
-        if self.block_length > self.BLOCK_LENGTH:
-            self.block_file.write("end")
-            self.block_file.close()
-            self._open_block()
-        else:
-            self.block_file.flush()
-            self.block_lineno += 1
+        with self._lock:
+            address = [self.block_number, self.block_lineno]
+            self.block_file.write(s)
+            self.block_length += len(s)
+            if self.block_length > self.BLOCK_LENGTH:
+                self.block_file.write("end")
+                self.block_file.close()
+                self._open_block()
+            else:
+                self.block_file.flush()
+                self.block_lineno += 1
         return address
 
 
