@@ -20,8 +20,8 @@ class Settings(BaseSettings):
     GS_QUOTE_FOUND_THRESHOLD: float = 0.75
     OUGHT_ICE_HOST: str = "0.0.0.0"
     OUGHT_ICE_PORT: int = 8935
-    OUGHT_ICE_NO_START_SERVER: bool = False
-    OUGHT_ICE_NO_BROWSER: bool = False
+    OUGHT_ICE_AUTO_SERVER: bool = True
+    OUGHT_ICE_AUTO_BROWSER: bool = True
 
 
 OUGHT_ICE_DIR = Path(environ.get("OUGHT_ICE_DIR", Path.home() / ".ought-ice"))

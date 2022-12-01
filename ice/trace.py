@@ -70,11 +70,11 @@ class Trace:
 
     def _server_and_browser(self):
         is_running = None
-        if not settings.OUGHT_ICE_NO_START_SERVER:
+        if settings.OUGHT_ICE_AUTO_SERVER:
             ensure_server_running()
             is_running = True
 
-        if settings.OUGHT_ICE_NO_BROWSER:
+        if not settings.OUGHT_ICE_AUTO_BROWSER:
             return
 
         is_running = is_running or is_server_running()
@@ -83,7 +83,7 @@ class Trace:
 
         import webbrowser
 
-        log.info("Opening trace in browser, set OUGHT_ICE_NO_BROWSER=1 to disable.")
+        log.info("Opening trace in browser, set OUGHT_ICE_AUTO_BROWSER=0 to disable.")
         webbrowser.open(self.url)
 
     def _open(self, name: str) -> IO[str]:
