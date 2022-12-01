@@ -307,6 +307,9 @@ def _get_first_descendant(value):
             if isinstance(value[0], str):
                 return [v for v in value if isinstance(v, str)]
             return _get_first_descendant(value[0])
+        if hasattr(value, "dict") and callable(value.dict):
+            value = compress(value.dict())
+            return _get_first_descendant(value)
     return value
 
 
