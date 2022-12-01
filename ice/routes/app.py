@@ -8,7 +8,7 @@ from starlette.responses import FileResponse
 from starlette.responses import PlainTextResponse
 
 from ice.routes import traces
-from ice.trace import trace_dir
+from ice.trace import traces_dir
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ dist_dir = Path(__file__).parent / "ui"
 app = FastAPI()
 app.include_router(traces.router)
 app.mount(
-    "/api/traces/", StaticFiles(directory=trace_dir), name="static"
+    "/api/traces/", StaticFiles(directory=traces_dir), name="static"
 )  # see comment on get_trace
 
 try:
