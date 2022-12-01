@@ -1,18 +1,40 @@
+from collections.abc import Iterator
 from collections.abc import Sequence
 from functools import cache
+from functools import cached_property
+from pathlib import Path
+from typing import Any
+from typing import ClassVar
+from typing import Generic
+from typing import Literal
+from typing import overload
+from typing import Type
+from typing import TypeVar
 
 import pandas as pd
 
 from pydantic import BaseModel
+from pydantic.generics import GenericModel
 from structlog.stdlib import get_logger
+from yaml import CLoader as Loader
+from yaml import load
 
+from ice.paper import Paper
 from ice.settings import settings
 
 log = get_logger()
 
 
-# TODO: merge with RecipeResult
-class GoldStandard(BaseModel):
+class ParsedGoldStandardBase(BaseModel):
+    question_short_name: ClassVar[str]
+
+
+ParsedGoldStandardType = TypeVar("ParsedGoldStandardType", bound=ParsedGoldStandardBase)
+
+GoldStandardSplit = Literal["test", "validation", "iterate"]
+
+
+class GoldStandard(GenericModel, Generic[ParsedGoldStandardType]):
     document_id: str
     question_short_name: str
     experiment: str
@@ -20,6 +42,26 @@ class GoldStandard(BaseModel):
     classifications: Sequence[str | None] = []
     quotes: list[str]
     split: str | None = None
+    answer_model: Type[ParsedGoldStandardType] | None = None
+
+    @cached_property
+    def parsed_answer(self) -> ParsedGoldStandardType | None:
+        return (
+            _parse_answer(self.answer, self.answer_model)
+            if self.answer_model is not None
+            else None
+        )
+
+    class Config:
+        keep_untouched = (cached_property,)
+        fields = dict(answer_model=dict(exclude=True))
+
+
+def _parse_answer(
+    _answer: str, model: Type[ParsedGoldStandardType]
+) -> ParsedGoldStandardType:
+    data = load(_answer, Loader=Loader)
+    return model.parse_obj(data)
 
 
 @cache
@@ -60,8 +102,13 @@ def add_classifications_column(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def standards_df_to_gold_standards(df: pd.DataFrame) -> list[GoldStandard]:
-    return [GoldStandard.parse_obj(record) for record in df.to_dict("records")]
+def _standards_df_to_gold_standards(
+    df: pd.DataFrame, answer_model: Type[ParsedGoldStandardType] | None
+) -> list[GoldStandard[ParsedGoldStandardType]]:
+    return [
+        GoldStandard.parse_obj(record | dict(answer_model=answer_model))
+        for record in df.to_dict("records")
+    ]
 
 
 def list_experiments(
@@ -91,12 +138,73 @@ def select_column_values(
     return df.loc[mask]
 
 
+_paper_dir = Path("/code/papers/")
+
+
+def load_paper(document_id: str) -> Paper:
+    return Paper.load(Path(_paper_dir, document_id))
+
+
+def load_papers(split: str, question_short_name: str):
+    doc_ids = {
+        gs.document_id
+        for gs in get_gold_standards(question_short_name=question_short_name)
+        if gs.split == split
+    }
+    return [load_paper(doc_id) for doc_id in doc_ids]
+
+
+def generate_papers_and_golds(
+    split: str,
+    gold_standard_type: Type[ParsedGoldStandardType],
+) -> Iterator[tuple[Paper, GoldStandard[ParsedGoldStandardType]]]:
+    papers = load_papers(split, gold_standard_type.question_short_name)
+
+    for paper in papers:
+        gold = get_gold_standard(
+            document_id=paper.document_id,
+            question_short_name=gold_standard_type.question_short_name,
+            model_type=gold_standard_type,
+        )
+        if not gold:
+            log.warning(
+                "Did not find gold standard",
+                document_id=paper.document_id,
+                question_short_name=gold_standard_type.question_short_name,
+            )
+            continue
+        yield paper, gold
+
+
+@overload
 def get_gold_standards(
     *,
     document_id: str | None = None,
     question_short_name: str | None = None,
     experiment: str | None = None,
-) -> list[GoldStandard]:
+    model_type: None = None,
+) -> list[GoldStandard[Any]]:
+    ...
+
+
+@overload
+def get_gold_standards(
+    *,
+    model_type: Type[ParsedGoldStandardType],
+    document_id: str | None = None,
+    question_short_name: str | None = None,
+    experiment: str | None = None,
+) -> list[GoldStandard[ParsedGoldStandardType]]:
+    ...
+
+
+def get_gold_standards(
+    *,
+    document_id: str | None = None,
+    question_short_name: str | None = None,
+    experiment: str | None = None,
+    model_type: Type[ParsedGoldStandardType] | None = None,
+) -> list[GoldStandard[ParsedGoldStandardType]]:
     df = retrieve_gold_standards_df()
 
     filters = dict(
@@ -107,7 +215,29 @@ def get_gold_standards(
 
     df = select_column_values(df, filters)
 
-    return standards_df_to_gold_standards(df)
+    return _standards_df_to_gold_standards(df, model_type)
+
+
+@overload
+def get_gold_standard(
+    *,
+    document_id: str | None = None,
+    question_short_name: str | None = None,
+    experiment: str | None = None,
+    model_type: None = None,
+) -> GoldStandard[Any] | None:
+    ...
+
+
+@overload
+def get_gold_standard(
+    *,
+    model_type: Type[ParsedGoldStandardType],
+    document_id: str | None = None,
+    question_short_name: str | None = None,
+    experiment: str | None = None,
+) -> GoldStandard[ParsedGoldStandardType] | None:
+    ...
 
 
 def get_gold_standard(
@@ -115,11 +245,13 @@ def get_gold_standard(
     document_id: str | None = None,
     question_short_name: str | None = None,
     experiment: str | None = None,
-) -> GoldStandard | None:
+    model_type: Type[ParsedGoldStandardType] | None = None,
+) -> GoldStandard[ParsedGoldStandardType] | None:
     gold_standards = get_gold_standards(
         document_id=document_id,
         question_short_name=question_short_name,
         experiment=experiment,
+        model_type=model_type,
     )
 
     if len(gold_standards) == 0:

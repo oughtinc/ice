@@ -33,7 +33,9 @@ async def _single_nubia(sample: Sample) -> list[NubiaResponse]:
 
     samples = list(product(sample.left, sample.right))
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(
+        timeout=httpx.Timeout(connect=20, read=20, write=10, pool=30)
+    ) as client:
         client.headers["x-api-key"] = settings.OUGHT_INFERENCE_API_KEY
 
         async def single_response(inputs: tuple[str, str]) -> NubiaResponse:

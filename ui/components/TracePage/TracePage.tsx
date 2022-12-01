@@ -1,7 +1,7 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isEmpty, last, set } from "lodash";
+import { isEmpty, last, set, sumBy } from "lodash";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
   createContext,
@@ -63,6 +63,7 @@ interface CallInfo extends InputOutputContentProps {
   shortArgs: string; // short representation of args
   shortResult?: string[]; // short representation of return value
   children?: Calls; // nested calls
+  fields?: Record<string, string>; // short arbitrary fields associated with the call
   func: BlockAddress<FuncBlock>; // long info about the function itself
   end?: number; // end time
 }
@@ -149,7 +150,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         if (offset >= contentLength) return;
 
         const initialOffset = 1e6;
-        const subsequentOffset = 1e7;
+        const subsequentOffset = 1e9;
         const limit = Math.min(
           offset + (offset === 0 ? initialOffset : subsequentOffset),
           contentLength,
@@ -305,6 +306,17 @@ const useCallInfo = (id: string) => {
   };
 };
 
+const useTotalTokens = (id: string): number => {
+  const children = useLinks()["getChildren"](id);
+  const { fields = {} } = useCallInfo(id);
+  return (Number(fields.davinci_equivalent_tokens) || 0) + sumBy(children, useTotalTokens);
+};
+
+const useCostEstimate = (id: string): number => {
+  const COST_USD_PER_DAVINCI_TOKEN = 0.02 / 1000;
+  return useTotalTokens(id) * COST_USD_PER_DAVINCI_TOKEN;
+};
+
 interface SelectedCallInfo extends CallInfo {
   id: string;
 }
@@ -349,7 +361,9 @@ const isModelCall = ({ cls, name }: CallInfo) =>
 
 const getFormattedName = (snakeCasedName: string) => {
   const spacedName = snakeCasedName.replace(/_/g, " ");
-  const capitalizedAndSpacedName = spacedName[0].toUpperCase() + spacedName.slice(1);
+  const capitalizedAndSpacedName = spacedName
+    ? spacedName[0].toUpperCase() + spacedName.slice(1)
+    : snakeCasedName;
   return capitalizedAndSpacedName;
 };
 
@@ -380,6 +394,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
   const { getParent } = useLinks();
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
+  const cost = useCostEstimate(id);
 
   const modelCall = isModelCall(callInfo);
   const isSiblingWithSelected = selectedId && getParent(id) === getParent(selectedId);
@@ -460,6 +475,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
                 <ResultComponent value={shortResult} />
               )}
             </div>
+            {`\$${Math.round(cost * 100) / 100}`}
           </div>
         </Button>
       </div>
@@ -742,6 +758,7 @@ const stripIndent = (source: string): string => {
 const Trace = ({ traceId }: { traceId: string }) => {
   const { selectedId, rootId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
+  // const params = useParams()
 
   const maybeSetSelectedId = useCallback(
     (update: (id: string) => string | undefined) => {
@@ -855,6 +872,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
           <DetailPane />
         </div>
       </div>
+      {/* {Object.keys(params)} */}
     </div>
   );
 };

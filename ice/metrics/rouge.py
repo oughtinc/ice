@@ -1,7 +1,11 @@
+from collections.abc import Mapping
+from collections.abc import Sequence
+
 from anyio.to_thread import run_sync
 from pydantic import BaseModel
 from rouge_metric import PyRouge
 
+from ice.cache import diskcache
 from ice.metrics.base import Metric
 from ice.metrics.base import Sample
 
@@ -54,3 +58,26 @@ class Rouge(Metric):
             return RougeResult.parse_obj(result_dict)
 
         return [await (_compute_single(s)) for s in sample]
+
+
+@diskcache()
+async def rouge_texts(
+    hypotheses: Sequence[str], references: Sequence[str]
+) -> Mapping[str, RougeResult]:
+    assert hypotheses, "hypotheses cannot be empty"
+    assert references, "references cannot be empty"
+    scores = await Rouge().compute(
+        [Sample(left=[hyp], right=references) for hyp in hypotheses]
+    )
+    return {hyp: score for hyp, score in zip(hypotheses, scores)}
+
+
+async def matches(
+    hypotheses: Sequence[str], references: Sequence[str], lcs_threshold: float = 0.7
+):
+    rouge_scores = await rouge_texts(hypotheses=hypotheses, references=references)
+    return {
+        hyp: scores
+        for hyp, scores in rouge_scores.items()
+        if scores.rouge_l.r >= lcs_threshold
+    }

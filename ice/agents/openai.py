@@ -123,13 +123,17 @@ class OpenAIAgent(Agent):
 
         abs_probs = {choice: lookup_prob(choice) for choice in choices}
         Z = sum(abs_probs.values())
-        if Z < 0.8:
+        if Z < 0.6:
             log.warning(f"{1-Z} of unaccounted probability in classify")
             log.warning(choice_prefix)
             log.warning(str(prediction))
             log.warning(str(abs_probs))
 
-        rel_probs = {choice: prob / Z for (choice, prob) in abs_probs.items()}
+        rel_probs = (
+            {choice: prob / Z for (choice, prob) in abs_probs.items()}
+            if Z != 0.0
+            else abs_probs
+        )
         return rel_probs
 
     def _print_markdown(self, obj: Any):
