@@ -60,7 +60,9 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
    python3.10 -m venv venv
    source venv/bin/activate
    pip install --upgrade pip
-   pip install -e . --config-settings editable_mode=compat
+   pip install -e '.[dev]' --config-settings editable_mode=compat
+   npm --prefix ui ci
+   npm --prefix ui run dev
    ```
 
 ## Terminology
