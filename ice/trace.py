@@ -264,18 +264,8 @@ class TracedABC(metaclass=TracedABCMeta):
     ...
 
 
-def get_first_descendant(value):
-    if value:
-        if isinstance(value, dict):
-            first, *_ = value.values()
-            return get_first_descendant(first)
-        if isinstance(value, (list, tuple)):
-            if isinstance(value[0], str):
-                return [v for v in value if isinstance(v, str)]
-            return get_first_descendant(value[0])
-    return value
-
-
+# TODO this and the functions it calls needs to be replaced with a better system
+#   for summarising args and return values
 def get_strings(value) -> list[str]:
     """
     Represent the given value as a short list of short strings
@@ -287,7 +277,7 @@ def get_strings(value) -> list[str]:
     if isinstance(value, dict):
         value = {k: v for k, v in value.items() if k not in ("self", "record")}
 
-    result = get_first_descendant(value)
+    result = _get_first_descendant(value)
 
     if isinstance(result, tuple):
         result = list(result)
@@ -296,17 +286,29 @@ def get_strings(value) -> list[str]:
             result = "()"
         result = [str(result)]
 
-    result = get_short_list(result)
-    result = [get_short_string(v) for v in result]
+    result = _get_short_list(result)
+    result = [_get_short_string(v) for v in result]
     return result
 
 
-def get_short_string(string, max_length=35) -> str:
+def _get_short_string(string, max_length=35) -> str:
     return string[:max_length].strip() + "..." if len(string) > max_length else string
 
 
-def get_short_list(lst: list, max_length=3) -> list:
+def _get_short_list(lst: list, max_length=3) -> list:
     return lst[:max_length] + ["..."] if len(lst) > max_length else lst
+
+
+def _get_first_descendant(value):
+    if value:
+        if isinstance(value, dict):
+            first, *_ = value.values()
+            return _get_first_descendant(first)
+        if isinstance(value, (list, tuple)):
+            if isinstance(value[0], str):
+                return [v for v in value if isinstance(v, str)]
+            return _get_first_descendant(value[0])
+    return value
 
 
 @lru_cache()
