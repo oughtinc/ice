@@ -23,7 +23,7 @@ def wait_until_server_running():
     start_time = time.time()
     while not is_server_running():
         if time.time() - start_time > 10:
-            raise TimeoutError("Server didn't start within 5 seconds")
+            raise TimeoutError("Server didn't start within 10 seconds")
         time.sleep(0.1)
 
 
