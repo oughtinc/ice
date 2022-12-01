@@ -35,7 +35,7 @@ def make_id() -> str:
     return ulid.new().str
 
 
-parent_id_var: ContextVar[str] = ContextVar("id")
+parent_id_var: ContextVar[str] = ContextVar("id", default="")
 
 traces_dir = OUGHT_ICE_DIR / "traces"
 traces_dir.mkdir(parents=True, exist_ok=True)
@@ -95,17 +95,17 @@ class Trace:
         self.block_length = 0
         self.block_lineno = 0
 
-    def add_to_block(self, x):
+    def add_to_block(self, x) -> tuple[int, int]:
         """
         Write the value x to the current block file as a single JSON line.
         """
         s = json.dumps(x, cls=JSONEncoder) + "\n"
         with self._lock:
-            address = [self.block_number, self.block_lineno]
+            address = (self.block_number, self.block_lineno)
             self.block_file.write(s)
             self.block_length += len(s)
             if self.block_length > self.BLOCK_LENGTH:
-                self.block_file.write("end")
+                self.block_file.write("end\n")
                 self.block_file.close()
                 self._open_block()
             else:
@@ -114,26 +114,27 @@ class Trace:
         return address
 
 
-trace_var: ContextVar[Optional[Trace]] = ContextVar("trace", default=None)
+current_trace: Optional[Trace] = None
 
 
 def enable_trace():
-    trace_var.set(Trace())
+    global current_trace
+    current_trace = Trace()
 
 
 def trace_enabled():
-    return trace_var.get() is not None
+    return current_trace is not None
 
 
 def emit(value):
-    if trc := trace_var.get():
-        json.dump(value, trc.file, cls=JSONEncoder)
-        print(file=trc.file, flush=True)
+    if current_trace:
+        json.dump(value, current_trace.file, cls=JSONEncoder)
+        print(file=current_trace.file, flush=True)
 
 
-def emit_block(x):
-    if trc := trace_var.get():
-        return trc.add_to_block(x)
+def emit_block(x) -> tuple[int, int]:
+    if current_trace:
+        return current_trace.add_to_block(x)
     else:
         return 0, 0
 
@@ -224,7 +225,7 @@ def trace(fn):
                 parent=parent_id,
                 start=monotonic_ns(),
                 name=fn.__name__,
-                arg=get_strings(arg_dict),
+                shortArgs=get_strings(arg_dict),
                 func=emit_block(func_info(fn)),
                 args=emit_block(arg_dict),
             )
@@ -285,18 +286,8 @@ class TracedABC(metaclass=TracedABCMeta):
     ...
 
 
-def get_first_descendant(value):
-    if value:
-        if isinstance(value, dict):
-            first, *_ = value.values()
-            return get_first_descendant(first)
-        if isinstance(value, (list, tuple)):
-            if isinstance(value[0], str):
-                return [v for v in value if isinstance(v, str)]
-            return get_first_descendant(value[0])
-    return value
-
-
+# TODO this and the functions it calls needs to be replaced with a better system
+#   for summarising args and return values
 def get_strings(value) -> list[str]:
     """
     Represent the given value as a short list of short strings
@@ -308,7 +299,7 @@ def get_strings(value) -> list[str]:
     if isinstance(value, dict):
         value = {k: v for k, v in value.items() if k not in ("self", "record")}
 
-    result = get_first_descendant(value)
+    result = _get_first_descendant(value)
 
     if isinstance(result, tuple):
         result = list(result)
@@ -317,17 +308,29 @@ def get_strings(value) -> list[str]:
             result = "()"
         result = [str(result)]
 
-    result = get_short_list(result)
-    result = [get_short_string(v) for v in result]
+    result = _get_short_list(result)
+    result = [_get_short_string(v) for v in result]
     return result
 
 
-def get_short_string(string, max_length=35) -> str:
+def _get_short_string(string, max_length=35) -> str:
     return string[:max_length].strip() + "..." if len(string) > max_length else string
 
 
-def get_short_list(lst: list, max_length=3) -> list:
+def _get_short_list(lst: list, max_length=3) -> list:
     return lst[:max_length] + ["..."] if len(lst) > max_length else lst
+
+
+def _get_first_descendant(value):
+    if value:
+        if isinstance(value, dict):
+            first, *_ = value.values()
+            return _get_first_descendant(first)
+        if isinstance(value, (list, tuple)):
+            if isinstance(value[0], str):
+                return [v for v in value if isinstance(v, str)]
+            return _get_first_descendant(value[0])
+    return value
 
 
 @lru_cache()
