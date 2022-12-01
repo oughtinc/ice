@@ -31,7 +31,7 @@ def make_id() -> str:
     return ulid.new().str
 
 
-parent_id_var: ContextVar[str] = ContextVar("id", default="")
+parent_id_var: ContextVar[str] = ContextVar("id")
 
 traces_dir = OUGHT_ICE_DIR / "traces"
 traces_dir.mkdir(parents=True, exist_ok=True)
@@ -87,7 +87,7 @@ class Trace:
         return address
 
 
-current_trace: Optional[Trace] = None
+trace_var: ContextVar[Optional[Trace]] = ContextVar("trace", default=None)
 
 
 def _url_prefix():
@@ -96,23 +96,22 @@ def _url_prefix():
 
 
 def enable_trace():
-    global current_trace
-    current_trace = Trace()
+    trace_var.set(Trace())
 
 
 def trace_enabled():
-    return current_trace is not None
+    return trace_var.get() is not None
 
 
 def emit(value):
-    if current_trace:
-        json.dump(value, current_trace.file, cls=JSONEncoder)
-        print(file=current_trace.file, flush=True)
+    if trc := trace_var.get():
+        json.dump(value, trc.file, cls=JSONEncoder)
+        print(file=trc.file, flush=True)
 
 
 def emit_block(x) -> tuple[int, int]:
-    if current_trace:
-        return current_trace.add_to_block(x)
+    if trc := trace_var.get():
+        return trc.add_to_block(x)
     else:
         return 0, 0
 
