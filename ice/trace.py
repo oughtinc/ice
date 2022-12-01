@@ -68,13 +68,13 @@ class Trace:
         self.block_length = 0
         self.block_lineno = 0
 
-    def add_to_block(self, x):
+    def add_to_block(self, x) -> tuple[int, int]:
         """
         Write the value x to the current block file as a single JSON line.
         """
         s = json.dumps(x, cls=JSONEncoder) + "\n"
         with self._lock:
-            address = [self.block_number, self.block_lineno]
+            address = (self.block_number, self.block_lineno)
             self.block_file.write(s)
             self.block_length += len(s)
             if self.block_length > self.BLOCK_LENGTH:
@@ -110,7 +110,7 @@ def emit(value):
         print(file=current_trace.file, flush=True)
 
 
-def emit_block(x):
+def emit_block(x) -> tuple[int, int]:
     if current_trace:
         return current_trace.add_to_block(x)
     else:
