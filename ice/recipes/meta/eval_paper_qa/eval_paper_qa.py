@@ -20,6 +20,7 @@ from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 from ice.recipes.meta.eval_paper_qa.types import PaperQaMethod
 from ice.recipes.meta.eval_paper_qa.types import SequenceGenerationEvaluation
 from ice.recipes.meta.eval_text_classification import BinaryClassificationMetrics
+from ice.settings import OUGHT_ICE_DIR
 from ice.trace import trace
 from ice.utils import map_async
 
@@ -122,8 +123,8 @@ class PaperQaEvalConfig(BaseModel):
     args: _PaperQaArgs
 
 
-def ensure_dir(path: str) -> str:
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
+def ensure_dir(path: Path) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
     return path
 
 
@@ -146,10 +147,10 @@ async def run_from_config(config: PaperQaEvalConfig) -> dict:
         generation_f1_score=f1,
     )
     if config.results_json:
-        with open(ensure_dir(config.results_json), "w") as r:
+        with ensure_dir(OUGHT_ICE_DIR / config.results_json).open("w") as r:
             r.writelines([json.dumps(results_line, indent=2, sort_keys=True)])
     if config.pr_curve:
-        agg_metrics.save_pr_curve(config.pr_curve)
+        agg_metrics.save_pr_curve(OUGHT_ICE_DIR / config.pr_curve)
     return results_line
 
 

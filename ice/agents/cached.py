@@ -1,6 +1,6 @@
 from ice.agents.base import Agent
 from ice.agents.base import Stop
-from ice.settings import settings
+from ice.settings import CACHE_DIR
 from ice.sqlite_shelf import SQLiteShelf
 
 
@@ -12,7 +12,7 @@ class CachedAgent(Agent):
     cache: SQLiteShelf
 
     def __init__(self, base_agent: Agent, cache_name: str = "cached_agent"):
-        cache_file = (settings.CACHE_DIR / "cached_agent.sqlite").as_posix()
+        cache_file = (CACHE_DIR / "cached_agent.sqlite").as_posix()
         self.cache = SQLiteShelf(cache_file, cache_name)
         self.base_agent = base_agent
 

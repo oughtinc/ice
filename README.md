@@ -21,21 +21,47 @@ ICE is a Python library and trace visualizer for language model programs.
 
 :warning: **The ICE API may change at any point.** The ICE interface is being actively developed and we may change the API at any point, including removing functionality, renaming methods, splitting ICE into multiple projects, and other similarly disruptive changes. Use at your own risk.
 
+## Requirements
+
+ICE requires Python 3.10. If you only have newer or older version(s) of Python installed, we recommend using [pyenv](https://github.com/pyenv/pyenv) to install Python 3.10 and manage multiple Python versions.
+
+If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
+
 ## Getting started
 
-1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+1. As part of general good Python practice, consider first creating and activating a [virtual environment](https://docs.python.org/3/library/venv.html) to avoid installing ICE 'globally'. For example:
 
-1. Clone the repository: `git clone https://github.com/oughtinc/ice.git && cd ice`
+   ```shell
+   python3.10 -m venv venv
+   source venv/bin/activate
+   ```
 
-1. Add required secrets to `.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format.
+1. Install ICE:
+
+   ```shell
+   pip install ought-ice
+   ```
+
+1. Set required secrets in `~/.ought-ice/.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format.
 
 1. Start ICE in its own terminal and leave it running:
 
-   ```sh
-   scripts/run-local.sh
+   ```shell
+   python -m ice.server
    ```
 
-1. Go through [the Primer](https://primer.ought.org/).
+1. To learn more, go through [the Primer](https://primer.ought.org/).
+
+## Developing ICE
+
+1. If you want to make changes to ICE itself, clone the repository, then install it in editable mode:
+
+   ```shell
+   python3.10 -m venv venv
+   source venv/bin/activate
+   pip install --upgrade pip
+   pip install -e . --config-settings editable_mode=compat
+   ```
 
 ## Terminology
 
@@ -69,55 +95,3 @@ We welcome community contributions:
 For larger contributions, make an issue for discussion before submitting a PR.
 
 And for even larger contributions, join us - [we're hiring](https://ought.org/careers)!
-
-### Releases
-
-To release a new version of ICE, follow these steps:
-
-1. Update the version number in:
-
-   - `docker-compose*.yml`
-   - `pyproject.toml`
-   - `package.json`
-   - `scripts/run-local.sh`
-
-1. Regenerate the `poetry.lock` file:
-
-   ```sh
-   docker compose exec ice poetry lock --no-update
-   ```
-
-1. Regenerate the `package-lock.json` file:
-
-   ```sh
-   docker compose exec ice npm --prefix ui install --package-lock-only
-   ```
-
-1. Update `CHANGELOG.md`.
-
-1. Commit the changes.
-
-1. Tag the commit with the version number:
-
-   ```sh
-   git tag <version>
-   ```
-
-1. Open a PR and verify that CI passes.
-
-1. Build and push the Docker images:
-
-   ```sh
-   # TODO: Script this, sharing code with scripts/run-local.sh.
-   docker buildx bake -f docker-compose.yml -f docker-compose.build.yml --push
-   docker buildx bake -f docker-compose.yml -f docker-compose.streamlit.yml -f docker-compose.build-streamlit.yml --push
-   docker buildx bake -f docker-compose.yml -f docker-compose.torch.yml -f docker-compose.build-torch.yml --push
-   ```
-
-1. Push the tag:
-
-   ```sh
-   git push --tags
-   ```
-
-1. Merge the PR.

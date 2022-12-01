@@ -1,10 +1,11 @@
 import json
-import os
+import threading
 
 from abc import ABCMeta
 from asyncio import create_task
 from collections.abc import Callable
 from contextvars import ContextVar
+from functools import lru_cache
 from functools import partial
 from functools import wraps
 from inspect import getdoc
@@ -14,13 +15,15 @@ from inspect import iscoroutinefunction
 from inspect import isfunction
 from inspect import Parameter
 from inspect import signature
-from pathlib import Path
 from time import monotonic_ns
 from typing import IO
+from typing import Optional
 
 import ulid
 
 from structlog import get_logger
+
+from ice.settings import OUGHT_ICE_DIR
 
 log = get_logger()
 
@@ -29,37 +32,94 @@ def make_id() -> str:
     return ulid.new().str
 
 
-trace_id = make_id()
-parent_id_var: ContextVar[str] = ContextVar("id", default=trace_id)
+parent_id_var: ContextVar[str] = ContextVar("id")
+
+traces_dir = OUGHT_ICE_DIR / "traces"
+traces_dir.mkdir(parents=True, exist_ok=True)
 
 
-trace_dir = Path(__file__).parent.parent / "ui" / "public" / "traces"
-trace_dir.mkdir(parents=True, exist_ok=True)
-trace_file: IO[str] | None = None
+class Trace:
+    """
+    Manages storing trace data to disk.
+    All data is stored under self.dir.
+    The primary metadata is stored in self.file, named trace.jsonl.
+    Potentially large values which will be lazily loaded are stored in block_*.jsonl.
+    Each block file is appended to until its size exceeds BLOCK_LENGTH.
+    """
+
+    BLOCK_LENGTH = 1024**2
+
+    def __init__(self):
+        self.id = make_id()
+        self.dir = traces_dir / self.id
+        self.dir.mkdir()
+        self.file = self._open("trace")
+        self.block_number = -1  # so that it starts at _open_block below
+        self._open_block()
+        self._lock = threading.Lock()
+        print(f"Trace: {_url_prefix()}/traces/{self.id}")
+        parent_id_var.set(self.id)
+
+    def _open(self, name: str) -> IO[str]:
+        return open(self.dir / f"{name}.jsonl", "a")
+
+    def _open_block(self):
+        self.block_number += 1
+        self.block_file = self._open(f"block_{self.block_number}")
+        self.block_length = 0
+        self.block_lineno = 0
+
+    def add_to_block(self, x) -> tuple[int, int]:
+        """
+        Write the value x to the current block file as a single JSON line.
+        """
+        s = json.dumps(x, cls=JSONEncoder) + "\n"
+        with self._lock:
+            address = (self.block_number, self.block_lineno)
+            self.block_file.write(s)
+            self.block_length += len(s)
+            if self.block_length > self.BLOCK_LENGTH:
+                self.block_file.write("end\n")
+                self.block_file.close()
+                self._open_block()
+            else:
+                self.block_file.flush()
+                self.block_lineno += 1
+        return address
+
+
+trace_var: ContextVar[Optional[Trace]] = ContextVar("trace", default=None)
 
 
 def _url_prefix():
-    if codespace := os.environ.get("CODESPACE_NAME"):
-        return f"https://{codespace}-3000.githubpreview.dev"
-    return "http://localhost:3000"
+    # TODO use OUGHT_ICE_HOST/PORT
+    return "http://localhost:8935"
 
 
 def enable_trace():
-    global trace_file
-
-    trace_file = (trace_dir / f"{trace_id}.jsonl").open("a")
-
-    print(f"Trace: {_url_prefix()}/traces/{trace_id}")
+    trace_var.set(Trace())
 
 
 def trace_enabled():
-    return trace_file is not None
+    return trace_var.get() is not None
 
 
 def emit(value):
-    if trace_file:
-        json.dump(value, trace_file, cls=JSONEncoder)
-        print(file=trace_file, flush=True)
+    if trc := trace_var.get():
+        json.dump(value, trc.file, cls=JSONEncoder)
+        print(file=trc.file, flush=True)
+
+
+def emit_block(x) -> tuple[int, int]:
+    if trc := trace_var.get():
+        return trc.add_to_block(x)
+    else:
+        return 0, 0
+
+
+def add_fields(**fields: str):
+    id = parent_id_var.get()
+    emit({f"{id}.fields.{key}": value for key, value in fields.items()})
 
 
 def compress(o: object):
@@ -88,9 +148,9 @@ class JSONEncoder(json.JSONEncoder):
         except TypeError:
             return repr(o)
 
-    def iterencode(self, o):
+    def iterencode(self, o, **kwargs):
         try:
-            return super().iterencode(o)
+            return super().iterencode(o, **kwargs)
         except TypeError:
             return self.default(o)
 
@@ -117,7 +177,7 @@ class _Recorder:
         self.id = id
 
     def __call__(self, **kwargs):
-        emit({f"{self.id}.records.{make_id()}": kwargs})
+        emit({f"{id}.records.{make_id()}": emit_block(kwargs)})
 
     def __repr__(self):
         # So this can be used in `diskcache()` functions
@@ -162,18 +222,21 @@ def trace(fn):
                 else:
                     arg_dict[k] = v
 
+            call_event = dict(
+                parent=parent_id,
+                start=monotonic_ns(),
+                name=fn.__name__ if hasattr(fn, "__name__") else repr(fn),
+                shortArgs=get_strings(arg_dict),
+                func=emit_block(func_info(fn)),
+                args=emit_block(arg_dict),
+            )
+            self = arg_dict.get("self")
+            if self:
+                call_event["cls"] = self.__class__.__name__
+
             emit(
                 {
-                    id: dict(
-                        parent=parent_id,
-                        start=monotonic_ns(),
-                        name=fn.__name__ if hasattr(fn, "__name__") else repr(fn),
-                        doc=getdoc(fn),
-                        args=arg_dict,
-                        source=getsource(fn.func)
-                        if isinstance(fn, partial)
-                        else getsource(fn),
-                    ),
+                    id: call_event,
                     f"{parent_id}.children.{id}": True,
                 }
             )
@@ -182,7 +245,13 @@ def trace(fn):
                 kwargs[recorder_name] = _Recorder(id)
 
             result = await fn(*args, **kwargs)
-            emit({f"{id}.result": result, f"{id}.end": monotonic_ns()})
+            emit(
+                {
+                    f"{id}.result": emit_block(result),
+                    f"{id}.shortResult": get_strings(result),
+                    f"{id}.end": monotonic_ns(),
+                }
+            )
             return result
 
         return await create_task(inner_wrapper(*args, **kwargs))
@@ -214,3 +283,61 @@ class TracedABCMeta(ABCMeta):
 
 class TracedABC(metaclass=TracedABCMeta):
     ...
+
+
+# TODO this and the functions it calls needs to be replaced with a better system
+#   for summarising args and return values
+def get_strings(value) -> list[str]:
+    """
+    Represent the given value as a short list of short strings
+    that can be stored directly in the central trace file and loaded eagerly in the UI.
+    """
+    if isinstance(value, dict) and "value" in value:
+        value = value["value"]
+
+    if isinstance(value, dict):
+        value = {k: v for k, v in value.items() if k not in ("self", "record")}
+
+    result = _get_first_descendant(value)
+
+    if isinstance(result, tuple):
+        result = list(result)
+    if not (result and isinstance(result, list)):
+        if result in (None, (), "", [], {}):
+            result = "()"
+        result = [str(result)]
+
+    result = _get_short_list(result)
+    result = [_get_short_string(v) for v in result]
+    return result
+
+
+def _get_short_string(string, max_length=35) -> str:
+    return string[:max_length].strip() + "..." if len(string) > max_length else string
+
+
+def _get_short_list(lst: list, max_length=3) -> list:
+    return lst[:max_length] + ["..."] if len(lst) > max_length else lst
+
+
+def _get_first_descendant(value):
+    if value:
+        if isinstance(value, dict):
+            first, *_ = value.values()
+            return _get_first_descendant(first)
+        if isinstance(value, (list, tuple)):
+            if isinstance(value[0], str):
+                return [v for v in value if isinstance(v, str)]
+            return _get_first_descendant(value[0])
+        if hasattr(value, "dict") and callable(value.dict):
+            value = compress(value.dict())
+            return _get_first_descendant(value)
+    return value
+
+
+@lru_cache()
+def func_info(fn):
+    return dict(
+        doc=getdoc(fn),
+        source=getsource(fn.func) if isinstance(fn, partial) else getsource(fn),
+    )

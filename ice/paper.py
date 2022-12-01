@@ -6,6 +6,7 @@ from typing import Annotated
 from typing import Literal
 from typing import Optional
 
+import nltk
 import requests
 
 from nltk.tokenize import sent_tokenize
@@ -15,12 +16,15 @@ from structlog.stdlib import get_logger
 
 from ice.cache import diskcache
 from ice.environment import env
+from ice.settings import OUGHT_ICE_DIR
 
 log = get_logger()
 
 PDF_PARSER_URL = "https://test.elicit.org/elicit-previews/james/oug-3083-support-parsing-arbitrary-pdfs-using/parse_pdf"
 
 SectionType = Literal["abstract", "main", "back"]
+
+nltk.download("punkt", quiet=True)
 
 
 def get_full_document_id(document_id: str) -> str:
@@ -98,7 +102,7 @@ def save_pdf_text(paper_body: list[dict], file_name: str):
     """
     Save pdf text to help with debugging.
     """
-    paper_txt_dir = Path(__file__).parent.parent / "data/paper_txt"
+    paper_txt_dir = OUGHT_ICE_DIR / "paper_txt"
     paper_txt_dir.mkdir(parents=True, exist_ok=True)
     open(paper_txt_dir / f"{file_name}.txt", "w").write(
         "\n\n".join(" ".join(paragraph["sentences"]) for paragraph in paper_body)

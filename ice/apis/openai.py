@@ -13,7 +13,7 @@ from tenacity.wait import wait_random_exponential
 
 from ice.cache import diskcache
 from ice.settings import settings
-from ice.trace import recorder
+from ice.trace import add_fields
 from ice.trace import trace
 
 log = get_logger()
@@ -127,7 +127,7 @@ async def _post(
 
 
 def get_davinci_equivalent_tokens(response: dict) -> int:
-    return (response.get("usage") or dict()).get("total_tokens", 0)
+    return response.get("usage", {}).get("total_tokens", 0)
 
 
 @trace
@@ -143,7 +143,6 @@ async def openai_complete(
     n: int = 1,
     echo: bool = False,
     cache_id: int = 0,  # for repeated non-deterministic sampling using caching
-    record=recorder,
 ) -> dict:
     """Send a completion request to the OpenAI API and return the JSON response."""
     params = {
@@ -163,5 +162,5 @@ async def openai_complete(
     response = await _post("completions", json=params, cache_id=cache_id)
     if isinstance(response, TooLongRequestError):
         raise response
-    record(davinci_equivalent_tokens=get_davinci_equivalent_tokens(response))
+    add_fields(davinci_equivalent_tokens=str(get_davinci_equivalent_tokens(response)))
     return response
