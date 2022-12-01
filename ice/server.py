@@ -4,10 +4,12 @@ import sys
 import time
 
 import httpx
+from structlog import get_logger
 
 from ice.settings import server_url
 from ice.settings import settings
 
+log = get_logger()
 
 def is_server_running():
     from ice.routes.app import PING_RESPONSE
@@ -31,7 +33,7 @@ def ensure_server_running():
     if is_server_running():
         return
 
-    print("Starting server, set OUGHT_ICE_NO_START_SERVER to disable.")
+    log.info("Starting server, set OUGHT_ICE_NO_START_SERVER to disable.")
     subprocess.Popen(
         [sys.executable, "-m", "ice.server", "start"],
         env=os.environ,
@@ -39,7 +41,7 @@ def ensure_server_running():
         stderr=subprocess.DEVNULL,
     )
     wait_until_server_running()
-    print("Server started!")
+    log.info("Server started!")
 
 
 def stop():

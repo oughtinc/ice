@@ -61,7 +61,7 @@ class Trace:
         self._open_block()
         self._lock = threading.Lock()
         parent_id_var.set(self.id)
-        print(f"Trace: {self.url}")
+        log.info(f"Trace: {self.url}")
         threading.Thread(target=self._server_and_browser).start()
 
     @property
@@ -83,7 +83,7 @@ class Trace:
 
         import webbrowser
 
-        print("Opening trace in browser, set OUGHT_ICE_NO_BROWSER=1 to disable.")
+        log.info("Opening trace in browser, set OUGHT_ICE_NO_BROWSER=1 to disable.")
         webbrowser.open(self.url)
 
     def _open(self, name: str) -> IO[str]:
