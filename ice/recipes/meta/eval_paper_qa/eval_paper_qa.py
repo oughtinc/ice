@@ -3,21 +3,15 @@ import json
 
 from collections.abc import Callable
 from collections.abc import Iterable
-from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
-from typing import Type
 
 from pydantic import BaseModel
 from ruamel.yaml import YAML
 from structlog.stdlib import get_logger
 
 from ice.evaluation.evaluation_report import latest_commit_hash
-from ice.metrics.gold_standards import get_gold_standard
-from ice.metrics.gold_standards import GoldStandard
-from ice.metrics.gold_standards import load_papers
-from ice.metrics.gold_standards import ParsedGoldStandardType
-from ice.paper import Paper
+from ice.metrics.qasper import token_f1_score
 from ice.recipe import recipe
 from ice.recipes.meta.eval_paper_qa.types import AnswerEvalMethod
 from ice.recipes.meta.eval_paper_qa.types import AnswerType_contra
@@ -35,33 +29,19 @@ log = get_logger()
 
 async def eval_paper_qa_method(
     method: PaperQaMethod[AnswerType_contra],
-    gold_standard_type: Type[ParsedGoldStandardType],
-    gold_standard_to_trials: Callable[
-        [GoldStandard[ParsedGoldStandardType]],
-        Iterable[PaperQaGoldStandard[AnswerType_contra]],
-    ],
+    paper_qa_generator: Callable[[str], Iterable[PaperQaGoldStandard]],
     answer_eval_method: AnswerEvalMethod[AnswerType_contra],
     classification_eval_method: ClassificationEvalMethod,
     split: str,
     max_concurrency: int = 10,
 ):
-    question_short_name = gold_standard_type.question_short_name
-
-    papers = load_papers(split, question_short_name=question_short_name)
-
-    log.info(
-        "Evaluating method on papers",
-        method=method.__class__.__name__,
-        question_short_name=question_short_name,
-        papers=[p.document_id for p in papers],
-    )
-
     @trace
     async def run_and_eval_method(
-        input_data: tuple[Paper, PaperQaGoldStandard]
+        qa_details: PaperQaGoldStandard,
     ) -> SequenceGenerationEvaluation[AnswerType_contra]:
-        paper, qa_details = input_data
-        answer = await method(paper, qa_details.question, qa_details.gold_support)
+        answer = await method(
+            qa_details.paper, qa_details.question, qa_details.gold_support
+        )
         correct, detail = await answer_eval_method(
             question=qa_details.question,
             ground_truth=qa_details.gold_answer,
@@ -73,9 +53,16 @@ async def eval_paper_qa_method(
             ground_truth=qa_details.gold_support,
             scores=answer.support_scores,
         )
+        answer_for_f1 = answer.answer
+        if isinstance(answer_for_f1, str):
+            generation_f1 = token_f1_score(
+                prediction=answer_for_f1, ground_truth=qa_details.gold_answer
+            )
+        else:
+            generation_f1 = 0.0
         return SequenceGenerationEvaluation(
             question=qa_details.question,
-            document_id=paper.document_id,
+            document_id=qa_details.paper.document_id,
             correct=correct,
             detail=detail,
             metrics=metrics,
@@ -86,43 +73,30 @@ async def eval_paper_qa_method(
                 for lab, text in zip(answer.support_labels, answer.support_candidates)
                 if lab
             ],
+            generation_f1_score=generation_f1,
         )
 
-    eval_data: list[tuple[Paper, PaperQaGoldStandard]] = []
-    gold_supports: list[Sequence[str]] = []
-
-    for paper in papers:
-        gold = get_gold_standard(
-            document_id=paper.document_id,
-            question_short_name=question_short_name,
-            model_type=gold_standard_type,
-        )
-        if not gold:
-            log.warning(
-                "Did not find gold standard",
-                document_id=paper.document_id,
-                question_short_name=question_short_name,
-            )
-            continue
-        for trial in gold_standard_to_trials(gold):
-            eval_data.append((paper, trial))
-            gold_supports.append(trial.gold_support)
+    paper_qa_details = list(paper_qa_generator(split))
 
     results = await map_async(
-        eval_data, run_and_eval_method, max_concurrency=max_concurrency
+        paper_qa_details, run_and_eval_method, max_concurrency=max_concurrency
     )
 
     scores = [r.correct for r in results]
     metrics = [r.metrics for r in results]
+    f1 = [r.generation_f1_score for r in results]
 
     # only aggregate where there is gold support (somewhat arbitrary choice but more informative)
-    metrics_under_support = [m for m, gs in zip(metrics, gold_supports) if gs]
+    metrics_under_support = [
+        m for m, qa_details in zip(metrics, paper_qa_details) if qa_details.gold_support
+    ]
     aggregated_metrics = BinaryClassificationMetrics.aggregate(metrics_under_support)
 
     return (
         sum(scores) / len(scores) if scores else 0,
         results,
         aggregated_metrics,
+        sum(f1) / len(f1) if f1 else 0.0,
     )
 
 
@@ -135,8 +109,7 @@ def load_object(location: str) -> Any:
 
 class _PaperQaArgs(BaseModel):
     split: str
-    gold_standard_type: str
-    gold_standard_to_trials: str
+    paper_qa_generator: str  # Callable[[str], Iterable[PaperQaGoldStandard]]
     method: str
     answer_eval_method: str
     classification_eval_method: str
@@ -155,13 +128,12 @@ def ensure_dir(path: str) -> str:
 
 
 async def run_from_config(config: PaperQaEvalConfig) -> dict:
-    score, results, agg_metrics = await eval_paper_qa_method(
+    score, results, agg_metrics, f1 = await eval_paper_qa_method(
         method=load_object(config.args.method),
         split=config.args.split,
-        gold_standard_type=load_object(config.args.gold_standard_type),
-        gold_standard_to_trials=load_object(config.args.gold_standard_to_trials),
         answer_eval_method=load_object(config.args.answer_eval_method),
         classification_eval_method=load_object(config.args.classification_eval_method),
+        paper_qa_generator=load_object(config.args.paper_qa_generator),
     )
     metrics = agg_metrics.as_dict()
     results_line = dict(
@@ -171,6 +143,7 @@ async def run_from_config(config: PaperQaEvalConfig) -> dict:
         results=[r.as_dict() for r in results],
         metrics=metrics,
         pr_thresholds=agg_metrics.pr_thresholds(),
+        generation_f1_score=f1,
     )
     if config.results_json:
         with open(ensure_dir(config.results_json), "w") as r:

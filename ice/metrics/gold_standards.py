@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from collections.abc import Sequence
 from functools import cache
 from functools import cached_property
@@ -32,7 +33,7 @@ ParsedGoldStandardType = TypeVar("ParsedGoldStandardType", bound=ParsedGoldStand
 
 GoldStandardSplit = Literal["test", "validation", "iterate"]
 
-# TODO: merge with RecipeResult
+
 class GoldStandard(GenericModel, Generic[ParsedGoldStandardType]):
     document_id: str
     question_short_name: str
@@ -151,6 +152,28 @@ def load_papers(split: str, question_short_name: str):
         if gs.split == split
     }
     return [load_paper(doc_id) for doc_id in doc_ids]
+
+
+def generate_papers_and_golds(
+    split: str,
+    gold_standard_type: Type[ParsedGoldStandardType],
+) -> Iterator[tuple[Paper, GoldStandard[ParsedGoldStandardType]]]:
+    papers = load_papers(split, gold_standard_type.question_short_name)
+
+    for paper in papers:
+        gold = get_gold_standard(
+            document_id=paper.document_id,
+            question_short_name=gold_standard_type.question_short_name,
+            model_type=gold_standard_type,
+        )
+        if not gold:
+            log.warning(
+                "Did not find gold standard",
+                document_id=paper.document_id,
+                question_short_name=gold_standard_type.question_short_name,
+            )
+            continue
+        yield paper, gold
 
 
 @overload

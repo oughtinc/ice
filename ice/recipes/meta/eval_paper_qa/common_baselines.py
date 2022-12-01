@@ -1,8 +1,6 @@
 from collections.abc import Callable
 from collections.abc import Sequence
 from functools import partial
-from typing import Literal
-from typing import overload
 
 from ice.apis.openai import TooLongRequestError
 from ice.formatter.transform.value import numbered_list
@@ -171,14 +169,12 @@ async def preselected_few_shot_qa_baseline(
         support_candidates = paper_division_func(paper)
         support_labels = as_bool(support, support_candidates)
     else:
-        # TODO pickup here
-        pass
-
+        support_labels = [False for _ in support]
 
     return PaperQaAnswer(
         answer=answer,
         support_candidates=support,
-        support_labels=as_bool(support, paper_division_func(paper)),
+        support_labels=support_labels,
     )
 
 

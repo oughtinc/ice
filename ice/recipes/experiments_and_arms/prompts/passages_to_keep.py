@@ -10,9 +10,8 @@ from ice.formatter.multi import StopSentinel
 from ice.recipe import recipe
 from ice.recipes.experiments_and_arms.num_utils import extract_nums
 from ice.recipes.experiments_and_arms.types import PassageWithReasoning
-from ice.trace import trace
 
-## TODO: Make configurable for different ways of prompting helpfulness
+# TODO: Make configurable for different ways of prompting helpfulness
 
 log = get_logger()
 
@@ -134,5 +133,6 @@ async def keep_most_helpful_paragraphs(
         later_passages = later_passages[1:]
         best_paras = best_paras | set((await get_best_paras([next_para])))
     return [p for p in best_paras]
+
 
 recipe.main(keep_most_helpful_paragraphs)

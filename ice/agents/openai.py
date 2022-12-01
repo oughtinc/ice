@@ -129,7 +129,11 @@ class OpenAIAgent(Agent):
             log.warning(str(prediction))
             log.warning(str(abs_probs))
 
-        rel_probs = {choice: prob / Z for (choice, prob) in abs_probs.items()} if Z != 0.0 else abs_probs
+        rel_probs = (
+            {choice: prob / Z for (choice, prob) in abs_probs.items()}
+            if Z != 0.0
+            else abs_probs
+        )
         return rel_probs
 
     def _print_markdown(self, obj: Any):

@@ -4,7 +4,6 @@ from ice.formatter.multi import format_multi
 from ice.formatter.multi import stop
 from ice.formatter.transform.dependent import plural_transform
 from ice.formatter.transform.positional import OrdinalWord
-from ice.formatter.transform.value import non_literal
 from ice.formatter.transform.value import numbered_list
 from ice.recipes.experiments_and_arms.prompts.utils import get_part
 from ice.recipes.experiments_and_arms.types import Arm
@@ -207,7 +206,7 @@ def make_quick_eval_prompt(
     )
     parts = [PREAMBLE] + list(
         format_multi(
-            EXPERIMENTS_EXAMPLE, EXAMPLES + [last_example], SHARED_PROMPT_PARTS
+            EXPERIMENTS_EXAMPLE, EXAMPLES + [last_example], SHARED_PROMPT_PARTS  # type: ignore[arg-type]
         )
     )
     stop_seq = OrdinalWord(capitalize=True).transform(len(EXAMPLES), len(EXAMPLES) + 1)

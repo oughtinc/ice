@@ -2,8 +2,7 @@
   results_json: "experiments/results/consort/adherence/01_baseline.json"
   args:
     split: validation
-    gold_standard_type: ice.recipes.consort_flow.types.ConsortFlow
-    gold_standard_to_trials: ice.recipes.consort_flow.generate_questions.adherence_questions_and_answers
+    paper_qa_generator: ice.recipes.consort_flow.generate_questions.generate_adherence_qas
     method: ice.recipes.meta.eval_paper_qa.common_baselines.paper_qa_baseline_str_answer
     answer_eval_method: ice.recipes.meta.eval_paper_qa.quick_question_driven_eval.quick_eval
     classification_eval_method: ice.recipes.meta.eval_paper_qa.common_eval_methods.eval_text_classification

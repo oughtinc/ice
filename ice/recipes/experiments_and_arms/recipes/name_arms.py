@@ -1,15 +1,9 @@
 from collections.abc import Sequence
 from typing import cast
-from typing import TypeVar
 
 from ice.apis.openai import openai_complete
-from ice.formatter.transform.dependent import CountWord
-from ice.formatter.transform.dependent import plural_transform
-from ice.formatter.transform.value import numbered_list
 from ice.paper import Paper
-from ice.recipe import Recipe
 from ice.recipe import recipe
-from ice.recipes.experiments_and_arms.golds import get_ea_gs
 from ice.recipes.experiments_and_arms.num_utils import strip_enumeration_prefix
 from ice.recipes.experiments_and_arms.prompts.can_name_arms import (
     CAN_WE_NAME_ARMS_BEST_CHOICE,
@@ -39,9 +33,7 @@ from ice.recipes.experiments_and_arms.prompts.quick_list import make_quick_list_
 from ice.recipes.experiments_and_arms.recipes.best_passages import (
     rate_helpfulness_with_reasoning,
 )
-from ice.recipes.experiments_and_arms.recipes.cluster import best_answer_by_clustering
 from ice.recipes.experiments_and_arms.recipes.consensus import best_answer_by_consensus
-from ice.recipes.experiments_and_arms.recipes.count_experiments import count_experiments
 from ice.recipes.experiments_and_arms.recipes.reason_select_and_answer import (
     answer_with_best_reasoning,
 )

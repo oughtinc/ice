@@ -39,6 +39,6 @@ Convert to a numbered list:
 
 def make_quick_list_prompt(answer: str):
     examples = format_multi(
-        TEMPLATE, EXAMPLES + [dict(answer=answer, separated=stop(""))]
+        TEMPLATE, EXAMPLES + [dict(answer=answer, separated=stop(""))]  # type: ignore[arg-type]
     )
     return "\n\n".join([PREAMBLE] + list(examples))

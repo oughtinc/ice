@@ -1,13 +1,10 @@
 import json
 
 from collections.abc import Sequence
-from functools import partial
 
 from ice.evaluation.evaluate_recipe_result import RecipeResult
 from ice.paper import Paper
 from ice.recipe import Recipe
-from ice.recipe import recipe
-from ice.recipes.experiment_arms import ExperimentArms
 from ice.recipes.experiments_and_arms.golds import get_ea_gs
 from ice.recipes.experiments_and_arms.recipes.name_arms import name_arms
 from ice.recipes.experiments_and_arms.recipes.name_experiments import name_experiments
@@ -34,12 +31,7 @@ async def experiments_and_arms(
         tuple[str, str, ExperimentsArms, ExperimentsArms]: The quick-eval grade, the explanation for that grade, the gold standard answer, and the generated answer.
     """
     gs = get_ea_gs(paper.document_id)
-    gs_exps, exps = await name_experiments(paper)
-
-    if gs and gs.parsed_answer:
-        gs_exps = [exp.name for exp in gs.parsed_answer.experiments]
-    else:
-        gs_exps = []
+    _, exps = await name_experiments(paper)
 
     async def run_arms(experiment_in_question: str) -> Sequence[str]:
         return await name_arms(

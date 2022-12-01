@@ -1,10 +1,8 @@
 import re
 
 from collections.abc import Sequence
-from typing import cast
 
 from numerizer import numerize
-from numpy import extract
 from structlog.stdlib import get_logger
 
 log = get_logger()

@@ -5,14 +5,14 @@ from structlog.stdlib import get_logger
 
 from ice.apis.openai import openai_complete
 from ice.recipe import recipe
-from ice.recipes.program_search.nodes.prune.prompts import (
-    EXAMPLE_SEPARATOR,
-    make_pruning_with_reasoning_prompt,
-)
+from ice.recipes.program_search.nodes.prune.prompts import EXAMPLE_SEPARATOR
 from ice.recipes.program_search.nodes.prune.prompts import (
     get_pruned_selections_via_logprobs,
 )
 from ice.recipes.program_search.nodes.prune.prompts import make_pruning_prompt
+from ice.recipes.program_search.nodes.prune.prompts import (
+    make_pruning_with_reasoning_prompt,
+)
 from ice.recipes.program_search.types import remove_lowest_perplexity
 from ice.utils import n_tokens
 
@@ -81,9 +81,19 @@ async def prune_with_reasoning(
     completion: str = response["choices"][0]["text"]
     if "from most to least important: " not in completion:
         log.warning("Unexpected completion", prompt=prompt, completion=completion)
-        prompt = prompt + completion.rstrip() + "\n\nWhich excerpts answer the question, from most to least"
-        response = await openai_complete(prompt=prompt, max_tokens=4090 - n_tokens(prompt), logprobs=100, echo=False, stop=EXAMPLE_SEPARATOR)
- 
+        prompt = (
+            prompt
+            + completion.rstrip()
+            + "\n\nWhich excerpts answer the question, from most to least"
+        )
+        response = await openai_complete(
+            prompt=prompt,
+            max_tokens=4090 - n_tokens(prompt),
+            logprobs=100,
+            echo=False,
+            stop=EXAMPLE_SEPARATOR,
+        )
+
     selection_probs = get_pruned_selections_via_logprobs(
         response["choices"][0]["logprobs"], num_selections=len(texts_with_perplexities)
     )

@@ -13,13 +13,12 @@ from ice.formatter.transform.dependent import plural_transform
 from ice.formatter.transform.positional import OrdinalWord
 from ice.formatter.transform.value import numbered_list
 from ice.formatter.transform.value import ValueTransform
-from ice.recipes.experiments_and_arms.num_utils import extract_nums
 from ice.recipes.experiments_and_arms.prompts.utils import get_part
 from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
 
 log = get_logger()
 
-## TODO: WRITE PROMPTS ##
+# TODO: WRITE PROMPTS ##
 
 NAME_ARMS_PREFACE = """When evaluating a Randomized Controlled Trial, we should first identify its methodology; in particular, we should identify how different subgroups of participants were split into different trial arms, in order to receive different treatments or controls. We will look at a few paragraphs from different papers to identify the trial arms for specific experiments. Once we do this task, we will be able to draw a chart identifying, for each experiment, what the trial arms were. After that, we will look to identify how many participants were put into each arm, and how randomization was performed. Some of these excerpts may not be helpful, so we'll only pay attention to the excerpts that provide explicit information about what the trial arms (subgroups of participants) were for a specific experiment."""
 

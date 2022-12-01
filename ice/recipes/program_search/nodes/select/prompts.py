@@ -1,7 +1,5 @@
 from collections.abc import Mapping
 from collections.abc import Sequence
-from itertools import cycle
-from typing import Literal
 from typing import TypedDict
 
 from ice.formatter.multi import format_multi
@@ -9,11 +7,7 @@ from ice.formatter.multi import stop
 from ice.formatter.multi import StopSentinel
 from ice.formatter.transform.value import numbered_list
 from ice.formatter.transform.value import ValueTransform
-from ice.recipes.program_search.nodes.select.dynamic import best_negative_example
-from ice.recipes.program_search.nodes.select.dynamic import first_positive_example
-from ice.recipes.program_search.nodes.select.dynamic import make_examples
 from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
-from ice.recipes.program_search.types import Selection
 
 NONE_ANSWER = "None of the new excerpts are needed to answer the question."
 

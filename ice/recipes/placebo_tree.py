@@ -256,7 +256,7 @@ Answer:"""
 class PlaceboTree(Recipe):
     async def run(self, *, paper: Paper):
         arms_recipe = ExperimentArms(mode=self.mode)
-        arms, arm_descriptions = await arms_recipe.run(paper=paper)
+        arms, arm_descriptions = await arms_recipe.run(paper=paper)  # type: ignore[call-arg]
 
         placebo_class, placebo_description_draft = await self.classify_placebo(
             paper, arms, arm_descriptions

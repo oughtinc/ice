@@ -1,16 +1,10 @@
-from ast import Mult
 from collections.abc import Callable
 from collections.abc import Sequence
-from typing import Protocol
-from typing import runtime_checkable
 
 from ice.formatter.multi import format_multi
-from ice.formatter.multi import stop
-from ice.formatter.multi import StopSentinel
 from ice.formatter.transform.dependent import CountWord
 from ice.formatter.transform.dependent import DependentTransform
 from ice.formatter.transform.dependent import plural_transform
-from ice.formatter.transform.positional import OrdinalWord
 from ice.formatter.transform.positional import PositionalTransform
 from ice.formatter.transform.value import numbered_list
 from ice.formatter.transform.value import ValueTransform
@@ -143,9 +137,7 @@ def make_can_we_name_experiments_prompt(
             helpfulness: str | None = None,
             reasoning: str | None = None,
         ) -> str:
-            last_example: dict[
-                str, ValueTransform[Sequence[str]] | str | StopSentinel | int
-            ] = start_last_example(
+            last_example: dict = start_last_example(
                 helpfulness=helpfulness, reasoning=reasoning, pre_final="Excerpt 1"
             ) | dict(
                 paragraphs=numbered_list(paragraphs),

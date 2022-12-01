@@ -1,6 +1,5 @@
 from collections.abc import Sequence
 
-from ice.apis.openai import openai_complete
 from ice.recipe import recipe
 from ice.recipes.experiments_and_arms.num_utils import strip_enumeration_prefix
 from ice.recipes.experiments_and_arms.prompts.cluster import build_cluster_prompt

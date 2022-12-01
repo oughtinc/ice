@@ -1,11 +1,7 @@
 from collections.abc import Callable
 from collections.abc import Sequence
-from pathlib import Path
-
-from tqdm import tqdm
 
 from ice.cache import diskcache
-from ice.metrics.gold_standards import get_gold_standards
 from ice.metrics.rouge import matches
 from ice.paper import Paper
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard

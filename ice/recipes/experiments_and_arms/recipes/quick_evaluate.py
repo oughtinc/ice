@@ -1,5 +1,4 @@
 from ice.apis.openai import openai_complete
-from ice.formatter.multi import format_multi
 from ice.recipe import recipe
 from ice.recipes.experiments_and_arms.prompts.quick_evaluate import get_grade
 from ice.recipes.experiments_and_arms.prompts.quick_evaluate import (

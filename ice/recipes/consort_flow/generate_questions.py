@@ -1,16 +1,32 @@
+from collections.abc import Callable
 from collections.abc import Iterable
 from functools import partial
+from typing import Type
 
 from ice.formatter.transform.value import numbered_list
+from ice.metrics.gold_standards import generate_papers_and_golds
 from ice.metrics.gold_standards import GoldStandard
-from ice.metrics.gold_standards import load_paper
+from ice.metrics.gold_standards import ParsedGoldStandardType
+from ice.paper import Paper
 from ice.recipes.consort_flow.types import ConsortFlow
 from ice.recipes.experiments_and_arms.types import ExperimentsArms
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 
 
+def generate_paper_qa_gold_standards(
+    split: str,
+    gold_standard_type: Type[ParsedGoldStandardType],
+    question_and_answer_generator: Callable[
+        [Paper, GoldStandard[ParsedGoldStandardType]],
+        Iterable[PaperQaGoldStandard],
+    ],
+) -> Iterable[PaperQaGoldStandard]:
+    for paper, gold in generate_papers_and_golds(split, gold_standard_type):
+        yield from question_and_answer_generator(paper, gold)
+
+
 def experiments_questions_and_answers(
-    gold: GoldStandard[ExperimentsArms], consolidate: bool = False
+    paper: Paper, gold: GoldStandard[ExperimentsArms], consolidate: bool = False
 ) -> Iterable[PaperQaGoldStandard]:
     if not gold.parsed_answer:
         return
@@ -27,7 +43,6 @@ def experiments_questions_and_answers(
 
     question = """Experiments are distinct from trial arms or groups; a single experiment might have multiple trial arms, like different interventions or controls. What experiment or experiments (aka trials, RCTs, studies) were conducted in this paper? Enumerate them, being mindful that there may just be one experiment or there could be more than one. Include the name and a brief description of each experiment."""
     gold_support = gold.quotes
-    paper = load_paper(gold.document_id)
     yield PaperQaGoldStandard(
         paper=paper,
         question=question,
@@ -37,13 +52,22 @@ def experiments_questions_and_answers(
     )
 
 
-experiments_questions_and_answers_str = partial(
-    experiments_questions_and_answers, consolidate=True
-)
+def generate_experiments_qas_lst(split: str):
+    yield from generate_paper_qa_gold_standards(
+        split, ExperimentsArms, experiments_questions_and_answers
+    )
+
+
+def generate_experiments_qas_str(split: str):
+    yield from generate_paper_qa_gold_standards(
+        split,
+        ExperimentsArms,
+        partial(experiments_questions_and_answers, consolidate=True),
+    )
 
 
 def arms_questions_and_answers(
-    gold: GoldStandard[ExperimentsArms], consolidate: bool = False
+    paper: Paper, gold: GoldStandard[ExperimentsArms], consolidate: bool = False
 ) -> Iterable[PaperQaGoldStandard]:
     if not gold.parsed_answer:
         return
@@ -51,7 +75,6 @@ def arms_questions_and_answers(
     all_exps = numbered_list(
         [f"{exp.name}: {exp.description}" for exp in experiments], separator=" / "
     ).transform()
-    paper = load_paper(gold.document_id)
     for experiment in experiments:
         gold_answer = [f"{arm.name}: {arm.description}" for arm in experiment.arms]
         short_gold_answer = [arm.name for arm in experiment.arms]
@@ -77,13 +100,26 @@ def arms_questions_and_answers(
         )
 
 
+def generate_arms_qas_lst(split: str):
+    yield from generate_paper_qa_gold_standards(
+        split, ExperimentsArms, arms_questions_and_answers
+    )
+
+
+def generate_arms_qas_str(split: str):
+    yield from generate_paper_qa_gold_standards(
+        split,
+        ExperimentsArms,
+        partial(arms_questions_and_answers, consolidate=True),
+    )
+
+
 def adherence_questions_and_answers(
-    gold: GoldStandard[ConsortFlow], consolidate: bool = False
+    paper: Paper, gold: GoldStandard[ConsortFlow]
 ) -> Iterable[PaperQaGoldStandard]:
     if not gold.parsed_answer:
         return
     experiments = gold.parsed_answer.experiments
-    paper = load_paper(gold.document_id)
     for experiment in experiments:
         arms = experiment.arms
         if not arms:
@@ -108,4 +144,7 @@ def adherence_questions_and_answers(
             )
 
 
-arms_questions_and_answers_str = partial(arms_questions_and_answers, consolidate=True)
+def generate_adherence_qas(split: str):
+    yield from generate_paper_qa_gold_standards(
+        split, ConsortFlow, adherence_questions_and_answers
+    )

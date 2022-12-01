@@ -1,24 +1,18 @@
 import itertools
 
-from collections.abc import Callable
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Literal
 
-from fastapi import Path
 from pydantic import BaseModel
 from tqdm import tqdm
 
-from ice.cache import diskcache
 from ice.metrics.gold_standards import get_gold_standard
 from ice.metrics.gold_standards import get_gold_standards
 from ice.metrics.gold_standards import GoldStandard
 from ice.metrics.gold_standards import GoldStandardSplit
-from ice.metrics.gold_standards import retrieve_gold_standards_df
 from ice.paper import Paper
 from ice.recipes.consort_flow.types import ConsortFlow
 from ice.recipes.consort_flow.types import SampleSize
-from ice.recipes.experiments_and_arms.golds import get_ea_gs
 from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
 from ice.recipes.program_search.nodes.select.dynamic import best_negative_example
 from ice.recipes.program_search.nodes.select.dynamic import first_positive_example
@@ -29,7 +23,6 @@ from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionE
 from ice.recipes.program_search.types import Selection
 from ice.recipes.program_search.types import sentences
 from ice.utils import map_async
-from ice.utils import reduce_async
 
 
 def get_consort_gs(document_id: str) -> GoldStandard[ConsortFlow] | None:
@@ -101,7 +94,7 @@ def download_papers(
     split: str = "validation", question_short_name: str = "consort_flow"
 ):
     paper_dir = Path("/code/papers/")  # fixed in container
-    doc_ids = {p.document_id for p in consort_gs_split(split, question_short_name)}
+    doc_ids = {p.document_id for p in consort_gs_split(split, question_short_name)}  # type: ignore[arg-type]
     paper_files = [f for f in paper_dir.iterdir() if f.name in doc_ids]
     return [
         Paper.load(f)

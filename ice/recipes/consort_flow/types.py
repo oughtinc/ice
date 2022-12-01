@@ -145,4 +145,3 @@ class ConsortFlow(ParsedGoldStandardBase):
     @validator("experiments", pre=True)
     def validate_experiments(cls, v):
         return _maybe_dict_to_sequence(Experiment, v)
-

@@ -19,7 +19,7 @@ from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
 
 log = get_logger()
 
-## TODO: WRITE PROMPTS ##
+# TODO: WRITE PROMPTS ##
 
 NAME_EXPERIMENTS_PREFACE = """Some research papers cover just one experiment, while others cover multiple experiments. Experiments are distinct from trial arms or groups; a single experiment might have multiple trial arms, like different interventions or controls. Let's look at some excerpts from research papers covering different numbers of experiments and try to identify what those experiments were, being careful to not confuse experiments with trial arms.""".strip()
 

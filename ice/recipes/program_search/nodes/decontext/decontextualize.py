@@ -1,7 +1,5 @@
 from collections.abc import Sequence
-from dataclasses import dataclass
 from itertools import count
-from typing import Protocol
 
 from tqdm import tqdm
 

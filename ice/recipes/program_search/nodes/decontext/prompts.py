@@ -86,7 +86,7 @@ def decontext_prompt(
         else QUESTION_FREE_EXAMPLE_TEMPLATE,
         QUESTION_GUIDED_EXAMPLES + [last_example]
         if questions
-        else QUESTION_FREE_EXAMPLES + [last_example],  # type: ignore[arg-type]
+        else QUESTION_FREE_EXAMPLES + [last_example],
     )
     return "\n\n".join(
         (

@@ -1,36 +1,32 @@
 from collections.abc import Mapping
 from collections.abc import Sequence
-from itertools import cycle
 from typing import cast
-from typing import Protocol
-from anyio import ExceptionGroup
 
 import numpy as np
 
+from anyio import ExceptionGroup
 from structlog.stdlib import get_logger
-from typing_extensions import reveal_type
 
 from ice.apis.openai import openai_complete
 from ice.apis.openai import TooLongRequestError
 from ice.paper import Paper
-from ice.recipe import Recipe
 from ice.recipe import recipe
-from ice.recipes.best_completion import best_completion, completion_perplexity
+from ice.recipes.best_completion import best_completion
+from ice.recipes.best_completion import completion_perplexity
 from ice.recipes.consort_flow import baseline_elicit_answer
+from ice.recipes.find_best_few_shot_prompt import score_few_shot
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 from ice.recipes.program_search.nodes.answer.types import Demonstration
+from ice.recipes.program_search.nodes.prune.prune import prune
+from ice.recipes.program_search.nodes.select.prompts import get_selections
+from ice.recipes.program_search.nodes.select.prompts import make_selection_prompt
+from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
 from ice.recipes.program_search.types import (
     remove_highest_perplexity,
 )
-from ice.recipes.program_search.nodes.prune.prune import prune
-from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
-from ice.recipes.program_search.nodes.select.prompts import get_selections
-from ice.recipes.program_search.nodes.select.prompts import make_selection_prompt
-from ice.recipes.program_search.nodes.select.prompts import render_selection_example
-from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
-from ice.recipes.program_search.utils.find_examples import matches
-from ice.recipes.find_best_few_shot_prompt import score_few_shot
-from ice.utils import map_async, n_tokens, reduce_async
+from ice.utils import map_async
+from ice.utils import n_tokens
+from ice.utils import reduce_async
 from ice.utils import window_dropping
 
 log = get_logger()

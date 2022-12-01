@@ -13,7 +13,6 @@ from pydantic import validator
 from pydantic.generics import GenericModel
 
 from ice.metrics.gold_standards import ParsedGoldStandardBase
-from ice.paper import Paragraph
 
 
 T = TypeVar("T")

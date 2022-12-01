@@ -54,7 +54,7 @@ async def elicit_qa(
 ):
     cells = [
         dict(paper, column={"type": "custom_question", "value": qa_question})
-        for paper in papers.values()
+        for paper in (papers or dict()).values()
     ]
     request_body = {"rootQuestion": root_question, "cells": cells}
     response = send_elicit_request(

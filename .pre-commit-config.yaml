@@ -31,5 +31,5 @@ repos:
     rev: v0.981
     hooks:
       - id: mypy
-        additional_dependencies: [numpy, httpx, pytest, structlog]
+        additional_dependencies: [numpy, httpx, pytest, structlog, types-PyYAML]
         args: [--config-file, mypy.ini]

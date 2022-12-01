@@ -1,14 +1,15 @@
 from collections.abc import Iterable
-from collections.abc import Mapping
 from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import cached_property
 from itertools import chain
-from sklearn.metrics import precision_recall_curve, PrecisionRecallDisplay
-from sklearn.metrics import roc_auc_score, roc_curve
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
 import numpy as np
+
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import PrecisionRecallDisplay
+from sklearn.metrics import roc_auc_score
 
 from ice.metrics.rouge import matches
 

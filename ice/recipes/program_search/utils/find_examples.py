@@ -3,8 +3,6 @@ from collections.abc import Sequence
 from enum import Enum
 from typing import TypeVar
 
-from typing import Mapping, Sequence, TypeVar
-from ice.recipes.program_search.types import Selection
 from ice.metrics.base import Sample
 from ice.metrics.nubia import Nubia
 from ice.metrics.nubia import NubiaResponse

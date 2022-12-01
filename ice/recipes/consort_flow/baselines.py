@@ -1,17 +1,16 @@
+from collections.abc import Callable
 from collections.abc import Sequence
 from functools import partial
 from itertools import chain
-from typing import Callable
-from ice.apis.openai import TooLongRequestError
-from ice.recipe import recipe
 
-from ice.metrics.gold_standards import get_gold_standard, load_papers
+from ice.apis.openai import TooLongRequestError
+from ice.metrics.gold_standards import get_gold_standard
+from ice.metrics.gold_standards import load_papers
 from ice.paper import Paper
+from ice.recipe import recipe
 from ice.recipes.consort_flow.baseline_elicit_answer import answer_like_elicit_qa
-from ice.recipes.consort_flow.generate_questions import (
-    adherence_questions_and_answers,
-    arms_questions_and_answers,
-)
+from ice.recipes.consort_flow.generate_questions import adherence_questions_and_answers
+from ice.recipes.consort_flow.generate_questions import arms_questions_and_answers
 from ice.recipes.consort_flow.generate_questions import (
     experiments_questions_and_answers,
 )
@@ -19,20 +18,24 @@ from ice.recipes.consort_flow.types import ConsortFlow
 from ice.recipes.experiments_and_arms.golds import get_ea_gs
 from ice.recipes.meta.eval_paper_qa.common_baselines import (
     preselected_few_shot_qa_baseline,
-    cheating_qa_baseline_list_answer,
 )
 from ice.recipes.meta.eval_paper_qa.quick_list import quick_list
-from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer, PaperQaGoldStandard
+from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer
+from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 from ice.recipes.meta.eval_paper_qa.utils import convert_demonstration_example
-from ice.recipes.primer.qa import answer
 from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
-from ice.recipes.program_search.nodes.prune.prune import prune, prune_with_reasoning
-from ice.recipes.program_search.types import remove_lowest_perplexity
+from ice.recipes.program_search.nodes.prune.prune import prune
+from ice.recipes.program_search.nodes.prune.prune import prune_with_reasoning
 from ice.recipes.program_search.nodes.select.select import (
     filter_by_perplexity_threshold,
-    select_using_elicit_prompt_few_shot,
+)
+from ice.recipes.program_search.nodes.select.select import (
     select_results_using_elicit_prompt,
 )
+from ice.recipes.program_search.nodes.select.select import (
+    select_using_elicit_prompt_few_shot,
+)
+from ice.recipes.program_search.types import remove_lowest_perplexity
 
 
 def experiments_few_shot_demonstration(
@@ -47,8 +50,8 @@ def experiments_few_shot_demonstration(
     paper_gs = list(
         chain(
             *[
-                experiments_questions_and_answers(gs, consolidate=consolidate)
-                for gs in gss
+                experiments_questions_and_answers(paper, gs, consolidate=consolidate)
+                for gs, paper in zip(gss, papers)
                 if gs
             ]
         )
@@ -66,7 +69,11 @@ def arms_few_shot_demonstration(
     ]
     gss = [get_ea_gs(p.document_id) for p in papers]
     paper_gs = list(
-        [arms_questions_and_answers(gs, consolidate=consolidate) for gs in gss if gs]
+        [
+            arms_questions_and_answers(paper, gs, consolidate=consolidate)
+            for gs, paper in zip(gss, papers)
+            if gs
+        ]
     )
     used_gs = []
     for paper in paper_gs:
@@ -96,8 +103,8 @@ def adherence_few_shot_demonstration(
     ]
     paper_gs = list(
         [
-            adherence_questions_and_answers(gs, consolidate=consolidate)
-            for gs in gss
+            adherence_questions_and_answers(paper, gs)
+            for gs, paper in zip(gss, papers)
             if gs
         ]
     )
@@ -516,19 +523,5 @@ async def decontext_elicit_baseline_prune_then_answer(
     answer = await elicit_baseline_prune_then_answer(paper, question)
     assert answer
 
-
-async def elicit_baseline_then_demonstration_answer(
-    paper: Paper, question: str, gold_support=None
-):
-    gold_support  # unused
-    texts = _to_paragraphs(paper)
-    selections = await select_results_using_elicit_prompt(
-        question=question, texts=texts
-    )
-
-
-# while selections:
-#     try:
-#         return await cheating_few_shot_qa_baseline()
 
 recipe.main(elicit_baseline_into_answer)

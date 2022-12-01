@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Generic
@@ -38,6 +37,7 @@ class SequenceGenerationEvaluation(Generic[AnswerType_contra]):
     gold_answer: AnswerType_contra
     generated_answer: AnswerType_contra
     support: Sequence[str]
+    generation_f1_score: float
 
     def as_dict(self):
         return dict(
@@ -49,6 +49,7 @@ class SequenceGenerationEvaluation(Generic[AnswerType_contra]):
             gold_answer=repr(self.gold_answer),
             generated_answer=repr(self.generated_answer),
             support=self.support,
+            f1_score=self.generation_f1_score,
         )
 
 

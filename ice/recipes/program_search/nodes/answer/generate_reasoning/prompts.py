@@ -6,7 +6,6 @@ from ice.formatter.multi import format_multi
 from ice.recipe import recipe
 from ice.recipes.program_search.nodes.answer.types import Demonstration
 from ice.recipes.program_search.nodes.answer.types import DemonstrationWithReasoning
-from ice.utils import map_async
 
 
 INSTRUCTIONS = "My friend came up with the following correct answers for each question but didn't write out his reasoning that supports each answer. Can you write a paragraph explaining why each answer is correct? Be sure to quote the parts of the text that support the answer, explaining why this is the correct conclusion."

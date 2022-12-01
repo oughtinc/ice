@@ -1,10 +1,7 @@
 import typing as t
 
 from pydantic import BaseModel
-from pydantic import root_validator
-from pydantic import validator
 from pydantic.generics import GenericModel
-from pyparsing import Optional
 
 from ice.paper import Paper
 
@@ -78,6 +75,7 @@ T = t.TypeVar("T")
 
 class Beam(GenericModel, t.Generic[T]):
     ...
+
 
 def remove_lowest_perplexity(results: t.Sequence[tuple[str, float]]):
     drop = min(range(len(results)), key=lambda idx: results[idx][1])

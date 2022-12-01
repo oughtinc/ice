@@ -7,7 +7,6 @@ from structlog.stdlib import get_logger
 from ice.apis.openai import openai_complete
 from ice.recipe import recipe
 from ice.utils import map_async
-from ice.utils import n_tokens
 
 log = get_logger()
 
@@ -27,7 +26,7 @@ async def completion_perplexity(
     """Calculate the perplexity of a completion given a prompt."""
     if not completion[0].isspace():
         log.warning("Completion does not start with whitespace!", completion=completion)
-    
+
     response = await openai_complete(
         prompt=prompt + completion,
         max_tokens=0,
@@ -50,7 +49,11 @@ async def completion_perplexity(
         else:
             break
 
-    completion_tokens = completion_tokens[1:] if completion == "".join(completion_tokens[1:]) else completion_tokens
+    completion_tokens = (
+        completion_tokens[1:]
+        if completion == "".join(completion_tokens[1:])
+        else completion_tokens
+    )
     if completion != "".join(completion_tokens):
         print("".join(completion_tokens), completion)
 

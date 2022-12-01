@@ -1,6 +1,7 @@
 import re
 
-from typing import Optional, Sequence
+from collections.abc import Sequence
+from typing import Optional
 
 from structlog import get_logger
 
@@ -30,9 +31,7 @@ async def answer_like_elicit_qa(
         excerpt=passage,
     )
 
-    response = await openai_complete(
-        prompt, stop=None
-    )
+    response = await openai_complete(prompt, stop=None)
 
     choices = response.get("choices")
 

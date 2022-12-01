@@ -2,10 +2,6 @@ from collections.abc import Sequence
 
 from structlog.stdlib import get_logger
 
-from ice.formatter.multi import format_multi
-from ice.recipes.experiments_and_arms.num_utils import extract_nums
-from ice.recipes.experiments_and_arms.num_utils import strip_enumeration_prefix
-from ice.recipes.experiments_and_arms.prompts.utils import get_part
 
 log = get_logger()
 

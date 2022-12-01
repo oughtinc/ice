@@ -8,7 +8,6 @@ from .adherence_tfew_paragraph import AdherenceParagraphTfew
 from .all_quotes import AllQuotesRecipe
 from .blinding_dynamic import BlindingDynamic
 from .comparisons_qa import ComparisonsQA
-from .consort_flow.allocated_to_arms import DecontextAndSelect
 from .evaluate_result import EvaluateResult
 from .evaluate_results import EvaluateResults
 from .experiment_arms import ExperimentArms
@@ -39,7 +38,6 @@ def get_recipe_classes() -> list[Type[Recipe]]:
         EvaluateResults,
         ExampleMetaRecipe,
         PaperDecontext,
-        DecontextAndSelect,
         ExperimentArms,
         FunnelSimple,
         PlaceboDescriptionInstruct,

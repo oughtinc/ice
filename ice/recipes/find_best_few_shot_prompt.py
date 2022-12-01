@@ -1,14 +1,16 @@
+from collections.abc import Iterator
+from collections.abc import Sequence
 from math import factorial
-from typing import Any, Iterator, Sequence, TypeVar
+from typing import TypeVar
+
+import numpy as np
 
 from structlog.stdlib import get_logger
+from tqdm import tqdm
 
 from ice.recipe import recipe
 from ice.recipes.best_completion import completion_perplexity
 from ice.utils import map_async
-from tqdm import tqdm
-
-import numpy as np
 
 EXAMPLES_PROMPTS = [
     "Complete this math problem: 2 + 2 =",
@@ -29,7 +31,7 @@ def remaining_prompts(
     prompts_and_completions: Sequence[tuple[str, str]],
     used_prompts_and_completions: Sequence[tuple[str, str]],
 ) -> Sequence[tuple[str, str]]:
-    return [p for p in prompts_and_completions if not p in used_prompts_and_completions]
+    return [p for p in prompts_and_completions if p not in used_prompts_and_completions]
 
 
 async def tuple_completion_perplexity(
@@ -65,10 +67,10 @@ T = TypeVar("T")
 
 
 def _random_permutations(
-    l: list[T], n_shots: int, rng: np.random.Generator, max=MAX_PERMUTATIONS
+    lst: list[T], n_shots: int, rng: np.random.Generator, max=MAX_PERMUTATIONS
 ) -> Iterator[Sequence[T]]:
     for _ in range(max):
-        copy = l.copy()
+        copy = lst.copy()
         rng.shuffle(copy)  # type: ignore[arg-type]
         yield copy[:n_shots]
 

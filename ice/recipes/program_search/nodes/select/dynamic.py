@@ -3,8 +3,6 @@ from typing import Generic
 
 from pydantic.generics import GenericModel
 
-from ice.recipes.program_search.types import Selection
-from ice.recipes.program_search.utils.find_examples import best_distractor
 from ice.recipes.program_search.utils.find_examples import mark_gs
 from ice.recipes.program_search.utils.find_examples import rouge_distractor_scores
 from ice.recipes.program_search.utils.find_examples import SelectionT_co

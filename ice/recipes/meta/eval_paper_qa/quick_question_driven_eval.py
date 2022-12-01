@@ -1,6 +1,5 @@
 import math
 
-from ice.apis.openai import openai_complete
 from ice.contrib.ought_private.openai.alpha import alpha_complete
 from ice.formatter.multi import format_multi
 from ice.formatter.multi import stop

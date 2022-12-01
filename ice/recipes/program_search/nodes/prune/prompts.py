@@ -12,10 +12,10 @@ from ice.formatter.transform.value import numbered_list
 from ice.formatter.transform.value import ValueTransform
 
 REASONINGS: list[str] = [
-    """- Excerpt 1 talks about the training of medical students and trainees and so is not related to effect size. 
-- Excerpt 2 talks about the need for medical trainees to learn from different kinds of images to attain expert level this is also not relevant to effect size. 
-- Excerpt 3 talks about how individual variability substantially affects learning styles this is also not relevant to effect size.  
-- Excerpt 4 says that learning is dictated by the diversity and number of cases  encountered this is again relevant to effect size.  
+    """- Excerpt 1 talks about the training of medical students and trainees and so is not related to effect size.
+- Excerpt 2 talks about the need for medical trainees to learn from different kinds of images to attain expert level this is also not relevant to effect size.
+- Excerpt 3 talks about how individual variability substantially affects learning styles this is also not relevant to effect size.
+- Excerpt 4 says that learning is dictated by the diversity and number of cases  encountered this is again relevant to effect size.
 - Excerpt 5 talks the benefits of an AI assisted teaching platform. This is irrelevant to the effect size.
 - Excerpt 6 talks about the WithAI score (88.87) of the medical students in the AIL group being significantly higher than the prelearning score (75.73). This directly related to the effect size.
 Which excerpts answer the question, from most to least important: 6""",
@@ -23,12 +23,12 @@ Which excerpts answer the question, from most to least important: 6""",
 - Excerpt 2 talks about the Ghana experiment having a more complex design with two additional treatment groups. This is very much relevant to the design of the Ghana experiment.
 - Excerpt 3 says that in this paper, they  are using only the group that received the pooled intervention. This is not relevant to the to the design of the Ghana experiment.
 - Excerpt 4 talks about the sample size used in the analysis, which could relate design of the Ghana experiment but it's not the most important detail.
-- Excerpt 5 presents the baseline data for the same variables and indices used as the primary outcome measures, which is not relevant to the design of the Ghana experiment . 
+- Excerpt 5 presents the baseline data for the same variables and indices used as the primary outcome measures, which is not relevant to the design of the Ghana experiment .
 - Excerpt 6 says that Panel A presents the mean comparisons and t-tests for equality of means, which is not relevant to the design of the Ghana experiment.
-- Excerpt 7 talks about how villages were randomly selected to be treatment or control villages in the countries with clustered randomization. This is relevant to the question. 
+- Excerpt 7 talks about how villages were randomly selected to be treatment or control villages in the countries with clustered randomization. This is relevant to the question.
 Which excerpts answer the question, from most to least important: 2, 1, 7, 4""",
     """- Excerpt 1 talks about how information about the general health of 8-year-old singletons born through ICSI was obtained from the parents by means of a questionnaire. This is not relevant to the sample size.
-- Excerpt 2 states that 15 out of 150 ICSI children experienced a major congenital malformation compared with 5/147 SC children. This excerpt includes the sample size for both the ICSI children and the SC children and is hence directly relevant to the question. 
+- Excerpt 2 states that 15 out of 150 ICSI children experienced a major congenital malformation compared with 5/147 SC children. This excerpt includes the sample size for both the ICSI children and the SC children and is hence directly relevant to the question.
 - Excerpt 3 says that pubertal staging was similar in both groups. This is not relevant to the sample size.
 - Excerpt 4 says that neurological examination did not show important differences between ICSI and SC children. This is not relevant to the sample size.
 - Excerpt 5 states that ICSI children did not require more remedial therapy or surgery or hospitalization than SC children. This is not relevant to the sample size.
@@ -152,7 +152,7 @@ def make_pruning_with_reasoning_prompt(
             reasoning_with_selection=stop("- Excerpt 1"),
         )
     ]
-    filled_examples = format_multi(EXAMPLE_WITH_REASONING_TEMPLATE, all_examples)  # type: ignore[arg-type]
+    filled_examples = format_multi(EXAMPLE_WITH_REASONING_TEMPLATE, all_examples)
     prompt = "\n\n".join((INSTRUCTIONS, EXAMPLE_SEPARATOR.join(filled_examples)))
     return prompt
 
@@ -187,9 +187,7 @@ def get_pruned_selections_via_logprobs(
         if selection.strip().isnumeric() and idx >= start_idx
     ]
     indexed_probs: dict[int, float] = {}
-    for rank, selected_idx in enumerate(
-        selections
-    ):
+    for rank, selected_idx in enumerate(selections):
         for candidate in range(num_selections):
             if candidate not in indexed_probs:
                 prob_at_position = lps["top_logprobs"][selected_idx].get(
