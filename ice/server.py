@@ -43,7 +43,7 @@ def ensure_server_running():
         stderr=subprocess.DEVNULL,
     )
     wait_until_server_running()
-    log.info("Server started!")
+    log.info("Server started! Run `python -m ice.server stop` to stop it.")
 
 
 def stop():
