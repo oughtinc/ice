@@ -10,11 +10,11 @@ async def test_trace_blocks():
     assert trace.current_trace
 
     long = "a" * trace.Trace.BLOCK_LENGTH
-    assert trace.emit_block("foo") == [0, 0]
-    assert trace.emit_block("bar") == [0, 1]
-    assert trace.emit_block(long) == [0, 2]
-    assert trace.emit_block("baz") == [1, 0]
-    assert trace.emit_block("quux") == [1, 1]
+    assert trace.emit_block("foo") == (0, 0)
+    assert trace.emit_block("bar") == (0, 1)
+    assert trace.emit_block(long) == (0, 2)
+    assert trace.emit_block("baz") == (1, 0)
+    assert trace.emit_block("quux") == (1, 1)
 
     assert (
         trace.current_trace.dir / "block_0.jsonl"
