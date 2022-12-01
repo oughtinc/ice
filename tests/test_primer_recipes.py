@@ -16,6 +16,7 @@ fake = Faker()
 
 root_dir = Path(__file__).parent.parent
 
+recipe.all_recipes = []
 primer_recipes_dir = root_dir / "ice" / "recipes" / "primer"
 for path in primer_recipes_dir.glob("**/*.py"):
     relative_path = path.relative_to(primer_recipes_dir)

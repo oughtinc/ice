@@ -11,6 +11,8 @@ log = get_logger()
 
 
 class ExperimentArms(Recipe):
+    do_not_test = True
+
     async def get_arms(self, paper: Paper, experiment: str) -> list[Arm]:
         qa_recipe = ComparisonsQA(mode=self.mode)
         arms_result = await qa_recipe.run(

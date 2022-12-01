@@ -254,6 +254,8 @@ Answer:"""
 
 
 class PlaceboTree(Recipe):
+    do_not_test = True
+
     async def run(self, *, paper: Paper):
         arms_recipe = ExperimentArms(mode=self.mode)
         arms, arm_descriptions = await arms_recipe.run(paper=paper)  # type: ignore[call-arg]

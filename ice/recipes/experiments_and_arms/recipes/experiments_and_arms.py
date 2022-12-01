@@ -31,7 +31,7 @@ async def experiments_and_arms(
         tuple[str, str, ExperimentsArms, ExperimentsArms]: The quick-eval grade, the explanation for that grade, the gold standard answer, and the generated answer.
     """
     gs = get_ea_gs(paper.document_id)
-    _, exps = await name_experiments(paper)
+    _, exps, _, _ = await name_experiments(paper)
 
     async def run_arms(experiment_in_question: str) -> Sequence[str]:
         return await name_arms(

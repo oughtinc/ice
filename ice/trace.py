@@ -118,8 +118,9 @@ def emit_block(x) -> tuple[int, int]:
 
 
 def add_fields(**fields: str):
-    id = parent_id_var.get()
-    emit({f"{id}.fields.{key}": value for key, value in fields.items()})
+    if trace_enabled():
+        id = parent_id_var.get()
+        emit({f"{id}.fields.{key}": value for key, value in fields.items()})
 
 
 def compress(o: object):
