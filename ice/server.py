@@ -59,10 +59,10 @@ def stop():
         pass  # expected as the server dies
 
     if is_server_running():
-        print(f"Weird, the server is still running!")
+        print("Weird, the server is still running!")
         sys.exit(1)
     else:
-        print(f"Server stopped!")
+        print("Server stopped!")
 
 
 def start():
