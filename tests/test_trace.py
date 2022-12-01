@@ -18,7 +18,7 @@ async def test_trace_blocks():
 
     assert (
         trace.current_trace.dir / "block_0.jsonl"
-    ).read_text() == f'"foo"\n"bar"\n"{long}"\nend'
+    ).read_text() == f'"foo"\n"bar"\n"{long}"\nend\n'
 
 
 def test_get_strings():

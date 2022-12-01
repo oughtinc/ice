@@ -78,7 +78,7 @@ class Trace:
             self.block_file.write(s)
             self.block_length += len(s)
             if self.block_length > self.BLOCK_LENGTH:
-                self.block_file.write("end")
+                self.block_file.write("end\n")
                 self.block_file.close()
                 self._open_block()
             else:

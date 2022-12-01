@@ -231,17 +231,25 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
 
     const url = `${urlPrefix(traceId)}/block_${blockNumber}.jsonl`;
     const fetchBlock = async (start: number) => {
+      // Note that the 999999999 is needed because our get_file implementation
+      // requires both ends of the range to be specified.
       const response = await fetch(url, { headers: { Range: `bytes=${start}-999999999` } });
       const text = await response.text();
 
       if (!isMounted.current) return;
 
-      const lines = text.split("\n").filter(Boolean);
-      if (lines[lines.length - 1] === "end") {
+      start += text.length;
+      const lines = text.split("\n");
+      // Remove the last line. Normally it's empty, i.e. text should end in a newline.
+      // This also handles lines being incomplete,
+      // in which case `start` is moved to the beginning of that line.
+      start -= lines.pop()!.length;
+
+      if (last(lines) === "end") {
         lines.pop();
       } else {
         // This block is incomplete, schedule polling for the rest.
-        setTimeout(() => fetchBlock(start + text.length), 1_000);
+        setTimeout(() => fetchBlock(start), 1_000);
       }
 
       if (lines.length) {
