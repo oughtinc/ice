@@ -60,7 +60,7 @@ interface CallInfo extends InputOutputContentProps {
   start: number; // start time
   name: string; // function name
   cls?: string; // class name for methods
-  arg: string; // short representation of args
+  shortArgs: string; // short representation of args
   shortResult?: string[]; // short representation of return value
   children?: Calls; // nested calls
   func: BlockAddress<FuncBlock>; // long info about the function itself
@@ -367,7 +367,7 @@ function lineAnchorId(id: string) {
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const callInfo = useCallInfo(id);
-  const { children = {}, select, selected, focussed, arg, shortResult } = callInfo;
+  const { children = {}, select, selected, focussed, shortArgs, shortResult } = callInfo;
   const { selectedId } = useTreeContext();
   const { getParent } = useLinks();
   const childIds = Object.keys(children);
@@ -444,7 +444,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
           <div className="mx-2">
             <CallName className="text-base text-slate-700" id={id} />
             <div className="text-sm text-gray-600 flex items-center">
-              <span className="text-indigo-600">{arg}</span>
+              <span className="text-indigo-600">{shortArgs}</span>
               <span className="px-2">→</span>
               {shortResult === undefined ? (
                 <Spinner size="small" />

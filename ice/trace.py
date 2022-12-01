@@ -202,7 +202,7 @@ def trace(fn):
                 parent=parent_id,
                 start=monotonic_ns(),
                 name=fn.__name__,
-                arg=get_strings(arg_dict),
+                shortArgs=get_strings(arg_dict),
                 func=emit_block(func_info(fn)),
                 args=emit_block(arg_dict),
             )
