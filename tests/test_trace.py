@@ -6,9 +6,8 @@ from ice import trace
 @pytest.mark.anyio
 async def test_trace_blocks():
     trace.enable_trace()
-    current_trace = trace.trace_var.get()
     assert trace.trace_enabled()
-    assert current_trace
+    assert trace.current_trace
 
     long = "a" * trace.Trace.BLOCK_LENGTH
     assert trace.emit_block("foo") == [0, 0]
@@ -18,7 +17,7 @@ async def test_trace_blocks():
     assert trace.emit_block("quux") == [1, 1]
 
     assert (
-        current_trace.dir / "block_0.jsonl"
+        trace.current_trace.dir / "block_0.jsonl"
     ).read_text() == f'"foo"\n"bar"\n"{long}"\nend'
 
 
