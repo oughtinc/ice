@@ -1,4 +1,6 @@
 import logging
+import os
+import signal
 
 from pathlib import Path
 
@@ -26,6 +28,20 @@ except RuntimeError:
     logger.warning(
         "ui folder not found, skipping static file mount. Run `npm run build` to build the ui."
     )
+
+
+PING_RESPONSE = "ought-ice says pong"
+
+
+@app.get("/ping")
+async def ping():
+    return PlainTextResponse(PING_RESPONSE)
+
+
+@app.post("/stop")
+async def stop():
+    # Note that this doesn't work properly when the server runs with --reload
+    os.kill(os.getpid(), signal.SIGKILL)
 
 
 @app.get("/{_full_path:path}")
