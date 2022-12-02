@@ -12,16 +12,18 @@ from ice.sqlite_shelf import SQLiteShelf
 
 
 def diskcache(cache_dir: Path = CACHE_DIR):
-    def get_cache_and_key(func, *args, **kwargs):
+    def get_cache(func):
         cache_file = (cache_dir / func.__name__).as_posix() + ".sqlite"
-        key = repr(inspect.getcallargs(func, *args, **kwargs))
-        cache = SQLiteShelf(cache_file, "diskcache")
-        return cache, key
+        return SQLiteShelf(cache_file, "diskcache")
+
+    def get_cache_key(func, *args, **kwargs):
+        return repr(inspect.getcallargs(func, *args, **kwargs))
 
     def decorator(func):
         @functools.wraps(func)
         def sync_wrapper(*args, **kwargs):
-            cache, key = get_cache_and_key(func, *args, **kwargs)
+            key = get_cache_key(func, *args, **kwargs)
+            cache = get_cache(func)
             if key in cache:
                 return cache[key]
             result = func(*args, **kwargs)
@@ -30,15 +32,16 @@ def diskcache(cache_dir: Path = CACHE_DIR):
 
         @functools.wraps(func)
         async def async_wrapper(*args, **kwargs):
-            cache, key = get_cache_and_key(func, *args, **kwargs)
+            key = get_cache_key(func, *args, **kwargs)
+            cache = get_cache(func)
             if key in cache:
                 return cache[key]
             cache.close()
-            # close connection while waiting for async function; fixes db connection bug
+            # close connection while waiting for async function so we don't have a bunch of connections open simultaneously
 
             result = await func(*args, **kwargs)
 
-            cache, key = get_cache_and_key(func, *args, **kwargs)
+            cache = get_cache(func)
             cache[key] = result
             return result
 
