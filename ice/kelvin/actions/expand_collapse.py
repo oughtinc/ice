@@ -38,6 +38,7 @@ class ToggleAction(Action):
                                 kind="IdParam",
                                 label="Row Id",
                                 value=row.id,
+                                readable_value=row.readable_value(),
                             )
                         ],
                     )

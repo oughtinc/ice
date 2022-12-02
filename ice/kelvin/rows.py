@@ -19,6 +19,9 @@ class Row(BaseModel):
     def __str__(self):
         return f"""<row id="{self.id}" kind="{self.kind}"/>"""
 
+    def readable_value(self):
+        return None
+
 
 class TextRow(Row):
     kind: Literal["Text"] = "Text"
@@ -26,6 +29,9 @@ class TextRow(Row):
 
     def __str__(self):
         return f"""<row id="{self.id}" kind="text">{self.text}</row>"""
+
+    def readable_value(self):
+        return self.text
 
 
 class PaperRow(Row):
@@ -45,6 +51,9 @@ class PaperRow(Row):
         else:
             return f"""<row id="{self.id}" kind="paper" title="{self.title}" authors="{self.authors}" year="{self.year}" has_full_text="{self.has_full_text}" is_expanded="false"/>"""
 
+    def readable_value(self):
+        return self.title
+
 
 class PaperSectionRow(Row):
     kind: Literal["PaperSection"] = "PaperSection"
@@ -60,6 +69,15 @@ class PaperSectionRow(Row):
             return f"""<row id="{self.id}" kind="paper_section" title="{self.title}" paper="{self.paper.id}" is_expanded="true">{section_text}</row>"""
         else:
             return f"""<row id="{self.id}" kind="paper_section" title="{self.title}" paper="{self.paper.id}" is_expanded="false">{self.preview}</row>"""
+
+    def readable_value(self):
+        return self.title
+
+    def as_markdown(self):
+        paragraphs_text = "\n\n".join(self.paragraphs)
+        return f"""# {self.title}
+
+{paragraphs_text}"""
 
 
 # class ActionRow(Row):

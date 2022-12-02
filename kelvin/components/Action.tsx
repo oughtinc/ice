@@ -1,10 +1,11 @@
+import Expander from "./Expander";
 import { Action as ActionType } from "/types";
 
 const Action = ({ kind, params, label }: ActionType) => {
   if (kind == "DebugAction") {
     return (
       <div className="action">
-        <pre className="max-w-1/2 whitespace-pre-wrap">{label}</pre>
+        <Expander openLabel="Hide prompt" closedLabel="Show prompt" content={label} />
       </div>
     );
   }

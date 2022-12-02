@@ -131,7 +131,7 @@ const SelectionListItem = ({
     </kbd>
   );
 
-  const iconColor = !multiselect && active && index == 0 ? "text-yellow-400" : "text-slate-400";
+  const iconColor = active && focused ? "text-yellow-400" : "text-slate-400";
 
   return (
     <li className={`flex p-1 pl-2 pr-2 items-center ${bgColor}`} ref={forwardedRef}>
@@ -158,7 +158,7 @@ const SelectionList = ({
   const itemRefs = useScrollIntoView({ items, focusIndex });
 
   useHotkeys(
-    "space, x",
+    "space",
     () => {
       const item = items[focusIndex];
       if (item) {

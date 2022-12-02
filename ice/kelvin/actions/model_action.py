@@ -9,6 +9,7 @@ from ice.kelvin.actions.base import ActionParam
 from ice.kelvin.actions.elicit import ElicitSearchAction
 from ice.kelvin.actions.elicit import ViewPaperAction
 from ice.kelvin.actions.expand_collapse import ToggleAction
+from ice.kelvin.actions.path import SaveElementToPathAction
 from ice.kelvin.actions.text import AddTextRowAction
 from ice.kelvin.history import History
 from ice.kelvin.history import history_to_str
@@ -81,7 +82,7 @@ LONG_EXAMPLE_SESSION = (
 )
 
 
-def get_model_action(frontier: Frontier, history: History) -> Action:
+def get_model_actions(frontier: Frontier, history: History) -> list[Action]:
     """
     v1: fixed commands
     """
@@ -91,34 +92,35 @@ def get_model_action(frontier: Frontier, history: History) -> Action:
     history_str = history_to_str(history)
 
     prompt = f"""
-You are an AI research assistant. You are helping a user do research. The user is trying to answer research questions by searching for papers, reading relevant sections, and writing down reasoning steps.
+You are my AI research assistant. You are helping me do research. I'm trying to answer research questions by searching for papers, saving them, reading relevant sections, and writing down reasoning steps.
 
-The user's workspace is a sequence of cards. At each point the user is looking at a single card. The user issues actions that operate on the current card and generate a new card.
+My workspace is a sequence of cards. At each point I'm looking at a single card. I issue actions that operate on the current card and generate a new card.
 
-Your goal is to find out what the user wants and help them accomplish their goal by suggesting helpful next actions. Whenever a new paper or card gets added or expanded, show your reasoning.
+Your goal is to find out what I want and to help me accomplish it by suggesting helpful next actions.
 
 Available actions:
 <action kind="FindPapers">[query]</action> runs a semantic search through about 200 million academic papers and gets the top results for the search term [query].
-<action kind="AddReasoning">[thought]</action> use this to write down your thinking process and share information with the user.
+<action kind="AddReasoning">[thought]</action> use this to share helpful information and analysis with me.
 <action kind="ViewPaper">[id]: [short paper title]</action> zoom in on a paper in the current card.
-<action kind="Toggle">[id]: [short section title]</action> expand a section in the current card that has is_expanded="false".
+<action kind="Toggle">[id]: [short section title]</action> expand a paper section in the current card (if it has is_expanded="false").
+<action kind="SavePaper">[paper id] to [path id]: [paper title] to [path title]</action> save papers that help me answer my research question.
 
-Here's an example of a session:
+Here's an example of a session from someone else:
 ========
 {SHORT_EXAMPLE_SESSION}
 ========
 
-Here's the current session:
+Here's my current session:
 ========
 {history_str}
 ========
 
-What action would you like to run?<|endofprompt>
+What action would you like to run for me?<|endofprompt>
 
 <action"""
     # 2. Get model response
     agent = OpenAIAgent(
-        model="text-alpha-002-current",
+        model="text-davinci-003",
     )
     # log.info("Running prompt", prompt=prompt)
     result_str = asyncio.run(agent.complete(prompt=prompt)).strip()
@@ -170,7 +172,11 @@ What action would you like to run?<|endofprompt>
         action = ViewPaperAction(
             params=[
                 ActionParam(
-                    name="paper_id", kind="IdParam", label="Paper", value=paper_id
+                    name="paper_id",
+                    kind="IdParam",
+                    label="Paper",
+                    value=paper_id,
+                    readable_value=title,
                 )
             ],
             label=f"View paper: {title}",
@@ -187,12 +193,52 @@ What action would you like to run?<|endofprompt>
         action = ToggleAction(
             params=[
                 ActionParam(
-                    name="section_id", kind="IdParam", label="Section", value=section_id
+                    name="section_id",
+                    kind="IdParam",
+                    label="Section",
+                    value=section_id,
+                    readable_value=title,
                 )
             ],
             label=f"Toggle section: {title}",
         )
+    elif kind == "SavePaper":
+        # "<action kind="SavePaper">[paper id] to [path id]: '[paper title]' to '[path title]'</action> save a paper to a path."
+        match = re.match(r"([^ ]+) to ([^:]+): '(.+)' to '(.+)'", params_str)
+        if match:
+            paper_id, path_id, paper_title, path_title = match.groups()
+        else:
+            # try to just match the ids
+            match = re.match(r"([^ ]+) to ([^ ]+)", params_str)
+            if match:
+                paper_id, path_id = match.groups()
+                paper_title = "(unknown paper title)"
+                path_title = "(unknown path title)"
+            else:
+                raise ValueError(f"Invalid action string: {result_str}")
+        action = SaveElementToPathAction(
+            params=[
+                ActionParam(
+                    name="element_id",
+                    kind="IdParam",
+                    label="Element",
+                    value=paper_id,
+                    readable_value=paper_title,
+                ),
+                ActionParam(
+                    name="path_id",
+                    kind="IdParam",
+                    label="Path",
+                    value=path_id,
+                    readable_value=path_title,
+                ),
+            ],
+            label=f"""Save paper "{paper_title}" to path "{path_title}" """,
+        )
+
     else:
         raise ValueError(f"Invalid action kind: {kind}")
 
-    return action
+    debug_action = Action(kind="DebugAction", params=[], label=prompt)
+
+    return [action, debug_action]

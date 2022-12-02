@@ -22,6 +22,12 @@ class ActionParam(BaseModel):
     value: Any
     label: str
     default_value: Any = None
+    readable_value: str | None = None
+
+    def __str__(self) -> str:
+        if self.readable_value is not None:
+            return f"{self.value}: {self.readable_value}"
+        return str(self.value)
 
 
 class ActionParamInt(ActionParam):
@@ -68,7 +74,12 @@ class Action(BaseModel):
         if len(self.params) == 0:
             return f"""<action kind="{self.kind}" />"""
         elif len(self.params) == 1:
-            return f"""<action kind="{self.kind}">{self.params[0].value}</action>"""
+            return f"""<action kind="{self.kind}">{self.params[0]}</action>"""
+        elif len(self.params) == 2:
+            if self.params[0].readable_value and self.params[1].readable_value:
+                return f"""<action kind="{self.kind}">{self.params[0].readable_value} to {self.params[1].readable_value}: {self.params[0].value} to {self.params[1].value}</action>"""
+            else:
+                return f"""<action kind="{self.kind}">{self.params[0].value} to {self.params[1].value}</action>"""
         return f"""<action kind="{self.kind}">{self.params}</action>"""
 
 
@@ -77,10 +88,12 @@ def update_row_in_frontier(
 ) -> PartialFrontier:
     card = frontier.focus_path_head()
 
+    new_row_id = generate_id()
+
     def _update_row(row):
         # Update row id to new id
         row = row.copy()
-        row.id = generate_id()
+        row.id = new_row_id
         return update_fn(row)
 
     new_rows = [_update_row(row) if row.id == row_id else row for row in card.rows]
@@ -88,8 +101,10 @@ def update_row_in_frontier(
     new_card = Card(rows=new_rows, prev_id=card.id, created_by_action=action)
 
     new_focused_row_index = next(
-        (i for i, row in enumerate(new_rows) if row.id == row_id), None
+        (i for i, row in enumerate(new_rows) if row.id == new_row_id), None
     )
+
+    log.info("update_row_in_frontier", new_focused_row_index=new_focused_row_index)
 
     new_frontier = frontier.update_focus_path_head(
         new_head_card=new_card,

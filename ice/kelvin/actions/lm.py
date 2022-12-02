@@ -29,7 +29,7 @@ class GenerationAction(Action):
         context = self.params[0].value
         command = self.params[1].value
         agent = OpenAIAgent(
-            model="text-alpha-002-current",
+            model="text-davinci-003",
         )
 
         if context == "NO_CONTEXT":
@@ -76,7 +76,7 @@ Result:
         if row_kinds == {"Text"}:
             marked_rows = frontier.get_marked_rows()
             lm_action = cls(
-                label=f"Run language model command on {len(marked_rows)} rows",
+                label=f"Run language model command on {len(marked_rows)} notes",
                 params=[
                     ActionParam(
                         name="context",
@@ -88,7 +88,7 @@ Result:
                 ],
             )
             show_more_action = cls(
-                label="Generate more bullets like this",
+                label="Generate more notes like this",
                 params=[
                     ActionParam(
                         name="context",
@@ -105,6 +105,22 @@ Result:
                 ],
             )
             actions += [lm_action, show_more_action]
+        elif row_kinds == {"PaperSection"}:
+            marked_rows = frontier.get_marked_rows()
+            sections_text = "\n\n".join(row.as_markdown() for row in marked_rows)
+            lm_action = cls(
+                label=f"Run language model command on {len(marked_rows)} sections",
+                params=[
+                    ActionParam(
+                        name="context",
+                        kind="TextParam",
+                        label="Context",
+                        value=sections_text,
+                    ),
+                    ActionParam(name="command", kind="TextParam", label="Command"),
+                ],
+            )
+            actions += [lm_action]
         else:
             lm_action = cls(
                 label="Run language model command",

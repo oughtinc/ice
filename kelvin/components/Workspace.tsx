@@ -139,7 +139,7 @@ const Workspace = () => {
           <div className="relative">
             {activeRequestCount > 0 && (
               <div className="text-center absolute bottom-5 border left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white text-black p-2">
-                Executing...
+                Loading...
               </div>
             )}
             <SelectionList

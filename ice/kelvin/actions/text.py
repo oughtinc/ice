@@ -100,6 +100,7 @@ class EditTextRowAction(Action):
                             kind="IdParam",
                             value=row.id,
                             label="Text Id",
+                            readable_value=truncated_text,
                         ),
                     ],
                     label=f'Edit text "{truncated_text}"',

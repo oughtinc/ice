@@ -96,10 +96,10 @@ class Path(BaseModel):
 
 
 class HydratedPath(BaseModel):
-    id: PathId
+    id: PathId = Field(default_factory=generate_id)
     label: str
     head_card: Card
-    view: View
+    view: View = Field(default_factory=View)
 
     def rows(self) -> list[Row]:
         return self.head_card.rows

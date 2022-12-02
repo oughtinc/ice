@@ -166,6 +166,7 @@ class ViewPaperAction(Action):
                             kind="IdParam",
                             label="Paper",
                             value=paper_id,
+                            readable_value=short_title,
                         )
                     ],
                 )
