@@ -2,7 +2,6 @@ from structlog.stdlib import get_logger
 
 from ice.recipe import recipe
 from ice.recipes.elicit.common import send_elicit_request
-from ice.recipes.elicit.fixtures import default_papers
 
 log = get_logger()
 
@@ -53,12 +52,9 @@ async def elicit_qa(
     qa_question: str = "What was the population?",
     papers: dict | None = None,
 ):
-    if papers is None:
-        log.warning("No papers provided, using default papers")
-        papers = default_papers
     cells = [
         dict(paper, column={"type": "custom_question", "value": qa_question})
-        for paper in papers.values()
+        for paper in (papers or dict()).values()
     ]
     request_body = {"rootQuestion": root_question, "cells": cells}
     response = send_elicit_request(

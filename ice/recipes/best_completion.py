@@ -7,7 +7,6 @@ from structlog.stdlib import get_logger
 from ice.apis.openai import openai_complete
 from ice.recipe import recipe
 from ice.utils import map_async
-from ice.utils import n_tokens
 
 log = get_logger()
 
@@ -27,6 +26,7 @@ async def completion_perplexity(
     """Calculate the perplexity of a completion given a prompt."""
     if not completion[0].isspace():
         log.warning("Completion does not start with whitespace!", completion=completion)
+
     response = await openai_complete(
         prompt=prompt + completion,
         max_tokens=0,
@@ -41,7 +41,23 @@ async def completion_perplexity(
 
     logits = choices[0]["logprobs"]["token_logprobs"]
 
-    completion_logits = logits[n_tokens(prompt) :]
+    tokens = choices[0]["logprobs"]["tokens"]
+    completion_tokens: list[str] = []
+    for token in reversed(tokens):
+        if completion.endswith("".join(completion_tokens)):
+            completion_tokens = [token] + completion_tokens
+        else:
+            break
+
+    completion_tokens = (
+        completion_tokens[1:]
+        if completion == "".join(completion_tokens[1:])
+        else completion_tokens
+    )
+    if completion != "".join(completion_tokens):
+        print("".join(completion_tokens), completion)
+
+    completion_logits = logits[-len(completion_tokens) :]
 
     perplexity = math.exp(-sum(completion_logits) / len(completion_logits))
 
@@ -52,15 +68,13 @@ async def best_completion(
     prompts: list[str] = PROMPTS,
     completion: str = COMPLETION,
 ) -> list[tuple[str, float]]:
-    """Returns a sorted list of completions and their perplexities."""
+    """Returns a list of prompts and their perplexities."""
     perplexities = await map_async(
         input_list=prompts,
         fn=partial(completion_perplexity, completion=completion),
         max_concurrency=10,
     )
-    prompt_list = list(zip(prompts, perplexities))
-
-    return sorted(prompt_list, key=lambda x: x[1])
+    return list(zip(prompts, perplexities))
 
 
 recipe.main(best_completion)

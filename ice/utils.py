@@ -10,6 +10,7 @@ from collections.abc import Callable
 from collections.abc import Coroutine
 from collections.abc import Iterable
 from collections.abc import Sequence
+from enum import Enum
 from functools import cache
 from random import Random
 from typing import Any
@@ -19,10 +20,48 @@ from typing import TypeVar
 import anyio
 import tqdm
 
+from more_itertools import windowed
 from structlog.stdlib import get_logger
 from transformers import GPT2TokenizerFast
 
 log = get_logger()
+
+
+def _merge(recurse, path: list, base: dict, nxt: dict) -> dict:
+    for k, v in nxt.items():
+        if k not in base:
+            base[k] = v
+        else:
+            base[k] = recurse(recurse, path + [k], base[k], v)
+    return base
+
+
+def deep_merge(base, nxt):
+    """
+    Performs a *limited* deep merge of nxt into base.
+    Type differences are overriden by nxt.
+    Lists are extended, but elements are not changed or recursed into.
+    Sets are unioned but not recursed into.
+    """
+
+    def merge_strategy(
+        merge_strategy,
+        path: list,
+        base,
+        nxt,
+    ):
+        if not (isinstance(base, type(nxt)) or isinstance(nxt, type(base))):
+            return nxt
+        elif isinstance(nxt, dict):
+            return _merge(merge_strategy, path, base, nxt)
+        elif isinstance(nxt, list) or isinstance(nxt, tuple):
+            return base + nxt
+        elif isinstance(nxt, set):
+            return base | nxt
+        return nxt
+
+    return merge_strategy(merge_strategy, [], base, nxt)
+
 
 InputType_co = TypeVar("InputType_co", covariant=True)
 ReturnType_co = TypeVar("ReturnType_co", covariant=True)
@@ -80,6 +119,34 @@ async def filter_async(
     return [item for item, value in zip(iterable_list, values) if value]
 
 
+T = TypeVar("T")
+S = TypeVar("S")
+
+
+async def reduce_async(
+    fn: Callable[[T, S], Awaitable[T]], iterable: Iterable[S], initial: T
+):
+    current = initial
+    for item in iterable:
+        current = await fn(current, item)
+    return current
+
+
+class _Sentinel(Enum):
+    token = 0
+
+
+_sentinel = _Sentinel.token
+
+
+def window_dropping(items: Sequence[T], n, step) -> Sequence[Sequence[T]]:
+    """Windows over items, shortening n if necessary"""
+    return [
+        [i for i in window if i is not _sentinel]
+        for window in windowed(items, n=n, step=step, fillvalue=_sentinel)
+    ]
+
+
 def longest_common_prefix(xs: Sequence[str]) -> str:
     if not xs:
         return ""
@@ -88,8 +155,6 @@ def longest_common_prefix(xs: Sequence[str]) -> str:
         prefix = os.path.commonprefix([prefix, x])
     return prefix
 
-
-T = TypeVar("T")
 
 AsyncComparator = Callable[[T, T], Awaitable[int]]
 

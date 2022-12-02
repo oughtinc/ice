@@ -1,5 +1,8 @@
+from collections.abc import Mapping
+
 import httpx
 
+from httpx import Response
 from httpx import TimeoutException
 from structlog.stdlib import get_logger
 from tenacity import retry
@@ -10,6 +13,8 @@ from tenacity.wait import wait_random_exponential
 
 from ice.cache import diskcache
 from ice.settings import settings
+from ice.trace import add_fields
+from ice.trace import trace
 
 log = get_logger()
 
@@ -53,6 +58,38 @@ def is_retryable_HttpError(e: BaseException) -> bool:
     )
 
 
+class TooLongRequestError(ValueError):
+    def __init__(self, prompt: str = "", detail: str = ""):
+        self.prompt = prompt
+        self.detail = detail
+        super().__init__(self.detail)
+
+
+def raise_if_too_long_error(prompt: object, response: Response) -> None:
+    # Raise something more specific than
+    # a generic status error if we have exceeded
+    # an OpenAI model's context window
+    if not isinstance(prompt, str) or response.status_code != 400:
+        return None
+    try:
+        body = response.json()
+    except Exception:
+        return None
+    if not isinstance(body, dict):
+        return None
+    message = body.get("error", dict).get("message", "")
+    if not isinstance(message, str):
+        return None
+    # This is a bit fragile, but since OpenAI can
+    # return 400s for other reasons, checking
+    # the message seems like the only real
+    # way to tell.
+    if "maximum context length" not in message:
+        return None
+    raise TooLongRequestError(prompt=prompt, detail=message)
+
+
+@diskcache()
 @retry(
     retry=retry_any(
         retry_if_exception(is_retryable_HttpError),
@@ -62,8 +99,11 @@ def is_retryable_HttpError(e: BaseException) -> bool:
     wait=wait_random_exponential(min=1),
     after=log_attempt_number,
 )
-async def _post(endpoint: str, json: dict, timeout: float | None = None) -> dict:
+async def _post(
+    endpoint: str, json: dict, timeout: float | None = None, cache_id: int = 0
+) -> dict | TooLongRequestError:
     """Send a POST request to the OpenAI API and return the JSON response."""
+    cache_id  # unused
 
     async with httpx.AsyncClient() as client:
         response = await client.post(
@@ -74,11 +114,23 @@ async def _post(endpoint: str, json: dict, timeout: float | None = None) -> dict
         )
         if response.status_code == 429:
             raise RateLimitError(response)
+        try:
+            raise_if_too_long_error(prompt=json.get("prompt"), response=response)
+        except TooLongRequestError as tlre:
+            # Hack alert: Don't raise here so this gets cached
+            return tlre
         response.raise_for_status()
         return response.json()
 
 
-@diskcache()
+# TODO: support more model types for conversion
+
+
+def get_davinci_equivalent_tokens(response: dict) -> int:
+    return response.get("usage", {}).get("total_tokens", 0)
+
+
+@trace
 async def openai_complete(
     prompt: str,
     stop: str | None = "\n",
@@ -87,23 +139,28 @@ async def openai_complete(
     model: str = "text-davinci-002",
     max_tokens: int = 256,
     logprobs: int | None = None,
+    logit_bias: Mapping[str, int | float] | None = None,
     n: int = 1,
     echo: bool = False,
     cache_id: int = 0,  # for repeated non-deterministic sampling using caching
 ) -> dict:
     """Send a completion request to the OpenAI API and return the JSON response."""
-    cache_id  # unused
-    return await _post(
-        "completions",
-        json={
-            "prompt": prompt,
-            "stop": stop,
-            "top_p": top_p,
-            "temperature": temperature,
-            "model": model,
-            "max_tokens": max_tokens,
-            "logprobs": logprobs,
-            "n": n,
-            "echo": echo,
-        },
-    )
+    params = {
+        "prompt": prompt,
+        "stop": stop,
+        "top_p": top_p,
+        "temperature": temperature,
+        "model": model,
+        "echo": echo,
+        "max_tokens": max_tokens,
+        "logprobs": logprobs,
+        "n": n,
+    }
+    if logit_bias:
+        params["logit_bias"] = logit_bias  # type: ignore[assignment]
+
+    response = await _post("completions", json=params, cache_id=cache_id)
+    if isinstance(response, TooLongRequestError):
+        raise response
+    add_fields(davinci_equivalent_tokens=str(get_davinci_equivalent_tokens(response)))
+    return response

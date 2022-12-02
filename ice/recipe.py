@@ -51,7 +51,7 @@ class Recipe(TracedABC, Generic[RecipeSettings]):
 
     def __init__(self, mode: Mode = "machine", settings: RecipeSettings | None = None):
         self.mode = mode
-        self.s = settings or self.defaults()
+        self.s = settings or self.defaults()  # type: ignore[call-arg,misc]
         self.results: list[RecipeResult] = []
 
     @classmethod
@@ -118,7 +118,11 @@ class RecipeHelper:
             raise TypeError("recipe.main must be given an async function")
 
         # Trace all globals defined in main's module.
-        g = main.__globals__
+        try:
+            g = main.__globals__
+        except AttributeError:
+            # Perhaps this is a functools.partial
+            g = main.func.__globals__  # type: ignore[attr-defined]
         for name, value in g.items():
             if getattr(value, "__module__", None) == main.__module__:
                 g[name] = trace(value)

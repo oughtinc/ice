@@ -8240,3 +8240,594 @@ Fig. 3 is most important",,1,4,3,"1. # of participants not monotonically decreas
 2. doesn't really allude to participants assessed for elligibility
 3. very low on detail
 4. but has the basic form",,
+1235,hooley-2018.pdf,https://github.com/brachbach/host-files/raw/main/hooley-2018.pdf,,,consort_flow_v2,"experiments:
+- name: writing interventions to help reduce nonsuicidal self-injury
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: autobiographical self-enhancement training
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: expressive writing
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: daily journaling
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","Specifically, we conducted a randomized controlled trial (RCT) to evaluate Autobiographical Self-Enhancement Training (ASET) -- a novel, cognitive intervention for NSSI focused on reducing self-criticism and enhancing positive self-worth. ","For the present RCT, we tested ASET against another potentially active treatment (expressive writing) and also against a control treatment (journaling). ","Expressive writing, a procedure first developed by Pennebaker and Beall [19] involves writing about stressful or upsetting experiences. ","Finally, we used a journaling (JNL) condition as a comparison control intervention. This involved writing about daily events without any focus on emotional issues. The JNL intervention was developed to control for daily writing (which was inte- gral to both the ASET and the EW conditions). ","After completion of the baseline assessment, participants were randomly assigned to one of three treatment groups: JNL (N = 46), EW (N = 49), and ASET (N = 49) using randomization software within Qualtrics. ",,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1236,käckenmeister-2019.pdf,https://github.com/brachbach/host-files/raw/main/käckenmeister-2019.pdf,,,consort_flow_v2,"experiments:
+- name: effect of dopamine on openness to experience and divergent thinking
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: sulpiride
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: placebo
+    allocated:
+    received:
+    attrition:
+    analyzed:
+",The present study provides an initial direct test of the hypothesis that openness to experience modulates the effects of a pharmacological manipulation of dopamine on measures of divergent thinking. Groups of healthy males received either the dopamine receptor blocker sulpiride or a placebo prior to performing four divergent thinking tasks. Openness to experience was measured beforehand and independently of the pharmacological manipulation. ,"The final sample reported here consisted of 193 males (mean age = 25.8, SD = 3.9; n = 95 in the sulpiride group and n = 98 in the placebo group). ","In a placebo-controlled, double-blind between-subjects design, participants orally ingested either 200 mg sulpiride or a placebo. Both substances were delivered in capsules matched for weight and color to assure double-blindness to participants’ experimental conditions. ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1237,geraerts-2013.pdf,https://github.com/brachbach/host-files/raw/main/geraerts-2013.pdf,,,consort_flow_v2,"experiments:
+- name: preoperative PFMT for incontinence after radical prostatectomy
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: preoperative pelvic floor muscle training
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: control
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","The aim of this study was to determine whether patients who performed PFMT before and after surgery, regained urinary continence earlier than patients who only performed PFMT after catheter removal. ","Before surgery, patients were randomized into the experimental group, starting PFMT 3 weeks before RP and continuing after surgery, or the control group, starting PFMT after catheter removal. ","Every patient received individual treatment on an outpatient basis once a week. The experimental group started exercising 3 weeks before RP. They received one session of 30 minutes of guided PFMT per week until surgery. Additionally patients performed a home program of 60 contractions/ day and were instructed on contracting the pelvic floor muscles while coughing and sitting down/ getting up from a chair. The fourth day after surgery, with the urinary catheter in situ, patients were encouraged to restart PFMT. ",The control group started exercising the day of catheter removal ,"One hundred eighty patients were included, 91 patients were randomized to the intervention group and 89 patients to the control group. ",,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1238,schoenfeld-2021.pdf,https://github.com/brachbach/host-files/raw/main/schoenfeld-2021.pdf,,,consort_flow_v2,"experiments:
+- name: phase synchrony between hemispheres for bimanual motor learning
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: in-phase
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: out-of-phase
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: sham
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","In experiment 2, we performed a between-subjects, double- blind study in 54 healthy participants to explore the effect of phase synchrony between both sensorimotor cortices using tACS at the individual’s beta peak frequency. ","To investigate the effect of phase synchrony between hemispheres on bimanual motor learning, we conducted a double-blind sham-controlled study with three groups (in-phase, out-of-phase, sham) differing in the relative phases of the applied sinusoidal current between the motor cortices ","Participants received either in-phase, i.e., 0◦ phase shift between hemispheres, (20 min), out-of-phase, i.e., 90◦ phase shift between hemispheres, (20 min) or sham (3 s of stimulation) tACS with a ramp up and down for 10 s. ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1239,d'alessandro-2004.pdf,https://github.com/brachbach/host-files/raw/main/d'alessandro-2004.pdf,,,consort_flow_v2,"experiments:
+- name: information prescriptions in pediatrics
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: information prescription
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: control
+    allocated:
+    received:
+    attrition:
+    analyzed:
+",Objective: To determine whether a pediatrician-provided IP would change parents’ attitudes/behaviors about using Internet health information resources. ,We conducted a randomized controlled trial of parents visiting an academic general pediatric practice. Both groups received a preintervention paper survey and a telephone survey 2 to 3 weeks after their clinic visit. The intervention group was offered computer training and received the IP and training summary handout. ,,,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1240,fowler-2019.pdf,https://github.com/brachbach/host-files/raw/main/fowler-2019.pdf,,,consort_flow_v2,"experiments:
+- name: vitamin C in patients with sepsis and ARDS
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: vitamin C
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: placebo
+    allocated:
+    received:
+    attrition:
+    analyzed:
+",The CITRIS-ALI randomized trial examined whether high-dose vitamin C would reduce organ failure and biomarkers of inflammation and vascular injury in patients with sepsis and ARDS. ,"Patients were randomly assigned to receive intravenous infusion of vitamin C (50 mg/kg in dextrose 5% in water, n = 84) or placebo (dextrose 5% in water only, n = 83) every 6 hours for 96 hours. ",,,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1241,green-2016.pdf,https://github.com/brachbach/host-files/raw/main/green-2016.pdf,,,consort_flow_v2,"experiments:
+- name: poverty alleviation program WINGS
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: WINGS
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: control
+    allocated:
+    received:
+    attrition:
+    analyzed:
+",Villages were randomized to the treatment group (60 villages with 896 participants) or the wait-list control group (60 villages with 904 participants) with an allocation ration of 1:1 ,"Randomization was stratified by district (60 villages per district), and villages were randomized to the immediate treatment group (60 villages with 896 participants) or the wait-list control group (60 villages with 904 participants) with an allocation ratio of 1:1. ","The Women’s Income Generating Support (WINGS) program had three core components: (i) 5 days of business skills training designed for illiterate populations, (ii) an individual start-up grant of roughly US$150, and (iii) 3 to 5 visits over approximately 18 months by trained community workers who provided business advice and encouragement to use the grant for busi- ness development. ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1242,jain-2010.pdf,https://github.com/brachbach/host-files/raw/main/jain-2010.pdf,,,consort_flow_v2,"experiments:
+- name: health impact of sodium dichloroisocyanurate in drinking water
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: NaDCC tablets
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: placebo
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","We conducted a randomized, placebo-controlled, triple-blinded trial to determine the health impact of daily use of sodium dichloroisocyanurate (NaDCC) tablets for household drinking water treatment in periurban Ghana. ","Tablets for the intervention group, which were designed to disinfect 20 L of water, contained NaDCC with a pharmaceutical/food-grade effervescent base that allowed the tablets to dissolve rapidly in water; placebo tablets consisted only of the effervescent base. ",,,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1243,batista-2018.pdf,https://github.com/brachbach/host-files/raw/main/batista-2018.pdf,,,consort_flow_v2,"experiments:
+- name: information flow and migrant remittances
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: five times 90 minutes of calling credit
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: three times 90 minutes of calling credit
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: control
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","We design and implement a randomized control trial to quantitatively assess the role of communication between migrants and their international network on the extent and value of remittance flows. In the experiment, a random sample of 1,500 migrants residing in Ireland was offered the possibility of contacting their networks outside the host country for free over a varying number of months. ","Participants in the experiment were randomly assigned to one of three groups. Respondents in Treatment Group 1 received 90 minutes of free international calling credit every month for five months. Migrants in Treatment Group 2 received 90 minutes of free international calling credit for three months (every other month). Finally, one third of the participants were assigned to the Control Group. ","Due to funding constraints, it was not possible to distribute the equivalent amount of the calling credit to the control group. ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1244,pinion-1994.pdf,https://github.com/brachbach/host-files/raw/main/pinion-1994.pdf,,,consort_flow_v2,"experiments:
+- name: endometrial laser ablation and transcervical endometrial resection for dysfunctional
+    uterine bleeding
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: hysterectomy
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: endometrial laser ablation
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: transcervical endometrial resection
+    allocated:
+    received:
+    attrition:
+    analyzed:
+",Objective-To evaluate the effectiveness and safety of endometrial laser ablation and transcervical resection of the endometrium compared with hysterectomy in the surgical treatment of women with dysfunctional uterine bleeding. ,"Although randomisation was primarily between hysterectomy and conservative surgery, those randomly allocated to conservative surgery were also randomly assigned to laser ablation or endometrial resection ","Two hundred and four eligible women gave written consent to the trial and were randomly allocated to hysterectomy (99), endometrial resection (52), or laser ablation (53). ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1245,shams-2018.pdf,https://github.com/brachbach/host-files/raw/main/shams-2018.pdf,,,consort_flow_v2,"experiments:
+- name: education intervention to reduce bullying
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: intervention
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: control
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","This educational study was of the field-trial type, and carried out on 237 middle school students in Gonabad City (Iran), from September 2015 to May 2016. The intervention group consisted of 147 students, and 90 were assigned to a control group. ","The intervention included three 90-minute training sessions for students in each class, two training sessions for teachers, and two others for parents. ",The control group along with their teachers and families did not receive any form of instruction. ,,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1246,lohi-2007.pdf,https://github.com/brachbach/host-files/raw/main/lohi-2007.pdf,,,consort_flow_v2,"experiments:
+- name: caffeine for sleep-deprived military pilot students
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: ceffeine
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: placebo
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","In this randomized, double-blind, placebo-controlled study, the effect of caffeine on simulator flight performance was examined in 13 military pilots during 37 hours of sleep deprivation. ","Before the subsequent flight rounds, the intake of caffeine and a placebo was randomized, so that six subjects received a placebo and seven received caffeine. ","The subjects were given two capsules with water at each dosage time exactly 1 hour before the simulator flight. Each active capsule contained 100 mg of caffeine, hence one peroral dose comprised a placebo or 200 mg of caffeine. ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1247,ceballos-laita-2021.pdf,https://github.com/brachbach/host-files/raw/main/ceballos-laita-2021.pdf,,,consort_flow_v2,"experiments:
+- name: pain neurophysiology education for women with fibromyalgia
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: PNE + TE
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: TE only
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","Our study aimed to assess the effects of therapeutic exercise and pain neurophysiology education versus TE in isolation on fatigue, sleep disturbances, and physical function in the short term and at three months of follow-up in women with fibromyalgia syndrome (FMS) ",A single-blind randomized controlled trial was carried out. A total of 32 women with FMS referred from medical doctors and fibromyalgia association were randomized in 2 groups: PNE + TE group or TE group. ,"Both groups received the same TE intervention, carried out by a physiotherapist who was an expert in the management of chronic pain and who was blinded to the group allocation. The TE program consisted of 30 sessions (3 sessions of 60 min per week for 10 weeks) and was designed in accordance with the ACSM guidelines. ",The PNE + TE group also received a face-to-face educational intervention (each session lasting 30–45 min) following the recommendations of Butler and Moseley [22]. This intervention consisted of 8 sessions and was applied by a medical doctor. ,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1248,mansfield-2017.pdf,https://github.com/brachbach/host-files/raw/main/mansfield-2017.pdf,,,consort_flow_v2,"experiments:
+- name: augmented feedback for reactive balance in older adults
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: feedback of the COG
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: feedback of the COP
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: no feedback
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","While concurrent augmented visual feedback of the centre of pressure (COP) or centre of gravity (COG) can improve quiet standing balance control, it is not known if such feedback improves reactive balance control. ",This study aimed to determine if: 1) concurrent augmented feedback can improve reactive balance control; and 2) feedback of the COP or COG is more effective. ,Participants were allocated in a blocked randomized manner to one of three groups: 1) feedback of the COG (COGf); 2) feedback of the COP (COPf); or 3) no feedback (NoFB). ,A yellow line showing the antero-posterior location of either the COG (COGf group) or the COP (COPf group) was displayed on the monitor during every odd-numbered trial (Figure 2a); a stationary ‘X’ was displayed during every even-numbered trial (Figure 2b). ,Participants in the NoFB group viewed the ‘X’ on the monitor for all trials. ,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1249,sgoifo-2017.pdf,https://github.com/brachbach/host-files/raw/main/sgoifo-2017.pdf,,,consort_flow_v2,"experiments:
+- name: IID for people with multiple sclerosis
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: integrated imaginative distention
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: control
+    allocated:
+    received:
+    attrition:
+    analyzed:
+- name: IID for people with insomnia
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: integrated imaginative distention
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: control
+    allocated:
+    received:
+    attrition:
+    analyzed:
+- name: IID for healthcare professionals
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: integrated imaginative distention
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: control
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","The design was a parallel, randomised 1:1 (intervention:waiting list), controlled, open-label trial. Participants were persons with multiple sclerosis (pwMS), persons with insomnia (pwINS), and health professionals (HP) as conditions related to fatigue and stress. ",IID was delivered by a single skilled psychotherapist through eight weekly training group sessions in 2 months. ,"IID training consists of four practical steps, twice repeated: a selection of Jacobson relaxation exercises with breath awareness, motor imaging, body imaginative scan, imaginative experience. ","For the controls, IID was planned 9 months later, after the end of follow-up. ",,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1250,panetta-2013.pdf,https://github.com/brachbach/host-files/raw/main/panetta-2013.pdf,,,consort_flow_v2,"experiments:
+- name: vinegar impact on lipids in non-diabetics
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: apple cider vinegar
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: control
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","we conducted a randomized placebo controlled clinical trial to determine the effects of apple cider vinegar intake in those without diabetes mellitus on total cholesterol (TC), low-density lipoprotein cholesterol (LDL-C), triglycerides, HDL-C, Hemoglobin A1C (Hgb-A1C) and measurement of inflammation with high sensitivity CRP levels (HS-CRP) ","A prospective randomized, double blind, placebo-controlled clinical trial consisting of 114 participants was conducted. Participants consumed 30 mL of either apple cider vinegar or placebo for two months. ",Participants were randomized equally to the treatment and control conditions. The control group supplemented their usual intake with 1.7% balsamic vinegar solution diluted in water and the treatment group with 100% apple cider vinegar ,Study participants were instructed to take 30 mL (approximately 2 Tablespoons) per day of solution. ,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1251,amundsen-2016.pdf,https://github.com/brachbach/host-files/raw/main/amundsen-2016.pdf,,,consort_flow_v2,"experiments:
+- name: onabotulinumtoxinA vs sacral neuromodulation for refractory incontinence
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: onabotulinumtoxinA
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: sacral neuromodulation
+    allocated:
+    received:
+    attrition:
+    analyzed:
+",INTERVENTIONS—Cystoscopic intradetrusor injection of 200 U of onabotulinumtoxinA (n = 192) or sacral neuromodulation (n = 189). ,The Refractory Overactive Bladder: Sacral Neuromodulation vs Botulinum Toxin Assessment (ROSETTA) trial used a comparative effectiveness design to assess whether onabotulinumtoxinA is superior to sacral neuromodulation in controlling episodes of urgency incontinence in women with refractory symptoms. ,Participants randomized to sacral neuromodulation underwent a first-stage lead placement in the operating suite under local and monitored anesthesia care. ,Participants randomized to onabotulinumtoxinA received a cystoscopic intradetrusor injection of 200 U performed in clinic. ,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1252,rotthoff-2006.pdf,https://github.com/brachbach/host-files/raw/main/rotthoff-2006.pdf,,,consort_flow_v2,"experiments:
+- name: long-menu questions vs open-ended questions
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: group A (LMQ)
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: group B (OEQ)
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","Using a summative online key feature (KF) examination we evaluated whether LMQs can be compared with OEQs in regard to the level of difficulty, performance and response times. ","We randomized 146 fourth year medical students into two groups. For the purpose of this study we created 7 peer-reviewed KF-cases with a total of 25 questions. All questions had the same content in both groups, but nine questions had a different answer type. ","Group A answered nine questions using an LM option, while group B used an OE option. The remaining 16 questions were identical for both groups. ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1253,peters-2018.pdf,https://github.com/brachbach/host-files/raw/main/peters-2018.pdf,,,consort_flow_v2,"experiments:
+- name: worker health program for constriction workers
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: all the right moves
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: control
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","This study evaluated the efficacy of an integrated Total Worker Health® program, “All the Right Moves”, designed to target the conditions of work and workers’ health behaviors through an ergonomics program combined with a worksite-based health promotion Health Week intervention. ",A matched-pair cluster randomized controlled trial was conducted on ten worksites (five intervention (n = 324); five control sites (n = 283)). ,"The ARM intervention contained two main intervention components: (1) the Soft Tissue Injury Prevention Program (StIPP) which focused on improving ergonomics practices at the site and worker level to improve musculoskeletal health; and (2) Health Week, that integrated key messages and provided integrated health coaching opportunities for individual workers to improve ergonomic practices and improved health behaviors (diet, physical activity, and smoking) associated with cardiovascular health. ","The intervention groups received the intervention, ARM, whilst the control group received no intervention. ",,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1254,wais-2021.pdf,https://github.com/brachbach/host-files/raw/main/wais-2021.pdf,,,consort_flow_v2,"experiments:
+- name: virtual reality and long-term memory in older adults
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: labyrinth‐VR
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: placebo
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","We developed a virtual reality (VR) spatial wayfinding game (Labyrinth‐VR) as a cognitive intervention with the hypothesis that it could improve detailed, high‐fidelity LTM capability. ","In the current study, 48 older adults (mean age 68.7 ± 6.4 years) with average cognitive abilities for their age were randomly assigned to 12 h of computer game play over four weeks in either the Labyrinth‐VR or placebo control game arms. ","The Placebo Control condition uses four commercially available computer games (i.e., Syberia by Microids, Burly Men at Sea by Brain & Brain, Reigns by Devolver Digital, and Mini Metro by Dinosaur Polo Club), which each involved their own narratives to create game goals, but do not require remembering detailed information or route navigation in order to achieve success. ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1255,castelein-2008.pdf,https://github.com/brachbach/host-files/raw/main/castelein-2008.pdf,,,consort_flow_v2,"experiments:
+- name: guided peer support groups for psychosis patients
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: minimally guided peer support group
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: waiting list
+    allocated:
+    received:
+    attrition:
+    analyzed:
+",The study was a randomized controlled trial (RCT) comparing the effects of care as usual plus minimally GPSG with a waiting-list condition (WLC) consisting of usual care alone ,"Briefly, the closed peer support group included approximately 10 patients and involved 16 sessions of 90 min biweekly over 8 months. Participants decided the topic of each session. Each session had the same structure discussing daily life experiences in pairs as well as group wise. ","The key point was to provide peer-to-peer interaction (3). For that reason, nurses needed to guide the groups with minimal involvement. ","Patients in the experimental condition participated in these groups and received care as usual consisting of medication monitoring, psycho-education, and supportive counseling. ","Patients in the control condition were put on a waiting list expecting to participate in their peer support group 8 months later. In the meantime, they did not follow a prescribed treatment protocol, but received care as usual. ",,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1256,nguyen-2019.pdf,https://github.com/brachbach/host-files/raw/main/nguyen-2019.pdf,,,consort_flow_v2,"experiments:
+- name: quality management practice
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: TG0 (control)
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: TG1 (QM meeting)
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: TG2 (placebo meeting)
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","We conducted a Randomized Controlled Trial (RCT) to explore the role of government information intervention on a firm’s management practices and performance. Specifically, we studied whether providing managers with information regarding the benefits of Quality Management practice (QM) can enable government to influence manager perception and adoption of QM, output quality, and firm performance. ","We first randomly assigned the 328 firms into three groups: control (TG0), treatment (TG1), and placebo (TG2). ","Managers in treatment group TG1 received information/statistics about the benefits of adopting QM, in a 40-minute meeting with an MPI official. Managers in the control group TG0 were not exposed to any information from our experiment, nor did they participate in any such meeting. The placebo group TG2 had a placebo meeting, which also lasted 40 minutes. However, managers in the placebo group did not receive information/statistics about QM benefits. ","The placebo meetings covered topics such as economic policies and matters that are expected to have no effect on QM practice (e.g., changing the workers’ shifts). ",,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1257,brouwers-2011.pdf,https://github.com/brachbach/host-files/raw/main/brouwers-2011.pdf,,,consort_flow_v2,"experiments:
+- name: training strategies for the AGREE II
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: tutorial
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: tutorial + practice exercise
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: user's manual (control)
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","Practice guidelines (PGs) are systematically developed statements intended to assist in patient and practitioner decisions. The AGREE II is the revised tool for PG development, reporting, and evaluation, comprised of 23 items, two global rating scores, and a new User’s Manual. In this study, we sought to develop, execute, and evaluate the impact of two internet interventions designed to accelerate the capacity of stakeholders to use the AGREE II. ","Participants were randomized to one of three training conditions. ‘Tutorial’–participants proceeded through the online tutorial with a virtual coach and reviewed a PDF copy of the AGREE II. ‘Tutorial + Practice Exercise’–in addition to the Tutorial, participants also appraised a ‘practice’ PG. For the practice PG appraisal, participants received feedback on how their scores compared to expert norms and formative feedback if scores fell outside the predefined range. ’AGREE II User’s Manual PDF (control condition)’–participants reviewed a PDF copy of the AGREE II only. ","we hypothesized the training platform that included the tutorial plus the practice exercise with feedback would be superior to the User’s Manual alone. For exploratory purposes, we also examined whether dif- ferences existed across the outcome measures between the two e-learning intervention groups. ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1258,weller-2015.pdf,https://github.com/brachbach/host-files/raw/main/weller-2015.pdf,,,consort_flow_v2,"experiments:
+- name: decision-making abilities in maltreated adolescent girls
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: Middle School Success intervention (MSS)
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: foster care services-as-usual (SAU)
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: non-maltreated
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","Maltreated foster girls (n = 92), randomly assigned at age 11 to either an intervention designed to prevent risk-taking behaviors or services as usual (SAU), and non-maltreated age and SES- matched girls living with their biological parent(s) (n = 80), completed a decision-making task (at age 15–17) that assessed risk-taking and sensitivity to expected value, an index of advantageous decision-making. ","In this study, we examined the plasticity of neurocognitive functioning by comparing the decision-making performance in three groups of adolescent girls: (1) a maltreated sample who was randomly assigned to receive a family-based, skill-focused foster care intervention; (2) a maltreated sample who was randomly assigned to receive foster care services-as-usual (SAU); and (3) a non-maltreated, low-income community comparison sample matched for age with the maltreated girls. ",Participants were randomly assigned to foster care services-as-usual (SAU) or the Middle School Success intervention (MSS). ,"The intervention consisted of three primary components: (a) six sessions of group-based caregiver management training for the foster parents prior to middle school entry, (b) six sessions of group-based skill-building sessions for the girls prior to middle school entry, and (c) weekly group-based caregiver management training for the foster parents and weekly one-on-one skills training for the girl during the first year of middle school. ",,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1259,mejdoubi-2015.pdf,https://github.com/brachbach/host-files/raw/main/mejdoubi-2015.pdf,,,consort_flow_v2,"experiments:
+- name: nurse home visitation program and child maltreatment
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: VoorZorg program
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: usual care
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","We conducted a single blind, parallel-group, randomized controlled trial that compared usual care with the nurse home visitation program, which began during pregnancy and continued until the children’s second birthdays, in 460 disadvantaged women who were pregnant for the first time and <26 years of age. ",All eligible women were stratified by region and ethnicity and randomized into a control or intervention group by an independent researcher of the VU University Medical Center. ,"The women in the control group received the usual care. [11] The women in the intervention group received the usual care plus the VoorZorg program. The VoorZorg program consisted of approximately 10 home visits during pregnancy, 20 during the first, and 20 during the second year of the life of the child by trained and experienced VoorZorg nurses ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1260,ho-2020.pdf,https://github.com/brachbach/host-files/raw/main/ho-2020.pdf,,,consort_flow_v2,"experiments:
+- name: placebo analgesia in VR and AR
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: analgesia-expectation
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: control-expectation
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","We examined whether a virtual placebo (a sham heat protective glove) can successfully induce analgesia, even when administered to a virtual body. ","The experiment used a 2x3x2 mixed design with the between participants factor treatment group (analgesia-expectation, control-expectation) and the within factors setting (virtual, augmented, physical) and time (pre-intervention, post-intervention). Participants were assigned to either an analgesia-expectation or control-expectation group using an alternating quasi randomization allocation method, and order of settings was administered in a counterbalanced manner. ","In contrast, participants in the control-expectation condition were informed that the aim of the experiment was to examine pain perception under different visual conditions, hence why they would either view the arm, or view a glove covering the arm. ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1261,ramey-2002.pdf,https://github.com/brachbach/host-files/raw/main/ramey-2002.pdf,,,consort_flow_v2,"experiments:
+- name: strychnine baits to control gopher populations
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: placebo
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: 0.35% strychnine
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: 0.75% strychnine
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: 1.30% strychnine
+    allocated:
+    received:
+    attrition:
+    analyzed:
+","In November 1990, field efficacy studies using milo baits formulated with 0.35%, 0.75%, or 1.30% strychnine alkaloid were compared to a placebo (0.0% strychnine) for controlling plains pocket gophers (Geomys bursarius) near Pleasanton, Texas. ","Within each block, one of the four strychnine alkaloid bait concentrations (0.0%, 0.35%, 0.75%, and 1.30%) was randomly assigned to each TU prior to baiting. ",,,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1262,benedek-2017.pdf,https://github.com/brachbach/host-files/raw/main/benedek-2017.pdf,,,consort_flow_v2,"experiments:
+- name: beer and creativity
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: alcohol
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: placebo
+    allocated:
+    received:
+    attrition:
+    analyzed:
+",This study investigated the effect of alcohol on cognition in a randomized placebo-controlled pretest-posttest design. ,"Participants of the alcohol group received Gösser Zwickl® (5.2% alcohol by volume) and participants of the non-alcoholic group received Gösser Naturgold® (< 0.5% alcohol by volume). These two beers were selected because they are very similar in taste and visual appearance (i.e., golden, naturally cloudy). ","The amount of beer was individually adjusted for weight, age and gender (Watson, Watson, & Batt, 1980; Widmark, 1932) targeting at a blood alcohol concentration (BAC) of 0.03 (in case of alcoholic beer). ",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1263,albrecht-2010.pdf,https://github.com/brachbach/host-files/raw/main/albrecht-2010.pdf,,,consort_flow_v2,"experiments:
+- name: anxiety induction from body odor
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: anxiety condition
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: neutral condition
+    allocated:
+    received:
+    attrition:
+    analyzed:
+",Thirteen male subjects participated in 2 different sweat donation sessions: chemosignals were collected during participation in a high rope course (anxiety condition) and in an ergometer workout (neutral condition). State and trait anxiety were evaluated in 20 female odor recipients using Spielberger’s state-trait anxiety inventory in a double-blind design. ,"During the first session, emotion of anxiety was induced by an exercise during a high rope course. The subjects were advised to climb a 7-m high pole and to stand on that pole without seeing the securing device that was fixed at the subjects’ back ",The control samples were collected during a 20 min ergometer workout in the hospital of the Ludwig-Maximilians-University Munich on a different day. ,,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,
+1264,karefylakis-2018.pdf,https://github.com/brachbach/host-files/raw/main/karefylakis-2018.pdf,,,consort_flow_v2,"experiments:
+- name: vitamin D for overweight men
+  description:
+  reasoning:
+  enrolment:
+  arms:
+  - name: vitamin D
+    allocated:
+    received:
+    attrition:
+    analyzed:
+  - name: placebo
+    allocated:
+    received:
+    attrition:
+    analyzed:
+",The aim of this study was to examine the effect of vitamin D supplementation on body composition and cardiorespiratory fitness in overweight/obese men with vitamin D deficiency. ,"This study was a prospective, placebo controlled, double blinded, randomized clinical trial with an allocation ratio of 1:1. ","The enrolled individuals were then randomized, in a double-blind manner, to either receiving vitamin D drops (Cholecalficerol, ACO Hud Nordic AB, Sweden) or placebo drops for six months. The intervention group received 2000 IU cholecalciferol/day (25 drops, 80 IU/drop); the placebo group received the same amount of rapeseed oil.",,,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,

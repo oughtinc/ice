@@ -29,22 +29,15 @@ _not_needed_sentinel = _NotNeededSentinel.token
 
 
 @final
-class StopSentinel:
+class StopSentinel(str):
     """Stop the string here."""
-
-    def __init__(self, value: str | int | float):
-        self.value = value
-
-    def __str__(self):
-        return str(self.value)
-
-    def __repr__(self):
-        return repr(self.value)
 
 
 literal = str | int | float | StopSentinel
 
 literal_or_transform = literal | _Transform
+
+FormatValues = Sequence[Mapping[str, literal_or_transform]]
 
 _StdLibFormatStringParses = list[tuple[str, str | None, str | None, str | None]]
 
@@ -142,7 +135,9 @@ def _format_truncate(
         k: v for k, v in concrete_values.items() if k in needed_keys
     }
     if not _no_sentinels_remaining(needed_concrete_values):
-        raise ValueError("Unfilled DependentTransform in partial example")
+        raise ValueError(
+            f"Unfilled DependentTransform in partial example:\nFormat: {format_placeholder}\nNeeded Values: {needed_concrete_values}"
+        )
     new_str = _unparse(keep).format_map(needed_concrete_values)
     return new_str
 
@@ -199,6 +194,7 @@ _STOP_EARLY_WARNING = "StopSentinel used in non-final case; this may be a mistak
 def _format_multi(
     format_string: str,
     cases: Sequence[Mapping[str, literal_or_transform]],
+    strip: bool,
 ) -> tuple[str, ...]:
     total = len(cases)
     transformed_examples = _apply_transforms(cases, total)
@@ -208,9 +204,11 @@ def _format_multi(
             transformed_examples,
         )
     )
-    ret_val, truncated = tuple(c[0] for c in filled_cases), [c[1] for c in filled_cases]
+    ret_val, truncated = tuple(c[0].strip() if strip else c[0] for c in filled_cases), [
+        c[1] for c in filled_cases
+    ]
     if any(truncated[:-1]):
-        log.warn(_STOP_EARLY_WARNING)
+        log.warn(_STOP_EARLY_WARNING, format_string=format_string, cases=cases)
     return ret_val
 
 
@@ -223,6 +221,7 @@ def format_multi(
     format_str: str,
     cases: Sequence[Mapping[str, literal_or_transform]],
     shared: Mapping[str, literal_or_transform] | None = None,
+    strip: bool = True,
 ) -> tuple[str, ...]:
     """
     str.Formatter on steroids.
@@ -236,4 +235,6 @@ def format_multi(
     Stop early and truncate a case with a StopSentinel value.
     """
     shared_dict = {k: v for k, v in (shared or dict()).items()}
-    return _format_multi(format_str, [shared_dict | case for case in cases])
+    return _format_multi(
+        format_str, [shared_dict | case for case in cases], strip=strip
+    )

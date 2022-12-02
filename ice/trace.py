@@ -6,6 +6,7 @@ from asyncio import create_task
 from collections.abc import Callable
 from contextvars import ContextVar
 from functools import lru_cache
+from functools import partial
 from functools import wraps
 from inspect import getdoc
 from inspect import getsource
@@ -138,6 +139,12 @@ def emit_block(x) -> tuple[int, int]:
         return 0, 0
 
 
+def add_fields(**fields: str):
+    if trace_enabled():
+        id = parent_id_var.get()
+        emit({f"{id}.fields.{key}": value for key, value in fields.items()})
+
+
 def compress(o: object):
     if isinstance(o, dict):
         if {"paragraphs", "document_id"} <= set(o):
@@ -153,7 +160,10 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(o, dict):
             return {repr(k): v for k, v in o.items()}
         if hasattr(o, "dict") and callable(o.dict):
-            return compress(o.dict())
+            try:
+                return compress(o.dict())
+            except TypeError:
+                return repr(o)
         if isfunction(o):
             return dict(class_name=o.__class__.__name__, name=o.__name__)
         try:
@@ -183,6 +193,21 @@ class JSONEncoder(json.JSONEncoder):
 Recorder = Callable[..., None]
 
 recorder: Recorder = lambda **kwargs: None
+
+
+class _Recorder:
+    def __init__(self, id: str):
+        self.id = id
+
+    def __call__(self, **kwargs):
+        emit({f"{id}.records.{make_id()}": emit_block(kwargs)})
+
+    def __repr__(self):
+        # So this can be used in `diskcache()` functions
+        # The diskcache implementation should probably not
+        # depend on calling __repr__ but that
+        # seems like a larger refactor
+        return "ice.trace._Recorder"
 
 
 def trace(fn):
@@ -223,7 +248,7 @@ def trace(fn):
             call_event = dict(
                 parent=parent_id,
                 start=monotonic_ns(),
-                name=fn.__name__,
+                name=fn.__name__ if hasattr(fn, "__name__") else repr(fn),
                 shortArgs=get_strings(arg_dict),
                 func=emit_block(func_info(fn)),
                 args=emit_block(arg_dict),
@@ -240,9 +265,7 @@ def trace(fn):
             )
 
             if recorder_name:
-                kwargs[recorder_name] = lambda **kwargs: emit(
-                    {f"{id}.records.{make_id()}": emit_block(kwargs)}
-                )
+                kwargs[recorder_name] = _Recorder(id)
 
             result = await fn(*args, **kwargs)
             emit(
@@ -339,5 +362,5 @@ def _get_first_descendant(value):
 def func_info(fn):
     return dict(
         doc=getdoc(fn),
-        source=getsource(fn),
+        source=getsource(fn.func) if isinstance(fn, partial) else getsource(fn),
     )
