@@ -390,6 +390,10 @@ function lineAnchorId(id: string) {
 }
 
 const COST_USD_PER_DAVINCI_TOKEN = 0.02 / 1000;
+const CURRENCY_FORMATTER = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const callInfo = useCallInfo(id);
@@ -487,7 +491,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
                 <ResultComponent value={shortResult} />
               )}
             </div>
-            {cost && `\$${Math.round(cost * 100) / 100}`}
+            {cost && CURRENCY_FORMATTER.format(cost)}
           </div>
         </Button>
       </div>
