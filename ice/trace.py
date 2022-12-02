@@ -1,3 +1,4 @@
+import hashlib
 import json
 import threading
 
@@ -61,6 +62,18 @@ class Trace:
         self.block_number = -1  # so that it starts at _open_block below
         self._open_block()
         self._lock = threading.Lock()
+
+        # Keep an in-memory cache of recent block values (JSON strings)
+        # keyed by their SHA256 hash, so equal values get the same address.
+        # Apply lru_cache to the bound method to skip the self argument,
+        # so instances of this class are not stored in the cache
+        # and they can be garbage collected.
+        self._write_block_value = lru_cache(maxsize=1024)(self._write_block_value)
+        # _write_block_value only takes one argument _string_hash,
+        # so the potentially large values themselves don't live in memory.
+        # The actual value is kept briefly in this attribute.
+        self._current_block_value: str
+
         parent_id_var.set(self.id)
         log.info(f"Trace: {self.url}")
         threading.Thread(target=self._server_and_browser).start()
@@ -96,22 +109,28 @@ class Trace:
         self.block_length = 0
         self.block_lineno = 0
 
-    def add_to_block(self, x) -> tuple[int, int]:
+    def add_to_block(self, value) -> tuple[int, int]:
         """
         Write the value x to the current block file as a single JSON line.
         """
-        s = json.dumps(x, cls=JSONEncoder) + "\n"
+        string = _encode_json(value)
+        string_hash = hashlib.sha256(string.encode("utf8")).digest()
         with self._lock:
-            address = (self.block_number, self.block_lineno)
-            self.block_file.write(s)
-            self.block_length += len(s)
-            if self.block_length > self.BLOCK_LENGTH:
-                self.block_file.write("end\n")
-                self.block_file.close()
-                self._open_block()
-            else:
-                self.block_file.flush()
-                self.block_lineno += 1
+            self._current_block_value = string
+            return self._write_block_value(string_hash)
+
+    def _write_block_value(self, _string_hash: bytes) -> tuple[int, int]:
+        address = (self.block_number, self.block_lineno)
+        s = self._current_block_value
+        self.block_file.write(s)
+        self.block_length += len(s)
+        if self.block_length > self.BLOCK_LENGTH:
+            self.block_file.write("end\n")
+            self.block_file.close()
+            self._open_block()
+        else:
+            self.block_file.flush()
+            self.block_lineno += 1
         return address
 
 
@@ -128,8 +147,8 @@ def trace_enabled():
 
 def emit(value):
     if trc := trace_var.get():
-        json.dump(value, trc.file, cls=JSONEncoder)
-        print(file=trc.file, flush=True)
+        trc.file.write(_encode_json(value))
+        trc.file.flush()
 
 
 def emit_block(x) -> tuple[int, int]:
@@ -143,6 +162,12 @@ def add_fields(**fields: str):
     if trace_enabled():
         id = parent_id_var.get()
         emit({f"{id}.fields.{key}": value for key, value in fields.items()})
+
+
+def _encode_json(x) -> str:
+    # Note that sort_keys=True here could improve caching,
+    # but it might make the output less readable.
+    return json.dumps(x, cls=JSONEncoder, separators=(",", ":")) + "\n"
 
 
 def compress(o: object):
