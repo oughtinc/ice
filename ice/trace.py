@@ -68,7 +68,9 @@ class Trace:
         # Apply lru_cache to the bound method to skip the self argument,
         # so instances of this class are not stored in the cache
         # and they can be garbage collected.
-        self._write_block_value = lru_cache(maxsize=1024)(self._write_block_value)
+        self._write_block_value_cached = lru_cache(maxsize=1024)(
+            self._write_block_value
+        )
         # _write_block_value only takes one argument _string_hash,
         # so the potentially large values themselves don't live in memory.
         # The actual value is kept briefly in this attribute.
@@ -117,7 +119,7 @@ class Trace:
         string_hash = hashlib.sha256(string.encode("utf8")).digest()
         with self._lock:
             self._current_block_value = string
-            return self._write_block_value(string_hash)
+            return self._write_block_value_cached(string_hash)
 
     def _write_block_value(self, _string_hash: bytes) -> tuple[int, int]:
         address = (self.block_number, self.block_lineno)
