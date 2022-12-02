@@ -1,7 +1,6 @@
 import itertools
 
 from collections.abc import Sequence
-from pathlib import Path
 
 from pydantic import BaseModel
 from tqdm import tqdm
@@ -22,8 +21,8 @@ from ice.recipes.program_search.nodes.select.prompts import render_selection_exa
 from ice.recipes.program_search.nodes.select.prompts import RenderableSelectionExample
 from ice.recipes.program_search.types import Selection
 from ice.recipes.program_search.types import sentences
-from ice.utils import map_async
 from ice.settings import settings
+from ice.utils import map_async
 
 
 def get_consort_gs(document_id: str) -> GoldStandard[ConsortFlow] | None:
@@ -94,7 +93,7 @@ def gold_standard_examples(
 def download_papers(
     split: str = "validation", question_short_name: str = "consort_flow"
 ):
-    paper_dir = _paper_dir = settings.PAPER_DIR
+    paper_dir = settings.PAPER_DIR
     doc_ids = {p.document_id for p in consort_gs_split(split, question_short_name)}  # type: ignore[arg-type]
     paper_files = [f for f in paper_dir.iterdir() if f.name in doc_ids]
     return [
