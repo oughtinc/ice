@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     OUGHT_ICE_PORT: int = 8935
     OUGHT_ICE_AUTO_SERVER: bool = True
     OUGHT_ICE_AUTO_BROWSER: bool = True
+    PAPER_DIR: Path = Path(__file__).parent.parent / "papers"
 
 
 OUGHT_ICE_DIR = Path(environ.get("OUGHT_ICE_DIR", Path.home() / ".ought-ice"))
