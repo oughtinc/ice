@@ -93,7 +93,7 @@ def gold_standard_examples(
 def download_papers(
     split: str = "validation", question_short_name: str = "consort_flow"
 ):
-    paper_dir = Path("/code/papers/")  # fixed in container
+    paper_dir = Path(__file__).parent.parent.parent.parent / "papers"
     doc_ids = {p.document_id for p in consort_gs_split(split, question_short_name)}  # type: ignore[arg-type]
     paper_files = [f for f in paper_dir.iterdir() if f.name in doc_ids]
     return [

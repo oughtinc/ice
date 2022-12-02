@@ -33,7 +33,11 @@ def diskcache(cache_dir: Path = CACHE_DIR):
             cache, key = get_cache_and_key(func, *args, **kwargs)
             if key in cache:
                 return cache[key]
+            cache.close()
+
             result = await func(*args, **kwargs)
+
+            cache, key = get_cache_and_key(func, *args, **kwargs)
             cache[key] = result
             return result
 
