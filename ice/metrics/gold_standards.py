@@ -138,7 +138,7 @@ def select_column_values(
     return df.loc[mask]
 
 
-_paper_dir = Path(__file__).parent.parent.parent / "papers"
+_paper_dir = settings.PAPER_DIR
 
 
 def load_paper(document_id: str) -> Paper:

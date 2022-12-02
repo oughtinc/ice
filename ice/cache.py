@@ -34,6 +34,7 @@ def diskcache(cache_dir: Path = CACHE_DIR):
             if key in cache:
                 return cache[key]
             cache.close()
+            # close connection while waiting for async function; fixes db connection bug
 
             result = await func(*args, **kwargs)
 
