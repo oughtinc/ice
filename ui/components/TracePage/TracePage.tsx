@@ -66,6 +66,7 @@ interface CallInfo extends InputOutputContentProps {
   fields?: Record<string, string>; // short arbitrary fields associated with the call
   func: BlockAddress<FuncBlock>; // long info about the function itself
   end?: number; // end time
+  totalTokens?: number;
 }
 
 interface FuncBlock {
@@ -105,7 +106,19 @@ const TreeContext = createContext<{
 } | null>(null);
 
 const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
-  Object.entries(updates).forEach(([path, value]) => set(calls, path, value));
+  Object.entries(updates).forEach(([path, value]) => {
+    set(calls, path, value);
+    if (path.endsWith(".fields.davinci_equivalent_tokens")) {
+      const tokens = Number(value);
+      if (isNaN(tokens)) return;
+      const callId = path.split(".")[0];
+      let call = calls[callId];
+      while (call) {
+        call.totalTokens = (call.totalTokens ?? 0) + tokens;
+        call = calls[call.parent];
+      }
+    }
+  });
 
 const urlPrefix = (traceId: string) => {
   const base = recipes[traceId] ? "https://oughtinc.github.io/static" : "/api";
@@ -306,17 +319,6 @@ const useCallInfo = (id: string) => {
   };
 };
 
-const useTotalTokens = (id: string): number => {
-  const children = useLinks()["getChildren"](id);
-  const { fields = {} } = useCallInfo(id);
-  return (Number(fields.davinci_equivalent_tokens) || 0) + sumBy(children, useTotalTokens);
-};
-
-const useCostEstimate = (id: string): number => {
-  const COST_USD_PER_DAVINCI_TOKEN = 0.02 / 1000;
-  return useTotalTokens(id) * COST_USD_PER_DAVINCI_TOKEN;
-};
-
 interface SelectedCallInfo extends CallInfo {
   id: string;
 }
@@ -387,14 +389,24 @@ function lineAnchorId(id: string) {
   return `line-anchor-${id}`;
 }
 
+const COST_USD_PER_DAVINCI_TOKEN = 0.02 / 1000;
+
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const callInfo = useCallInfo(id);
-  const { children = {}, select, selected, focussed, shortArgs, shortResult } = callInfo;
+  const {
+    children = {},
+    select,
+    selected,
+    focussed,
+    shortArgs,
+    shortResult,
+    totalTokens,
+  } = callInfo;
   const { selectedId } = useTreeContext();
   const { getParent } = useLinks();
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
-  const cost = useCostEstimate(id);
+  const cost = totalTokens && totalTokens * COST_USD_PER_DAVINCI_TOKEN;
 
   const modelCall = isModelCall(callInfo);
   const isSiblingWithSelected = selectedId && getParent(id) === getParent(selectedId);
@@ -475,7 +487,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
                 <ResultComponent value={shortResult} />
               )}
             </div>
-            {`\$${Math.round(cost * 100) / 100}`}
+            {cost && `\$${Math.round(cost * 100) / 100}`}
           </div>
         </Button>
       </div>
