@@ -2,9 +2,6 @@ from typing import Type
 
 from ice.recipe import Recipe
 
-from .adherence_keyword_baseline import AdherenceKeywordBaseline
-from .adherence_simple import AdherenceSimpleInstruct
-from .adherence_tfew_paragraph import AdherenceParagraphTfew
 from .all_quotes import AllQuotesRecipe
 from .blinding_dynamic import BlindingDynamic
 from .comparisons_qa import ComparisonsQA
@@ -21,9 +18,6 @@ from .subrecipe_example import ExampleMetaRecipe
 
 def get_recipe_classes() -> list[Type[Recipe]]:
     return [
-        AdherenceKeywordBaseline,
-        AdherenceParagraphTfew,
-        AdherenceSimpleInstruct,
         AllQuotesRecipe,
         BlindingDynamic,
         ComparisonsQA,
