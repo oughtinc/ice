@@ -1,5 +1,4 @@
 import json
-import os
 
 from functools import reduce
 from pathlib import Path
@@ -12,6 +11,7 @@ from tenacity import stop_after_attempt
 from tenacity import wait_random_exponential
 
 from ice.cache import diskcache
+from ice.settings import settings
 from ice.utils import deep_merge
 
 
@@ -19,23 +19,22 @@ script_dir = Path(__file__).parent
 root_dir = script_dir.parent.parent.parent
 config = dotenv_values(root_dir / ".env")
 
-ELICIT_AUTH_TOKEN = os.getenv("ELICIT_AUTH_TOKEN", config.get("ELICIT_AUTH_TOKEN"))
-
-if not ELICIT_AUTH_TOKEN:
-    raise Exception(
-        "ELICIT_AUTH_TOKEN not found. Please look it up by checking idToken in cookies for elicit.org and add it to .env."
-    )
-
 
 @diskcache()
-@retry(stop=stop_after_attempt(2), wait=wait_random_exponential(2))
+# try 5 times, because sometimes preview apps take a while to start responding again after they have an issue
+@retry(stop=stop_after_attempt(5), wait=wait_random_exponential(2))
 def send_elicit_request(*, request_body, endpoint: str):
-    assert ELICIT_AUTH_TOKEN is not None, "ELICIT_AUTH_TOKEN is not set"
+    if settings.ELICIT_AUTH_TOKEN is None:
+        raise ValueError(
+            "ELICIT_AUTH_TOKEN not found. Please look it up by checking idToken in cookies for Elicit. The token should NOT start with Bearer, it should just be a string of letters and numbers."
+        )
+
     headers = {
         "Content-Type": "application/json",
-        "Authorization": ELICIT_AUTH_TOKEN,
+        "Authorization": f"Bearer {settings.ELICIT_AUTH_TOKEN}",
     }
     chunks = []
+
     with httpx.stream(
         "POST",
         endpoint,
@@ -44,8 +43,8 @@ def send_elicit_request(*, request_body, endpoint: str):
         timeout=40,
     ) as r:
         for chunk in r.iter_text():
-            print(chunk)
             chunks.append(chunk)
+
     joined = "".join(chunks)
     split_on_newlines = joined.split("\n")
     as_json = [json.loads(line) for line in split_on_newlines if line]
