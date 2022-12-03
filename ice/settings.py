@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     OPENAI_ORG_ID: str = ""
     OUGHT_INFERENCE_API_KEY: str = ""
     OUGHT_INFERENCE_URL: AnyHttpUrl = "https://prod.elicit.org"
+    ELICIT_AUTH_TOKEN: str = ""
     GOLD_STANDARDS_CSV_PATH: Path = (
         Path(__file__).parent.parent / "gold_standards/gold_standards.csv"
     )
