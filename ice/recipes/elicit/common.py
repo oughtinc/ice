@@ -24,7 +24,7 @@ config = dotenv_values(root_dir / ".env")
 # try 5 times, because sometimes preview apps take a while to start responding again after they have an issue
 @retry(stop=stop_after_attempt(5), wait=wait_random_exponential(2))
 def send_elicit_request(*, request_body, endpoint: str):
-    if settings.ELICIT_AUTH_TOKEN is None:
+    if not settings.ELICIT_AUTH_TOKEN:
         raise ValueError(
             "ELICIT_AUTH_TOKEN not found. Please look it up by checking idToken in cookies for Elicit. The token should NOT start with Bearer, it should just be a string of letters and numbers."
         )
