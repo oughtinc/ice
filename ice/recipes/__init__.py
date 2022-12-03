@@ -14,11 +14,6 @@ from .experiment_arms import ExperimentArms
 from .experiments_and_arms.recipes.experiments_and_arms import ExperimentsAndArms
 from .experiments_and_arms.recipes.name_experiments import NameExperiments
 from .funnel_simple import FunnelSimple
-from .placebo_description import PlaceboDescriptionInstruct
-from .placebo_dialogs import PlaceboDialogs
-from .placebo_keyword_baseline import PlaceboKeywordBaseline
-from .placebo_simple import PlaceboSimpleInstruct
-from .placebo_tree import PlaceboTree
 from .program_search.nodes.decontext.decontextualize import PaperDecontext
 from .rank_paragraphs import RankParagraphs
 from .subrecipe_example import ExampleMetaRecipe
@@ -40,10 +35,5 @@ def get_recipe_classes() -> list[Type[Recipe]]:
         PaperDecontext,
         ExperimentArms,
         FunnelSimple,
-        PlaceboDescriptionInstruct,
-        PlaceboDialogs,
-        PlaceboKeywordBaseline,
-        PlaceboSimpleInstruct,
-        PlaceboTree,
         RankParagraphs,
     ]
