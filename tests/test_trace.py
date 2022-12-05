@@ -1,3 +1,4 @@
+import pandas as pd
 import pytest
 
 from ice import trace
@@ -90,3 +91,7 @@ def test_get_strings():
 
     # Nested lists are not flattened
     assert trace.get_strings([["a", "b"], ["c", "d"]]) == ["a", "b"]
+
+    assert trace.get_strings(pd.DataFrame({"a": [1, 2, 3]})) == [
+        "   a\n" "0  1\n" "1  2\n" "2  3"
+    ]

@@ -352,8 +352,12 @@ def get_strings(value) -> list[str]:
 
     if isinstance(result, tuple):
         result = list(result)
-    if not (result and isinstance(result, list)):
-        if result in (None, (), "", [], {}):
+    if not (isinstance(result, list) and result):
+        # if result in (None, (), "", [], {}):
+        # but without breaking due to truth-testing of pandas dataframes
+        if any(
+            isinstance(result, type(x)) and result == x for x in (None, (), "", [], {})
+        ):
             result = "()"
         result = [str(result)]
 
@@ -371,18 +375,18 @@ def _get_short_list(lst: list, max_length=3) -> list:
 
 
 def _get_first_descendant(value):
-    if value:
-        if isinstance(value, dict):
-            first, *_ = value.values()
-            return _get_first_descendant(first)
-        if isinstance(value, (list, tuple)):
-            if isinstance(value[0], str):
-                return [v for v in value if isinstance(v, str)]
-            return _get_first_descendant(value[0])
-        if hasattr(value, "dict") and callable(value.dict):
-            value = compress(value.dict())
-            return _get_first_descendant(value)
-    return value
+    if isinstance(value, dict) and value:
+        first, *_ = value.values()
+        return _get_first_descendant(first)
+    elif isinstance(value, (list, tuple)) and value:
+        if isinstance(value[0], str):
+            return [v for v in value if isinstance(v, str)]
+        return _get_first_descendant(value[0])
+    elif hasattr(value, "dict") and callable(value.dict):
+        value = compress(value.dict())
+        return _get_first_descendant(value)
+    else:
+        return value
 
 
 @lru_cache()
