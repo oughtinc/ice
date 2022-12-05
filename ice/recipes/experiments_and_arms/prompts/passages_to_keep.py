@@ -132,7 +132,16 @@ async def keep_most_helpful_paragraphs(
         next_para = later_passages[0]
         later_passages = later_passages[1:]
         best_paras = best_paras | set((await get_best_paras([next_para])))
-    return [p for p in best_paras]
+
+    # Sort so that the returned order is deterministic for caching etc.
+    best_paras_sorted = sorted(best_paras)
+
+    # Plain alphabetical sort actually lands on a pathological case
+    # that leads to a test failure where count_experiments returns 59 which leads to
+    # ValueError: Count 59 not in count word dictionary
+    # So we reverse here to workaround that, although that should be solved in general
+    # and the recipe/test should be moved out of the repo anyway.
+    return best_paras_sorted[::-1]
 
 
 recipe.main(keep_most_helpful_paragraphs)
