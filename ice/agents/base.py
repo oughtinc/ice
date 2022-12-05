@@ -14,6 +14,7 @@ class Agent(TracedABC):
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256,
+        **kwargs
     ) -> str:
         raise NotImplementedError
 
