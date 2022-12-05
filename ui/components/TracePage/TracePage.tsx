@@ -779,7 +779,7 @@ const SelectFunction = () => {
   const nameCounts = chain(calls)
     .values()
     .filter("name")
-    .map(call => JSON.stringify([call.name, call.cls]))
+    .map(call => JSON.stringify([call.cls, call.name]))
     .countBy()
     .value();
 
@@ -787,7 +787,7 @@ const SelectFunction = () => {
     .sort()
     .map(nameJson => {
       const count = nameCounts[nameJson];
-      const [name, cls] = JSON.parse(nameJson);
+      const [cls, name] = JSON.parse(nameJson);
       let label = `${getFormattedName(name)} (${count})`;
       if (cls) {
         label = getFormattedName(cls) + " : " + label;
@@ -802,7 +802,7 @@ const SelectFunction = () => {
   const onChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const nameJson = event.target.value;
     if (!nameJson) return;
-    const [name, cls] = JSON.parse(nameJson);
+    const [cls, name] = JSON.parse(nameJson);
     const newExpanded: Record<string, true> = {};
     for (const id of Object.keys(calls)) {
       let call = calls[id];
