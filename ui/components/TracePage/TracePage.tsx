@@ -85,6 +85,11 @@ type Blocks = Record<number, string[]>;
 // Represents [block number, line number].
 type BlockAddress<T> = [number, number];
 
+interface SelectedFunction {
+  name: string; // function name
+  cls?: string; // class name for methods
+}
+
 const MODEL_CALL_NAMES = [
   "relevance",
   "answer",
@@ -105,6 +110,8 @@ const TreeContext = createContext<{
   setExpanded: (id: string, expanded: boolean) => void;
   setExpandedById: Dispatch<SetStateAction<Record<string, boolean>>>;
   getFocussed: (id: string) => boolean;
+  selectedFunction: SelectedFunction | undefined;
+  setSelectedFunction: Dispatch<SetStateAction<SelectedFunction | undefined>>;
 } | null>(null);
 
 const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
@@ -135,6 +142,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   const [rootId, setRootId] = useState<string>("");
   const [expandedById, setExpandedById] = useState<Record<string, boolean>>({});
   const [autoselected, setAutoselected] = useState(false);
+  const [selectedFunction, setSelectedFunction] = useState<SelectedFunction>();
 
   useEffect(() => {
     if (!autoselected) {
@@ -294,6 +302,8 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
             setExpandedById(current => ({ ...current, [id]: expanded }));
         },
         setExpandedById,
+        selectedFunction,
+        setSelectedFunction,
         getFocussed,
       }}
     >
@@ -775,7 +785,7 @@ const stripIndent = (source: string): string => {
 };
 
 const SelectFunction = () => {
-  const { calls, setExpandedById } = useTreeContext();
+  const { calls, setSelectedFunction } = useTreeContext();
   const nameCounts = chain(calls)
     .values()
     .filter("name")
@@ -803,17 +813,7 @@ const SelectFunction = () => {
     const nameJson = event.target.value;
     if (!nameJson) return;
     const [cls, name] = JSON.parse(nameJson);
-    const newExpanded: Record<string, true> = {};
-    for (const id of Object.keys(calls)) {
-      let call = calls[id];
-      if (call.name === name && call.cls == cls) {
-        while (call) {
-          newExpanded[call.parent] = true;
-          call = calls[call.parent];
-        }
-      }
-    }
-    setExpandedById(e => ({ ...e, ...newExpanded }));
+    setSelectedFunction({ cls, name });
   };
 
   return (
@@ -823,8 +823,37 @@ const SelectFunction = () => {
   );
 };
 
+const expandSelectedFunction = (
+  selectedFunction: SelectedFunction | undefined,
+  calls: Calls,
+  setExpandedById: any,
+) => {
+  if (!selectedFunction) return;
+  const { name, cls } = selectedFunction;
+  const newExpanded: Record<string, true> = {};
+  for (const id of Object.keys(calls)) {
+    let call = calls[id];
+    if (call.name === name && call.cls == cls) {
+      while (call) {
+        newExpanded[call.parent] = true;
+        call = calls[call.parent];
+      }
+    }
+  }
+  setExpandedById((e: any) => ({ ...e, ...newExpanded }));
+};
+
 const Trace = ({ traceId }: { traceId: string }) => {
-  const { selectedId, rootId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
+  const {
+    selectedId,
+    rootId,
+    setSelectedId,
+    getExpanded,
+    setExpanded,
+    selectedFunction,
+    setExpandedById,
+    calls,
+  } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
   // const params = useParams()
 
@@ -918,6 +947,12 @@ const Trace = ({ traceId }: { traceId: string }) => {
         <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
           <nav>
             <SelectFunction />
+            <Button
+              disabled={!selectedFunction}
+              onClick={() => expandSelectedFunction(selectedFunction, calls, setExpandedById)}
+            >
+              Expand
+            </Button>
           </nav>
           <ArcherContainer
             ref={archerContainerRef}
