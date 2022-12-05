@@ -1,9 +1,10 @@
-import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
+import { Button, Collapse, Select, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isEmpty, last, set, sumBy } from "lodash";
+import { isEmpty, last, set, chain } from "lodash";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
+  ChangeEvent,
   createContext,
   Dispatch,
   ReactNode,
@@ -102,6 +103,7 @@ const TreeContext = createContext<{
   setSelectedId: Dispatch<SetStateAction<string | undefined>>;
   getExpanded: (id: string) => boolean;
   setExpanded: (id: string, expanded: boolean) => void;
+  setExpandedById: Dispatch<SetStateAction<Record<string, boolean>>>;
   getFocussed: (id: string) => boolean;
 } | null>(null);
 
@@ -291,6 +293,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
           if (id !== rootId && !isModelCall(calls[id]))
             setExpandedById(current => ({ ...current, [id]: expanded }));
         },
+        setExpandedById,
         getFocussed,
       }}
     >
@@ -771,6 +774,55 @@ const stripIndent = (source: string): string => {
     .join("\n");
 };
 
+const SelectFunction = () => {
+  const { calls, setExpandedById } = useTreeContext();
+  const nameCounts = chain(calls)
+    .values()
+    .filter("name")
+    .map(call => JSON.stringify([call.name, call.cls]))
+    .countBy()
+    .value();
+
+  const options = Object.keys(nameCounts)
+    .sort()
+    .map(nameJson => {
+      const count = nameCounts[nameJson];
+      const [name, cls] = JSON.parse(nameJson);
+      let label = `${getFormattedName(name)} (${count})`;
+      if (cls) {
+        label = getFormattedName(cls) + " : " + label;
+      }
+      return (
+        <option key={nameJson} value={nameJson}>
+          {label}
+        </option>
+      );
+    });
+
+  const onChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const nameJson = event.target.value;
+    if (!nameJson) return;
+    const [name, cls] = JSON.parse(nameJson);
+    const newExpanded: Record<string, true> = {};
+    for (const id of Object.keys(calls)) {
+      let call = calls[id];
+      if (call.name === name && call.cls == cls) {
+        while (call) {
+          newExpanded[call.parent] = true;
+          call = calls[call.parent];
+        }
+      }
+    }
+    setExpandedById(e => ({ ...e, ...newExpanded }));
+  };
+
+  return (
+    <Select placeholder="Select function..." onChange={onChange}>
+      {options}
+    </Select>
+  );
+};
+
 const Trace = ({ traceId }: { traceId: string }) => {
   const { selectedId, rootId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
@@ -864,6 +916,9 @@ const Trace = ({ traceId }: { traceId: string }) => {
     <div className="flex flex-col h-full min-h-screen max-h-screen">
       <div className="flex divide-x divide-gray-100 flex-1 overflow-clip">
         <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
+          <nav>
+            <SelectFunction />
+          </nav>
           <ArcherContainer
             ref={archerContainerRef}
             noCurves
