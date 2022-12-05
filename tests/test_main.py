@@ -15,7 +15,7 @@ nest_asyncio.apply()
 
 def do_not_test(recipe: Type[Recipe]) -> bool:
     if hasattr(recipe, "do_not_test"):
-        return recipe.do_not_test  # type: ignore
+        return recipe.do_not_test
     return False
 
 
