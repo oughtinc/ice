@@ -18,9 +18,9 @@ from inspect import Parameter
 from inspect import signature
 from time import monotonic_ns
 from typing import Any
+from typing import cast
 from typing import IO
 from typing import Optional
-from typing import cast
 
 import ulid
 
