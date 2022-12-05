@@ -17,8 +17,10 @@ from inspect import isfunction
 from inspect import Parameter
 from inspect import signature
 from time import monotonic_ns
+from typing import Any
 from typing import IO
 from typing import Optional
+from typing import cast
 
 import ulid
 
@@ -356,7 +358,8 @@ def get_strings(value) -> list[str]:
         # if result in (None, (), "", [], {}):
         # but without breaking due to truth-testing of pandas dataframes
         if any(
-            isinstance(result, type(x)) and result == x for x in (None, (), "", [], {})
+            isinstance(result, type(x)) and result == x
+            for x in cast(tuple[Any], (None, (), "", [], {}))
         ):
             result = "()"
         result = [str(result)]
@@ -374,7 +377,7 @@ def _get_short_list(lst: list, max_length=3) -> list:
     return lst[:max_length] + ["..."] if len(lst) > max_length else lst
 
 
-def _get_first_descendant(value):
+def _get_first_descendant(value: Any) -> Any:
     if isinstance(value, dict) and value:
         first, *_ = value.values()
         return _get_first_descendant(first)
