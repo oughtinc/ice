@@ -68,6 +68,7 @@ interface CallInfo extends InputOutputContentProps {
   func: BlockAddress<FuncBlock>; // long info about the function itself
   end?: number; // end time
   totalTokens?: number;
+  visible?: boolean;
 }
 
 interface FuncBlock {
@@ -103,6 +104,7 @@ const TreeContext = createContext<{
   traceId: string;
   rootId: string;
   calls: Calls;
+  setCalls: Dispatch<SetStateAction<Calls>>;
   getBlockValue: <T>(block: BlockAddress<T>) => T | undefined;
   selectedId: string | undefined;
   setSelectedId: Dispatch<SetStateAction<string | undefined>>;
@@ -292,6 +294,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       value={{
         traceId,
         calls,
+        setCalls,
         getBlockValue,
         rootId,
         selectedId,
@@ -414,7 +417,9 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
     shortArgs,
     shortResult,
     totalTokens,
+    visible,
   } = callInfo;
+  if (visible === false) return null;
   const { selectedId } = useTreeContext();
   const { getParent } = useLinks();
   const childIds = Object.keys(children);
@@ -831,8 +836,7 @@ const expandSelectedFunction = (
   if (!selectedFunction) return;
   const { name, cls } = selectedFunction;
   const newExpanded: Record<string, true> = {};
-  for (const id of Object.keys(calls)) {
-    let call = calls[id];
+  for (let call of Object.values(calls)) {
     if (call.name === name && call.cls == cls) {
       while (call) {
         newExpanded[call.parent] = true;
@@ -843,6 +847,35 @@ const expandSelectedFunction = (
   setExpandedById((e: any) => ({ ...e, ...newExpanded }));
 };
 
+function hideOtherNodes(selectedFunction: SelectedFunction | undefined, setCalls: any) {
+  if (!selectedFunction) return;
+  setCalls((calls: Calls) => {
+    return produce(calls, draft => {
+      const { name, cls } = selectedFunction;
+      for (const call of Object.values(draft)) {
+        call.visible = false;
+      }
+
+      function setChildrenVisible(c: CallInfo) {
+        c.visible = true;
+        for (const childId of Object.keys(c.children || {})) {
+          setChildrenVisible(draft[childId]);
+        }
+      }
+
+      for (let call of Object.values(draft)) {
+        if (call.name === name && call.cls == cls) {
+          setChildrenVisible(call);
+          while (call) {
+            call.visible = true;
+            call = draft[call.parent];
+          }
+        }
+      }
+    });
+  });
+}
+
 const Trace = ({ traceId }: { traceId: string }) => {
   const {
     selectedId,
@@ -852,6 +885,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
     setExpanded,
     selectedFunction,
     setExpandedById,
+    setCalls,
     calls,
   } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
@@ -952,6 +986,12 @@ const Trace = ({ traceId }: { traceId: string }) => {
               onClick={() => expandSelectedFunction(selectedFunction, calls, setExpandedById)}
             >
               Expand
+            </Button>
+            <Button
+              disabled={!selectedFunction}
+              onClick={() => hideOtherNodes(selectedFunction, setCalls)}
+            >
+              Hide others
             </Button>
           </nav>
           <ArcherContainer
