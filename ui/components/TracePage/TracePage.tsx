@@ -305,10 +305,6 @@ const useTreeContext = () => {
   return context;
 };
 
-function useBlockValue<T>(blockAddress: BlockAddress<T>): T | undefined {
-  return useTreeContext().getBlockValue(blockAddress);
-}
-
 const useCallInfo = (id: string) => {
   const { calls, selectedId, setSelectedId, getFocussed } = useTreeContext();
   return {
@@ -636,10 +632,11 @@ type Tab = "io" | "src";
 const DetailPaneContent = ({ info }: DetailPaneContentProps) => {
   const { id, func } = info;
   const [tab, setTab] = useState<Tab>("io"); // io for inputs and outputs, src for source
+  const { getBlockValue } = useTreeContext();
 
   return (
     <div className="flex-1 p-6">
-      <TabHeader id={id} doc={useBlockValue(func)?.doc} />
+      <TabHeader id={id} doc={getBlockValue(func)?.doc} />
       <TabBar tab={tab} setTab={setTab} />
       <TabContent tab={tab} info={info} />
     </div>
@@ -686,13 +683,14 @@ const TabButton = ({ label, value, tab, setTab }: TabButtonProps) => (
 
 const TabContent = ({ tab, info }: { tab: Tab; info: CallInfo }) => {
   const { func, args, records, result } = info;
+  const { getBlockValue } = useTreeContext();
 
   return (
     <div className="space-y-4 mt-4">
       {tab === "io" ? (
         <InputOutputContent args={args} records={records} result={result} />
       ) : (
-        <SourceContent source={useBlockValue(func)?.source} />
+        <SourceContent source={getBlockValue(func)?.source} />
       )}
     </div>
   );
@@ -706,18 +704,19 @@ const excludeMetadata = (source: Record<string, unknown> | undefined) => {
 };
 
 const InputOutputContent = ({ args, records, result }: InputOutputContentProps) => {
+  const { getBlockValue } = useTreeContext();
   return (
     <>
-      <Json name="Inputs" value={excludeMetadata(useBlockValue(args))} />
+      <Json name="Inputs" value={excludeMetadata(getBlockValue(args))} />
       {!isEmpty(records) && (
         <Json
           name="Records"
           value={Object.values(records)
-            .map(useBlockValue)
+            .map(getBlockValue)
             .filter(v => v)}
         />
       )}
-      <Json name="Outputs" value={result && useBlockValue(result)} />
+      <Json name="Outputs" value={result && getBlockValue(result)} />
     </>
   );
 };
