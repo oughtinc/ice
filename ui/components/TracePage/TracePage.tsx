@@ -995,6 +995,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
             >
               Expand
             </Button>
+            <Button onClick={() => setExpandedById({})}>Collapse all</Button>
             <Button
               disabled={!selectedFunction}
               onClick={() => hideOtherNodes(selectedFunction, setCalls)}
