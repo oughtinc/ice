@@ -1,7 +1,7 @@
 import { Button, Collapse, FormLabel, Select, Skeleton, Switch, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isEmpty, last, set, chain } from "lodash";
+import { isEmpty, last, set, chain, memoize } from "lodash";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
   ChangeEvent,
@@ -68,7 +68,6 @@ interface CallInfo extends InputOutputContentProps {
   func: BlockAddress<FuncBlock>; // long info about the function itself
   end?: number; // end time
   totalTokens?: number;
-  visible?: boolean;
 }
 
 interface FuncBlock {
@@ -116,6 +115,7 @@ const TreeContext = createContext<{
   setHighlighted: Dispatch<SetStateAction<Highlighted | undefined>>;
   hideOthers: boolean;
   setHideOthers: Dispatch<SetStateAction<boolean>>;
+  isVisible: (id: string) => boolean;
 } | null>(null);
 
 const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
@@ -292,6 +292,23 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     return undefined;
   }
 
+  const isVisible = useMemo(() => {
+    if (!hideOthers || !highlighted) return () => true;
+
+    const checkParents = memoize((id: string): boolean => {
+      const call = calls[id];
+      return call && (isHighlighted(call, highlighted) || checkParents(call.parent));
+    });
+    const checkChildren = memoize((id: string): boolean => {
+      const call = calls[id];
+      return (
+        call &&
+        (isHighlighted(call, highlighted) || Object.keys(call.children || {}).some(checkChildren))
+      );
+    });
+    return (id: string) => checkParents(id) || checkChildren(id);
+  }, [hideOthers, highlighted, calls]);
+
   return (
     <TreeContext.Provider
       value={{
@@ -313,6 +330,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         getFocussed,
         hideOthers,
         setHideOthers,
+        isVisible,
       }}
     >
       {children}
@@ -418,7 +436,7 @@ function isHighlighted(call: CallInfo, highlighted?: Highlighted) {
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const callInfo = useCallInfo(id);
-  const { selectedId, highlighted, hideOthers } = useTreeContext();
+  const { selectedId, highlighted, isVisible } = useTreeContext();
   const { getParent } = useLinks();
   const { expanded, setExpanded } = useExpanded(id);
 
@@ -430,9 +448,8 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
     shortArgs,
     shortResult,
     totalTokens,
-    visible,
   } = callInfo;
-  if (visible === false && hideOthers) return null;
+  if (!isVisible(id)) return null;
 
   const childIds = Object.keys(children);
   const cost = totalTokens && totalTokens * COST_USD_PER_DAVINCI_TOKEN;
@@ -868,41 +885,6 @@ const expandHighlighted = (
   setExpandedById((e: any) => ({ ...e, ...newExpanded }));
 };
 
-function hideOtherNodes(
-  highlighted: Highlighted | undefined,
-  setCalls: any,
-  hidden: boolean,
-  setHideOthers: any,
-) {
-  if (!highlighted) return;
-  setHideOthers(hidden);
-  if (!hidden) return;
-  setCalls((calls: Calls) => {
-    return produce(calls, draft => {
-      for (const call of Object.values(draft)) {
-        call.visible = false;
-      }
-
-      function setChildrenVisible(c: CallInfo) {
-        c.visible = true;
-        for (const childId of Object.keys(c.children || {})) {
-          setChildrenVisible(draft[childId]);
-        }
-      }
-
-      for (let call of Object.values(draft)) {
-        if (isHighlighted(call, highlighted)) {
-          setChildrenVisible(call);
-          while (call) {
-            call.visible = true;
-            call = draft[call.parent];
-          }
-        }
-      }
-    });
-  });
-}
-
 const Trace = ({ traceId }: { traceId: string }) => {
   const {
     selectedId,
@@ -1022,9 +1004,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
               <Switch
                 checked={hideOthers}
                 disabled={!highlighted}
-                onChange={event =>
-                  hideOtherNodes(highlighted, setCalls, event.target.checked, setHideOthers)
-                }
+                onChange={event => setHideOthers(event.target.checked)}
               />
             </FormLabel>
           </nav>
