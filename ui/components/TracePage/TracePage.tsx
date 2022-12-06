@@ -1,19 +1,9 @@
-import {
-  Button,
-  Collapse,
-  FormLabel,
-  Select,
-  Skeleton,
-  Switch,
-  useToast,
-  HStack,
-} from "@chakra-ui/react";
+import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isEmpty, last, set, chain, memoize } from "lodash";
+import { isEmpty, last, set, memoize } from "lodash";
 import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
 import {
-  ChangeEvent,
   createContext,
   Dispatch,
   ReactNode,
@@ -33,6 +23,7 @@ import Spinner from "./Spinner";
 import { recipes } from "/helpers/recipes";
 import * as COLORS from "/styles/colors.json";
 import { useParams } from "react-router";
+import { Toolbar, Highlighted, isHighlighted } from "/components/TracePage/Toolbar";
 
 const elicitStyle = {
   "hljs-keyword": { color: COLORS.indigo[600] }, // use primary color for keywords
@@ -65,7 +56,7 @@ type InputOutputContentProps = {
   records?: Record<string, BlockAddress<unknown>>;
 };
 
-interface CallInfo extends InputOutputContentProps {
+export interface CallInfo extends InputOutputContentProps {
   parent: string; // outer call ID
   start: number; // start time
   name: string; // function name
@@ -84,7 +75,7 @@ interface FuncBlock {
   source?: string;
 }
 
-type Calls = Record<string, CallInfo>;
+export type Calls = Record<string, CallInfo>;
 
 // Mapping from block number (identifies the filename) to a list of lines.
 // Each line is a JSON string.
@@ -93,11 +84,6 @@ type Blocks = Record<number, string[]>;
 // Describes where to load a value of type T from Blocks.
 // Represents [block number, line number].
 type BlockAddress<T> = [number, number];
-
-interface Highlighted {
-  name: string; // function name
-  cls?: string; // class name for methods
-}
 
 const MODEL_CALL_NAMES = [
   "relevance",
@@ -345,7 +331,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   );
 };
 
-const useTreeContext = () => {
+export const useTreeContext = () => {
   const context = useContext(TreeContext);
   if (!context) throw new Error("useTreeContext must be used within a TreeProvider");
   return context;
@@ -403,7 +389,7 @@ const useLinks = () => {
 const isModelCall = ({ cls, name }: CallInfo) =>
   MODEL_CALL_NAMES.includes(name) && cls?.includes("Agent");
 
-const getFormattedName = (snakeCasedName: string) => {
+export const getFormattedName = (snakeCasedName: string) => {
   const spacedName = snakeCasedName.replace(/_/g, " ");
   const capitalizedAndSpacedName = spacedName
     ? spacedName[0].toUpperCase() + spacedName.slice(1)
@@ -436,10 +422,6 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
 });
-
-function isHighlighted(call: CallInfo, highlighted?: Highlighted) {
-  return call.name == highlighted?.name && call.cls == highlighted?.cls;
-}
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const callInfo = useCallInfo(id);
@@ -830,78 +812,8 @@ const stripIndent = (source: string): string => {
     .join("\n");
 };
 
-const SelectHighlightedFunction = () => {
-  const { calls, highlighted, setHighlighted } = useTreeContext();
-  const nameCounts = chain(calls)
-    .values()
-    .slice(1) // skip the root
-    .filter("name")
-    .countBy(call => JSON.stringify([call.cls, call.name]))
-    .value();
-
-  const options = Object.keys(nameCounts)
-    .sort()
-    .map(nameJson => {
-      const count = nameCounts[nameJson];
-      const [cls, name] = JSON.parse(nameJson);
-      let label = `${getFormattedName(name)} (${count})`;
-      if (cls) {
-        label = getFormattedName(cls) + " : " + label;
-      }
-      return (
-        <option key={nameJson} value={nameJson}>
-          {label}
-        </option>
-      );
-    });
-
-  const onChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const nameJson = event.target.value;
-    if (!nameJson) return;
-    const [cls, name] = JSON.parse(nameJson);
-    setHighlighted({ cls, name });
-  };
-
-  return (
-    <span style={{ maxWidth: "50%" }}>
-      <Select
-        placeholder="Select function..."
-        onChange={onChange}
-        value={JSON.stringify([highlighted?.cls, highlighted?.name])}
-      >
-        {options}
-      </Select>
-    </span>
-  );
-};
-
-const highlightedAncestors = (highlighted: Highlighted | undefined, calls: Calls) => {
-  const result: Record<string, true> = {};
-  if (!highlighted) return result;
-  for (let call of Object.values(calls)) {
-    if (isHighlighted(call, highlighted)) {
-      while (call) {
-        result[call.parent] = true;
-        call = calls[call.parent];
-      }
-    }
-  }
-  return result;
-};
-
 const Trace = ({ traceId }: { traceId: string }) => {
-  const {
-    selectedId,
-    rootId,
-    setSelectedId,
-    getExpanded,
-    setExpanded,
-    highlighted,
-    setExpandedById,
-    calls,
-    setHideOthers,
-    hideOthers,
-  } = useTreeContext();
+  const { selectedId, rootId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
   // const params = useParams()
 
@@ -993,29 +905,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
     <div className="flex flex-col h-full min-h-screen max-h-screen">
       <div className="flex divide-x divide-gray-100 flex-1 overflow-clip">
         <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
-          <HStack>
-            <SelectHighlightedFunction />
-            <Button
-              disabled={!highlighted}
-              onClick={() =>
-                setExpandedById(expanded => ({
-                  ...expanded,
-                  ...highlightedAncestors(highlighted, calls),
-                }))
-              }
-            >
-              Expand
-            </Button>
-            <Button onClick={() => setExpandedById({})}>Collapse all</Button>
-            <FormLabel>
-              Hide others
-              <Switch
-                checked={hideOthers}
-                disabled={!highlighted}
-                onChange={event => setHideOthers(event.target.checked)}
-              />
-            </FormLabel>
-          </HStack>
+          <Toolbar />
           <ArcherContainer
             ref={archerContainerRef}
             noCurves
