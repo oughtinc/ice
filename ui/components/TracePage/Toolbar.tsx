@@ -1,6 +1,6 @@
 import { chain } from "lodash";
 import { ChangeEvent } from "react";
-import { Button, FormLabel, HStack, Select, Switch } from "@chakra-ui/react";
+import { Button, FormControl, FormLabel, HStack, Select, Switch } from "@chakra-ui/react";
 import { CallInfo, Calls, getFormattedName, useTreeContext } from "/components/TracePage/TracePage";
 
 const SelectHighlightedFunction = () => {
@@ -74,28 +74,33 @@ export function isHighlighted(call: CallInfo, highlighted?: Highlighted) {
 export const Toolbar = () => {
   const { highlighted, setExpandedById, hideOthers, setHideOthers, calls } = useTreeContext();
   return (
-    <HStack>
+    <HStack spacing="1.5em">
       <SelectHighlightedFunction />
-      <Button
-        disabled={!highlighted}
-        onClick={() =>
-          setExpandedById(expanded => ({
-            ...expanded,
-            ...highlightedAncestors(highlighted, calls),
-          }))
-        }
-      >
-        Expand
-      </Button>
-      <Button onClick={() => setExpandedById({})}>Collapse all</Button>
-      <FormLabel>
-        Hide others
+      <HStack>
+        <Button
+          disabled={!highlighted}
+          onClick={() =>
+            setExpandedById(expanded => ({
+              ...expanded,
+              ...highlightedAncestors(highlighted, calls),
+            }))
+          }
+        >
+          Expand
+        </Button>
+        <Button onClick={() => setExpandedById({})}>Collapse all</Button>
+      </HStack>
+      <FormControl display="flex" alignItems="center">
+        <FormLabel marginInlineEnd="5px" mb="0">
+          Hide others
+        </FormLabel>
         <Switch
+          size="lg"
           checked={hideOthers}
           disabled={!highlighted}
           onChange={event => setHideOthers(event.target.checked)}
         />
-      </FormLabel>
+      </FormControl>
     </HStack>
   );
 };
