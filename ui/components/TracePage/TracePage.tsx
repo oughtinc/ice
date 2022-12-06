@@ -827,8 +827,7 @@ const SelectHighlightedFunction = () => {
     .values()
     .slice(1) // skip the root
     .filter("name")
-    .map(call => JSON.stringify([call.cls, call.name]))
-    .countBy()
+    .countBy(call => JSON.stringify([call.cls, call.name]))
     .value();
 
   const options = Object.keys(nameCounts)
