@@ -431,8 +431,6 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
     shortResult,
     totalTokens,
     visible,
-    cls,
-    name,
   } = callInfo;
   if (visible === false && hideOthers) return null;
 
