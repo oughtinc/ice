@@ -23,7 +23,8 @@ import Spinner from "./Spinner";
 import { recipes } from "/helpers/recipes";
 import * as COLORS from "/styles/colors.json";
 import { useParams } from "react-router";
-import { Toolbar, Highlighted, isHighlighted } from "/components/TracePage/Toolbar";
+import { Toolbar, isHighlighted } from "/components/TracePage/Toolbar";
+import { CallName, CallFunction } from "/components/TracePage/CallName";
 
 const elicitStyle = {
   "hljs-keyword": { color: COLORS.indigo[600] }, // use primary color for keywords
@@ -105,8 +106,8 @@ const TreeContext = createContext<{
   setExpanded: (id: string, expanded: boolean) => void;
   setExpandedById: Dispatch<SetStateAction<Record<string, boolean>>>;
   getFocussed: (id: string) => boolean;
-  highlighted: Highlighted | undefined;
-  setHighlighted: Dispatch<SetStateAction<Highlighted | undefined>>;
+  highlighted: CallFunction | undefined;
+  setHighlighted: Dispatch<SetStateAction<CallFunction | undefined>>;
   hideOthers: boolean;
   setHideOthers: Dispatch<SetStateAction<boolean>>;
   isVisible: (id: string) => boolean;
@@ -140,7 +141,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   const [rootId, setRootId] = useState<string>("");
   const [expandedById, setExpandedById] = useState<Record<string, boolean>>({});
   const [autoselected, setAutoselected] = useState(false);
-  const [highlighted, setHighlighted] = useState<Highlighted>();
+  const [highlighted, setHighlighted] = useState<CallFunction>();
   const [hideOthers, setHideOthers] = useState(false);
 
   useEffect(() => {
@@ -397,22 +398,6 @@ export const getFormattedName = (snakeCasedName: string) => {
   return capitalizedAndSpacedName;
 };
 
-const CallName = ({ className, id }: { className?: string; id: string }) => {
-  const { name, cls: recipeClassName } = useCallInfo(id);
-  const displayName =
-    (name === "execute" || name === "run") && recipeClassName ? recipeClassName : name;
-  return (
-    <div className="flex items-center gap-1">
-      {recipeClassName && recipeClassName !== displayName ? (
-        <span className={classNames(className, "text-gray-500")}>
-          {getFormattedName(recipeClassName)}:
-        </span>
-      ) : undefined}
-      <span className={className}>{getFormattedName(displayName)}</span>
-    </div>
-  );
-};
-
 function lineAnchorId(id: string) {
   return `line-anchor-${id}`;
 }
@@ -437,6 +422,8 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
     shortArgs,
     shortResult,
     totalTokens,
+    cls,
+    name,
   } = callInfo;
   if (!isVisible(id)) return null;
 
@@ -519,7 +506,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             )}
           </ArcherElement>
           <div className="mx-2">
-            <CallName className="text-base text-slate-700" id={id} />
+            <CallName className="text-base text-slate-700" {...{ cls, name }} />
             <div className="text-sm text-gray-600 flex items-center">
               <span className="text-indigo-600">{shortArgs}</span>
               <span className="px-2">→</span>
@@ -672,23 +659,23 @@ type DetailPaneContentProps = {
 type Tab = "io" | "src";
 
 const DetailPaneContent = ({ info }: DetailPaneContentProps) => {
-  const { id, func } = info;
+  const { func, cls, name } = info;
   const [tab, setTab] = useState<Tab>("io"); // io for inputs and outputs, src for source
   const { getBlockValue } = useTreeContext();
 
   return (
     <div className="flex-1 p-6">
-      <TabHeader id={id} doc={getBlockValue(func)?.doc} />
+      <TabHeader {...{ cls, name }} doc={getBlockValue(func)?.doc} />
       <TabBar tab={tab} setTab={setTab} />
       <TabContent tab={tab} info={info} />
     </div>
   );
 };
 
-const TabHeader = ({ id, doc }: { id: string; doc?: string }) => (
+const TabHeader = ({ cls, name, doc }: { cls?: string; name: string; doc?: string }) => (
   <div className="mb-4">
     <h3 className="text-lg font-semibold text-gray-800">
-      <CallName id={id} />
+      <CallName {...{ cls, name }} />
     </h3>
     <p className="text-gray-600 text-sm whitespace-pre-line">{doc}</p>
   </div>

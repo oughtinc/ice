@@ -1,8 +1,19 @@
 import { chain } from "lodash";
-import { ChangeEvent } from "react";
-import { Button, FormControl, FormLabel, HStack, Select, Switch } from "@chakra-ui/react";
-import { CallInfo, Calls, getFormattedName, useTreeContext } from "/components/TracePage/TracePage";
-import { ArrowsIn, ArrowsOut } from "phosphor-react";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  HStack,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Switch,
+} from "@chakra-ui/react";
+import { CallInfo, Calls, useTreeContext } from "/components/TracePage/TracePage";
+import { ArrowsIn, ArrowsOut, CaretDown } from "phosphor-react";
+import { CallFunction, CallName } from "/components/TracePage/CallName";
 
 const SelectHighlightedFunction = () => {
   const { calls, highlighted, setHighlighted } = useTreeContext();
@@ -18,38 +29,34 @@ const SelectHighlightedFunction = () => {
     .map(nameJson => {
       const count = nameCounts[nameJson];
       const [cls, name] = JSON.parse(nameJson);
-      let label = `${getFormattedName(name)} (${count})`;
-      if (cls) {
-        label = getFormattedName(cls) + " : " + label;
-      }
       return (
-        <option key={nameJson} value={nameJson}>
-          {label}
-        </option>
+        <MenuItem
+          key={nameJson}
+          onClick={() => {
+            setHighlighted({ cls, name });
+          }}
+        >
+          <Box as="span" minWidth="3em" textAlign="right" marginRight="0.5em">
+            {count} ×
+          </Box>
+          <CallName {...{ cls, name }} />
+        </MenuItem>
       );
     });
 
-  const onChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const nameJson = event.target.value;
-    if (!nameJson) return;
-    const [cls, name] = JSON.parse(nameJson);
-    setHighlighted({ cls, name });
-  };
-
   return (
-    <span style={{ maxWidth: "50%" }}>
-      <Select
-        placeholder="Select function..."
-        onChange={onChange}
-        value={JSON.stringify([highlighted?.cls, highlighted?.name])}
-      >
-        {options}
-      </Select>
+    <span>
+      <Menu>
+        <MenuButton as={Button} rightIcon={<CaretDown />} variant="outline">
+          {highlighted ? <CallName {...highlighted} /> : "Select function..."}
+        </MenuButton>
+        <MenuList>{options}</MenuList>
+      </Menu>
     </span>
   );
 };
 
-const highlightedAncestors = (highlighted: Highlighted | undefined, calls: Calls) => {
+const highlightedAncestors = (highlighted: CallFunction | undefined, calls: Calls) => {
   const result: Record<string, true> = {};
   if (!highlighted) return result;
   for (let call of Object.values(calls)) {
@@ -63,12 +70,7 @@ const highlightedAncestors = (highlighted: Highlighted | undefined, calls: Calls
   return result;
 };
 
-export interface Highlighted {
-  name: string; // function name
-  cls?: string; // class name for methods
-}
-
-export function isHighlighted(call: CallInfo, highlighted?: Highlighted) {
+export function isHighlighted(call: CallInfo, highlighted?: CallFunction) {
   return call.name == highlighted?.name && call.cls == highlighted?.cls;
 }
 
