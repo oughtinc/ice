@@ -821,7 +821,7 @@ const stripIndent = (source: string): string => {
     .join("\n");
 };
 
-const SelectFunction = () => {
+const SelectHighlightedFunction = () => {
   const { calls, highlighted, setHighlighted } = useTreeContext();
   const nameCounts = chain(calls)
     .values()
@@ -988,7 +988,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
       <div className="flex divide-x divide-gray-100 flex-1 overflow-clip">
         <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
           <nav>
-            <SelectFunction />
+            <SelectHighlightedFunction />
             <Button
               disabled={!highlighted}
               onClick={() => expandHighlighted(highlighted, calls, setExpandedById)}
