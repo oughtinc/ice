@@ -808,6 +808,7 @@ const SelectFunction = () => {
   const { calls, selectedFunction, setSelectedFunction } = useTreeContext();
   const nameCounts = chain(calls)
     .values()
+    .slice(1) // skip the root
     .filter("name")
     .map(call => JSON.stringify([call.cls, call.name]))
     .countBy()
