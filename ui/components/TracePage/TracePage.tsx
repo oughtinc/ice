@@ -418,9 +418,11 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
     shortResult,
     totalTokens,
     visible,
+    cls,
+    name,
   } = callInfo;
   if (visible === false) return null;
-  const { selectedId } = useTreeContext();
+  const { selectedId, selectedFunction } = useTreeContext();
   const { getParent } = useLinks();
   const childIds = Object.keys(children);
   const { expanded, setExpanded } = useExpanded(id);
@@ -451,6 +453,12 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             ev.stopPropagation();
           }}
           isActive={selected}
+          {...(selectedFunction?.cls == cls && selectedFunction?.name === name
+            ? {
+                borderColor: "yellow.500",
+                borderWidth: "5px",
+              }
+            : {})}
         >
           <ArcherElement
             id={lineAnchorId(id)}
