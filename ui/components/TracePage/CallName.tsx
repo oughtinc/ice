@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import { getFormattedName } from "/components/TracePage/TracePage";
 
 export const CallName = ({ className, name, cls }: CallNameProps) => {
   const displayName = (name === "execute" || name === "run") && cls ? cls : name;
@@ -21,3 +20,11 @@ export interface CallFunction {
 interface CallNameProps extends CallFunction {
   className?: string;
 }
+
+export const getFormattedName = (snakeCasedName: string) => {
+  const spacedName = snakeCasedName.replace(/_/g, " ");
+  const capitalizedAndSpacedName = spacedName
+    ? spacedName[0].toUpperCase() + spacedName.slice(1)
+    : snakeCasedName;
+  return capitalizedAndSpacedName;
+};

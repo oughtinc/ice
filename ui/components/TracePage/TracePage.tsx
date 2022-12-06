@@ -24,7 +24,7 @@ import { recipes } from "/helpers/recipes";
 import * as COLORS from "/styles/colors.json";
 import { useParams } from "react-router";
 import { Toolbar, isHighlighted } from "/components/TracePage/Toolbar";
-import { CallName, CallFunction } from "/components/TracePage/CallName";
+import { CallName, CallFunction, getFormattedName } from "/components/TracePage/CallName";
 
 const elicitStyle = {
   "hljs-keyword": { color: COLORS.indigo[600] }, // use primary color for keywords
@@ -389,14 +389,6 @@ const useLinks = () => {
 
 const isModelCall = ({ cls, name }: CallInfo) =>
   MODEL_CALL_NAMES.includes(name) && cls?.includes("Agent");
-
-export const getFormattedName = (snakeCasedName: string) => {
-  const spacedName = snakeCasedName.replace(/_/g, " ");
-  const capitalizedAndSpacedName = spacedName
-    ? spacedName[0].toUpperCase() + spacedName.slice(1)
-    : snakeCasedName;
-  return capitalizedAndSpacedName;
-};
 
 function lineAnchorId(id: string) {
   return `line-anchor-${id}`;
