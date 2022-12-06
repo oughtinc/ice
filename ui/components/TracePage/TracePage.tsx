@@ -864,22 +864,18 @@ const SelectHighlightedFunction = () => {
   );
 };
 
-const expandHighlighted = (
-  highlighted: Highlighted | undefined,
-  calls: Calls,
-  setExpandedById: any,
-) => {
-  if (!highlighted) return;
-  const newExpanded: Record<string, true> = {};
+const highlightedAncestors = (highlighted: Highlighted | undefined, calls: Calls) => {
+  const result: Record<string, true> = {};
+  if (!highlighted) return result;
   for (let call of Object.values(calls)) {
     if (isHighlighted(call, highlighted)) {
       while (call) {
-        newExpanded[call.parent] = true;
+        result[call.parent] = true;
         call = calls[call.parent];
       }
     }
   }
-  setExpandedById((e: any) => ({ ...e, ...newExpanded }));
+  return result;
 };
 
 const Trace = ({ traceId }: { traceId: string }) => {
@@ -990,7 +986,12 @@ const Trace = ({ traceId }: { traceId: string }) => {
             <SelectHighlightedFunction />
             <Button
               disabled={!highlighted}
-              onClick={() => expandHighlighted(highlighted, calls, setExpandedById)}
+              onClick={() =>
+                setExpandedById(expanded => ({
+                  ...expanded,
+                  ...highlightedAncestors(highlighted, calls),
+                }))
+              }
             >
               Expand
             </Button>
