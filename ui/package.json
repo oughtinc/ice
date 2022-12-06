@@ -17,6 +17,12 @@
     "ulidx": "^0.3.0"
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "^7.0.0-alpha.59",
+    "@storybook/addon-interactions": "^7.0.0-alpha.59",
+    "@storybook/addon-links": "^7.0.0-alpha.59",
+    "@storybook/react": "^7.0.0-alpha.59",
+    "@storybook/react-vite": "^7.0.0-alpha.59",
+    "@storybook/testing-library": "^0.0.13",
     "@types/node": "18.11.11",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
@@ -24,8 +30,10 @@
     "@vitejs/plugin-react": "^2.2.0",
     "autoprefixer": "^10.4.13",
     "eslint": "8.29.0",
+    "eslint-plugin-storybook": "^0.6.8",
     "patch-package": "^6.5.0",
     "postcss": "^8.4.19",
+    "storybook": "^7.0.0-alpha.59",
     "tailwindcss": "^3.2.4",
     "tailwindcss-labeled-groups": "^0.0.2",
     "typescript": "4.9.3",
@@ -36,7 +44,9 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "version": "0.0.0"
 }
