@@ -2,6 +2,7 @@ import { chain } from "lodash";
 import { ChangeEvent } from "react";
 import { Button, FormControl, FormLabel, HStack, Select, Switch } from "@chakra-ui/react";
 import { CallInfo, Calls, getFormattedName, useTreeContext } from "/components/TracePage/TracePage";
+import { ArrowsIn, ArrowsOut } from "phosphor-react";
 
 const SelectHighlightedFunction = () => {
   const { calls, highlighted, setHighlighted } = useTreeContext();
@@ -85,10 +86,13 @@ export const Toolbar = () => {
               ...highlightedAncestors(highlighted, calls),
             }))
           }
+          leftIcon={<ArrowsOut size="1.5em" />}
         >
           Expand
         </Button>
-        <Button onClick={() => setExpandedById({})}>Collapse all</Button>
+        <Button onClick={() => setExpandedById({})} leftIcon={<ArrowsIn size="1.5em" />}>
+          Collapse all
+        </Button>
       </HStack>
       <FormControl display="flex" alignItems="center">
         <FormLabel marginInlineEnd="5px" mb="0">
