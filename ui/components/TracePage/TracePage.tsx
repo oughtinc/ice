@@ -86,7 +86,7 @@ type Blocks = Record<number, string[]>;
 // Represents [block number, line number].
 type BlockAddress<T> = [number, number];
 
-interface SelectedFunction {
+interface Highlighted {
   name: string; // function name
   cls?: string; // class name for methods
 }
@@ -112,8 +112,8 @@ const TreeContext = createContext<{
   setExpanded: (id: string, expanded: boolean) => void;
   setExpandedById: Dispatch<SetStateAction<Record<string, boolean>>>;
   getFocussed: (id: string) => boolean;
-  selectedFunction: SelectedFunction | undefined;
-  setSelectedFunction: Dispatch<SetStateAction<SelectedFunction | undefined>>;
+  highlighted: Highlighted | undefined;
+  setHighlighted: Dispatch<SetStateAction<Highlighted | undefined>>;
   hideOthers: boolean;
   setHideOthers: Dispatch<SetStateAction<boolean>>;
 } | null>(null);
@@ -146,7 +146,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   const [rootId, setRootId] = useState<string>("");
   const [expandedById, setExpandedById] = useState<Record<string, boolean>>({});
   const [autoselected, setAutoselected] = useState(false);
-  const [selectedFunction, setSelectedFunction] = useState<SelectedFunction>();
+  const [highlighted, setHighlighted] = useState<Highlighted>();
   const [hideOthers, setHideOthers] = useState(false);
 
   useEffect(() => {
@@ -308,8 +308,8 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
             setExpandedById(current => ({ ...current, [id]: expanded }));
         },
         setExpandedById,
-        selectedFunction,
-        setSelectedFunction,
+        highlighted,
+        setHighlighted,
         getFocussed,
         hideOthers,
         setHideOthers,
@@ -414,7 +414,7 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat("en-US", {
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const callInfo = useCallInfo(id);
-  const { selectedId, selectedFunction, hideOthers } = useTreeContext();
+  const { selectedId, highlighted, hideOthers } = useTreeContext();
   const { getParent } = useLinks();
   const { expanded, setExpanded } = useExpanded(id);
 
@@ -460,7 +460,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             ev.stopPropagation();
           }}
           isActive={selected}
-          {...(selectedFunction?.cls == cls && selectedFunction?.name === name
+          {...(highlighted?.cls == cls && highlighted?.name === name
             ? {
                 borderColor: "yellow.500",
                 borderWidth: "5px",
@@ -805,7 +805,7 @@ const stripIndent = (source: string): string => {
 };
 
 const SelectFunction = () => {
-  const { calls, selectedFunction, setSelectedFunction } = useTreeContext();
+  const { calls, highlighted, setHighlighted } = useTreeContext();
   const nameCounts = chain(calls)
     .values()
     .slice(1) // skip the root
@@ -834,27 +834,27 @@ const SelectFunction = () => {
     const nameJson = event.target.value;
     if (!nameJson) return;
     const [cls, name] = JSON.parse(nameJson);
-    setSelectedFunction({ cls, name });
+    setHighlighted({ cls, name });
   };
 
   return (
     <Select
       placeholder="Select function..."
       onChange={onChange}
-      value={JSON.stringify([selectedFunction?.cls, selectedFunction?.name])}
+      value={JSON.stringify([highlighted?.cls, highlighted?.name])}
     >
       {options}
     </Select>
   );
 };
 
-const expandSelectedFunction = (
-  selectedFunction: SelectedFunction | undefined,
+const expandHighlighted = (
+  highlighted: Highlighted | undefined,
   calls: Calls,
   setExpandedById: any,
 ) => {
-  if (!selectedFunction) return;
-  const { name, cls } = selectedFunction;
+  if (!highlighted) return;
+  const { name, cls } = highlighted;
   const newExpanded: Record<string, true> = {};
   for (let call of Object.values(calls)) {
     if (call.name === name && call.cls == cls) {
@@ -868,17 +868,17 @@ const expandSelectedFunction = (
 };
 
 function hideOtherNodes(
-  selectedFunction: SelectedFunction | undefined,
+  highlighted: Highlighted | undefined,
   setCalls: any,
   hidden: boolean,
   setHideOthers: any,
 ) {
-  if (!selectedFunction) return;
+  if (!highlighted) return;
   setHideOthers(hidden);
   if (!hidden) return;
   setCalls((calls: Calls) => {
     return produce(calls, draft => {
-      const { name, cls } = selectedFunction;
+      const { name, cls } = highlighted;
       for (const call of Object.values(draft)) {
         call.visible = false;
       }
@@ -910,7 +910,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
     setSelectedId,
     getExpanded,
     setExpanded,
-    selectedFunction,
+    highlighted,
     setExpandedById,
     setCalls,
     calls,
@@ -1011,8 +1011,8 @@ const Trace = ({ traceId }: { traceId: string }) => {
           <nav>
             <SelectFunction />
             <Button
-              disabled={!selectedFunction}
-              onClick={() => expandSelectedFunction(selectedFunction, calls, setExpandedById)}
+              disabled={!highlighted}
+              onClick={() => expandHighlighted(highlighted, calls, setExpandedById)}
             >
               Expand
             </Button>
@@ -1021,9 +1021,9 @@ const Trace = ({ traceId }: { traceId: string }) => {
               Hide others
               <Switch
                 checked={hideOthers}
-                disabled={!selectedFunction}
+                disabled={!highlighted}
                 onChange={event =>
-                  hideOtherNodes(selectedFunction, setCalls, event.target.checked, setHideOthers)
+                  hideOtherNodes(highlighted, setCalls, event.target.checked, setHideOthers)
                 }
               />
             </FormLabel>
