@@ -805,7 +805,7 @@ const stripIndent = (source: string): string => {
 };
 
 const SelectFunction = () => {
-  const { calls, setSelectedFunction } = useTreeContext();
+  const { calls, selectedFunction, setSelectedFunction } = useTreeContext();
   const nameCounts = chain(calls)
     .values()
     .filter("name")
@@ -823,7 +823,11 @@ const SelectFunction = () => {
         label = getFormattedName(cls) + " : " + label;
       }
       return (
-        <option key={nameJson} value={nameJson}>
+        <option
+          key={nameJson}
+          value={nameJson}
+          selected={selectedFunction?.cls === cls && selectedFunction?.name === name}
+        >
           {label}
         </option>
       );
@@ -910,6 +914,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
     setCalls,
     calls,
     setHideOthers,
+    hideOthers,
   } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
   // const params = useParams()
@@ -1014,11 +1019,12 @@ const Trace = ({ traceId }: { traceId: string }) => {
             <FormLabel>
               Hide others
               <Switch
+                checked={hideOthers}
                 disabled={!selectedFunction}
                 onChange={event =>
                   hideOtherNodes(selectedFunction, setCalls, event.target.checked, setHideOthers)
                 }
-              ></Switch>
+              />
             </FormLabel>
           </nav>
           <ArcherContainer
