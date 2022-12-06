@@ -412,6 +412,10 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat("en-US", {
   currency: "USD",
 });
 
+function isHighlighted(call: CallInfo, highlighted?: Highlighted) {
+  return call.name == highlighted?.name && call.cls == highlighted?.cls;
+}
+
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const callInfo = useCallInfo(id);
   const { selectedId, highlighted, hideOthers } = useTreeContext();
@@ -460,7 +464,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             ev.stopPropagation();
           }}
           isActive={selected}
-          {...(highlighted?.cls == cls && highlighted?.name === name
+          {...(isHighlighted(callInfo, highlighted)
             ? {
                 borderColor: "yellow.500",
                 borderWidth: "5px",
@@ -854,10 +858,9 @@ const expandHighlighted = (
   setExpandedById: any,
 ) => {
   if (!highlighted) return;
-  const { name, cls } = highlighted;
   const newExpanded: Record<string, true> = {};
   for (let call of Object.values(calls)) {
-    if (call.name === name && call.cls == cls) {
+    if (isHighlighted(call, highlighted)) {
       while (call) {
         newExpanded[call.parent] = true;
         call = calls[call.parent];
@@ -878,7 +881,6 @@ function hideOtherNodes(
   if (!hidden) return;
   setCalls((calls: Calls) => {
     return produce(calls, draft => {
-      const { name, cls } = highlighted;
       for (const call of Object.values(draft)) {
         call.visible = false;
       }
@@ -891,7 +893,7 @@ function hideOtherNodes(
       }
 
       for (let call of Object.values(draft)) {
-        if (call.name === name && call.cls == cls) {
+        if (isHighlighted(call, highlighted)) {
           setChildrenVisible(call);
           while (call) {
             call.visible = true;
