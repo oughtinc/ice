@@ -103,7 +103,6 @@ const TreeContext = createContext<{
   traceId: string;
   rootId: string;
   calls: Calls;
-  setCalls: Dispatch<SetStateAction<Calls>>;
   getBlockValue: <T>(block: BlockAddress<T>) => T | undefined;
   selectedId: string | undefined;
   setSelectedId: Dispatch<SetStateAction<string | undefined>>;
@@ -314,7 +313,6 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       value={{
         traceId,
         calls,
-        setCalls,
         getBlockValue,
         rootId,
         selectedId,
@@ -894,7 +892,6 @@ const Trace = ({ traceId }: { traceId: string }) => {
     setExpanded,
     highlighted,
     setExpandedById,
-    setCalls,
     calls,
     setHideOthers,
     hideOthers,
