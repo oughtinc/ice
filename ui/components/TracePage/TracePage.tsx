@@ -1,4 +1,13 @@
-import { Button, Collapse, FormLabel, Select, Skeleton, Switch, useToast } from "@chakra-ui/react";
+import {
+  Button,
+  Collapse,
+  FormLabel,
+  Select,
+  Skeleton,
+  Switch,
+  useToast,
+  HStack,
+} from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
 import { isEmpty, last, set, chain, memoize } from "lodash";
@@ -854,13 +863,15 @@ const SelectHighlightedFunction = () => {
   };
 
   return (
-    <Select
-      placeholder="Select function..."
-      onChange={onChange}
-      value={JSON.stringify([highlighted?.cls, highlighted?.name])}
-    >
-      {options}
-    </Select>
+    <span style={{ maxWidth: "50%" }}>
+      <Select
+        placeholder="Select function..."
+        onChange={onChange}
+        value={JSON.stringify([highlighted?.cls, highlighted?.name])}
+      >
+        {options}
+      </Select>
+    </span>
   );
 };
 
@@ -982,7 +993,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
     <div className="flex flex-col h-full min-h-screen max-h-screen">
       <div className="flex divide-x divide-gray-100 flex-1 overflow-clip">
         <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
-          <nav>
+          <HStack>
             <SelectHighlightedFunction />
             <Button
               disabled={!highlighted}
@@ -1004,7 +1015,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
                 onChange={event => setHideOthers(event.target.checked)}
               />
             </FormLabel>
-          </nav>
+          </HStack>
           <ArcherContainer
             ref={archerContainerRef}
             noCurves
