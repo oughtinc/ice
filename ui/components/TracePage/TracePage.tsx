@@ -823,11 +823,7 @@ const SelectFunction = () => {
         label = getFormattedName(cls) + " : " + label;
       }
       return (
-        <option
-          key={nameJson}
-          value={nameJson}
-          selected={selectedFunction?.cls === cls && selectedFunction?.name === name}
-        >
+        <option key={nameJson} value={nameJson}>
           {label}
         </option>
       );
@@ -841,7 +837,11 @@ const SelectFunction = () => {
   };
 
   return (
-    <Select placeholder="Select function..." onChange={onChange}>
+    <Select
+      placeholder="Select function..."
+      onChange={onChange}
+      value={JSON.stringify([selectedFunction?.cls, selectedFunction?.name])}
+    >
       {options}
     </Select>
   );
