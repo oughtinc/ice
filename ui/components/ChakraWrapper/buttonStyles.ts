@@ -32,6 +32,7 @@ function addBaseStyles(
   return themingInfo => {
     return {
       ...styles(themingInfo),
+      cursor: "pointer",
       height: HEIGHT_BY_SIZE[themingInfo.size],
       fontSize: FONT_SIZE_BY_SIZE[themingInfo.size],
       ["& span.chakra-button__icon:nth-of-type(1)"]: {

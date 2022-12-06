@@ -423,6 +423,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
         })}
       >
         <Button
+          as="div"
           className={classNames(
             "justify-start text-start items-start h-fit min-w-[300px] p-1.5 !shadow-none",
           )}
