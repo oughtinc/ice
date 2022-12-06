@@ -1,4 +1,4 @@
-import { Button, Collapse, Select, Skeleton, useToast } from "@chakra-ui/react";
+import { Button, Collapse, FormLabel, Select, Skeleton, Switch, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
 import { isEmpty, last, set, chain } from "lodash";
@@ -114,6 +114,8 @@ const TreeContext = createContext<{
   getFocussed: (id: string) => boolean;
   selectedFunction: SelectedFunction | undefined;
   setSelectedFunction: Dispatch<SetStateAction<SelectedFunction | undefined>>;
+  hideOthers: boolean;
+  setHideOthers: Dispatch<SetStateAction<boolean>>;
 } | null>(null);
 
 const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
@@ -145,6 +147,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   const [expandedById, setExpandedById] = useState<Record<string, boolean>>({});
   const [autoselected, setAutoselected] = useState(false);
   const [selectedFunction, setSelectedFunction] = useState<SelectedFunction>();
+  const [hideOthers, setHideOthers] = useState(false);
 
   useEffect(() => {
     if (!autoselected) {
@@ -308,6 +311,8 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         selectedFunction,
         setSelectedFunction,
         getFocussed,
+        hideOthers,
+        setHideOthers,
       }}
     >
       {children}
@@ -409,6 +414,10 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat("en-US", {
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const callInfo = useCallInfo(id);
+  const { selectedId, selectedFunction, hideOthers } = useTreeContext();
+  const { getParent } = useLinks();
+  const { expanded, setExpanded } = useExpanded(id);
+
   const {
     children = {},
     select,
@@ -421,11 +430,9 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
     cls,
     name,
   } = callInfo;
-  if (visible === false) return null;
-  const { selectedId, selectedFunction } = useTreeContext();
-  const { getParent } = useLinks();
+  if (visible === false && hideOthers) return null;
+
   const childIds = Object.keys(children);
-  const { expanded, setExpanded } = useExpanded(id);
   const cost = totalTokens && totalTokens * COST_USD_PER_DAVINCI_TOKEN;
 
   const modelCall = isModelCall(callInfo);
@@ -855,8 +862,15 @@ const expandSelectedFunction = (
   setExpandedById((e: any) => ({ ...e, ...newExpanded }));
 };
 
-function hideOtherNodes(selectedFunction: SelectedFunction | undefined, setCalls: any) {
+function hideOtherNodes(
+  selectedFunction: SelectedFunction | undefined,
+  setCalls: any,
+  hidden: boolean,
+  setHideOthers: any,
+) {
   if (!selectedFunction) return;
+  setHideOthers(hidden);
+  if (!hidden) return;
   setCalls((calls: Calls) => {
     return produce(calls, draft => {
       const { name, cls } = selectedFunction;
@@ -895,6 +909,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
     setExpandedById,
     setCalls,
     calls,
+    setHideOthers,
   } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
   // const params = useParams()
@@ -996,12 +1011,15 @@ const Trace = ({ traceId }: { traceId: string }) => {
               Expand
             </Button>
             <Button onClick={() => setExpandedById({})}>Collapse all</Button>
-            <Button
-              disabled={!selectedFunction}
-              onClick={() => hideOtherNodes(selectedFunction, setCalls)}
-            >
+            <FormLabel>
               Hide others
-            </Button>
+              <Switch
+                disabled={!selectedFunction}
+                onChange={event =>
+                  hideOtherNodes(selectedFunction, setCalls, event.target.checked, setHideOthers)
+                }
+              ></Switch>
+            </FormLabel>
           </nav>
           <ArcherContainer
             ref={archerContainerRef}
