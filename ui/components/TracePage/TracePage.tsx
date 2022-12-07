@@ -407,6 +407,8 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
   const { getParent } = useLinks();
   const { expanded, setExpanded } = useExpanded(id);
 
+  if (!isVisible(id)) return null;
+
   const {
     children = {},
     select,
@@ -418,7 +420,6 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
     cls,
     name,
   } = callInfo;
-  if (!isVisible(id)) return null;
 
   const childIds = Object.keys(children);
   const cost = totalTokens && totalTokens * COST_USD_PER_DAVINCI_TOKEN;
