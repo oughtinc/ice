@@ -4,7 +4,7 @@
     "@chakra-ui/system": "^1.12.1",
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
-    "classnames": "^2.3.1",
+    "classnames": "^2.3.2",
     "framer-motion": "^6.3.3",
     "immer": "^9.0.15",
     "lodash": "^4.17.21",
