@@ -1,7 +1,7 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isEmpty, last, set, sumBy } from "lodash";
+import { isEmpty, last, memoize, set } from "lodash";
 import {
   createContext,
   Dispatch,
@@ -22,6 +22,8 @@ import Spinner from "./Spinner";
 import { recipes } from "/helpers/recipes";
 import * as COLORS from "/styles/colors.json";
 import { useParams } from "react-router";
+import { isHighlighted, Toolbar } from "/components/TracePage/Toolbar";
+import { CallFunction, CallName, getFormattedName } from "/components/TracePage/CallName";
 import { CallIconButton } from "./CallIconButton";
 
 const elicitStyle = {
@@ -55,7 +57,7 @@ type InputOutputContentProps = {
   records?: Record<string, BlockAddress<unknown>>;
 };
 
-interface CallInfo extends InputOutputContentProps {
+export interface CallInfo extends InputOutputContentProps {
   parent: string; // outer call ID
   start: number; // start time
   name: string; // function name
@@ -74,7 +76,7 @@ interface FuncBlock {
   source?: string;
 }
 
-type Calls = Record<string, CallInfo>;
+export type Calls = Record<string, CallInfo>;
 
 // Mapping from block number (identifies the filename) to a list of lines.
 // Each line is a JSON string.
@@ -102,7 +104,13 @@ const TreeContext = createContext<{
   setSelectedId: Dispatch<SetStateAction<string | undefined>>;
   getExpanded: (id: string) => boolean;
   setExpanded: (id: string, expanded: boolean) => void;
+  setExpandedById: Dispatch<SetStateAction<Record<string, boolean>>>;
   getFocussed: (id: string) => boolean;
+  highlightedFunction: CallFunction | undefined;
+  setHighlightedFunction: Dispatch<SetStateAction<CallFunction | undefined>>;
+  othersHidden: boolean;
+  setOthersHidden: Dispatch<SetStateAction<boolean>>;
+  isVisible: (id: string) => boolean;
 } | null>(null);
 
 const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
@@ -133,6 +141,8 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   const [rootId, setRootId] = useState<string>("");
   const [expandedById, setExpandedById] = useState<Record<string, boolean>>({});
   const [autoselected, setAutoselected] = useState(false);
+  const [highlightedFunction, setHighlightedFunction] = useState<CallFunction>();
+  const [othersHidden, setOthersHidden] = useState(false);
 
   useEffect(() => {
     if (!autoselected) {
@@ -277,6 +287,24 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     return undefined;
   }
 
+  const isVisible = useMemo(() => {
+    if (!othersHidden || !highlightedFunction) return () => true;
+
+    const checkParents = memoize((id: string): boolean => {
+      const call = calls[id];
+      return call && (isHighlighted(call, highlightedFunction) || checkParents(call.parent));
+    });
+    const checkChildren = memoize((id: string): boolean => {
+      const call = calls[id];
+      return (
+        call &&
+        (isHighlighted(call, highlightedFunction) ||
+          Object.keys(call.children || {}).some(checkChildren))
+      );
+    });
+    return (id: string) => checkParents(id) || checkChildren(id);
+  }, [othersHidden, highlightedFunction, calls]);
+
   return (
     <TreeContext.Provider
       value={{
@@ -290,7 +318,13 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         setExpanded: (id: string, expanded: boolean) => {
           if (id !== rootId) setExpandedById(current => ({ ...current, [id]: expanded }));
         },
+        setExpandedById,
+        highlightedFunction,
+        setHighlightedFunction,
         getFocussed,
+        othersHidden,
+        setOthersHidden,
+        isVisible,
       }}
     >
       {children}
@@ -298,7 +332,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   );
 };
 
-const useTreeContext = () => {
+export const useTreeContext = () => {
   const context = useContext(TreeContext);
   if (!context) throw new Error("useTreeContext must be used within a TreeProvider");
   return context;
@@ -356,30 +390,6 @@ const useLinks = () => {
 const isModelCall = ({ cls, name }: CallInfo) =>
   MODEL_CALL_NAMES.includes(name) && !!cls?.includes("Agent");
 
-const getFormattedName = (snakeCasedName: string) => {
-  const spacedName = snakeCasedName.replace(/_/g, " ");
-  const capitalizedAndSpacedName = spacedName
-    ? spacedName[0].toUpperCase() + spacedName.slice(1)
-    : snakeCasedName;
-  return capitalizedAndSpacedName;
-};
-
-const CallName = ({ className, id }: { className?: string; id: string }) => {
-  const { name, cls: recipeClassName } = useCallInfo(id);
-  const displayName =
-    (name === "execute" || name === "run") && recipeClassName ? recipeClassName : name;
-  return (
-    <div className="flex items-center gap-1">
-      {recipeClassName && recipeClassName !== displayName ? (
-        <span className={classNames(className, "text-gray-500")}>
-          {getFormattedName(recipeClassName)}:
-        </span>
-      ) : undefined}
-      <span className={className}>{getFormattedName(displayName)}</span>
-    </div>
-  );
-};
-
 function lineAnchorId(id: string) {
   return `line-anchor-${id}`;
 }
@@ -392,6 +402,12 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat("en-US", {
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const callInfo = useCallInfo(id);
+  const { selectedId, highlightedFunction, isVisible } = useTreeContext();
+  const { getParent } = useLinks();
+  const { expanded, setExpanded } = useExpanded(id);
+
+  if (!isVisible(id)) return null;
+
   const {
     children = {},
     select,
@@ -400,11 +416,11 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
     shortArgs,
     shortResult,
     totalTokens,
+    cls,
+    name,
   } = callInfo;
-  const { selectedId } = useTreeContext();
-  const { getParent } = useLinks();
+
   const childIds = Object.keys(children);
-  const { expanded, setExpanded } = useExpanded(id);
   const cost = totalTokens && totalTokens * COST_USD_PER_DAVINCI_TOKEN;
 
   const modelCall = isModelCall(callInfo);
@@ -432,6 +448,12 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             ev.stopPropagation();
           }}
           isActive={selected}
+          {...(isHighlighted(callInfo, highlightedFunction)
+            ? {
+                borderColor: "yellow.500",
+                borderWidth: "5px",
+              }
+            : {})}
         >
           <ArcherElement
             id={lineAnchorId(id)}
@@ -458,7 +480,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             />
           </ArcherElement>
           <div className="mx-2">
-            <CallName className="text-base text-slate-700" id={id} />
+            <CallName className="text-base text-slate-700" cls={cls} name={name} />
             <div className="text-sm text-gray-600 flex items-center">
               <span className="text-indigo-600">{shortArgs}</span>
               <span className="px-2">→</span>
@@ -611,23 +633,23 @@ type DetailPaneContentProps = {
 type Tab = "io" | "src";
 
 const DetailPaneContent = ({ info }: DetailPaneContentProps) => {
-  const { id, func } = info;
+  const { func, cls, name } = info;
   const [tab, setTab] = useState<Tab>("io"); // io for inputs and outputs, src for source
   const { getBlockValue } = useTreeContext();
 
   return (
     <div className="flex-1 p-6">
-      <TabHeader id={id} doc={getBlockValue(func)?.doc} />
+      <TabHeader cls={cls} name={name} doc={getBlockValue(func)?.doc} />
       <TabBar tab={tab} setTab={setTab} />
       <TabContent tab={tab} info={info} />
     </div>
   );
 };
 
-const TabHeader = ({ id, doc }: { id: string; doc?: string }) => (
+const TabHeader = ({ cls, name, doc }: { cls?: string; name: string; doc?: string }) => (
   <div className="mb-4">
     <h3 className="text-lg font-semibold text-gray-800">
-      <CallName id={id} />
+      <CallName cls={cls} name={name} />
     </h3>
     <p className="text-gray-600 text-sm whitespace-pre-line">{doc}</p>
   </div>
@@ -844,6 +866,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
     <div className="flex flex-col h-full min-h-screen max-h-screen">
       <div className="flex divide-x divide-gray-100 flex-1 overflow-clip">
         <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
+          <Toolbar />
           <ArcherContainer
             ref={archerContainerRef}
             noCurves
