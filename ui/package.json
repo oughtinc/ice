@@ -24,7 +24,7 @@
     "@vitejs/plugin-react": "^2.2.0",
     "autoprefixer": "^10.4.8",
     "eslint": "8.16.0",
-    "patch-package": "^6.4.7",
+    "patch-package": "^6.5.0",
     "postcss": "^8.4.16",
     "tailwindcss": "^3.1.8",
     "tailwindcss-labeled-groups": "^0.0.2",
