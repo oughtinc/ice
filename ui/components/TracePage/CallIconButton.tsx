@@ -15,11 +15,13 @@ export function CallIconButton({
   const expandable = !isModelCall && childCount > 0;
   return (
     <Button
-      aria-label={expandable ? (expanded ? "Collapse" : "Expand") : undefined}
       className="rounded-full p-1 h-fit mr-2 !shadow-none hover:bg-slate-200 w-12"
       isActive={expanded}
-      leftIcon={expandable ? expanded ? <CaretDown /> : <CaretRight /> : undefined}
-      onClick={() => (expandable ? onChange(expanded) : undefined)}
+      {...!expandable ? {} : {
+        "aria-label": expanded ? "Collapse" : "Expand",
+        leftIcon: expanded ? <CaretDown /> : <CaretRight />,
+        onClick: () => onChange(expanded),
+      }}
       size="md"
       variant="outline"
     >
