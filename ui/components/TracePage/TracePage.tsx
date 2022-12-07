@@ -1,8 +1,7 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isEmpty, last, set, memoize } from "lodash";
-import { CaretDown, CaretRight, ChatCenteredDots } from "phosphor-react";
+import { isEmpty, last, memoize, set } from "lodash";
 import {
   createContext,
   Dispatch,
@@ -23,8 +22,9 @@ import Spinner from "./Spinner";
 import { recipes } from "/helpers/recipes";
 import * as COLORS from "/styles/colors.json";
 import { useParams } from "react-router";
-import { Toolbar, isHighlighted } from "/components/TracePage/Toolbar";
-import { CallName, CallFunction, getFormattedName } from "/components/TracePage/CallName";
+import { isHighlighted, Toolbar } from "/components/TracePage/Toolbar";
+import { CallFunction, CallName, getFormattedName } from "/components/TracePage/CallName";
+import { CallIconButton } from "./CallIconButton";
 
 const elicitStyle = {
   "hljs-keyword": { color: COLORS.indigo[600] }, // use primary color for keywords
@@ -316,8 +316,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         setSelectedId,
         getExpanded: (id: string) => expandedById[id] ?? false,
         setExpanded: (id: string, expanded: boolean) => {
-          if (id !== rootId && !isModelCall(calls[id]))
-            setExpandedById(current => ({ ...current, [id]: expanded }));
+          if (id !== rootId) setExpandedById(current => ({ ...current, [id]: expanded }));
         },
         setExpandedById,
         highlightedFunction,
@@ -389,7 +388,7 @@ const useLinks = () => {
 };
 
 const isModelCall = ({ cls, name }: CallInfo) =>
-  MODEL_CALL_NAMES.includes(name) && cls?.includes("Agent");
+  MODEL_CALL_NAMES.includes(name) && !!cls?.includes("Agent");
 
 function lineAnchorId(id: string) {
   return `line-anchor-${id}`;
@@ -468,36 +467,17 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
                 : []
             }
           >
-            {childIds.length > 0 ? (
-              <Button
-                aria-label={expanded ? "Collapse" : "Expand"}
-                className={classNames(
-                  "rounded-full p-1 h-fit mr-2 !shadow-none hover:bg-slate-200 w-12",
-                )}
-                leftIcon={modelCall ? undefined : expanded ? <CaretDown /> : <CaretRight />}
-                size="md"
-                isActive={expanded}
-                variant="outline"
-                onClick={event => {
-                  setExpanded(!expanded);
-                  // Theres a hard to debug layout thing here, where sometimes
-                  // the arrows don't redraw properly when nodes are expanded.
-                  setTimeout(() => refreshArcherArrows(), 50);
-                }}
-              >
-                <span className={"mr-1"}>{modelCall ? <ChatCenteredDots /> : childIds.length}</span>
-              </Button>
-            ) : (
-              <Button
-                className={classNames(
-                  "rounded-full p-1 h-fit mr-2 !shadow-none hover:bg-slate-200 w-12",
-                )}
-                size="md"
-                variant="outline"
-              >
-                <span>𝑓</span>
-              </Button>
-            )}
+            <CallIconButton
+              expanded={expanded}
+              onChange={expanded => {
+                setExpanded(!expanded);
+                // Theres a hard to debug layout thing here, where sometimes
+                // the arrows don't redraw properly when nodes are expanded.
+                setTimeout(() => refreshArcherArrows(), 50);
+              }}
+              childCount={childIds.length}
+              isModelCall={modelCall}
+            />
           </ArcherElement>
           <div className="mx-2">
             <CallName className="text-base text-slate-700" cls={cls} name={name} />
