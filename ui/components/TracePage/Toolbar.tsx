@@ -19,8 +19,13 @@ const SelectHighlightedFunction = () => {
   const { calls, highlightedFunction, setHighlightedFunction } = useTreeContext();
   const nameCounts = chain(calls)
     .values()
-    .slice(1) // skip the root
+    .slice(1) // skip the root (a call that's hidden in the tree)
+
+    // TODO this is working around a broken non-call object in the Calls
+    //  that has the ID of the trace. This is a side effect of how children are emitted,
+    //  and should be fixed properly at the source of the problem.
     .filter("name")
+
     .countBy(call => JSON.stringify([call.cls, call.name]))
     .value();
 
