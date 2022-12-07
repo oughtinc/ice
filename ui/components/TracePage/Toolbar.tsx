@@ -39,7 +39,7 @@ const SelectHighlightedFunction = () => {
           <Box as="span" minWidth="3em" textAlign="right" marginRight="0.5em">
             {count} ×
           </Box>
-          <CallName {...{ cls, name }} />
+          <CallName cls={cls} name={name} />
         </MenuItem>
       );
     });

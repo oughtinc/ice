@@ -499,7 +499,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             )}
           </ArcherElement>
           <div className="mx-2">
-            <CallName className="text-base text-slate-700" {...{ cls, name }} />
+            <CallName className="text-base text-slate-700" cls={cls} name={name} />
             <div className="text-sm text-gray-600 flex items-center">
               <span className="text-indigo-600">{shortArgs}</span>
               <span className="px-2">→</span>
@@ -658,7 +658,7 @@ const DetailPaneContent = ({ info }: DetailPaneContentProps) => {
 
   return (
     <div className="flex-1 p-6">
-      <TabHeader {...{ cls, name }} doc={getBlockValue(func)?.doc} />
+      <TabHeader cls={cls} name={name} doc={getBlockValue(func)?.doc} />
       <TabBar tab={tab} setTab={setTab} />
       <TabContent tab={tab} info={info} />
     </div>
@@ -668,7 +668,7 @@ const DetailPaneContent = ({ info }: DetailPaneContentProps) => {
 const TabHeader = ({ cls, name, doc }: { cls?: string; name: string; doc?: string }) => (
   <div className="mb-4">
     <h3 className="text-lg font-semibold text-gray-800">
-      <CallName {...{ cls, name }} />
+      <CallName cls={cls} name={name} />
     </h3>
     <p className="text-gray-600 text-sm whitespace-pre-line">{doc}</p>
   </div>
