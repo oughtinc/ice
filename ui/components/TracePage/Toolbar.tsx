@@ -16,7 +16,7 @@ import { ArrowsIn, ArrowsOut, CaretDown } from "phosphor-react";
 import { CallFunction, CallName } from "/components/TracePage/CallName";
 
 const SelectHighlightedFunction = () => {
-  const { calls, highlighted, setHighlighted } = useTreeContext();
+  const { calls, highlightedFunction, setHighlightedFunction } = useTreeContext();
   const nameCounts = chain(calls)
     .values()
     .slice(1) // skip the root
@@ -33,7 +33,7 @@ const SelectHighlightedFunction = () => {
         <MenuItem
           key={nameJson}
           onClick={() => {
-            setHighlighted({ cls, name });
+            setHighlightedFunction({ cls, name });
           }}
         >
           <Box as="span" minWidth="3em" textAlign="right" marginRight="0.5em">
@@ -48,7 +48,7 @@ const SelectHighlightedFunction = () => {
     <span>
       <Menu>
         <MenuButton as={Button} rightIcon={<CaretDown />} variant="outline">
-          {highlighted ? <CallName {...highlighted} /> : "Select function..."}
+          {highlightedFunction ? <CallName {...highlightedFunction} /> : "Select function..."}
         </MenuButton>
         <MenuList>{options}</MenuList>
       </Menu>
@@ -56,11 +56,11 @@ const SelectHighlightedFunction = () => {
   );
 };
 
-const highlightedAncestors = (highlighted: CallFunction | undefined, calls: Calls) => {
+const highlightedAncestors = (highlightedFunction: CallFunction | undefined, calls: Calls) => {
   const result: Record<string, true> = {};
-  if (!highlighted) return result;
+  if (!highlightedFunction) return result;
   for (let call of Object.values(calls)) {
-    if (isHighlighted(call, highlighted)) {
+    if (isHighlighted(call, highlightedFunction)) {
       while (call) {
         result[call.parent] = true;
         call = calls[call.parent];
@@ -70,22 +70,23 @@ const highlightedAncestors = (highlighted: CallFunction | undefined, calls: Call
   return result;
 };
 
-export function isHighlighted(call: CallInfo, highlighted?: CallFunction) {
-  return call.name == highlighted?.name && call.cls == highlighted?.cls;
+export function isHighlighted(call: CallInfo, highlightedFunction?: CallFunction) {
+  return call.name == highlightedFunction?.name && call.cls == highlightedFunction?.cls;
 }
 
 export const Toolbar = () => {
-  const { highlighted, setExpandedById, hideOthers, setHideOthers, calls } = useTreeContext();
+  const { highlightedFunction, setExpandedById, othersHidden, setOthersHidden, calls } =
+    useTreeContext();
   return (
     <HStack spacing="1.5em">
       <SelectHighlightedFunction />
       <HStack>
         <Button
-          disabled={!highlighted}
+          disabled={!highlightedFunction}
           onClick={() =>
             setExpandedById(expanded => ({
               ...expanded,
-              ...highlightedAncestors(highlighted, calls),
+              ...highlightedAncestors(highlightedFunction, calls),
             }))
           }
           leftIcon={<ArrowsOut size="1.5em" />}
@@ -102,9 +103,9 @@ export const Toolbar = () => {
         </FormLabel>
         <Switch
           size="lg"
-          checked={hideOthers}
-          disabled={!highlighted}
-          onChange={event => setHideOthers(event.target.checked)}
+          checked={othersHidden}
+          disabled={!highlightedFunction}
+          onChange={event => setOthersHidden(event.target.checked)}
         />
       </FormControl>
     </HStack>

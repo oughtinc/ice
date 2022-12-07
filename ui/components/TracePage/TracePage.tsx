@@ -106,10 +106,10 @@ const TreeContext = createContext<{
   setExpanded: (id: string, expanded: boolean) => void;
   setExpandedById: Dispatch<SetStateAction<Record<string, boolean>>>;
   getFocussed: (id: string) => boolean;
-  highlighted: CallFunction | undefined;
-  setHighlighted: Dispatch<SetStateAction<CallFunction | undefined>>;
-  hideOthers: boolean;
-  setHideOthers: Dispatch<SetStateAction<boolean>>;
+  highlightedFunction: CallFunction | undefined;
+  setHighlightedFunction: Dispatch<SetStateAction<CallFunction | undefined>>;
+  othersHidden: boolean;
+  setOthersHidden: Dispatch<SetStateAction<boolean>>;
   isVisible: (id: string) => boolean;
 } | null>(null);
 
@@ -141,8 +141,8 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   const [rootId, setRootId] = useState<string>("");
   const [expandedById, setExpandedById] = useState<Record<string, boolean>>({});
   const [autoselected, setAutoselected] = useState(false);
-  const [highlighted, setHighlighted] = useState<CallFunction>();
-  const [hideOthers, setHideOthers] = useState(false);
+  const [highlightedFunction, setHighlightedFunction] = useState<CallFunction>();
+  const [othersHidden, setOthersHidden] = useState(false);
 
   useEffect(() => {
     if (!autoselected) {
@@ -288,21 +288,22 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   }
 
   const isVisible = useMemo(() => {
-    if (!hideOthers || !highlighted) return () => true;
+    if (!othersHidden || !highlightedFunction) return () => true;
 
     const checkParents = memoize((id: string): boolean => {
       const call = calls[id];
-      return call && (isHighlighted(call, highlighted) || checkParents(call.parent));
+      return call && (isHighlighted(call, highlightedFunction) || checkParents(call.parent));
     });
     const checkChildren = memoize((id: string): boolean => {
       const call = calls[id];
       return (
         call &&
-        (isHighlighted(call, highlighted) || Object.keys(call.children || {}).some(checkChildren))
+        (isHighlighted(call, highlightedFunction) ||
+          Object.keys(call.children || {}).some(checkChildren))
       );
     });
     return (id: string) => checkParents(id) || checkChildren(id);
-  }, [hideOthers, highlighted, calls]);
+  }, [othersHidden, highlightedFunction, calls]);
 
   return (
     <TreeContext.Provider
@@ -319,11 +320,11 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
             setExpandedById(current => ({ ...current, [id]: expanded }));
         },
         setExpandedById,
-        highlighted,
-        setHighlighted,
+        highlightedFunction,
+        setHighlightedFunction,
         getFocussed,
-        hideOthers,
-        setHideOthers,
+        othersHidden,
+        setOthersHidden,
         isVisible,
       }}
     >
@@ -402,7 +403,7 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat("en-US", {
 
 const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: () => void }) => {
   const callInfo = useCallInfo(id);
-  const { selectedId, highlighted, isVisible } = useTreeContext();
+  const { selectedId, highlightedFunction, isVisible } = useTreeContext();
   const { getParent } = useLinks();
   const { expanded, setExpanded } = useExpanded(id);
 
@@ -447,7 +448,7 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             ev.stopPropagation();
           }}
           isActive={selected}
-          {...(isHighlighted(callInfo, highlighted)
+          {...(isHighlighted(callInfo, highlightedFunction)
             ? {
                 borderColor: "yellow.500",
                 borderWidth: "5px",
