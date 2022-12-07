@@ -36,6 +36,7 @@ const SelectHighlightedFunction = () => {
             setHighlightedFunction({ cls, name });
           }}
         >
+          {/* TODO use tailwind instead */}
           <Box as="span" minWidth="3em" textAlign="right" marginRight="0.5em">
             {count} ×
           </Box>
@@ -78,6 +79,7 @@ export const Toolbar = () => {
   const { highlightedFunction, setExpandedById, othersHidden, setOthersHidden, calls } =
     useTreeContext();
   return (
+    // TODO use tailwind instead
     <HStack spacing="1.5em">
       <SelectHighlightedFunction />
       <HStack>
