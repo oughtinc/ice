@@ -159,8 +159,6 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
     }
   }, [autoselected, calls, traceId]);
 
-  const isMounted = useRef(true);
-
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
 
@@ -186,7 +184,6 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
         const { status } = response;
         if (status !== 206) throw new Error(`Unexpected status: ${status}`);
         const text = await response.text();
-        if (!isMounted.current) return;
 
         const end = text.lastIndexOf("\n") + 1;
         traceOffsetRef.current += end;
@@ -201,16 +198,13 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       } catch (e) {
         console.warn("fetch failed", e);
       } finally {
-        if (isMounted.current) {
-          timeoutId = setTimeout(poll, delay);
-        }
+        timeoutId = setTimeout(poll, delay);
       }
     };
 
     poll();
 
     return () => {
-      isMounted.current = false;
       clearTimeout(timeoutId);
     };
   }, [traceId]);
@@ -259,8 +253,6 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
       // requires both ends of the range to be specified.
       const response = await fetch(url, { headers: { Range: `bytes=${start}-999999999` } });
       const text = await response.text();
-
-      if (!isMounted.current) return;
 
       start += text.length;
       const lines = text.split("\n");
