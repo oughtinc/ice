@@ -26,6 +26,7 @@ import { isHighlighted, Toolbar } from "/components/TracePage/Toolbar";
 import { CallFunction, CallName, getFormattedName } from "/components/TracePage/CallName";
 import { CallIconButton } from "./CallIconButton";
 import { FString, FStringPart } from "/components/TracePage/FString";
+import { StringToScalar } from "./Table";
 
 const elicitStyle = {
   "hljs-keyword": { color: COLORS.indigo[600] }, // use primary color for keywords
@@ -66,7 +67,7 @@ export interface CallInfo extends InputOutputContentProps {
   shortArgs: string; // short representation of args
   shortResult?: string[]; // short representation of return value
   children?: Calls; // nested calls
-  fields?: Record<string, string>; // short arbitrary fields associated with the call
+  fields?: StringToScalar; // short arbitrary fields associated with the call
   func: BlockAddress<FuncBlock>; // long info about the function itself
   end?: number; // end time
   totalTokens?: number;

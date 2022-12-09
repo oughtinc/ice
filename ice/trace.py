@@ -17,7 +17,7 @@ from inspect import isfunction
 from inspect import Parameter
 from inspect import signature
 from time import monotonic_ns
-from typing import Any
+from typing import Any, Union
 from typing import cast
 from typing import IO
 from typing import Optional
@@ -164,7 +164,10 @@ def emit_block(x) -> tuple[int, int]:
         return 0, 0
 
 
-def add_fields(**fields: str):
+Scalar = Union[bool, int, float, str, None]
+
+
+def add_fields(**fields: Scalar):
     if trace_enabled():
         id = parent_id_var.get()
         emit({f"{id}.fields.{key}": value for key, value in fields.items()})
