@@ -60,6 +60,7 @@ type InputOutputContentProps = {
 };
 
 export interface CallInfo extends InputOutputContentProps {
+  id: string; // unique ID
   parent: string; // outer call ID
   start: number; // start time
   name: string; // function name
@@ -118,6 +119,10 @@ const TreeContext = createContext<{
 const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
   Object.entries(updates).forEach(([path, value]) => {
     set(calls, path, value);
+
+    const id = path.split(".")[0];
+    calls[id].id = id;
+
     if (path.endsWith(".fields.davinci_equivalent_tokens")) {
       const tokens = Number(value);
       if (isNaN(tokens)) return;
@@ -350,13 +355,9 @@ const useCallInfo = (id: string) => {
   };
 };
 
-interface SelectedCallInfo extends CallInfo {
-  id: string;
-}
-
-const useSelectedCallInfo = (): SelectedCallInfo | undefined => {
+const useSelectedCallInfo = (): CallInfo | undefined => {
   const { calls, selectedId } = useTreeContext();
-  return selectedId ? { ...calls[selectedId], id: selectedId } : undefined;
+  return selectedId ? calls[selectedId] : undefined;
 };
 
 const useExpanded = (id: string) => {
@@ -634,7 +635,7 @@ const DetailPane = () => {
 };
 
 type DetailPaneContentProps = {
-  info: SelectedCallInfo;
+  info: CallInfo;
 };
 
 type Tab = "io" | "src";
