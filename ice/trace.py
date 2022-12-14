@@ -1,3 +1,4 @@
+import dataclasses
 import hashlib
 import json
 import threading
@@ -188,6 +189,8 @@ class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, dict):
             return {repr(k): v for k, v in o.items()}
+        if dataclasses.is_dataclass(o):
+            return dataclasses.asdict(o)
         if hasattr(o, "dict") and callable(o.dict):
             try:
                 return compress(o.dict())
@@ -385,6 +388,8 @@ def _get_first_descendant(value: Any) -> Any:
         if isinstance(value[0], str):
             return [v for v in value if isinstance(v, str)]
         return _get_first_descendant(value[0])
+    elif dataclasses.is_dataclass(value):
+        return _get_first_descendant(dataclasses.asdict(value))
     elif hasattr(value, "dict") and callable(value.dict):
         value = compress(value.dict())
         return _get_first_descendant(value)
