@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from collections.abc import Iterable
 from functools import partial
+from itertools import islice
 from typing import Type
 
 from ice.formatter.transform.value import numbered_list
@@ -55,6 +56,15 @@ def experiments_questions_and_answers(
 def generate_experiments_qas_lst(split: str):
     yield from generate_paper_qa_gold_standards(
         split, ExperimentsArms, experiments_questions_and_answers
+    )
+
+
+def only_10_generate_experiments_qas_lst(split: str):
+    yield from islice(
+        generate_paper_qa_gold_standards(
+            split, ExperimentsArms, experiments_questions_and_answers
+        ),
+        10,
     )
 
 
