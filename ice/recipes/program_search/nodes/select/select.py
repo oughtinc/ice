@@ -7,6 +7,7 @@ import numpy as np
 from anyio import ExceptionGroup
 from structlog.stdlib import get_logger
 
+from ice.agents.ought_inference import OughtInferenceAgent
 from ice.apis.openai import openai_complete
 from ice.apis.openai import TooLongRequestError
 from ice.paper import Paper
@@ -389,6 +390,25 @@ async def select_using_elicit_prompt_few_shot(
         for text, prompt_perplexity in zip(texts, prompt_perplexities)
     ]
     # Lower perplexity means more likely to be "not mentioned in excerpt"
+
+
+async def select_results_using_top_monot5_paragraph(
+    question: str,
+    texts: Sequence[str],
+    **kwargs,
+) -> Sequence[tuple[str, float]]:
+    agent = OughtInferenceAgent(engine="mono-t5-base-qa")
+
+    scores = agent.relevance_batch(
+        question=question,
+        contexts=texts,
+    )
+
+    assert len(scores) == len(texts)
+
+    best_text = max(zip(texts, scores), key=lambda t: t[1])[0]
+
+    return [(best_text, 1.0)]
 
 
 def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str]:
