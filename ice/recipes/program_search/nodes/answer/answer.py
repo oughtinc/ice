@@ -147,9 +147,7 @@ async def demonstration_answer_with_reasoning(
     return await _get_reasoning(prompt, answer)
 
 
-async def elicit_answer_prompt(
-    question: str, texts: Sequence[str], demonstrations: Sequence[Demonstration]
-) -> str:
+async def elicit_answer_prompt(question: str, texts: str) -> str:
     prompt = f"""Answer the question "{question}" based on the excerpt from a research paper. \
 Include everything that the paper excerpt has to say about the answer. \
 Make sure everything you say is supported by the excerpt. \
