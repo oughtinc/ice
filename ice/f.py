@@ -14,8 +14,12 @@ class FValue:
 
 
 class F(str):
-    def __new__(cls, s):
+    def __new__(cls, s, parts=None):
         result = super().__new__(cls, s)
+        if parts is not None:
+            result.parts = parts
+            return result
+
         frame = inspect.currentframe().f_back
         ex = executing.Source.executing(frame)
         if ex.node is None:
@@ -53,3 +57,33 @@ class F(str):
 
     def dict(self):
         return {"__fstring__": self.parts}
+
+    def strip(self, *args):
+        return self.lstrip(*args).rstrip(*args)
+
+    def lstrip(self, *args):
+        return self._strip(0, "lstrip", *args)
+
+    def rstrip(self, *args):
+        return self._strip(-1, "rstrip", *args)
+
+    def _strip(self, index, method, *args):
+        parts = self.parts.copy()
+        while True:
+            part = parts[index]
+            if isinstance(part, FValue):
+                s = part.formatted
+            else:
+                s = part
+            s = getattr(s, method)(*args)
+            if s:
+                if isinstance(part, FValue):
+                    part = FValue(part.source, part.value, s)
+                else:
+                    part = s
+                parts[index] = part
+                break
+            else:
+                del parts[index]
+        s = getattr(super(), method)(*args)
+        return F(s, parts)
