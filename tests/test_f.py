@@ -36,3 +36,12 @@ def test_f_json():
             ]
         }
     )
+
+
+def test_add():
+    s = F("hello ") + "world"
+    assert s == "hello world"
+    assert s.parts == ["hello ", "world"]
+    s = "hello " + F("world")
+    assert s == "hello world"
+    assert s.parts == ["hello ", "world"]

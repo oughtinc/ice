@@ -1,6 +1,7 @@
 import ast
 import inspect
 import warnings
+from copy import deepcopy
 from dataclasses import dataclass
 
 import executing
@@ -55,6 +56,9 @@ class F(str):
             result.parts.append(FValue(source, value, formatted))
         return result
 
+    def __deepcopy__(self, memodict=None):
+        return F(str(self), deepcopy(self.parts, memodict))
+
     def dict(self):
         return {"__fstring__": self.parts}
 
@@ -87,3 +91,22 @@ class F(str):
                 del parts[index]
         s = getattr(super(), method)(*args)
         return F(s, parts)
+
+    def _add(self, other, method):
+        if isinstance(other, F):
+            other_parts = other.parts
+        elif isinstance(other, str):
+            other_parts = [other]
+        else:
+            raise TypeError(
+                f"unsupported operand type(s) for +: 'F' and '{type(other).__name__}'"
+            )
+        s = method(str(self), str(other))
+        parts = method(self.parts, other_parts)
+        return F(s, parts)
+
+    def __add__(self, other):
+        return self._add(other, lambda a, b: a + b)
+
+    def __radd__(self, other):
+        return self._add(other, lambda a, b: b + a)
