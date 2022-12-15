@@ -399,7 +399,7 @@ async def select_results_using_top_monot5_paragraph(
 ) -> Sequence[tuple[str, float]]:
     agent = OughtInferenceAgent(engine="mono-t5-base-qa")
 
-    scores = agent.relevance_batch(
+    scores = await agent.relevance_batch(
         question=question,
         contexts=texts,
     )
