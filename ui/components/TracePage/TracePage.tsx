@@ -790,7 +790,6 @@ const Trace = ({ traceId }: { traceId: string }) => {
     (update: (id: string) => string | undefined) => {
       setSelectedId(id => {
         const res = update(id as any) || id;
-        console.log(res);
         return id && res;
       });
     },
@@ -823,7 +822,6 @@ const Trace = ({ traceId }: { traceId: string }) => {
                 }
               }),
             ArrowDown: () => {
-              console.log(rootId, selectedId);
               maybeSetSelectedId(id => getExpandedChildren(id)[0] || nextFrom(id));
             },
             ArrowLeft: () =>
