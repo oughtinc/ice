@@ -60,7 +60,13 @@ class F(str):
         return F(str(self), deepcopy(self.parts, memodict))
 
     def dict(self):
-        return {"__fstring__": self.parts}
+        parts = []
+        for part in self.parts:
+            if isinstance(part, FValue) and isinstance(part.value, F):
+                parts.extend(part.value.parts)
+            else:
+                parts.append(part)
+        return {"__fstring__": parts}
 
     def strip(self, *args):
         return self.lstrip(*args).rstrip(*args)
