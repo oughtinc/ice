@@ -41,7 +41,26 @@ def test_f_json():
 def test_add():
     s = F("hello ") + "world"
     assert s == "hello world"
-    assert s.parts == ["hello ", "world"]
+    assert s.parts == [
+        FValue(
+            source="F('hello ')",
+            value="hello ",
+            formatted="hello ",
+        ),
+        "world",
+    ]
+    assert s.parts[0].value.parts == ["hello "]
     s = "hello " + F("world")
     assert s == "hello world"
-    assert s.parts == ["hello ", "world"]
+    assert s.parts == [
+        "hello ",
+        FValue(source="F('world')", value="world", formatted="world"),
+    ]
+    s += "!"
+    assert s == "hello world!"
+    assert s.parts == ["hello world", "!"]
+    assert s.parts[0].parts == [
+        "hello ",
+        FValue(source="F('world')", value="world", formatted="world"),
+    ]
+    assert s.flatten().parts == ["hello ", "world", "!"]
