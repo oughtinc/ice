@@ -90,10 +90,9 @@ async def _paper_qa_baseline(
 
 
 async def _elicit_paper_qa_baseline(
-    paper: Paper, question, gold_support: Sequence[str] | None, enumerate_answer: bool
+    paper: Paper, question, gold_support: Sequence[str] | None
 ) -> PaperQaAnswer:
     gold_support  # unused
-    enumerate_answer  # unused
     answer: str | Sequence[str]
     all_paras = [str(p).casefold().strip() for p in paper.paragraphs if str(p).strip()]
     top_paragraph = await select_results_using_top_monot5_paragraph(
