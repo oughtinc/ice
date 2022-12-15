@@ -395,8 +395,7 @@ async def select_using_elicit_prompt_few_shot(
 async def select_results_using_top_monot5_paragraph(
     question: str,
     texts: Sequence[str],
-    **kwargs,
-) -> Sequence[tuple[str, float]]:
+) -> str:
     agent = OughtInferenceAgent(engine="mono-t5-base-qa")
 
     scores = await agent.relevance_batch(
@@ -406,9 +405,7 @@ async def select_results_using_top_monot5_paragraph(
 
     assert len(scores) == len(texts)
 
-    best_text = max(zip(texts, scores), key=lambda t: t[1])[0]
-
-    return [(best_text, 1.0)]
+    return max(zip(texts, scores), key=lambda t: t[1])[0]
 
 
 def as_strings(selections: Sequence[bool], texts: Sequence[str]) -> Sequence[str]:
