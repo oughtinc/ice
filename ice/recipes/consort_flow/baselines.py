@@ -413,6 +413,14 @@ zero_shot_experiments_few_shot_answer = partial(
     few_shot_demonstration_func=experiments_few_shot_demonstration,
     do_demonstration_answer=True,
 )
+zero_shot_experiments_few_shot_answer_with_reasoning = partial(
+    _all_options,
+    few_shot_demonstration_func=experiments_few_shot_demonstration,
+    do_demonstration_answer=True,
+    do_demonstration_reasoning=True,
+)
+
+
 zero_shot_experiments_decontext_then_answer = partial(
     _all_options,
     few_shot_demonstration_func=experiments_few_shot_demonstration,
