@@ -17,6 +17,8 @@ class PaperQaGoldStandard(Generic[AnswerType_contra]):
     gold_answer: AnswerType_contra
     short_gold_answer: AnswerType_contra
     gold_support: Sequence[str]
+    experiment: str | None = None
+    arm: str | None = None
 
 
 @dataclass
@@ -38,6 +40,9 @@ class SequenceGenerationEvaluation(Generic[AnswerType_contra]):
     generated_answer: AnswerType_contra
     support: Sequence[str]
     generation_f1_score: float
+    gold_support: Sequence[str] | None = None
+    experiment: str | None = None
+    arm: str | None = None
 
     def as_dict(self):
         return dict(
@@ -50,6 +55,9 @@ class SequenceGenerationEvaluation(Generic[AnswerType_contra]):
             generated_answer=repr(self.generated_answer),
             support=self.support,
             f1_score=self.generation_f1_score,
+            gold_support=self.gold_support,
+            experiment=self.experiment,
+            arm=self.arm
         )
 
 
