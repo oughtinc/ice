@@ -3,6 +3,8 @@ from collections.abc import Sequence
 from functools import partial
 from itertools import chain
 
+from structlog import get_logger
+
 from ice.apis.openai import TooLongRequestError
 from ice.metrics.gold_standards import get_gold_standard
 from ice.metrics.gold_standards import load_papers
@@ -23,6 +25,7 @@ from ice.recipes.meta.eval_paper_qa.quick_list import quick_list
 from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 from ice.recipes.meta.eval_paper_qa.utils import convert_demonstration_example
+from ice.recipes.program_search.nodes.answer.answer import elicit_answer_prompt
 from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
 from ice.recipes.program_search.nodes.prune.prune import prune
 from ice.recipes.program_search.nodes.prune.prune import prune_with_reasoning
@@ -36,6 +39,8 @@ from ice.recipes.program_search.nodes.select.select import (
     select_using_elicit_prompt_few_shot,
 )
 from ice.recipes.program_search.types import remove_lowest_perplexity
+
+log = get_logger(__name__)
 
 
 def experiments_few_shot_demonstration(
@@ -304,10 +309,19 @@ async def _all_options(
 
         if do_decontext_at_answer:
             selections = await _decontext_selections(paper=paper, selections=selections)
-    
+
     else:
-        assert gold_support is not None
+        if gold_support is None:
+            log.warn("No gold support for paper %s", paper.document_id)
+            return PaperQaAnswer(
+                answer=["Not mentioned."],
+                support_candidates=[],
+                support_labels=[],
+                support_scores=[],
+            )
         selections = gold_support
+        texts = selections
+        texts_with_perplexities = [(t, 0.0) for t in texts]
 
     while selections:
         try:
@@ -351,6 +365,24 @@ async def _all_options(
         support_candidates=texts,
         support_labels=[False for text in texts],
         support_scores=[t[1] for t in texts_with_perplexities],
+    )
+
+
+async def _cheating_elicit_qa_baseline(
+    paper: Paper,
+    question: str,
+    gold_support: Sequence[str] | None,
+):
+    relevant_str = "\n\n".join(gs for gs in gold_support) if gold_support else ""
+    if relevant_str:
+        answer = await elicit_answer_prompt(question=question, text=relevant_str)
+    else:
+        log.warn("No gold support for paper %s", paper.document_id)
+        answer = "Not mentioned."
+    return PaperQaAnswer(
+        answer=answer,
+        support_candidates=gold_support if gold_support else [],
+        support_labels=[True for _ in gold_support] if gold_support else [],
     )
 
 
