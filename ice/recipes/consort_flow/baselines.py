@@ -259,50 +259,55 @@ async def _all_options(
     do_demonstration_reasoning: bool = False,
     do_return_list: bool = True,
     cls_threshold: float = 1.06,
+    use_gold_support: bool = False,
 ):
-    gold_support  # unused
-    texts = _to_paragraphs(paper)
-    supporting_examples = few_shot_demonstration_func(paper.document_id, True)
-    paragraph_supporting_examples = [
-        await convert_demonstration_example(example, _to_paragraphs)
-        for example in supporting_examples
-    ]
-    if do_few_shot_selection:
-        texts_with_perplexities = await select_using_elicit_prompt_few_shot(
-            question=question, texts=texts, examples=paragraph_supporting_examples
-        )
-        # Few-shot prompt needs a lower threshold
-        selections = filter_by_perplexity_threshold(
-            texts_with_perplexities,
-            threshold=cls_threshold,
-        )
-    else:
-        texts_with_perplexities = await select_results_using_elicit_prompt(
-            question=question, texts=texts
-        )
-        selections = filter_by_perplexity_threshold(
-            texts_with_perplexities,
-            threshold=cls_threshold,
-        )
-
-    if prune_to_max:
-        if do_prune_reasoning:
-            pruned_selections = await prune_with_reasoning(
-                question=question,
-                texts_with_perplexities=selections,
-                max_to_keep=prune_to_max,
+    if not use_gold_support:
+        texts = _to_paragraphs(paper)
+        supporting_examples = few_shot_demonstration_func(paper.document_id, True)
+        paragraph_supporting_examples = [
+            await convert_demonstration_example(example, _to_paragraphs)
+            for example in supporting_examples
+        ]
+        if do_few_shot_selection:
+            texts_with_perplexities = await select_using_elicit_prompt_few_shot(
+                question=question, texts=texts, examples=paragraph_supporting_examples
+            )
+            # Few-shot prompt needs a lower threshold
+            selections = filter_by_perplexity_threshold(
+                texts_with_perplexities,
+                threshold=cls_threshold,
             )
         else:
-            pruned_selections = await prune(
-                question=question,
-                texts=[t[0] for t in selections],
-                max_to_keep=prune_to_max,
+            texts_with_perplexities = await select_results_using_elicit_prompt(
+                question=question, texts=texts
+            )
+            selections = filter_by_perplexity_threshold(
+                texts_with_perplexities,
+                threshold=cls_threshold,
             )
 
-        selections = [t for t in selections if t[0] in pruned_selections]
+        if prune_to_max:
+            if do_prune_reasoning:
+                pruned_selections = await prune_with_reasoning(
+                    question=question,
+                    texts_with_perplexities=selections,
+                    max_to_keep=prune_to_max,
+                )
+            else:
+                pruned_selections = await prune(
+                    question=question,
+                    texts=[t[0] for t in selections],
+                    max_to_keep=prune_to_max,
+                )
 
-    if do_decontext_at_answer:
-        selections = await _decontext_selections(paper=paper, selections=selections)
+            selections = [t for t in selections if t[0] in pruned_selections]
+
+        if do_decontext_at_answer:
+            selections = await _decontext_selections(paper=paper, selections=selections)
+    
+    else:
+        assert gold_support is not None
+        selections = gold_support
 
     while selections:
         try:
@@ -466,6 +471,15 @@ zero_shot_adherence_few_shot_answer = partial(
     do_demonstration_answer=True,
     do_return_list=False,
 )
+
+cheating_zero_shot_adherence_few_shot_answer = partial(
+    _all_options,
+    few_shot_demonstration_func=adherence_few_shot_demonstration,
+    do_demonstration_answer=True,
+    do_return_list=False,
+    use_gold_support=True,
+)
+
 zero_shot_adherence_decontext_then_answer = partial(
     _all_options,
     few_shot_demonstration_func=adherence_few_shot_demonstration,

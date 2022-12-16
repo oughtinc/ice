@@ -59,6 +59,27 @@ async def _cheating_qa_baseline(
         support_labels=[True for _ in gold_support],
     )
 
+async def _cheating_elicit_qa_baseline(
+    paper: Paper,
+    question: str,
+    gold_support: Sequence[str] | None,
+    enumerate_answer: bool,
+):
+    relevant_str = "\n\n".join(gs for gs in gold_support) if gold_support else ""
+    if not relevant_str:
+        raise ValueError("Method requires gold support")
+    response: str | Sequence[str] = await answer(
+        context=relevant_str, question=question
+    )
+    if enumerate_answer:
+        response = await quick_list(question, str(response))
+    assert gold_support
+    return PaperQaAnswer(
+        answer=response,
+        support_candidates=gold_support,
+        support_labels=[True for _ in gold_support],
+    )
+
 
 cheating_qa_baseline_str_answer: PaperQaMethod[str] = partial(
     _cheating_qa_baseline, enumerate_answer=False
