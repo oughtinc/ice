@@ -151,6 +151,8 @@ def adherence_questions_and_answers(
                 gold_answer=gold_answer,
                 short_gold_answer=gold_answer,
                 gold_support=[] if isinstance(adherence, str) else adherence.quotes,
+                experiment=experiment.name,
+                arm=arm.name,
             )
 
 
