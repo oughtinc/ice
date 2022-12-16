@@ -147,7 +147,7 @@ async def demonstration_answer_with_reasoning(
     return await _get_reasoning(prompt, answer)
 
 
-async def elicit_answer_prompt(question: str, texts: str) -> str:
+async def elicit_answer_prompt(question: str, text: str) -> str:
     prompt = f"""Answer the question "{question}" based on the excerpt from a research paper. \
 Include everything that the paper excerpt has to say about the answer. \
 Make sure everything you say is supported by the excerpt. \
@@ -155,7 +155,7 @@ The excerpt may cite other papers; \
 answer about the paper you're reading the excerpt from, not the papers that it cites. \
 Answer in one phrase or sentence:
 
-Paper excerpt: {texts[0]}
+Paper excerpt: {text}
 
 Question: {question}
 
