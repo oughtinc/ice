@@ -25,3 +25,15 @@ class OughtInferenceAgent(Agent):
             )
             response.raise_for_status()
         return response.json()["results"][0]["score"]
+
+    @retry(wait=wait_random_exponential(), stop=stop_after_attempt(3))
+    async def relevance_batch(
+        self, *, question, contexts, verbose=False, default=None
+    ) -> list[float]:
+        async with httpx.AsyncClient() as client:
+            client.headers["x-api-key"] = settings.OUGHT_INFERENCE_API_KEY
+            response = await client.post(
+                self.url, json=dict(query=question, documents=contexts)
+            )
+            response.raise_for_status()
+        return [r["score"] for r in response.json()["results"]]

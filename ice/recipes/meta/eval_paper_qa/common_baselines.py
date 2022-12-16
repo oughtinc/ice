@@ -18,8 +18,12 @@ from ice.recipes.program_search.nodes.answer.answer import demonstration_answer
 from ice.recipes.program_search.nodes.answer.answer import (
     demonstration_answer_with_reasoning,
 )
+from ice.recipes.program_search.nodes.answer.answer import elicit_answer_prompt
 from ice.recipes.program_search.nodes.answer.types import Demonstration
 from ice.recipes.program_search.nodes.select.select import as_bool
+from ice.recipes.program_search.nodes.select.select import (
+    select_results_using_top_monot5_paragraph,
+)
 from ice.utils import map_async
 
 
@@ -82,6 +86,24 @@ async def _paper_qa_baseline(
         answer=answer,
         support_candidates=all_paras,
         support_labels=[p.casefold().strip() in predicted_paras for p in all_paras],
+    )
+
+
+async def _elicit_paper_qa_baseline(
+    paper: Paper, question, gold_support: Sequence[str] | None
+) -> PaperQaAnswer:
+    gold_support  # unused
+    answer: str | Sequence[str]
+    all_paras = [str(p).casefold().strip() for p in paper.paragraphs if str(p).strip()]
+    top_paragraph = await select_results_using_top_monot5_paragraph(
+        question=question,
+        texts=all_paras,
+    )
+    answer = await elicit_answer_prompt(question, top_paragraph)
+    return PaperQaAnswer(
+        answer=answer,
+        support_candidates=all_paras,
+        support_labels=[(p.casefold().strip() == top_paragraph) for p in all_paras],
     )
 
 
