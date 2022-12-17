@@ -57,7 +57,7 @@ class SequenceGenerationEvaluation(Generic[AnswerType_contra]):
             f1_score=self.generation_f1_score,
             gold_support=self.gold_support,
             experiment=self.experiment,
-            arm=self.arm
+            arm=self.arm,
         )
 
 
