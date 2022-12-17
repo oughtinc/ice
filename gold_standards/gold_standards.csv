@@ -4959,27 +4959,28 @@ Fig. 3 is most important",,1,4,3,"1. # of participants not monotonically decreas
   - name: autobiographical self-enhancement training
     allocated:
     received:
-        description: Not mentioned
+        description: All participants completed at least one daily writing. 67% of participants completed more than 21 daily writings, which was significantly less than in the expressive writing group.
         quotes:
-            - All participants were entered into the study between July, 2016 and September, 2016. Figure 1 summarizes the flow of recruitment.
+            - ""All participants completed at least one daily writing assignment. Most participants (77.08%) completed more than 21 daily writings with similar proportions across groups (ASET group: 67.35%, EW group: 83.67%, JNL group: 80.43%). However, groups differed significantly in the total number of daily writings completed (F(2) = 3.69, p = .03). Bonferroni corrected post-hoc tests revealed that participants completed significantly more daily writing assignments in the EW condition (M = 23.65; SD = 5.18) compared to the ASET condition (M = 21.31, SD = 7.36; p < .05). There were no significant differences in the number of daily writ- ings completed by participants in any other condition.""
     attrition:
     analyzed:
   - name: expressive writing
     allocated:
     received:
-        description: Not mentioned
+        description: All participants completed at least one daily writing. 83% of participants completed more than 21 daily writings, which was significantly more than in the autobiographical self-enhancement training group.
         quotes:
-            - All participants were entered into the study between July, 2016 and September, 2016. Figure 1 summarizes the flow of recruitment.
+            - ""All participants completed at least one daily writing assignment. Most participants (77.08%) completed more than 21 daily writings with similar proportions across groups (ASET group: 67.35%, EW group: 83.67%, JNL group: 80.43%). However, groups differed significantly in the total number of daily writings completed (F(2) = 3.69, p = .03). Bonferroni corrected post-hoc tests revealed that participants completed significantly more daily writing assignments in the EW condition (M = 23.65; SD = 5.18) compared to the ASET condition (M = 21.31, SD = 7.36; p < .05). There were no significant differences in the number of daily writ- ings completed by participants in any other condition.""
     attrition:
     analyzed:
   - name: daily journaling
     allocated:
     received:
-        description: Not mentioned
+        description: All participants completed at least one daily writing. 80% of participants completed more than 21 daily writings.
         quotes:
-            - All participants were entered into the study between July, 2016 and September, 2016. Figure 1 summarizes the flow of recruitment.
+            - ""All participants completed at least one daily writing assignment. Most participants (77.08%) completed more than 21 daily writings with similar proportions across groups (ASET group: 67.35%, EW group: 83.67%, JNL group: 80.43%). However, groups differed significantly in the total number of daily writings completed (F(2) = 3.69, p = .03). Bonferroni corrected post-hoc tests revealed that participants completed significantly more daily writing assignments in the EW condition (M = 23.65; SD = 5.18) compared to the ASET condition (M = 21.31, SD = 7.36; p < .05). There were no significant differences in the number of daily writ- ings completed by participants in any other condition.""
     attrition:
-    analyzed:","Specifically, we conducted a randomized controlled trial (RCT) to evaluate Autobiographical Self-Enhancement Training (ASET) -- a novel, cognitive intervention for NSSI focused on reducing self-criticism and enhancing positive self-worth. ","For the present RCT, we tested ASET against another potentially active treatment (expressive writing) and also against a control treatment (journaling). ","Expressive writing, a procedure first developed by Pennebaker and Beall [19] involves writing about stressful or upsetting experiences. ","Finally, we used a journaling (JNL) condition as a comparison control intervention. This involved writing about daily events without any focus on emotional issues. The JNL intervention was developed to control for daily writing (which was inte- gral to both the ASET and the EW conditions). ","After completion of the baseline assessment, participants were randomly assigned to one of three treatment groups: JNL (N = 46), EW (N = 49), and ASET (N = 49) using randomization software within Qualtrics. ",,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,checked,,checked
+    analyzed:
+","Specifically, we conducted a randomized controlled trial (RCT) to evaluate Autobiographical Self-Enhancement Training (ASET) -- a novel, cognitive intervention for NSSI focused on reducing self-criticism and enhancing positive self-worth. ","For the present RCT, we tested ASET against another potentially active treatment (expressive writing) and also against a control treatment (journaling). ","Expressive writing, a procedure first developed by Pennebaker and Beall [19] involves writing about stressful or upsetting experiences. ","Finally, we used a journaling (JNL) condition as a comparison control intervention. This involved writing about daily events without any focus on emotional issues. The JNL intervention was developed to control for daily writing (which was inte- gral to both the ASET and the EW conditions). ","After completion of the baseline assessment, participants were randomly assigned to one of three treatment groups: JNL (N = 46), EW (N = 49), and ASET (N = 49) using randomization software within Qualtrics. ",,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,checked,,checked
 1236,käckenmeister-2019.pdf,https://github.com/brachbach/host-files/raw/main/käckenmeister-2019.pdf,,,consort_flow_v2,"experiments:
 - name: effect of dopamine on openness to experience and divergent thinking
   description:
@@ -5013,9 +5014,9 @@ Fig. 3 is most important",,1,4,3,"1. # of participants not monotonically decreas
   - name: preoperative pelvic floor muscle training
     allocated:
     received:
-        description: not mentioned
+        description: The paper claims that participants adhered ""very strictly"" to the training but does not quantify adherence or give further detail.
         quotes:
-            - One hundred eighty patients were included, 91 patients were randomized to the intervention group and 89 patients to the control group. Ten patients were lost to follow-up. 
+            - Patients were very strictly towards their appointments with the physiotherapist and the performance of exercises.
     attrition:
     analyzed:
   - name: control
@@ -5025,7 +5026,7 @@ Fig. 3 is most important",,1,4,3,"1. # of participants not monotonically decreas
         quotes:
             - One hundred eighty patients were included, 91 patients were randomized to the intervention group and 89 patients to the control group. Ten patients were lost to follow-up. 
     attrition:
-    analyzed:","The aim of this study was to determine whether patients who performed PFMT before and after surgery, regained urinary continence earlier than patients who only performed PFMT after catheter removal. ","Before surgery, patients were randomized into the experimental group, starting PFMT 3 weeks before RP and continuing after surgery, or the control group, starting PFMT after catheter removal. ","Every patient received individual treatment on an outpatient basis once a week. The experimental group started exercising 3 weeks before RP. They received one session of 30 minutes of guided PFMT per week until surgery. Additionally patients performed a home program of 60 contractions/ day and were instructed on contracting the pelvic floor muscles while coughing and sitting down/ getting up from a chair. The fourth day after surgery, with the urinary catheter in situ, patients were encouraged to restart PFMT. ",The control group started exercising the day of catheter removal ,"One hundred eighty patients were included, 91 patients were randomized to the intervention group and 89 patients to the control group. ",,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,checked,,checked
+    analyzed:","The aim of this study was to determine whether patients who performed PFMT before and after surgery, regained urinary continence earlier than patients who only performed PFMT after catheter removal. ","Before surgery, patients were randomized into the experimental group, starting PFMT 3 weeks before RP and continuing after surgery, or the control group, starting PFMT after catheter removal. ","Every patient received individual treatment on an outpatient basis once a week. The experimental group started exercising 3 weeks before RP. They received one session of 30 minutes of guided PFMT per week until surgery. Additionally patients performed a home program of 60 contractions/ day and were instructed on contracting the pelvic floor muscles while coughing and sitting down/ getting up from a chair. The fourth day after surgery, with the urinary catheter in situ, patients were encouraged to restart PFMT. ",The control group started exercising the day of catheter removal ,"One hundred eighty patients were included, 91 patients were randomized to the intervention group and 89 patients to the control group. ",,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,checked,checked,checked
 1238,schoenfeld-2021.pdf,https://github.com/brachbach/host-files/raw/main/schoenfeld-2021.pdf,,,consort_flow_v2,"experiments:
 - name: phase synchrony between hemispheres for bimanual motor learning
   description:
@@ -8365,7 +8366,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
           n: 19
           quotes: []
         received:
-          description: Adherence was described as ""good"" but not quantified
+          description: Compliance with oral supplementation was ""good"", and daily intake averaged about 400 kcal
           quotes:
             - compliance with oral supplementation was good, and daily intake averaged
               about 400 kcal
@@ -8384,7 +8385,7 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
           n: 28
           quotes: []
         received:
-          description: Adherence was described as ""good"" but not quantified
+          description: Compliance with oral supplementation was ""good"", and daily intake averaged about 400 kcal
           quotes:
             - compliance with oral supplementation was good, and daily intake averaged
               about 400 kcal
@@ -8838,15 +8839,9 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
           n: 40
           quotes: []
         received:
-          description: Not mentioned
+          description: The paper implies that all participants received the spray.
           quotes:
-            - For the 79 participants whose resting-state functional connectivity
-              data was analyzed, 22 young (50% female) and 18 older (56% female) participants
-              were randomly assigned to self-administer via a nasal spray 24 IUs (one
-              puff per nostril) of oxytocin
-            - Eighteen young (50% female) and 21 older (62% female) participants self-
-              administered a placebo that contained all ingredients with the exception
-              of the oxytocin at the start of the full study visit.
+            - For the 79 participants whose resting-state functional connectivity data was analyzed, 22 young (50% female) and 18 older (56% female) participants were randomly assigned to self-administer via a nasal spray 24 IUs (one puff per nostril) of oxytocin. Eighteen young (50% female) and 21 older (62% female) participants self- administered a placebo that contained all ingredients with the exception of the oxytocin at the start of the full study visit.
         attrition:
         analyzed:
       - name: placebo
@@ -8856,18 +8851,12 @@ trimethoprim-sulfamethoxazole (TS), or monthly dihydroartemisinin-piperaquine (D
           n: 39
           quotes: []
         received:
-          description: Not mentioned
+          description: The paper implies that all participants received the placebo spray.
           quotes:
-            - For the 79 participants whose resting-state functional connectivity
-              data was analyzed, 22 young (50% female) and 18 older (56% female) participants
-              were randomly assigned to self-administer via a nasal spray 24 IUs (one
-              puff per nostril) of oxytocin
-            - Eighteen young (50% female) and 21 older (62% female) participants self-
-              administered a placebo that contained all ingredients with the exception
-              of the oxytocin at the start of the full study visit.
+            - For the 79 participants whose resting-state functional connectivity data was analyzed, 22 young (50% female) and 18 older (56% female) participants were randomly assigned to self-administer via a nasal spray 24 IUs (one puff per nostril) of oxytocin. Eighteen young (50% female) and 21 older (62% female) participants self- administered a placebo that contained all ingredients with the exception of the oxytocin at the start of the full study visit.
         attrition:
         analyzed:
-","The current study investigated effects of intranasal oxytocin administration on resting-state functional connectivity between amygdala and medial prefrontal cortex (mPFC), as two central regions involved in social-cognitive and affective processing.","This resulted in a total of 79 for the analysis presented in this paper, comprising 40 young (M = 22.7 years, SD = 3.02) and 39 older (M = 71.2 years, SD = 5.19) white, English-speaking adults.","For the 79 participants whose resting-state functional connectivity data was analyzed, 22 young (50% female) and 18 older (56% female) participants were randomly assigned to self-administer via a nasal spray 24 IUs (one puff per nostril) of oxytocin. Eighteen young (50% female) and 21 older (62% female) participants self- administered a placebo that contained all ingredients with the exception of the oxytocin at the start of the full study visit. "," In a double-blind design, 79 participants were randomly assigned to self-administer either intranasal oxytocin or placebo before undergoing resting-state functional magnetic resonance imaging. ",,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,,,checked
+","The current study investigated effects of intranasal oxytocin administration on resting-state functional connectivity between amygdala and medial prefrontal cortex (mPFC), as two central regions involved in social-cognitive and affective processing.","This resulted in a total of 79 for the analysis presented in this paper, comprising 40 young (M = 22.7 years, SD = 3.02) and 39 older (M = 71.2 years, SD = 5.19) white, English-speaking adults.","For the 79 participants whose resting-state functional connectivity data was analyzed, 22 young (50% female) and 18 older (56% female) participants were randomly assigned to self-administer via a nasal spray 24 IUs (one puff per nostril) of oxytocin. Eighteen young (50% female) and 21 older (62% female) participants self- administered a placebo that contained all ingredients with the exception of the oxytocin at the start of the full study visit. "," In a double-blind design, 79 participants were randomly assigned to self-administer either intranasal oxytocin or placebo before undergoing resting-state functional magnetic resonance imaging. ",,,,,,,,,,,,,,,,,,,,,,,,,test,,,,,,,,,,,,,,,,,,,,,checked,checked
 1453,bures-2016.pdf,https://github.com/brachbach/host-files/raw/main/bures-2016.pdf,,,consort_flow_v2,"experiments:
   - name: improved application technique for gluing lung defects
     description: in-vitro repair of superficial lung defects for for alveolar air
