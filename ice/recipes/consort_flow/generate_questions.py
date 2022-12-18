@@ -137,7 +137,7 @@ def adherence_questions_and_answers(
         for arm in arms:
             question = f"""In a randomized controlled trial, participants are assigned to a trial arm to receive a particular intervention or control. Adherence describes how many participants in the trial arm receive the intervention or control they were assigned, and how much of it they receive. Compliance describes how well participants in the trial arm comply with the intervention protocol.
 
-On the other hand, attrition is a different concept -- it describes how many participants in the trial arm drop out of the study along the way. 
+On the other hand, attrition is a different concept -- it describes how many participants in the trial arm drop out of the study along the way.
 
 For the {arm.name} arm of the {experiment.name} ({experiment.description}) experiment specifically, what does the paper say about adherence and compliance rates (NOT attrition)? Say 'not mentioned' if adherence/compliance rates are not mentioned."""
             adherence = arm.received
