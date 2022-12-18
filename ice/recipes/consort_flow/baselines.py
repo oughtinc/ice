@@ -25,6 +25,7 @@ from ice.recipes.meta.eval_paper_qa.quick_list import quick_list
 from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 from ice.recipes.meta.eval_paper_qa.utils import convert_demonstration_example
+from ice.recipes.meta.eval_paper_qa.utils import identify_gs_str
 from ice.recipes.program_search.nodes.answer.answer import elicit_answer_prompt
 from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
 from ice.recipes.program_search.nodes.prune.prune import prune
@@ -39,7 +40,6 @@ from ice.recipes.program_search.nodes.select.select import (
     select_using_elicit_prompt_few_shot,
 )
 from ice.recipes.program_search.types import remove_lowest_perplexity
-from ice.recipes.meta.eval_paper_qa.utils import identify_gs_str
 
 log = get_logger(__name__)
 
