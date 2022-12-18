@@ -39,6 +39,7 @@ from ice.recipes.program_search.nodes.select.select import (
     select_using_elicit_prompt_few_shot,
 )
 from ice.recipes.program_search.types import remove_lowest_perplexity
+from ice.recipes.meta.eval_paper_qa.utils import identify_gs_str
 
 log = get_logger(__name__)
 
@@ -373,7 +374,10 @@ async def _cheating_elicit_qa_baseline(
     question: str,
     gold_support: Sequence[str] | None,
 ):
-    relevant_str = "\n\n".join(gs for gs in gold_support) if gold_support else ""
+    if gold_support is None:
+        gold_support = []
+    gold_support_strs = await identify_gs_str(_to_paragraphs(paper), gold_support)
+    relevant_str = "\n\n".join(gs for gs in gold_support_strs)
     if relevant_str:
         answer = await elicit_answer_prompt(question=question, text=relevant_str)
     else:
