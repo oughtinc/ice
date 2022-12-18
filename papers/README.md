@@ -1,3 +1,3 @@
-# host-files
+Papers can be downloaded from https://github.com/oughtinc/ice-papers
 
-host files to link to
+This folder is excluded from the project license.
