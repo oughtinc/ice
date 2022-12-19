@@ -1,4 +1,6 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
+import { Allotment } from "allotment";
+import "allotment/dist/style.css";
 import classNames from "classnames";
 import produce from "immer";
 import { isEmpty, last, memoize, set } from "lodash";
@@ -17,7 +19,6 @@ import {
 import { ArcherContainer, ArcherElement } from "react-archer";
 import { ArcherContainerHandle } from "react-archer/lib/ArcherContainer/ArcherContainer.types";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import Separator from "./Separator";
 import Spinner from "./Spinner";
 import { recipes } from "/helpers/recipes";
 import * as COLORS from "/styles/colors.json";
@@ -867,8 +868,6 @@ const Trace = ({ traceId }: { traceId: string }) => {
     return () => window.removeEventListener("keydown", keyListener);
   }, [bindings]);
 
-  const [detailWidth, setDetailWidth] = useState(500);
-
   const firstRoot = getChildren(traceId)[0];
 
   const archerContainerRef = useRef<ArcherContainerHandle | null>(null);
@@ -877,33 +876,35 @@ const Trace = ({ traceId }: { traceId: string }) => {
   }, []);
 
   return (
-    <div className="flex flex-col h-full min-h-screen max-h-screen">
+    <div className="flex flex-col h-screen">
       <div className="flex divide-x divide-gray-100 flex-1 overflow-clip">
-        <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
-          <Toolbar />
-          <ArcherContainer
-            ref={archerContainerRef}
-            noCurves
-            strokeColor="#E2E8F0"
-            strokeWidth={1}
-            startMarker={false}
-            endMarker={false}
-          >
-            {firstRoot ? (
-              <CallChildren id={firstRoot} refreshArcherArrows={refreshArcherArrows} />
-            ) : (
-              <div className="flex justify-center items-center h-full">
-                <Spinner size="medium" />
-              </div>
-            )}
-          </ArcherContainer>
-        </div>
+        <Allotment>
+          <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
+            <Toolbar />
+            <ArcherContainer
+              ref={archerContainerRef}
+              noCurves
+              strokeColor="#E2E8F0"
+              strokeWidth={1}
+              startMarker={false}
+              endMarker={false}
+            >
+              {firstRoot ? (
+                <CallChildren id={firstRoot} refreshArcherArrows={refreshArcherArrows} />
+              ) : (
+                <div className="flex justify-center items-center h-full">
+                  <Spinner size="medium" />
+                </div>
+              )}
+            </ArcherContainer>
+          </div>
 
-        <Separator detailWidth={detailWidth} setDetailWidth={setDetailWidth} />
-
-        <div className="bg-gray-50 overflow-y-auto flex-shrink-0" style={{ width: detailWidth }}>
-          <DetailPane />
-        </div>
+          <Allotment.Pane preferredSize={500}>
+            <div className="bg-gray-50 overflow-y-auto flex-shrink-0">
+              <DetailPane />
+            </div>
+          </Allotment.Pane>
+        </Allotment>
       </div>
       {/* {Object.keys(params)} */}
     </div>
