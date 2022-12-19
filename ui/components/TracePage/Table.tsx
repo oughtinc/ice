@@ -5,12 +5,24 @@ import { uniq } from "lodash";
 
 export type StringToScalar = Record<string, boolean | number | string | null>;
 
-export const Table = ({ rows }: { rows: StringToScalar[] }) => (
+export const Table = ({
+  rows,
+  rowIds = [],
+  onFocusChange,
+}: {
+  rows: StringToScalar[];
+  rowIds?: string[];
+  onFocusChange?: ({ rowId }: { rowId: string | undefined }) => void;
+}) => (
   <AgGridReact<StringToScalar>
     className="ag-theme-alpine w-full"
-    domLayout="autoHeight"
-    defaultColDef={{ filter: true, sortable: true, resizable: true }}
     columnDefs={uniq(rows.flatMap(Object.keys)).map(field => ({ field }))}
+    defaultColDef={{ filter: true, sortable: true, resizable: true }}
+    domLayout="autoHeight"
+    onCellFocused={({ rowIndex }) =>
+      onFocusChange?.({ rowId: rowIndex === null ? undefined : rowIds?.[rowIndex] })
+    }
+    pagination
     rowData={rows}
   ></AgGridReact>
 );
