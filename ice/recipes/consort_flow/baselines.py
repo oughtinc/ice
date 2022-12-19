@@ -3,6 +3,8 @@ from collections.abc import Sequence
 from functools import partial
 from itertools import chain
 
+from structlog import get_logger
+
 from ice.apis.openai import TooLongRequestError
 from ice.metrics.gold_standards import get_gold_standard
 from ice.metrics.gold_standards import load_papers
@@ -23,6 +25,8 @@ from ice.recipes.meta.eval_paper_qa.quick_list import quick_list
 from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 from ice.recipes.meta.eval_paper_qa.utils import convert_demonstration_example
+from ice.recipes.meta.eval_paper_qa.utils import identify_gs_str
+from ice.recipes.program_search.nodes.answer.answer import elicit_answer_prompt
 from ice.recipes.program_search.nodes.decontext.decontextualize import paper_decontext
 from ice.recipes.program_search.nodes.prune.prune import prune
 from ice.recipes.program_search.nodes.prune.prune import prune_with_reasoning
@@ -36,6 +40,8 @@ from ice.recipes.program_search.nodes.select.select import (
     select_using_elicit_prompt_few_shot,
 )
 from ice.recipes.program_search.types import remove_lowest_perplexity
+
+log = get_logger(__name__)
 
 
 def experiments_few_shot_demonstration(
@@ -259,50 +265,64 @@ async def _all_options(
     do_demonstration_reasoning: bool = False,
     do_return_list: bool = True,
     cls_threshold: float = 1.06,
+    use_gold_support: bool = False,
 ):
-    gold_support  # unused
-    texts = _to_paragraphs(paper)
-    supporting_examples = few_shot_demonstration_func(paper.document_id, True)
-    paragraph_supporting_examples = [
-        await convert_demonstration_example(example, _to_paragraphs)
-        for example in supporting_examples
-    ]
-    if do_few_shot_selection:
-        texts_with_perplexities = await select_using_elicit_prompt_few_shot(
-            question=question, texts=texts, examples=paragraph_supporting_examples
-        )
-        # Few-shot prompt needs a lower threshold
-        selections = filter_by_perplexity_threshold(
-            texts_with_perplexities,
-            threshold=cls_threshold,
-        )
-    else:
-        texts_with_perplexities = await select_results_using_elicit_prompt(
-            question=question, texts=texts
-        )
-        selections = filter_by_perplexity_threshold(
-            texts_with_perplexities,
-            threshold=cls_threshold,
-        )
-
-    if prune_to_max:
-        if do_prune_reasoning:
-            pruned_selections = await prune_with_reasoning(
-                question=question,
-                texts_with_perplexities=selections,
-                max_to_keep=prune_to_max,
+    if not use_gold_support:
+        texts = _to_paragraphs(paper)
+        supporting_examples = few_shot_demonstration_func(paper.document_id, True)
+        paragraph_supporting_examples = [
+            await convert_demonstration_example(example, _to_paragraphs)
+            for example in supporting_examples
+        ]
+        if do_few_shot_selection:
+            texts_with_perplexities = await select_using_elicit_prompt_few_shot(
+                question=question, texts=texts, examples=paragraph_supporting_examples
+            )
+            # Few-shot prompt needs a lower threshold
+            selections = filter_by_perplexity_threshold(
+                texts_with_perplexities,
+                threshold=cls_threshold,
             )
         else:
-            pruned_selections = await prune(
-                question=question,
-                texts=[t[0] for t in selections],
-                max_to_keep=prune_to_max,
+            texts_with_perplexities = await select_results_using_elicit_prompt(
+                question=question, texts=texts
+            )
+            selections = filter_by_perplexity_threshold(
+                texts_with_perplexities,
+                threshold=cls_threshold,
             )
 
-        selections = [t for t in selections if t[0] in pruned_selections]
+        if prune_to_max:
+            if do_prune_reasoning:
+                pruned_selections = await prune_with_reasoning(
+                    question=question,
+                    texts_with_perplexities=selections,
+                    max_to_keep=prune_to_max,
+                )
+            else:
+                pruned_selections = await prune(
+                    question=question,
+                    texts=[t[0] for t in selections],
+                    max_to_keep=prune_to_max,
+                )
 
-    if do_decontext_at_answer:
-        selections = await _decontext_selections(paper=paper, selections=selections)
+            selections = [t for t in selections if t[0] in pruned_selections]
+
+        if do_decontext_at_answer:
+            selections = await _decontext_selections(paper=paper, selections=selections)
+
+    else:
+        if gold_support is None:
+            log.warn("No gold support for paper %s", paper.document_id)
+            return PaperQaAnswer(
+                answer=["Not mentioned."],
+                support_candidates=[],
+                support_labels=[],
+                support_scores=[],
+            )
+        selections = gold_support
+        texts = selections
+        texts_with_perplexities = [(t, 0.0) for t in texts]
 
     while selections:
         try:
@@ -346,6 +366,27 @@ async def _all_options(
         support_candidates=texts,
         support_labels=[False for text in texts],
         support_scores=[t[1] for t in texts_with_perplexities],
+    )
+
+
+async def _cheating_elicit_qa_baseline(
+    paper: Paper,
+    question: str,
+    gold_support: Sequence[str] | None,
+):
+    if gold_support is None:
+        gold_support = []
+    gold_support_strs = await identify_gs_str(_to_paragraphs(paper), gold_support)
+    relevant_str = "\n\n".join(gs for gs in gold_support_strs)
+    if relevant_str:
+        answer = await elicit_answer_prompt(question=question, text=relevant_str)
+    else:
+        log.warn("No gold support for paper %s", paper.document_id)
+        answer = "Not mentioned."
+    return PaperQaAnswer(
+        answer=answer,
+        support_candidates=gold_support if gold_support else [],
+        support_labels=[True for _ in gold_support] if gold_support else [],
     )
 
 
@@ -466,6 +507,15 @@ zero_shot_adherence_few_shot_answer = partial(
     do_demonstration_answer=True,
     do_return_list=False,
 )
+
+cheating_zero_shot_adherence_few_shot_answer = partial(
+    _all_options,
+    few_shot_demonstration_func=adherence_few_shot_demonstration,
+    do_demonstration_answer=True,
+    do_return_list=False,
+    use_gold_support=True,
+)
+
 zero_shot_adherence_decontext_then_answer = partial(
     _all_options,
     few_shot_demonstration_func=adherence_few_shot_demonstration,

@@ -135,8 +135,11 @@ def adherence_questions_and_answers(
         if not arms:
             return
         for arm in arms:
-            EXPLANATION = "Adherence describes how many participants selected for an intervention actually received it. Attrition describes how many of the initial sample dropped out of the study or were otherwise not available to be included in the final analysis. Compliance describes how well participants in the intervention complied with its protocol."
-            question = f"""{EXPLANATION} For the {arm.name} arm of the {experiment.name} ({experiment.description}) experiment specifically, what does the paper say about the adherence, attrition, or compliance rate (say 'not mentioned' if it is not mentioned)?"""
+            question = f"""In a randomized controlled trial, participants are assigned to a trial arm to receive a particular intervention or control. Adherence describes how many participants in the trial arm receive the intervention or control they were assigned, and how much of it they receive. Compliance describes how well participants in the trial arm comply with the intervention protocol.
+
+On the other hand, attrition is a different concept -- it describes how many participants in the trial arm drop out of the study along the way.
+
+For the {arm.name} arm of the {experiment.name} ({experiment.description}) experiment specifically, what does the paper say about adherence and compliance rates (NOT attrition)? Say 'not mentioned' if adherence/compliance rates are not mentioned."""
             adherence = arm.received
             if not adherence:
                 continue
@@ -151,6 +154,8 @@ def adherence_questions_and_answers(
                 gold_answer=gold_answer,
                 short_gold_answer=gold_answer,
                 gold_support=[] if isinstance(adherence, str) else adherence.quotes,
+                experiment=experiment.name,
+                arm=arm.name,
             )
 
 
