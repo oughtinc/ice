@@ -183,6 +183,7 @@ def get_gold_standards(
     question_short_name: str | None = None,
     experiment: str | None = None,
     model_type: None = None,
+    split: str | None = None,
 ) -> list[GoldStandard[Any]]:
     ...
 
@@ -204,6 +205,7 @@ def get_gold_standards(
     question_short_name: str | None = None,
     experiment: str | None = None,
     model_type: Type[ParsedGoldStandardType] | None = None,
+    split: str | None = None,
 ) -> list[GoldStandard[ParsedGoldStandardType]]:
     df = retrieve_gold_standards_df()
 
@@ -211,6 +213,7 @@ def get_gold_standards(
         document_id=document_id,
         question_short_name=question_short_name,
         experiment=experiment,
+        split=split,
     )
 
     df = select_column_values(df, filters)
