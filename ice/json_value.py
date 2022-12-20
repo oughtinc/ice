@@ -2,6 +2,9 @@ import dataclasses
 from inspect import isfunction
 from typing import Any
 
+from fvalues import F
+
+
 JSONValue = str | int | float | bool | None | list["JSONValue"] | dict[str, "JSONValue"]
 
 
@@ -12,6 +15,8 @@ def to_json_value(x: Any) -> JSONValue:
         }
     if isinstance(x, (list, tuple, set)):
         return [to_json_value(v) for v in x]
+    if isinstance(x, F):
+        return {"__fstring__": to_json_value(x.flatten().parts)}
     if hasattr(x, "dict") and callable(x.dict):
         try:
             return to_json_value(x.dict())

@@ -1,4 +1,4 @@
-from ice.f import F
+from fvalues import F
 from ice.recipes.primer.debate.types import *
 
 
