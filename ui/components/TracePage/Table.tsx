@@ -15,10 +15,9 @@ export const Table = ({
   onFocusChange?: ({ rowId }: { rowId: string | undefined }) => void;
 }) => (
   <AgGridReact<StringToScalar>
-    className="ag-theme-alpine w-full"
+    className="ag-theme-alpine w-full h-full"
     columnDefs={uniq(rows.flatMap(Object.keys)).map(field => ({ field }))}
     defaultColDef={{ filter: true, sortable: true, resizable: true }}
-    domLayout="autoHeight"
     onCellFocused={({ rowIndex }) =>
       onFocusChange?.({ rowId: rowIndex === null ? undefined : rowIds?.[rowIndex] })
     }
