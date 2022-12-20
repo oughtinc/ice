@@ -1,5 +1,6 @@
 from collections.abc import Iterator
 from collections.abc import Sequence
+from itertools import chain
 from math import factorial
 from typing import TypeVar
 
@@ -10,6 +11,7 @@ from tqdm import tqdm
 
 from ice.recipe import recipe
 from ice.recipes.best_completion import completion_perplexity
+from ice.trace import add_fields
 from ice.utils import map_async
 
 EXAMPLES_PROMPTS = [
@@ -151,6 +153,14 @@ async def score_few_shot(
             all_prompts, desc="Evaluating prompts"
         )
     ]
+
+    entries = list(
+        chain.from_iterable(
+            [(f"prompt_{i}", p), (f"score_{i}", s)]
+            for i, (p, s) in enumerate(sorted(scored_prompts, key=lambda x: x[1]))
+        )
+    )
+    add_fields(**dict(chain(entries[:6], entries[-6:])))
 
     return scored_prompts  # The prompt with the lowest perplexity is the best few-shot prompt.
 

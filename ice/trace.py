@@ -21,11 +21,14 @@ from typing import Any
 from typing import cast
 from typing import IO
 from typing import Optional
+from typing import Union
 
 import ulid
 
 from structlog import get_logger
 
+from ice.json_value import JSONValue
+from ice.json_value import to_json_value
 from ice.server import ensure_server_running
 from ice.server import is_server_running
 from ice.settings import OUGHT_ICE_DIR
@@ -162,7 +165,10 @@ def emit_block(x) -> tuple[int, int]:
         return 0, 0
 
 
-def add_fields(**fields: str):
+Scalar = Union[bool, int, float, str, None]
+
+
+def add_fields(**fields: Scalar):
     if trace_enabled():
         id = parent_id_var.get()
         emit({f"{id}.fields.{key}": value for key, value in fields.items()})
@@ -171,40 +177,7 @@ def add_fields(**fields: str):
 def _encode_json(x) -> str:
     # Note that sort_keys=True here could improve caching,
     # but it might make the output less readable.
-    return json.dumps(x, cls=JSONEncoder, separators=(",", ":")) + "\n"
-
-
-def compress(o: object):
-    if isinstance(o, dict):
-        if {"paragraphs", "document_id"} <= set(o):
-            return {"document_id": o["document_id"]}
-        return {k: compress(v) for k, v in o.items()}
-    if isinstance(o, list):
-        return [compress(v) for v in o]
-    return o
-
-
-class JSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, dict):
-            return {repr(k): v for k, v in o.items()}
-        if hasattr(o, "dict") and callable(o.dict):
-            try:
-                return compress(o.dict())
-            except TypeError:
-                return repr(o)
-        if isfunction(o):
-            return dict(class_name=o.__class__.__name__, name=o.__name__)
-        try:
-            return json.JSONEncoder.default(self, o)
-        except TypeError:
-            return repr(o)
-
-    def iterencode(self, o, **kwargs):
-        try:
-            return super().iterencode(o, **kwargs)
-        except TypeError:
-            return self.default(o)
+    return json.dumps(to_json_value(x), separators=(",", ":")) + "\n"
 
 
 # To add records to the trace, use the following code:
@@ -274,6 +247,9 @@ def trace(fn):
                 else:
                     arg_dict[k] = v
 
+            self = arg_dict.get("self")
+            arg_dict = to_json_value(arg_dict)
+
             call_event = dict(
                 parent=parent_id,
                 start=monotonic_ns(),
@@ -282,7 +258,6 @@ def trace(fn):
                 func=emit_block(func_info(fn)),
                 args=emit_block(arg_dict),
             )
-            self = arg_dict.get("self")
             if self:
                 call_event["cls"] = self.__class__.__name__
 
@@ -297,10 +272,11 @@ def trace(fn):
                 kwargs[recorder_name] = _Recorder(id)
 
             result = await fn(*args, **kwargs)
+            result_json = to_json_value(result)
             emit(
                 {
-                    f"{id}.result": emit_block(result),
-                    f"{id}.shortResult": get_strings(result),
+                    f"{id}.result": emit_block(result_json),
+                    f"{id}.shortResult": get_strings(result_json),
                     f"{id}.end": monotonic_ns(),
                 }
             )
@@ -339,7 +315,7 @@ class TracedABC(metaclass=TracedABCMeta):
 
 # TODO this and the functions it calls needs to be replaced with a better system
 #   for summarising args and return values
-def get_strings(value) -> list[str]:
+def get_strings(value: JSONValue) -> list[str]:
     """
     Represent the given value as a short list of short strings
     that can be stored directly in the central trace file and loaded eagerly in the UI.
@@ -377,17 +353,14 @@ def _get_short_list(lst: list, max_length=3) -> list:
     return lst[:max_length] + ["..."] if len(lst) > max_length else lst
 
 
-def _get_first_descendant(value: Any) -> Any:
+def _get_first_descendant(value: JSONValue) -> Any:
     if isinstance(value, dict) and value:
         first, *_ = value.values()
         return _get_first_descendant(first)
-    elif isinstance(value, (list, tuple)) and value:
+    elif isinstance(value, list) and value:
         if isinstance(value[0], str):
             return [v for v in value if isinstance(v, str)]
         return _get_first_descendant(value[0])
-    elif hasattr(value, "dict") and callable(value.dict):
-        value = compress(value.dict())
-        return _get_first_descendant(value)
     else:
         return value
 
