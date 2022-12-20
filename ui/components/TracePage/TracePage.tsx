@@ -897,24 +897,28 @@ const Trace = ({ traceId }: { traceId: string }) => {
     <div className="h-screen">
       <Allotment>
         <Allotment vertical>
-          <div className="w-full h-full overflow-auto p-6">
-            <Toolbar />
-            <ArcherContainer
-              ref={archerContainerRef}
-              noCurves
-              strokeColor="#E2E8F0"
-              strokeWidth={1}
-              startMarker={false}
-              endMarker={false}
-            >
-              {firstRoot ? (
-                <CallChildren id={firstRoot} refreshArcherArrows={refreshArcherArrows} />
-              ) : (
-                <div className="flex justify-center items-center h-full">
-                  <Spinner size="medium" />
-                </div>
-              )}
-            </ArcherContainer>
+          <div className="w-full h-full overflow-auto">
+            <div className="sticky top-0 z-10 bg-white p-4">
+              <Toolbar />
+            </div>
+            <div className="pl-4">
+              <ArcherContainer
+                ref={archerContainerRef}
+                noCurves
+                strokeColor="#E2E8F0"
+                strokeWidth={1}
+                startMarker={false}
+                endMarker={false}
+              >
+                {firstRoot ? (
+                  <CallChildren id={firstRoot} refreshArcherArrows={refreshArcherArrows} />
+                ) : (
+                  <div className="flex justify-center items-center h-full">
+                    <Spinner size="medium" />
+                  </div>
+                )}
+              </ArcherContainer>
+            </div>
           </div>
           <Allotment.Pane className="call-table" preferredSize={500}>
             <Table
