@@ -25,9 +25,9 @@ from typing import Optional
 import ulid
 
 from structlog import get_logger
+
 from ice.json_value import JSONValue
 from ice.json_value import to_json_value
-
 from ice.server import ensure_server_running
 from ice.server import is_server_running
 from ice.settings import OUGHT_ICE_DIR

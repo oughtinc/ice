@@ -1,4 +1,5 @@
 import dataclasses
+
 from inspect import isfunction
 from typing import Any
 
