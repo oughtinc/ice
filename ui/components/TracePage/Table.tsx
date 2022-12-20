@@ -21,7 +21,7 @@ export const Table = ({
     onCellFocused={({ rowIndex }) =>
       onFocusChange?.({ rowId: rowIndex === null ? undefined : rowIds?.[rowIndex] })
     }
-    pagination
+    pagination={rows.length > 100}
     rowData={rows}
   ></AgGridReact>
 );
