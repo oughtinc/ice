@@ -243,17 +243,16 @@ def trace(fn):
                 else:
                     arg_dict[k] = v
 
-            self = arg_dict.get("self")
-            arg_dict = to_json_value(arg_dict)
-
+            arg_dict_json = to_json_value(arg_dict)
             call_event = dict(
                 parent=parent_id,
                 start=monotonic_ns(),
                 name=fn.__name__ if hasattr(fn, "__name__") else repr(fn),
-                shortArgs=get_strings(arg_dict),
+                shortArgs=get_strings(arg_dict_json),
                 func=emit_block(func_info(fn)),
-                args=emit_block(arg_dict),
+                args=emit_block(arg_dict_json),
             )
+            self = arg_dict.get("self")
             if self:
                 call_event["cls"] = self.__class__.__name__
 
