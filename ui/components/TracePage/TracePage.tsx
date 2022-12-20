@@ -23,7 +23,7 @@ import Spinner from "./Spinner";
 import { recipes } from "/helpers/recipes";
 import * as COLORS from "/styles/colors.json";
 import { useParams } from "react-router";
-import { isHighlighted, Toolbar } from "/components/TracePage/Toolbar";
+import { getHighlightedCalls, isHighlighted, Toolbar } from "/components/TracePage/Toolbar";
 import { CallFunction, CallName, getFormattedName } from "/components/TracePage/CallName";
 import { CallIconButton } from "./CallIconButton";
 import {
@@ -32,7 +32,7 @@ import {
   FString,
   RawFStringPart,
 } from "/components/TracePage/FString";
-import { StringToScalar } from "./Table";
+import { StringToScalar, Table } from "./Table";
 
 const elicitStyle = {
   "hljs-keyword": { color: COLORS.indigo[600] }, // use primary color for keywords
@@ -499,7 +499,6 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
                 <ResultComponent value={shortResult} />
               )}
             </div>
-            {cost && CURRENCY_FORMATTER.format(cost)}
           </div>
         </Button>
       </div>
@@ -791,7 +790,15 @@ const stripIndent = (source: string): string => {
 };
 
 const Trace = ({ traceId }: { traceId: string }) => {
-  const { selectedId, rootId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
+  const {
+    calls,
+    selectedId,
+    rootId,
+    setSelectedId,
+    getExpanded,
+    setExpanded,
+    highlightedFunction,
+  } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
   // const params = useParams()
 
@@ -856,6 +863,14 @@ const Trace = ({ traceId }: { traceId: string }) => {
 
   useEffect(() => {
     const keyListener = (event: KeyboardEvent) => {
+      // Ignore events when the table is in focus.
+      if (
+        event.target instanceof Node &&
+        document.querySelector(".call-table")?.contains(event.target)
+      ) {
+        return;
+      }
+
       const binding = bindings[event.key];
       if (binding) {
         event.stopPropagation();
@@ -875,11 +890,13 @@ const Trace = ({ traceId }: { traceId: string }) => {
     archerContainerRef.current?.refreshScreen();
   }, []);
 
+  const highlightedCalls = getHighlightedCalls(highlightedFunction, calls);
+
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex divide-x divide-gray-100 flex-1 overflow-clip">
-        <Allotment>
-          <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
+    <div className="h-screen">
+      <Allotment>
+        <Allotment vertical>
+          <div className="w-full h-full overflow-auto p-6">
             <Toolbar />
             <ArcherContainer
               ref={archerContainerRef}
@@ -898,15 +915,21 @@ const Trace = ({ traceId }: { traceId: string }) => {
               )}
             </ArcherContainer>
           </div>
-
-          <Allotment.Pane preferredSize={500}>
-            <div className="bg-gray-50 overflow-y-auto flex-shrink-0">
-              <DetailPane />
-            </div>
+          <Allotment.Pane className="call-table" preferredSize={500}>
+            <Table
+              rows={highlightedCalls.map(({ fields = {} }) => fields)}
+              rowIds={highlightedCalls.map(({ id }) => id)}
+              onFocusChange={({ rowId }) => setSelectedId(rowId)}
+            />
           </Allotment.Pane>
         </Allotment>
-      </div>
-      {/* {Object.keys(params)} */}
+
+        <Allotment.Pane preferredSize={500}>
+          <div className="bg-gray-50 w-full h-full overflow-auto">
+            <DetailPane />
+          </div>
+        </Allotment.Pane>
+      </Allotment>
     </div>
   );
 };
