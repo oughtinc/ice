@@ -17,17 +17,18 @@ from inspect import isfunction
 from inspect import Parameter
 from inspect import signature
 from time import monotonic_ns
-from typing import Any, Union
+from typing import Any
 from typing import cast
 from typing import IO
 from typing import Optional
+from typing import Union
 
 import ulid
 
 from structlog import get_logger
+
 from ice.json_value import JSONValue
 from ice.json_value import to_json_value
-
 from ice.server import ensure_server_running
 from ice.server import is_server_running
 from ice.settings import OUGHT_ICE_DIR
