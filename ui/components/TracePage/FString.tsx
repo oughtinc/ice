@@ -4,9 +4,24 @@ interface FValue {
   formatted: string;
 }
 
-export type FStringPart = string | FValue;
+export type FlattenedFStringPart = string | FValue;
+export type RawFStringPart = FlattenedFStringPart | { __fstring__: RawFStringPart[] };
 
-export const FString = ({ parts }: { parts: FStringPart[] }) => {
+export function flattenFString(parts: RawFStringPart[]): FlattenedFStringPart[] {
+  return parts.flatMap(part => {
+    if (typeof part === "object") {
+      if ("__fstring__" in part) {
+        return flattenFString(part.__fstring__);
+      }
+      if (typeof part.value === "object" && "__fstring__" in part.value) {
+        return flattenFString(part.value.__fstring__ as RawFStringPart[]);
+      }
+    }
+    return [part];
+  });
+}
+
+export const FString = ({ parts }: { parts: FlattenedFStringPart[] }) => {
   let oddValue = false;
   return (
     <span>
@@ -19,7 +34,7 @@ export const FString = ({ parts }: { parts: FStringPart[] }) => {
         const inner = part.formatted;
 
         // This commented code allows seeing the original nested construction,
-        // if the value isn't flattened in the trace.
+        // if the value isn't flattened.
         // const inner =
         //   typeof part.value === "object" && "__fstring__" in part.value ? (
         //     <FString parts={part.value.__fstring__ as FStringPart[]} />

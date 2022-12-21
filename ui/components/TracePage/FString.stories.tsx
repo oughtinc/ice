@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { FString } from "./FString";
+import { flattenFString, FString } from "./FString";
 
 const meta: Meta<typeof FString> = {
   title: "TracePage/FString",
@@ -23,5 +23,28 @@ export const HelloWorld: Story = {
       },
       ".",
     ],
+  },
+};
+
+export const Nested: Story = {
+  args: {
+    parts: flattenFString([
+      "Hello ",
+      {
+        source: "inner",
+        value: {
+          __fstring__: [
+            "inner ",
+            {
+              __fstring__: ["inmost ", { source: "1", value: "1", formatted: "1" }],
+            },
+            { source: "2", value: "2", formatted: "2" },
+          ],
+        },
+        formatted: "inner inmost 12",
+      },
+      { source: "3", value: "3", formatted: "3" },
+      ".",
+    ]),
   },
 };

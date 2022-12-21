@@ -17,7 +17,7 @@ def to_json_value(x: Any) -> JSONValue:
     if isinstance(x, (list, tuple, set)):
         return [to_json_value(v) for v in x]
     if isinstance(x, F):
-        return {"__fstring__": to_json_value(x.flatten().parts)}
+        return {"__fstring__": to_json_value(x.parts)}
     if hasattr(x, "dict") and callable(x.dict):
         try:
             return to_json_value(x.dict())
