@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from typing import Any
+from typing import cast
 
 from ice.json_value import JSONValue
 
@@ -11,7 +13,7 @@ class Summarizer:
     depth_limit: int = 4
     float_digits: int = 4
 
-    def summarize(self, x: JSONValue, depth_left: int = None):
+    def summarize(self, x: JSONValue, depth_left: int | None = None):
         if depth_left is None:
             depth_left = self.depth_limit
         elif depth_left <= 0:
@@ -30,7 +32,7 @@ class Summarizer:
     def summarize_dict(self, x: dict[str, JSONValue], depth_left: int):
         if list(x.keys()) == ["__fstring__"]:
             new_x = {}
-            for part in x["__fstring__"]:
+            for part in cast(Any, x["__fstring__"]):
                 if isinstance(part, dict) and "value" in part:
                     new_x[part["source"]] = part["value"]
             x = new_x
