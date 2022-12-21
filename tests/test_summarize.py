@@ -20,7 +20,8 @@ def test_f():
 
 def test_basic():
     assert summarize(list(range(10))) == [0, 1, 2]
-    assert summarize(dict(enumerate(range(100)))) == {
+    d: dict = dict(enumerate(range(100)))
+    assert summarize(d) == {
         0: 0,
         1: 1,
         2: 2,
