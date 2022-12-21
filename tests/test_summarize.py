@@ -73,3 +73,35 @@ def test_empty():
     assert summarize({"a": "b", "c": None, "d": {}, "e": [], "f": ""}) == {
         "a": "b",
     }
+
+
+def test_complex():
+    assert summarize(
+        {
+            "a": {
+                "b": [1, 2, 3, 4, 5],
+                "c": {
+                    "d": "abc" * 100,
+                    "e": 1.23456789,
+                },
+            },
+            "f": None,
+            "g": {
+                "h": {
+                    "i": {
+                        "j": {
+                            "k": "hello",
+                        }
+                    }
+                }
+            },
+        }
+    ) == {
+        "a": {
+            "b": [1, 2, 3],
+            "c": {
+                "d": "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc...cabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc",
+                "e": 1.2346,
+            },
+        }
+    }
