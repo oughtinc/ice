@@ -27,6 +27,7 @@ import ulid
 from structlog import get_logger
 
 from ice.json_value import JSONValue
+from ice.summarize import summarize
 from ice.json_value import to_json_value
 from ice.server import ensure_server_running
 from ice.server import is_server_running
@@ -249,6 +250,7 @@ def trace(fn):
                 start=monotonic_ns(),
                 name=fn.__name__ if hasattr(fn, "__name__") else repr(fn),
                 shortArgs=get_strings(arg_dict_json),
+                argsSummary=summarize(arg_dict_json),
                 func=emit_block(func_info(fn)),
                 args=emit_block(arg_dict_json),
             )
@@ -272,6 +274,7 @@ def trace(fn):
                 {
                     f"{id}.result": emit_block(result_json),
                     f"{id}.shortResult": get_strings(result_json),
+                    f"{id}.resultSummary": summarize(result_json),
                     f"{id}.end": monotonic_ns(),
                 }
             )
