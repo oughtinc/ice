@@ -3,6 +3,7 @@
 **/.vscode
 **/*.egg-info
 /.coverage
+/.env
 /.git
 /.mypy_cache
 /.pre-commit-home
