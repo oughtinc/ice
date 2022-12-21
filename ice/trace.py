@@ -27,13 +27,13 @@ import ulid
 from structlog import get_logger
 
 from ice.json_value import JSONValue
-from ice.summarize import summarize
 from ice.json_value import to_json_value
 from ice.server import ensure_server_running
 from ice.server import is_server_running
 from ice.settings import OUGHT_ICE_DIR
 from ice.settings import server_url
 from ice.settings import settings
+from ice.summarize import summarize
 
 log = get_logger()
 
