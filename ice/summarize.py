@@ -28,6 +28,13 @@ class Summarizer:
             return x
 
     def summarize_dict(self, x: dict[str, JSONValue], depth_left: int):
+        if list(x.keys()) == ["__fstring__"]:
+            new_x = {}
+            for part in x["__fstring__"]:
+                if isinstance(part, dict) and "value" in part:
+                    new_x[part["source"]] = part["value"]
+            x = new_x
+
         result = {}
         for k in sorted(x.keys())[: self.dict_limit]:
             v = self.summarize(x[k], depth_left - 1)
