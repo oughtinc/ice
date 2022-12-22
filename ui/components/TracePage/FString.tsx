@@ -1,3 +1,5 @@
+import { Tooltip } from "@chakra-ui/react";
+
 interface FValue {
   source: string;
   value: any;
@@ -34,9 +36,9 @@ export const FString = ({ parts }: { parts: FlattenedFStringPart[] }) => {
         const inner = part.formatted;
 
         return (
-          <span key={i} title={part.source} className={`p2 bg-${color}-50 text-${color}-600`}>
-            {inner}
-          </span>
+          <Tooltip label={part.source} key={i}>
+            <span className={`p2 bg-${color}-50 text-${color}-600`}>{inner}</span>
+          </Tooltip>
         );
       })}
     </span>
