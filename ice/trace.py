@@ -33,7 +33,6 @@ from ice.server import is_server_running
 from ice.settings import OUGHT_ICE_DIR
 from ice.settings import server_url
 from ice.settings import settings
-from ice.summarize import summarize
 
 log = get_logger()
 
@@ -250,7 +249,6 @@ def trace(fn):
                 start=monotonic_ns(),
                 name=fn.__name__ if hasattr(fn, "__name__") else repr(fn),
                 shortArgs=get_strings(arg_dict_json),
-                argsSummary=summarize(arg_dict_json),
                 func=emit_block(func_info(fn)),
                 args=emit_block(arg_dict_json),
             )
@@ -274,7 +272,6 @@ def trace(fn):
                 {
                     f"{id}.result": emit_block(result_json),
                     f"{id}.shortResult": get_strings(result_json),
-                    f"{id}.resultSummary": summarize(result_json),
                     f"{id}.end": monotonic_ns(),
                 }
             )
