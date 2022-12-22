@@ -1,3 +1,5 @@
+from fvalues import F
+
 from ice.recipes.primer.debate.types import *
 
 
@@ -14,5 +16,5 @@ def render_debate(debate: Debate, self_name: Name | None = None) -> str:
     for speaker, text in debate:
         if speaker == self_name:
             speaker = "You"
-        debate_text += f'{speaker}: "{text}"\n'
+        debate_text += F(f'{speaker}: "{text}"\n')
     return debate_text.strip()

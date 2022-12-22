@@ -46,7 +46,6 @@ def test_get_strings():
 
     # Empty values that get converted to '()'
     assert trace.get_strings([]) == ["()"]
-    assert trace.get_strings(()) == ["()"]
     assert trace.get_strings({}) == ["()"]
     assert trace.get_strings(None) == ["()"]
     assert trace.get_strings("") == ["()"]
@@ -85,9 +84,6 @@ def test_get_strings():
 
     # Non-strings are filtered out
     assert trace.get_strings(["a", "b", 3, None, "c"]) == ["a", "b", "c"]
-
-    # Tuples are converted to lists
-    assert trace.get_strings(("a", "b")) == ["a", "b"]
 
     # Nested lists are not flattened
     assert trace.get_strings([["a", "b"], ["c", "d"]]) == ["a", "b"]

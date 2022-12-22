@@ -25,6 +25,12 @@ import { useParams } from "react-router";
 import { isHighlighted, Toolbar } from "/components/TracePage/Toolbar";
 import { CallFunction, CallName, getFormattedName } from "/components/TracePage/CallName";
 import { CallIconButton } from "./CallIconButton";
+import {
+  FlattenedFStringPart,
+  flattenFString,
+  FString,
+  RawFStringPart,
+} from "/components/TracePage/FString";
 
 const elicitStyle = {
   "hljs-keyword": { color: COLORS.indigo[600] }, // use primary color for keywords
@@ -542,7 +548,7 @@ const ResultComponent = ({ value }: { value: string[] }): JSX.Element => {
 type JsonChild =
   | { type: "array"; values: unknown[] }
   | { type: "object"; values: [string, unknown][] }
-  | { type: "value"; value: unknown };
+  | { type: "value"; value: unknown; fstring?: FlattenedFStringPart[] };
 
 const getStructuralType = (data: unknown) => {
   if (typeof data === "object" && data && !Array.isArray(data)) return "object";
@@ -562,7 +568,15 @@ const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
     if (typeof data === "object" && data) {
       // Array or Object
       if (Array.isArray(data)) return { type: "array", values: data };
-      else return { type: "object", values: Object.entries(data) };
+      if ("__fstring__" in data) {
+        const parts = data.__fstring__ as RawFStringPart[];
+        const flattenedParts = flattenFString(parts);
+        const value = flattenedParts
+          .map(part => (typeof part === "string" ? part : part.value))
+          .join("");
+        return { type: "value", value, fstring: flattenedParts };
+      }
+      return { type: "object", values: Object.entries(data) };
     }
     return { type: "value", value: data };
   }, [data]);
@@ -600,7 +614,7 @@ const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
         toast({ title: "Copied to clipboard", duration: 1000 });
       }}
     >
-      {value}
+      {view.fstring ? <FString parts={view.fstring} /> : value}
     </span>
   ) : (
     <span className="text-gray-600">empty</span>
