@@ -20,9 +20,11 @@ def to_json_value(x: Any) -> JSONValue:
         return {"__fstring__": to_json_value(x.parts)}
     if hasattr(x, "dict") and callable(x.dict):
         try:
-            return to_json_value(x.dict())
-        except TypeError:
+            x = x.dict()
+        except TypeError:  # raised if wrong number of arguments
             pass
+        else:
+            return to_json_value(x)
     if dataclasses.is_dataclass(x):
         return to_json_value(dataclasses.asdict(x))
     if isfunction(x):

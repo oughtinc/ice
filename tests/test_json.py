@@ -80,6 +80,11 @@ def test_primitives():
 
 def test_repr():
     class Foo:
+        def dict(self, x):
+            # This doesn't get used because it has a parameter,
+            # which leads to raising a TypeError when .dict() is called.
+            return {"a": x}
+
         def __repr__(self):
             return "Foo"
 
