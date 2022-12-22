@@ -17,10 +17,11 @@ from inspect import isfunction
 from inspect import Parameter
 from inspect import signature
 from time import monotonic_ns
-from typing import Any, Union
+from typing import Any
 from typing import cast
 from typing import IO
 from typing import Optional
+from typing import Union
 
 import ulid
 
