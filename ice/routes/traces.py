@@ -15,12 +15,10 @@ router = APIRouter(prefix="/api/traces", tags=["traces"])
 async def list_traces():
     # e.g. if trace_dir contains files trace1/trace.jsonl, trace2/trace.jsonl, other.txt,
     # return ["trace1", "trace2"]
-    return list(
-        sorted(
-            folder.name
-            for folder in traces_dir.iterdir()
-            if folder.is_dir() and (folder / "trace.jsonl").exists()
-        )
+    return sorted(
+        folder.name
+        for folder in traces_dir.iterdir()
+        if folder.is_dir() and (folder / "trace.jsonl").exists()
     )
 
 
