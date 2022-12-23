@@ -5,6 +5,8 @@ from abc import abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from fvalues import F
+
 from ice.recipe import recipe
 from ice.recipes.primer.search_string import search_string
 
@@ -14,43 +16,53 @@ Log = list[str]
 
 def render_enumerate(items: Sequence[object]) -> str:
     """Render numbered list, one per line"""
-    return "\n\n".join(f"{i+1}. {item}" for i, item in enumerate(items))
+    return "\n\n".join(F(f"{i+1}. {item}") for i, item in enumerate(items))
 
 
 def render_context(question: str, log: Log) -> str:
-    question_context = f'The question you want to answer: "{question}"'
+    question_context = F(f'The question you want to answer: "{question}"')
     if not log:
         return question_context
-    return f"""{question_context}
+    return F(
+        f"""{question_context}
 
 What you've done so far:
 
 {render_enumerate(log)}"""
+    )
 
 
 def render_action_context(question: str, log: Log, max_actions: int) -> str:
     action_count_text = (
         "You have one action left. (The one you're taking right now.)"
         if max_actions == 1
-        else f"You have {max_actions} actions left. (The one you're taking right now, and {max_actions - 1} follow-up actions.)"
+        else F(
+            f"You have {max_actions} actions left. (The one you're taking right now, and {max_actions - 1} follow-up actions.)"
+        )
     )
-    return f"""{render_context(question, log)}
+    return F(
+        f"""{render_context(question, log)}
 
 {action_count_text}"""
+    )
 
 
 def make_knowledge_prompt(question: str, log: Log) -> str:
-    return f"""{render_context(question, log)}
+    return F(
+        f"""{render_context(question, log)}
 
 Q: Do you have enough information to correctly answer the question? Say "A: Yes" or "A: No"
 A:"""
+    )
 
 
 def make_answer_prompt(question: str, log: Log) -> str:
-    return f"""{render_context(question, log)}
+    return F(
+        f"""{render_context(question, log)}
 
 Q: {question}
 A:"""
+    )
 
 
 async def is_info_sufficient(question: str, log: Log) -> bool:
@@ -88,7 +100,8 @@ class CalculationAction(Action):
 
     @classmethod
     def make_proposal_prompt(cls, question: str, log: Log, max_actions: int) -> str:
-        return f"""{render_action_context(question, log, max_actions)}
+        return F(
+            f"""{render_action_context(question, log, max_actions)}
 
 You have chosen to take the action "Do a calculation".
 
@@ -96,6 +109,7 @@ You have access to a Python interpreter. What single-line calculation would most
 
 >>> import math
 >>>"""
+        )
 
     @classmethod
     async def propose(
@@ -111,13 +125,13 @@ You have access to a Python interpreter. What single-line calculation would most
         try:
             return str(eval(self.calculation))
         except Exception as e:
-            return f"Error: {e}"
+            return F(f"Error: {e}")
 
     def make_log_entry(self, result: str) -> str:
-        return f"You calculated '{self.calculation}' and got the result '{result}'."
+        return F(f"You calculated '{self.calculation}' and got the result '{result}'.")
 
     def __str__(self):
-        return f"Do calculation: {self.calculation}"
+        return F(f"Do calculation: {self.calculation}")
 
 
 @dataclass
@@ -126,13 +140,15 @@ class WebSearchAction(Action):
 
     @classmethod
     def make_proposal_prompt(cls, question: str, log: Log, max_actions: int) -> str:
-        return f"""{render_action_context(question, log, max_actions)}
+        return F(
+            f"""{render_action_context(question, log, max_actions)}
 
 You have chosen to take the action "Run a web search".
 
 What is a first web search query you could run to help you answer the question "{question}"?
 
 Query:"""
+        )
 
     @classmethod
     async def propose(
@@ -149,10 +165,12 @@ Query:"""
         return results_str
 
     def make_log_entry(self, result: str) -> str:
-        return f"You searched the web for '{self.search_term}' and got the result '{result}'."
+        return F(
+            f"You searched the web for '{self.search_term}' and got the result '{result}'."
+        )
 
     def __str__(self):
-        return f"Run web search: {self.search_term}"
+        return F(f"Run web search: {self.search_term}")
 
 
 async def get_action_candidates(
@@ -172,10 +190,13 @@ def make_action_choice_prompt(
     question: str, log: Log, actions: list[Action], max_actions: int
 ) -> str:
     follow_up_text = (
-        "" if max_actions == 1 else f", and {max_actions - 1} similar follow-up actions"
+        ""
+        if max_actions == 1
+        else F(f", and {max_actions - 1} similar follow-up actions")
     )
 
-    return f"""{render_context(question, log)}
+    return F(
+        f"""{render_context(question, log)}
 
 You can take one of the following actions now{follow_up_text} before you need to answer:
 
@@ -183,6 +204,7 @@ You can take one of the following actions now{follow_up_text} before you need to
 
 Question: What next action should you take to make progress on answering the question "{question}"? {render_numbers(len(actions))}?
 Answer:"""
+    )
 
 
 async def choose_action(
@@ -199,7 +221,7 @@ async def choose_action(
 async def get_action_choice_probs(action_choice_prompt, actions):
     action_choice_probs, _ = await recipe.agent("instruct-reasoning-crowd").classify(
         prompt=action_choice_prompt,
-        choices=tuple(f" {i}" for i in range(1, len(actions) + 1)),
+        choices=tuple(F(f" {i}") for i in range(1, len(actions) + 1)),
     )
     return action_choice_probs
 

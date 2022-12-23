@@ -1,21 +1,27 @@
+from fvalues import F
+
 from ice.recipe import recipe
 
 
 def generate_reasoning_prompt(question: str) -> str:
-    return f"""Answer the following question:
+    return F(
+        f"""Answer the following question:
 
 Question: "{question}"
 Answer: "Let's think step by step.
-""".strip()
+"""
+    ).strip()
 
 
 def generate_answer_prompt(question: str, reasoning: str) -> str:
-    return f"""Answer the following question using the reasoning shown below:
+    return F(
+        f"""Answer the following question using the reasoning shown below:
 
 Question: "{question}"
 Reasoning: "{reasoning}"
 Short answer: "
-""".strip()
+"""
+    ).strip()
 
 
 async def get_reasoning(question: str) -> str:

@@ -1,3 +1,5 @@
+from fvalues import F
+
 DEFAULT_QUESTION = "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?"
 
 DEFAULT_STEPS = [
@@ -9,4 +11,4 @@ DEFAULT_STEPS = [
 
 
 def render_steps(steps: list[str]) -> str:
-    return "\n".join(f"{i}. {step}" for (i, step) in enumerate(steps, start=1))
+    return "\n".join(F(f"{i}. {step}") for (i, step) in enumerate(steps, start=1))

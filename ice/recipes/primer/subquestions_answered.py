@@ -1,14 +1,18 @@
+from fvalues import F
+
 from ice.recipe import recipe
 from ice.recipes.primer.subquestions import ask_subquestions
 from ice.utils import map_async
 
 
 def make_qa_prompt(question: str) -> str:
-    return f"""Answer the following question:
+    return F(
+        f"""Answer the following question:
 
 Question: "{question}"
 Answer: "
-""".strip()
+"""
+    ).strip()
 
 
 async def answer(question: str) -> str:

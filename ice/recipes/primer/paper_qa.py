@@ -1,5 +1,7 @@
 from collections.abc import Sequence
 
+from fvalues import F
+
 from ice.paper import Paper
 from ice.paper import Paragraph
 from ice.recipe import recipe
@@ -8,10 +10,12 @@ from ice.utils import map_async
 
 
 def make_classification_prompt(paragraph: Paragraph, question: str) -> str:
-    return f"""Here is a paragraph from a research paper: "{paragraph}"
+    return F(
+        f"""Here is a paragraph from a research paper: "{paragraph}"
 
 Question: Does this paragraph answer the question '{question}'? Say Yes or No.
 Answer:"""
+    )
 
 
 async def classify_paragraph(paragraph: Paragraph, question: str) -> float:

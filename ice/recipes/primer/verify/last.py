@@ -1,9 +1,12 @@
+from fvalues import F
+
 from ice.recipe import recipe
 from ice.recipes.primer.verify.utils import *
 
 
 def make_verification_prompt(question: str, steps: list[str]) -> str:
-    return f"""Consider this question: "{question}"
+    return F(
+        f"""Consider this question: "{question}"
 
 Here are the first few steps of an answer:
 
@@ -11,6 +14,7 @@ Here are the first few steps of an answer:
 
 Q: Is step {len(steps)} correct, assuming that the previous steps are correct? Say "A: Yes" or "A: No".
 A:"""
+    )
 
 
 async def check_step(question: str, steps: list[str]) -> float:

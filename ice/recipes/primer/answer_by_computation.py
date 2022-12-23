@@ -1,17 +1,22 @@
+from fvalues import F
+
 from ice.recipe import recipe
 
 
 def make_computation_choice_prompt(question: str) -> str:
-    return f"""You've been asked to answer the question "{question}".
+    return F(
+        f"""You've been asked to answer the question "{question}".
 
 You have access to a Python interpreter.
 
 Enter an expression that will help you answer the question.
 >>>"""
+    )
 
 
 def make_compute_qa_prompt(question: str, expression: str, result: str) -> str:
-    return f"""A recording of a Python interpreter session:
+    return F(
+        f"""A recording of a Python interpreter session:
 
 >>> {expression}: {result}
 
@@ -19,14 +24,15 @@ Answer the following question, using the Python session if helpful:
 
 Question: "{question}"
 Answer: "
-""".strip()
+"""
+    ).strip()
 
 
 def eval_python(expression: str) -> str:
     try:
         result = eval(expression)
     except Exception as e:
-        result = f"Error: {e}"
+        result = F(f"Error: {e}")
     return str(result)
 
 
