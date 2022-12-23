@@ -9,6 +9,7 @@ from faker import Faker
 from ice.paper import Paper
 from ice.recipe import FunctionBasedRecipe
 from ice.recipe import recipe
+from ice.trace import enable_trace
 
 Faker.seed(0)
 fake = Faker()
@@ -40,4 +41,5 @@ async def test_all_primer_recipes(main: FunctionBasedRecipe):
         else:
             raise ValueError(f"Cannot handle parameter {p}")
         kwargs[p.name] = value
+    enable_trace()
     await main(**kwargs)
