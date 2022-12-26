@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed SQLite connection error which sometimes occurred when running async functions decorated with `@diskcache`. 
+- Fixed SQLite connection error which sometimes occurred when running async functions decorated with `@diskcache`.
 - Replaced hardcoded `/code/papers/` path (which only made sense in the old docker container) with environment variable `PAPER_DIR`.
 - Added empty `py.typed` file to the package for type checkers.
 
