@@ -48,7 +48,7 @@ def render_results(data: dict) -> str:
             continue
         results.append(F(f"{title}\n{link}\n{snippet}\n"))
 
-    return "\n".join(results)
+    return F("\n").join(results)
 
 
 async def choose_query(question: str) -> str:

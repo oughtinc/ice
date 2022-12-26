@@ -11,4 +11,4 @@ DEFAULT_STEPS = [
 
 
 def render_steps(steps: list[str]) -> str:
-    return "\n".join(F(f"{i}. {step}") for (i, step) in enumerate(steps, start=1))
+    return F("\n").join(F(f"{i}. {step}") for (i, step) in enumerate(steps, start=1))

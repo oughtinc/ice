@@ -4,7 +4,7 @@ from ice.recipes.primer.answer_by_dispatch.types import *
 
 
 def make_action_selection_prompt(question: str) -> str:
-    action_types_str = "\n".join(
+    action_types_str = F("\n").join(
         [
             F(f"{i+1}. {action_type.description}")
             for i, action_type in enumerate(action_types)

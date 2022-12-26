@@ -16,7 +16,7 @@ Log = list[str]
 
 def render_enumerate(items: Sequence[object]) -> str:
     """Render numbered list, one per line"""
-    return "\n\n".join(F(f"{i+1}. {item}") for i, item in enumerate(items))
+    return F("\n\n").join(F(f"{i+1}. {item}") for i, item in enumerate(items))
 
 
 def render_context(question: str, log: Log) -> str:
