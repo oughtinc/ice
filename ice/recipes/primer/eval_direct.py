@@ -1,3 +1,5 @@
+from fvalues import F
+
 from ice.recipe import recipe
 
 
@@ -5,7 +7,7 @@ def eval_python(expression: str) -> str:
     try:
         result = eval(expression)
     except Exception as e:
-        result = f"Error: {e}"
+        result = F(f"Error: {e}")
     return str(result)
 
 

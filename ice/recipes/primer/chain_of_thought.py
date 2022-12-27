@@ -1,12 +1,16 @@
+from fvalues import F
+
 from ice.recipe import recipe
 
 
 def make_chain_of_thought_prompt(question: str, answer_prefix: str = "") -> str:
-    return f"""Answer the following question:
+    return F(
+        f"""Answer the following question:
 
 Question: "{question}"
 Answer: "{answer_prefix}
-""".strip()
+"""
+    ).strip()
 
 
 async def chain_of_thought(

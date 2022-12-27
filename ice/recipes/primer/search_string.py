@@ -1,5 +1,7 @@
 import httpx
 
+from fvalues import F
+
 from ice.recipe import recipe
 
 
@@ -21,9 +23,9 @@ def render_results(data: dict) -> str:
         snippet = result.get("snippet")
         if not title or not link or not snippet:
             continue
-        results.append(f"{title}\n{link}\n{snippet}\n")
+        results.append(F(f"{title}\n{link}\n{snippet}\n"))
 
-    return "\n".join(results)
+    return F("\n").join(results)
 
 
 async def search_string(
