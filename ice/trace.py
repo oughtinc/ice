@@ -37,11 +37,7 @@ from ice.settings import settings
 log = get_logger()
 
 
-def make_id() -> str:
-    return ulid.new().str
-
-
-parent_id_var: ContextVar[str] = ContextVar("id")
+parent_id_var: ContextVar[int] = ContextVar("id")
 
 traces_dir = OUGHT_ICE_DIR / "traces"
 traces_dir.mkdir(parents=True, exist_ok=True)
@@ -59,7 +55,7 @@ class Trace:
     BLOCK_LENGTH = 1024**2
 
     def __init__(self):
-        self.id = make_id()
+        self.id = ulid.new().str
         self.dir = traces_dir / self.id
         self.dir.mkdir()
         self.file = self._open("trace")
@@ -80,13 +76,19 @@ class Trace:
         # The actual value is kept briefly in this attribute.
         self._current_block_value: str
 
-        parent_id_var.set(self.id)
+        self._counter = 0
+        parent_id_var.set(0)
         log.info(f"Trace: {self.url}")
         threading.Thread(target=self._server_and_browser).start()
 
     @property
     def url(self) -> str:
         return f"{server_url()}/traces/{self.id}"
+
+    def next_counter(self) -> int:
+        with self._lock:
+            self._counter += 1
+            return self._counter
 
     def _server_and_browser(self):
         is_running = None
@@ -194,11 +196,13 @@ recorder: Recorder = lambda **kwargs: None
 
 
 class _Recorder:
-    def __init__(self, id: str):
+    def __init__(self, id: int):
         self.id = id
 
     def __call__(self, **kwargs):
-        emit({self.id: {"records": {make_id(): emit_block(kwargs)}}})
+        emit(
+            {self.id: {"records": {trace_var.get().next_counter(): emit_block(kwargs)}}}
+        )
 
     def __repr__(self):
         # So this can be used in `diskcache()` functions
@@ -225,7 +229,7 @@ def trace(fn):
 
         @wraps(fn)
         async def inner_wrapper(*args, **kwargs):
-            id = make_id()
+            id = trace_var.get().next_counter()
             parent_id = parent_id_var.get()
             parent_id_var.set(id)
 
