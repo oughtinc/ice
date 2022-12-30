@@ -1,0 +1,86 @@
+[
+  {
+    "1": {
+      "args": {
+        "args": {},
+        "gold_standard_splits": null,
+        "input_files": null,
+        "json_out": null,
+        "mode": "test",
+        "output_file": null,
+        "question_short_name": null,
+        "recipe_name": "ExampleMetaRecipe"
+      },
+      "name": "main",
+      "parent": 0,
+      "shortArgs": [
+        "test"
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "self": {
+          "class_name": "ExampleMetaRecipe",
+          "mode": "test"
+        }
+      },
+      "cls": "ExampleMetaRecipe",
+      "name": "run",
+      "parent": 1,
+      "shortArgs": [
+        "()"
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "input": [
+          "MetaRecipe"
+        ],
+        "self": {
+          "class_name": "MesaRecipe",
+          "mode": "test"
+        }
+      },
+      "cls": "MesaRecipe",
+      "name": "run",
+      "parent": 2,
+      "shortArgs": [
+        "MetaRecipe"
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": [
+        "MetaRecipe",
+        "MesaRecipe.first_node",
+        "MesaRecipe.second_node"
+      ],
+      "shortResult": [
+        "MetaRecipe",
+        "MesaRecipe.first_node",
+        "MesaRecipe.second_node"
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": "MetaRecipe ---> MesaRecipe.first_node ---> MesaRecipe.second_node ---> MetaRecipe.collect_result",
+      "shortResult": [
+        "MetaRecipe ---> MesaRecipe.first_no..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": null,
+      "shortResult": [
+        "()"
+      ]
+    }
+  }
+]

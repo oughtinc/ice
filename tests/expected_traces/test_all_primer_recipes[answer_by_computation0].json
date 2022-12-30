@@ -1,0 +1,134 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "Foot space school movement trouble record."
+      },
+      "name": "answer_by_computation",
+      "parent": 0,
+      "shortArgs": [
+        "Foot space school movement trouble..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "question": "Foot space school movement trouble record."
+      },
+      "name": "choose_computation",
+      "parent": 1,
+      "shortArgs": [
+        "Foot space school movement trouble..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "You've been asked to answer the question \"",
+            {
+              "formatted": "Foot space school movement trouble record.",
+              "source": "question",
+              "value": "Foot space school movement trouble record."
+            },
+            "\".\n\nYou have access to a Python interpreter.\n\nEnter an expression that will help you answer the question.\n>>>"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 2,
+      "shortArgs": [
+        "You've been asked to answer the que...",
+        "\".\n\nYou have access to a Python int..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": "Oil price cup court information somebody its.",
+      "shortResult": [
+        "Oil price cup court information som..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": "Oil price cup court information somebody its.",
+      "shortResult": [
+        "Oil price cup court information som..."
+      ]
+    }
+  },
+  {
+    "4": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "A recording of a Python interpreter session:\n\n>>> ",
+            {
+              "formatted": "Oil price cup court information somebody its.",
+              "source": "expression",
+              "value": "Oil price cup court information somebody its."
+            },
+            ": ",
+            {
+              "formatted": "Error: invalid syntax (<string>, line 1)",
+              "source": "result",
+              "value": "Error: invalid syntax (<string>, line 1)"
+            },
+            "\n\nAnswer the following question, using the Python session if helpful:\n\nQuestion: \"",
+            {
+              "formatted": "Foot space school movement trouble record.",
+              "source": "question",
+              "value": "Foot space school movement trouble record."
+            },
+            "\"\nAnswer: \""
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 1,
+      "shortArgs": [
+        "A recording of a Python interpreter...",
+        ": ",
+        "Answer the following question, us...",
+        "..."
+      ]
+    }
+  },
+  {
+    "4": {
+      "result": "Forget hour child pay traditional region.",
+      "shortResult": [
+        "Forget hour child pay traditional r..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Forget hour child pay traditional region.",
+      "shortResult": [
+        "Forget hour child pay traditional r..."
+      ]
+    }
+  }
+]

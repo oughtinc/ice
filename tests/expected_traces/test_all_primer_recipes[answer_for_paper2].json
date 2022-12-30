@@ -1,0 +1,137 @@
+[
+  {
+    "1": {
+      "args": {
+        "paper": {
+          "document_id": "keenan-2018-tiny.txt"
+        },
+        "question": "Pm ready almost special involve trouble open."
+      },
+      "name": "answer_for_paper",
+      "parent": 0,
+      "shortArgs": [
+        "keenan-2018-tiny.txt"
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "paragraph": {
+          "section_type": "abstract",
+          "sections": [
+            {
+              "number": "",
+              "title": "Abstract"
+            }
+          ],
+          "sentences": [
+            "In this cluster-randomized trial, we assigned communities in Malawi, Niger, and Tanzania to four twice-yearly mass distributions of either oral azithromycin (approxi- mately 20 mg per kilogram of body weight) or placebo.",
+            "Children 1 to 59 months of age were identified in twice-yearly censuses and were offered participation in the trial.",
+            "Vital status was determined at subsequent censuses.",
+            "The primary outcome was aggregate all-cause mortality; country-specific rates were assessed in prespecified subgroup analyses.",
+            "Among postneonatal, preschool children in sub-Saharan Africa, childhood mortality was lower in communities randomly assigned to mass distribution of azithromycin than in those assigned to placebo, with the largest effect seen in Niger.",
+            "Any imple- mentation of a policy of mass distribution would need to strongly consider the poten- tial effect of such a strategy on antibiotic resistance.",
+            "(Funded by the Bill and Melinda Gates Foundation; MORDOR ClinicalTrials.gov number, NCT02047981.)"
+          ]
+        },
+        "question": "Pm ready almost special involve trouble open."
+      },
+      "name": "classify_paragraph",
+      "parent": 1,
+      "shortArgs": [
+        "In this cluster-randomized trial, w...",
+        "Children 1 to 59 months of age were...",
+        "Vital status was determined at subs...",
+        "..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "choices": [
+          " Yes",
+          " No"
+        ],
+        "default": null,
+        "prompt": {
+          "__fstring__": [
+            "Here is a paragraph from a research paper: \"",
+            {
+              "formatted": "In this cluster-randomized trial, we assigned communities in Malawi, Niger, and Tanzania to four twice-yearly mass distributions of either oral azithromycin (approxi- mately 20 mg per kilogram of body weight) or placebo. Children 1 to 59 months of age were identified in twice-yearly censuses and were offered participation in the trial. Vital status was determined at subsequent censuses. The primary outcome was aggregate all-cause mortality; country-specific rates were assessed in prespecified subgroup analyses. Among postneonatal, preschool children in sub-Saharan Africa, childhood mortality was lower in communities randomly assigned to mass distribution of azithromycin than in those assigned to placebo, with the largest effect seen in Niger. Any imple- mentation of a policy of mass distribution would need to strongly consider the poten- tial effect of such a strategy on antibiotic resistance. (Funded by the Bill and Melinda Gates Foundation; MORDOR ClinicalTrials.gov number, NCT02047981.)",
+              "source": "paragraph",
+              "value": {
+                "section_type": "abstract",
+                "sections": [
+                  {
+                    "number": "",
+                    "title": "Abstract"
+                  }
+                ],
+                "sentences": [
+                  "In this cluster-randomized trial, we assigned communities in Malawi, Niger, and Tanzania to four twice-yearly mass distributions of either oral azithromycin (approxi- mately 20 mg per kilogram of body weight) or placebo.",
+                  "Children 1 to 59 months of age were identified in twice-yearly censuses and were offered participation in the trial.",
+                  "Vital status was determined at subsequent censuses.",
+                  "The primary outcome was aggregate all-cause mortality; country-specific rates were assessed in prespecified subgroup analyses.",
+                  "Among postneonatal, preschool children in sub-Saharan Africa, childhood mortality was lower in communities randomly assigned to mass distribution of azithromycin than in those assigned to placebo, with the largest effect seen in Niger.",
+                  "Any imple- mentation of a policy of mass distribution would need to strongly consider the poten- tial effect of such a strategy on antibiotic resistance.",
+                  "(Funded by the Bill and Melinda Gates Foundation; MORDOR ClinicalTrials.gov number, NCT02047981.)"
+                ]
+              }
+            },
+            "\"\n\nQuestion: Does this paragraph answer the question '",
+            {
+              "formatted": "Pm ready almost special involve trouble open.",
+              "source": "question",
+              "value": "Pm ready almost special involve trouble open."
+            },
+            "'? Say Yes or No.\nAnswer:"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "classify",
+      "parent": 2,
+      "shortArgs": [
+        "Here is a paragraph from a research...",
+        "\"\n\nQuestion: Does this paragraph an...",
+        "'? Say Yes or No.\nAnswer:"
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": [
+        {
+          " No": 0.46540762596503044,
+          " Yes": 0.5345923740349696
+        },
+        null
+      ],
+      "shortResult": [
+        "0.5345923740349696"
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": 0.5345923740349696,
+      "shortResult": [
+        "0.5345923740349696"
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": 0.5345923740349696,
+      "shortResult": [
+        "0.5345923740349696"
+      ]
+    }
+  }
+]

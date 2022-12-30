@@ -1,0 +1,173 @@
+[
+  {
+    "1": {
+      "args": {
+        "max_actions": 3,
+        "question": "How far would all the film frames that make up the 400-plus episodes of The Simpsons stretch?"
+      },
+      "name": "sequential_action",
+      "parent": 0,
+      "shortArgs": [
+        "How far would all the film frames t..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "log": [],
+        "question": "How far would all the film frames that make up the 400-plus episodes of The Simpsons stretch?"
+      },
+      "name": "is_info_sufficient",
+      "parent": 1,
+      "shortArgs": [
+        "How far would all the film frames t..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "choices": [
+          " Yes",
+          " No"
+        ],
+        "default": null,
+        "prompt": {
+          "__fstring__": [
+            {
+              "formatted": "The question you want to answer: \"How far would all the film frames that make up the 400-plus episodes of The Simpsons stretch?\"",
+              "source": "render_context(question, log)",
+              "value": {
+                "__fstring__": [
+                  "The question you want to answer: \"",
+                  {
+                    "formatted": "How far would all the film frames that make up the 400-plus episodes of The Simpsons stretch?",
+                    "source": "question",
+                    "value": "How far would all the film frames that make up the 400-plus episodes of The Simpsons stretch?"
+                  },
+                  "\""
+                ]
+              }
+            },
+            "\n\nQ: Do you have enough information to correctly answer the question? Say \"A: Yes\" or \"A: No\"\nA:"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "classify",
+      "parent": 2,
+      "shortArgs": [
+        "render_context(question, log)"
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": [
+        {
+          " No": 0.2747376478346178,
+          " Yes": 0.7252623521653822
+        },
+        null
+      ],
+      "shortResult": [
+        "0.7252623521653822"
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": true,
+      "shortResult": [
+        "True"
+      ]
+    }
+  },
+  {
+    "4": {
+      "args": {
+        "log": [],
+        "question": "How far would all the film frames that make up the 400-plus episodes of The Simpsons stretch?"
+      },
+      "name": "answer_directly",
+      "parent": 1,
+      "shortArgs": [
+        "How far would all the film frames t..."
+      ]
+    }
+  },
+  {
+    "5": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            {
+              "formatted": "The question you want to answer: \"How far would all the film frames that make up the 400-plus episodes of The Simpsons stretch?\"",
+              "source": "render_context(question, log)",
+              "value": {
+                "__fstring__": [
+                  "The question you want to answer: \"",
+                  {
+                    "formatted": "How far would all the film frames that make up the 400-plus episodes of The Simpsons stretch?",
+                    "source": "question",
+                    "value": "How far would all the film frames that make up the 400-plus episodes of The Simpsons stretch?"
+                  },
+                  "\""
+                ]
+              }
+            },
+            "\n\nQ: ",
+            {
+              "formatted": "How far would all the film frames that make up the 400-plus episodes of The Simpsons stretch?",
+              "source": "question",
+              "value": "How far would all the film frames that make up the 400-plus episodes of The Simpsons stretch?"
+            },
+            "\nA:"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": null,
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 4,
+      "shortArgs": [
+        "render_context(question, log)"
+      ]
+    }
+  },
+  {
+    "5": {
+      "result": "Option million hope break another station.",
+      "shortResult": [
+        "Option million hope break another s..."
+      ]
+    }
+  },
+  {
+    "4": {
+      "result": "Option million hope break another station.",
+      "shortResult": [
+        "Option million hope break another s..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Option million hope break another station.",
+      "shortResult": [
+        "Option million hope break another s..."
+      ]
+    }
+  }
+]

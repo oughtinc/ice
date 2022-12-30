@@ -1,0 +1,22 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "Despite and century best green poor senior add."
+      },
+      "name": "answer_by_computation",
+      "parent": 0,
+      "shortArgs": [
+        "Despite and century best green poor..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Error: invalid syntax (<string>, line 1)",
+      "shortResult": [
+        "Error: invalid syntax (<string>, li..."
+      ]
+    }
+  }
+]

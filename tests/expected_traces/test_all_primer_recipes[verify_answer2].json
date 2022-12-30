@@ -1,0 +1,77 @@
+[
+  {
+    "1": {
+      "args": {
+        "answer": "Far treat early American.",
+        "question": "Stay I price room least experience."
+      },
+      "name": "verify_answer",
+      "parent": 0,
+      "shortArgs": [
+        "Stay I price room least experience."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "choices": [
+          " Yes",
+          " No"
+        ],
+        "default": null,
+        "prompt": {
+          "__fstring__": [
+            "Consider this question: \"",
+            {
+              "formatted": "Stay I price room least experience.",
+              "source": "question",
+              "value": "Stay I price room least experience."
+            },
+            "\"\n\nPotential answer: \"",
+            {
+              "formatted": "Far treat early American.",
+              "source": "answer",
+              "value": "Far treat early American."
+            },
+            "\"\n\nQ: Is the potential answer above correct? Say \"A: Yes\" or \"A: No\".\nA:"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "classify",
+      "parent": 1,
+      "shortArgs": [
+        "Consider this question: \"",
+        "\"\n\nPotential answer: \"",
+        "\"\n\nQ: Is the potential answer above..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": [
+        {
+          " No": 0.48084951228878386,
+          " Yes": 0.5191504877112162
+        },
+        null
+      ],
+      "shortResult": [
+        "0.5191504877112162"
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": 0.5191504877112162,
+      "shortResult": [
+        "0.5191504877112162"
+      ]
+    }
+  }
+]

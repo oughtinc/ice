@@ -1,0 +1,643 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+        "steps": [
+          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+          "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+          "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies",
+          "So, the final answer is 6 cookies per person."
+        ]
+      },
+      "name": "verify_answer",
+      "parent": 0,
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+        "steps": [
+          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies"
+        ]
+      },
+      "name": "check_step",
+      "parent": 1,
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+        "steps": [
+          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+          "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies"
+        ]
+      },
+      "name": "check_step",
+      "parent": 1,
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
+    }
+  },
+  {
+    "4": {
+      "args": {
+        "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+        "steps": [
+          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+          "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+          "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies"
+        ]
+      },
+      "name": "check_step",
+      "parent": 1,
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
+    }
+  },
+  {
+    "5": {
+      "args": {
+        "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+        "steps": [
+          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+          "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+          "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies",
+          "So, the final answer is 6 cookies per person."
+        ]
+      },
+      "name": "check_step",
+      "parent": 1,
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
+    }
+  },
+  {
+    "6": {
+      "args": {
+        "choices": [
+          " Yes",
+          " No"
+        ],
+        "default": null,
+        "prompt": {
+          "__fstring__": [
+            "Consider this question: \"",
+            {
+              "formatted": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+              "source": "question",
+              "value": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?"
+            },
+            "\"\n\nHere are the first few steps of an answer:\n\n",
+            {
+              "formatted": "1. Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+              "source": "render_steps(steps)",
+              "value": {
+                "__fstring__": [
+                  {
+                    "formatted": "1. Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+                    "source": "list((F(f\"{i}. {step}\") for (i, step) in enumerate(steps, start=1)))[0]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "1",
+                          "source": "i",
+                          "value": 1
+                        },
+                        ". ",
+                        {
+                          "formatted": "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+                          "source": "step",
+                          "value": "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "\n\nQ: Is step ",
+            {
+              "formatted": "1",
+              "source": "len(steps)",
+              "value": 1
+            },
+            " correct, assuming that the previous steps are correct? Say \"A: Yes\" or \"A: No\".\nA:"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "classify",
+      "parent": 2,
+      "shortArgs": [
+        "Consider this question: \"",
+        "\"\n\nHere are the first few steps of...",
+        "\n\nQ: Is step ",
+        "..."
+      ]
+    }
+  },
+  {
+    "6": {
+      "result": [
+        {
+          " No": 0.1626368830884087,
+          " Yes": 0.8373631169115912
+        },
+        null
+      ],
+      "shortResult": [
+        "0.8373631169115912"
+      ]
+    }
+  },
+  {
+    "7": {
+      "args": {
+        "choices": [
+          " Yes",
+          " No"
+        ],
+        "default": null,
+        "prompt": {
+          "__fstring__": [
+            "Consider this question: \"",
+            {
+              "formatted": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+              "source": "question",
+              "value": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?"
+            },
+            "\"\n\nHere are the first few steps of an answer:\n\n",
+            {
+              "formatted": "1. Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies\n2. There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+              "source": "render_steps(steps)",
+              "value": {
+                "__fstring__": [
+                  {
+                    "formatted": "1. Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+                    "source": "list((F(f\"{i}. {step}\") for (i, step) in enumerate(steps, start=1)))[0]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "1",
+                          "source": "i",
+                          "value": 1
+                        },
+                        ". ",
+                        {
+                          "formatted": "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+                          "source": "step",
+                          "value": "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "\n",
+                    "source": "F(\"\\n\")",
+                    "value": {
+                      "__fstring__": [
+                        "\n"
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "2. There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+                    "source": "list((F(f\"{i}. {step}\") for (i, step) in enumerate(steps, start=1)))[1]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "2",
+                          "source": "i",
+                          "value": 2
+                        },
+                        ". ",
+                        {
+                          "formatted": "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+                          "source": "step",
+                          "value": "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "\n\nQ: Is step ",
+            {
+              "formatted": "2",
+              "source": "len(steps)",
+              "value": 2
+            },
+            " correct, assuming that the previous steps are correct? Say \"A: Yes\" or \"A: No\".\nA:"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "classify",
+      "parent": 3,
+      "shortArgs": [
+        "Consider this question: \"",
+        "\"\n\nHere are the first few steps of...",
+        "\n\nQ: Is step ",
+        "..."
+      ]
+    }
+  },
+  {
+    "7": {
+      "result": [
+        {
+          " No": 0.41064257347452415,
+          " Yes": 0.5893574265254758
+        },
+        null
+      ],
+      "shortResult": [
+        "0.5893574265254758"
+      ]
+    }
+  },
+  {
+    "8": {
+      "args": {
+        "choices": [
+          " Yes",
+          " No"
+        ],
+        "default": null,
+        "prompt": {
+          "__fstring__": [
+            "Consider this question: \"",
+            {
+              "formatted": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+              "source": "question",
+              "value": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?"
+            },
+            "\"\n\nHere are the first few steps of an answer:\n\n",
+            {
+              "formatted": "1. Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies\n2. There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies\n3. She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies",
+              "source": "render_steps(steps)",
+              "value": {
+                "__fstring__": [
+                  {
+                    "formatted": "1. Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+                    "source": "list((F(f\"{i}. {step}\") for (i, step) in enumerate(steps, start=1)))[0]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "1",
+                          "source": "i",
+                          "value": 1
+                        },
+                        ". ",
+                        {
+                          "formatted": "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+                          "source": "step",
+                          "value": "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "\n",
+                    "source": "F(\"\\n\")",
+                    "value": {
+                      "__fstring__": [
+                        "\n"
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "2. There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+                    "source": "list((F(f\"{i}. {step}\") for (i, step) in enumerate(steps, start=1)))[1]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "2",
+                          "source": "i",
+                          "value": 2
+                        },
+                        ". ",
+                        {
+                          "formatted": "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+                          "source": "step",
+                          "value": "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "\n",
+                    "source": "F(\"\\n\")",
+                    "value": {
+                      "__fstring__": [
+                        "\n"
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "3. She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies",
+                    "source": "list((F(f\"{i}. {step}\") for (i, step) in enumerate(steps, start=1)))[2]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "3",
+                          "source": "i",
+                          "value": 3
+                        },
+                        ". ",
+                        {
+                          "formatted": "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies",
+                          "source": "step",
+                          "value": "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "\n\nQ: Is step ",
+            {
+              "formatted": "3",
+              "source": "len(steps)",
+              "value": 3
+            },
+            " correct, assuming that the previous steps are correct? Say \"A: Yes\" or \"A: No\".\nA:"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "classify",
+      "parent": 4,
+      "shortArgs": [
+        "Consider this question: \"",
+        "\"\n\nHere are the first few steps of...",
+        "\n\nQ: Is step ",
+        "..."
+      ]
+    }
+  },
+  {
+    "8": {
+      "result": [
+        {
+          " No": 0.6934821315117362,
+          " Yes": 0.3065178684882638
+        },
+        null
+      ],
+      "shortResult": [
+        "0.3065178684882638"
+      ]
+    }
+  },
+  {
+    "9": {
+      "args": {
+        "choices": [
+          " Yes",
+          " No"
+        ],
+        "default": null,
+        "prompt": {
+          "__fstring__": [
+            "Consider this question: \"",
+            {
+              "formatted": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+              "source": "question",
+              "value": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?"
+            },
+            "\"\n\nHere are the first few steps of an answer:\n\n",
+            {
+              "formatted": "1. Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies\n2. There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies\n3. She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies\n4. So, the final answer is 6 cookies per person.",
+              "source": "render_steps(steps)",
+              "value": {
+                "__fstring__": [
+                  {
+                    "formatted": "1. Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+                    "source": "list((F(f\"{i}. {step}\") for (i, step) in enumerate(steps, start=1)))[0]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "1",
+                          "source": "i",
+                          "value": 1
+                        },
+                        ". ",
+                        {
+                          "formatted": "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+                          "source": "step",
+                          "value": "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "\n",
+                    "source": "F(\"\\n\")",
+                    "value": {
+                      "__fstring__": [
+                        "\n"
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "2. There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+                    "source": "list((F(f\"{i}. {step}\") for (i, step) in enumerate(steps, start=1)))[1]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "2",
+                          "source": "i",
+                          "value": 2
+                        },
+                        ". ",
+                        {
+                          "formatted": "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+                          "source": "step",
+                          "value": "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "\n",
+                    "source": "F(\"\\n\")",
+                    "value": {
+                      "__fstring__": [
+                        "\n"
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "3. She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies",
+                    "source": "list((F(f\"{i}. {step}\") for (i, step) in enumerate(steps, start=1)))[2]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "3",
+                          "source": "i",
+                          "value": 3
+                        },
+                        ". ",
+                        {
+                          "formatted": "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies",
+                          "source": "step",
+                          "value": "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "\n",
+                    "source": "F(\"\\n\")",
+                    "value": {
+                      "__fstring__": [
+                        "\n"
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "4. So, the final answer is 6 cookies per person.",
+                    "source": "list((F(f\"{i}. {step}\") for (i, step) in enumerate(steps, start=1)))[3]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "4",
+                          "source": "i",
+                          "value": 4
+                        },
+                        ". ",
+                        {
+                          "formatted": "So, the final answer is 6 cookies per person.",
+                          "source": "step",
+                          "value": "So, the final answer is 6 cookies per person."
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "\n\nQ: Is step ",
+            {
+              "formatted": "4",
+              "source": "len(steps)",
+              "value": 4
+            },
+            " correct, assuming that the previous steps are correct? Say \"A: Yes\" or \"A: No\".\nA:"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "classify",
+      "parent": 5,
+      "shortArgs": [
+        "Consider this question: \"",
+        "\"\n\nHere are the first few steps of...",
+        "\n\nQ: Is step ",
+        "..."
+      ]
+    }
+  },
+  {
+    "9": {
+      "result": [
+        {
+          " No": 0.38345733438710905,
+          " Yes": 0.616542665612891
+        },
+        null
+      ],
+      "shortResult": [
+        "0.616542665612891"
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": 0.8373631169115912,
+      "shortResult": [
+        "0.8373631169115912"
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": 0.5893574265254758,
+      "shortResult": [
+        "0.5893574265254758"
+      ]
+    }
+  },
+  {
+    "4": {
+      "result": 0.3065178684882638,
+      "shortResult": [
+        "0.3065178684882638"
+      ]
+    }
+  },
+  {
+    "5": {
+      "result": 0.616542665612891,
+      "shortResult": [
+        "0.616542665612891"
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": [
+        [
+          0.8373631169115912,
+          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies"
+        ],
+        [
+          0.5893574265254758,
+          "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies"
+        ],
+        [
+          0.3065178684882638,
+          "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies"
+        ],
+        [
+          0.616542665612891,
+          "So, the final answer is 6 cookies per person."
+        ]
+      ],
+      "shortResult": [
+        "0.8373631169115912"
+      ]
+    }
+  }
+]

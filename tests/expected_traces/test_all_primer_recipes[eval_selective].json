@@ -1,0 +1,85 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "Pass both left character explain sit friend."
+      },
+      "name": "eval_selective",
+      "parent": 0,
+      "shortArgs": [
+        "Pass both left character explain si..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "question": "Pass both left character explain sit friend."
+      },
+      "name": "choose_computation",
+      "parent": 1,
+      "shortArgs": [
+        "Pass both left character explain si..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "You've been asked to answer the question \"",
+            {
+              "formatted": "Pass both left character explain sit friend.",
+              "source": "question",
+              "value": "Pass both left character explain sit friend."
+            },
+            "\".\n\nYou have access to a Python interpreter.\n\nEnter an expression that will help you answer the question.\n>>>"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 2,
+      "shortArgs": [
+        "You've been asked to answer the que...",
+        "\".\n\nYou have access to a Python int..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": "Example with several perhaps sound write.",
+      "shortResult": [
+        "Example with several perhaps sound..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": "Example with several perhaps sound write.",
+      "shortResult": [
+        "Example with several perhaps sound..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": [
+        "Example with several perhaps sound write.",
+        "Error: invalid syntax (<string>, line 1)"
+      ],
+      "shortResult": [
+        "Example with several perhaps sound...",
+        "Error: invalid syntax (<string>, li..."
+      ]
+    }
+  }
+]

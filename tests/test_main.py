@@ -8,7 +8,7 @@ import pytest
 from ice.recipe import Recipe
 from ice.recipes import get_recipe_classes
 from main import main_cli
-
+from tests.test_regression import check_trace
 
 nest_asyncio.apply()
 
@@ -45,11 +45,12 @@ no_paper_recipe_classes = [
 )
 @pytest.mark.anyio
 async def test_paper_recipes(recipe_name: str):
-    main_cli(
-        mode="test",
-        input_files=["./papers/keenan-2018-tiny.txt"],
-        recipe_name=recipe_name,
-    )
+    with check_trace(recipe_name):
+        main_cli(
+            mode="test",
+            input_files=["./papers/keenan-2018-tiny.txt"],
+            recipe_name=recipe_name,
+        )
 
 
 @pytest.mark.parametrize(
@@ -58,7 +59,8 @@ async def test_paper_recipes(recipe_name: str):
 )
 @pytest.mark.anyio
 async def test_no_paper_recipes(recipe_name: str):
-    main_cli(
-        mode="test",
-        recipe_name=recipe_name,
-    )
+    with check_trace(recipe_name):
+        main_cli(
+            mode="test",
+            recipe_name=recipe_name,
+        )

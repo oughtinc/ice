@@ -1,0 +1,319 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "How many people live in Germany?"
+      },
+      "name": "answer_by_dispatch",
+      "parent": 0,
+      "shortArgs": [
+        "How many people live in Germany?"
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "question": "How many people live in Germany?"
+      },
+      "name": "select_action",
+      "parent": 1,
+      "shortArgs": [
+        "How many people live in Germany?"
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "choices": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "default": null,
+        "prompt": {
+          "__fstring__": [
+            "You want to answer the question \"",
+            {
+              "formatted": "How many people live in Germany?",
+              "source": "question",
+              "value": "How many people live in Germany?"
+            },
+            "\".\n\nYou have the following options:\n\n",
+            {
+              "formatted": "1. Run a web search using Google. This is helpful if the question depends on obscure facts or current information, such as the weather or the latest news.\n2. Run a computation in Python. This is helpful if the question depends on calculation or other mechanical processes that you can specify in a short program.\n3. Write out the reasoning steps. This is helpful if the question involves logical deduction or evidence-based reasoning.",
+              "source": "action_types_str",
+              "value": {
+                "__fstring__": [
+                  {
+                    "formatted": "1. Run a web search using Google. This is helpful if the question depends on obscure facts or current information, such as the weather or the latest news.",
+                    "source": "([\n            F(f\"{i+1}. {action_type.description}\")\n            for i, action_type in enumerate(action_types)\n        ])[0]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "1",
+                          "source": "i+1",
+                          "value": 1
+                        },
+                        ". ",
+                        {
+                          "formatted": "Run a web search using Google. This is helpful if the question depends on obscure facts or current information, such as the weather or the latest news.",
+                          "source": "action_type.description",
+                          "value": "Run a web search using Google. This is helpful if the question depends on obscure facts or current information, such as the weather or the latest news."
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "\n",
+                    "source": "F(\"\\n\")",
+                    "value": {
+                      "__fstring__": [
+                        "\n"
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "2. Run a computation in Python. This is helpful if the question depends on calculation or other mechanical processes that you can specify in a short program.",
+                    "source": "([\n            F(f\"{i+1}. {action_type.description}\")\n            for i, action_type in enumerate(action_types)\n        ])[1]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "2",
+                          "source": "i+1",
+                          "value": 2
+                        },
+                        ". ",
+                        {
+                          "formatted": "Run a computation in Python. This is helpful if the question depends on calculation or other mechanical processes that you can specify in a short program.",
+                          "source": "action_type.description",
+                          "value": "Run a computation in Python. This is helpful if the question depends on calculation or other mechanical processes that you can specify in a short program."
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "\n",
+                    "source": "F(\"\\n\")",
+                    "value": {
+                      "__fstring__": [
+                        "\n"
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "3. Write out the reasoning steps. This is helpful if the question involves logical deduction or evidence-based reasoning.",
+                    "source": "([\n            F(f\"{i+1}. {action_type.description}\")\n            for i, action_type in enumerate(action_types)\n        ])[2]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "3",
+                          "source": "i+1",
+                          "value": 3
+                        },
+                        ". ",
+                        {
+                          "formatted": "Write out the reasoning steps. This is helpful if the question involves logical deduction or evidence-based reasoning.",
+                          "source": "action_type.description",
+                          "value": "Write out the reasoning steps. This is helpful if the question involves logical deduction or evidence-based reasoning."
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "\n\nQ: Which of these options do you want to use before you answer the question? Choose the option that will most help you give an accurate answer.\nA: I want to use option #"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "classify",
+      "parent": 2,
+      "shortArgs": [
+        "You want to answer the question \"",
+        "\".\n\nYou have the following options:...",
+        "Q: Which of these options do you..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": [
+        {
+          "1": 0.19152525923958227,
+          "2": 0.27693897437582116,
+          "3": 0.2229897674687923,
+          "4": 0.23153952039570347,
+          "5": 0.07700647852010072
+        },
+        null
+      ],
+      "shortResult": [
+        "0.19152525923958227"
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": {
+        "description": "Run a computation in Python. This is helpful if the question depends on calculation or other mechanical processes that you can specify in a short program.",
+        "name": "Computation",
+        "recipe": {
+          "class_name": "function",
+          "name": "answer_by_computation"
+        }
+      },
+      "shortResult": [
+        "Computation"
+      ]
+    }
+  },
+  {
+    "4": {
+      "args": {
+        "question": "How many people live in Germany?"
+      },
+      "name": "answer_by_computation",
+      "parent": 1,
+      "shortArgs": [
+        "How many people live in Germany?"
+      ]
+    }
+  },
+  {
+    "5": {
+      "args": {
+        "question": "How many people live in Germany?"
+      },
+      "name": "choose_computation",
+      "parent": 4,
+      "shortArgs": [
+        "How many people live in Germany?"
+      ]
+    }
+  },
+  {
+    "6": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "You've been asked to answer the question \"",
+            {
+              "formatted": "How many people live in Germany?",
+              "source": "question",
+              "value": "How many people live in Germany?"
+            },
+            "\".\n\nYou have access to a Python interpreter.\n\nEnter an expression that will help you answer the question.\n>>>"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 5,
+      "shortArgs": [
+        "You've been asked to answer the que...",
+        "\".\n\nYou have access to a Python int..."
+      ]
+    }
+  },
+  {
+    "6": {
+      "result": "Whether similar sort environment remember available technology.",
+      "shortResult": [
+        "Whether similar sort environment re..."
+      ]
+    }
+  },
+  {
+    "5": {
+      "result": "Whether similar sort environment remember available technology.",
+      "shortResult": [
+        "Whether similar sort environment re..."
+      ]
+    }
+  },
+  {
+    "7": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "A recording of a Python interpreter session:\n\n>>> ",
+            {
+              "formatted": "Whether similar sort environment remember available technology.",
+              "source": "expression",
+              "value": "Whether similar sort environment remember available technology."
+            },
+            ": ",
+            {
+              "formatted": "Error: invalid syntax (<string>, line 1)",
+              "source": "result",
+              "value": "Error: invalid syntax (<string>, line 1)"
+            },
+            "\n\nAnswer the following question, using the Python session if helpful:\n\nQuestion: \"",
+            {
+              "formatted": "How many people live in Germany?",
+              "source": "question",
+              "value": "How many people live in Germany?"
+            },
+            "\"\nAnswer: \""
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 4,
+      "shortArgs": [
+        "A recording of a Python interpreter...",
+        ": ",
+        "Answer the following question, us...",
+        "..."
+      ]
+    }
+  },
+  {
+    "7": {
+      "result": "Friend detail alone less note.",
+      "shortResult": [
+        "Friend detail alone less note."
+      ]
+    }
+  },
+  {
+    "4": {
+      "result": "Friend detail alone less note.",
+      "shortResult": [
+        "Friend detail alone less note."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Friend detail alone less note.",
+      "shortResult": [
+        "Friend detail alone less note."
+      ]
+    }
+  }
+]

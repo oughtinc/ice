@@ -1,0 +1,61 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "What is happening on 9/9/2022?"
+      },
+      "name": "answer",
+      "parent": 0,
+      "shortArgs": [
+        "What is happening on 9/9/2022?"
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "Answer the following question:\n\nQuestion: \"",
+            {
+              "formatted": "What is happening on 9/9/2022?",
+              "source": "question",
+              "value": "What is happening on 9/9/2022?"
+            },
+            "\"\nAnswer: \""
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 1,
+      "shortArgs": [
+        "Answer the following question:\n\nQue...",
+        "\"\nAnswer: \""
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": "History politics focus though believe country difference.",
+      "shortResult": [
+        "History politics focus though belie..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "History politics focus though believe country difference.",
+      "shortResult": [
+        "History politics focus though belie..."
+      ]
+    }
+  }
+]
