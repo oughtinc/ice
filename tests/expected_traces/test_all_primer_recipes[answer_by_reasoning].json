@@ -6,9 +6,7 @@
       },
       "name": "answer_by_reasoning",
       "parent": 0,
-      "shortArgs": [
-        "What would happen if the average te..."
-      ]
+      "shortArgs": ["What would happen if the average te..."]
     }
   },
   {
@@ -18,9 +16,7 @@
       },
       "name": "get_reasoning",
       "parent": 1,
-      "shortArgs": [
-        "What would happen if the average te..."
-      ]
+      "shortArgs": ["What would happen if the average te..."]
     }
   },
   {
@@ -57,17 +53,13 @@
   {
     "3": {
       "result": "Participant professional past measure.",
-      "shortResult": [
-        "Participant professional past measu..."
-      ]
+      "shortResult": ["Participant professional past measu..."]
     }
   },
   {
     "2": {
       "result": "Participant professional past measure.",
-      "shortResult": [
-        "Participant professional past measu..."
-      ]
+      "shortResult": ["Participant professional past measu..."]
     }
   },
   {
@@ -78,9 +70,7 @@
       },
       "name": "get_answer",
       "parent": 1,
-      "shortArgs": [
-        "What would happen if the average te..."
-      ]
+      "shortArgs": ["What would happen if the average te..."]
     }
   },
   {
@@ -124,25 +114,19 @@
   {
     "5": {
       "result": "Still fear public better process so.",
-      "shortResult": [
-        "Still fear public better process so..."
-      ]
+      "shortResult": ["Still fear public better process so..."]
     }
   },
   {
     "4": {
       "result": "Still fear public better process so.",
-      "shortResult": [
-        "Still fear public better process so..."
-      ]
+      "shortResult": ["Still fear public better process so..."]
     }
   },
   {
     "1": {
       "result": "Still fear public better process so.",
-      "shortResult": [
-        "Still fear public better process so..."
-      ]
+      "shortResult": ["Still fear public better process so..."]
     }
   }
 ]

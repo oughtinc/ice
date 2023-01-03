@@ -6,17 +6,13 @@
       },
       "name": "answer_by_computation",
       "parent": 0,
-      "shortArgs": [
-        "Despite and century best green poor..."
-      ]
+      "shortArgs": ["Despite and century best green poor..."]
     }
   },
   {
     "1": {
       "result": "Error: invalid syntax (<string>, line 1)",
-      "shortResult": [
-        "Error: invalid syntax (<string>, li..."
-      ]
+      "shortResult": ["Error: invalid syntax (<string>, li..."]
     }
   }
 ]

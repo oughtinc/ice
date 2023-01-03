@@ -4,9 +4,7 @@
       "args": {
         "args": {},
         "gold_standard_splits": null,
-        "input_files": [
-          "./papers/keenan-2018-tiny.txt"
-        ],
+        "input_files": ["./papers/keenan-2018-tiny.txt"],
         "json_out": null,
         "mode": "test",
         "output_file": null,
@@ -15,9 +13,7 @@
       },
       "name": "main",
       "parent": 0,
-      "shortArgs": [
-        "test"
-      ]
+      "shortArgs": ["test"]
     }
   },
   {
@@ -38,9 +34,7 @@
       "cls": "AdherenceSimpleInstruct",
       "name": "run",
       "parent": 1,
-      "shortArgs": [
-        "keenan-2018-tiny.txt"
-      ]
+      "shortArgs": ["keenan-2018-tiny.txt"]
     }
   },
   {
@@ -58,25 +52,19 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 2,
-      "shortArgs": [
-        "Human: I'm trying to evaluate som..."
-      ]
+      "shortArgs": ["Human: I'm trying to evaluate som..."]
     }
   },
   {
     "3": {
       "result": "Produce society necessary various reduce.",
-      "shortResult": [
-        "Produce society necessary various r..."
-      ]
+      "shortResult": ["Produce society necessary various r..."]
     }
   },
   {
     "2": {
       "result": "Produce society necessary various reduce.",
-      "shortResult": [
-        "Produce society necessary various r..."
-      ]
+      "shortResult": ["Produce society necessary various r..."]
     }
   },
   {
@@ -94,9 +82,7 @@
       "cls": "AdherenceSimpleInstruct",
       "name": "evaluation_report",
       "parent": 1,
-      "shortArgs": [
-        "()"
-      ]
+      "shortArgs": ["()"]
     }
   },
   {
@@ -107,10 +93,7 @@
             "answer": "Produce society necessary various reduce.",
             "answer_rating": null,
             "classification_eq": [],
-            "classifications": [
-              null,
-              null
-            ],
+            "classifications": [null, null],
             "document_id": "keenan-2018.pdf",
             "elicit_commit": null,
             "evaluated_excerpts": {
@@ -128,10 +111,7 @@
             "failure_modes": null,
             "gold_standard": {
               "answer": "Azithromycin was administered to 90% of participants.",
-              "classifications": [
-                "explicit",
-                null
-              ],
+              "classifications": ["explicit", null],
               "document_id": "keenan-2018.pdf",
               "experiment": "Oral azithromycin for childhood mortality",
               "question_short_name": "adherence",
@@ -146,17 +126,13 @@
         ],
         "technique_name": "AdherenceSimpleInstruct"
       },
-      "shortResult": [
-        "AdherenceSimpleInstruct"
-      ]
+      "shortResult": ["AdherenceSimpleInstruct"]
     }
   },
   {
     "1": {
       "result": null,
-      "shortResult": [
-        "()"
-      ]
+      "shortResult": ["()"]
     }
   }
 ]

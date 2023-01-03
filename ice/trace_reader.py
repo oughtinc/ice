@@ -1,4 +1,5 @@
 import json
+
 from functools import lru_cache
 
 from ice.trace import traces_dir

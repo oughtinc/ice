@@ -9,9 +9,7 @@
       },
       "name": "answer_for_paper",
       "parent": 0,
-      "shortArgs": [
-        "keenan-2018-tiny.txt"
-      ]
+      "shortArgs": ["keenan-2018-tiny.txt"]
     }
   },
   {
@@ -50,10 +48,7 @@
   {
     "3": {
       "args": {
-        "choices": [
-          " Yes",
-          " No"
-        ],
+        "choices": [" Yes", " No"],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -113,25 +108,19 @@
         },
         null
       ],
-      "shortResult": [
-        "0.5345923740349696"
-      ]
+      "shortResult": ["0.5345923740349696"]
     }
   },
   {
     "2": {
       "result": 0.5345923740349696,
-      "shortResult": [
-        "0.5345923740349696"
-      ]
+      "shortResult": ["0.5345923740349696"]
     }
   },
   {
     "1": {
       "result": 0.5345923740349696,
-      "shortResult": [
-        "0.5345923740349696"
-      ]
+      "shortResult": ["0.5345923740349696"]
     }
   }
 ]

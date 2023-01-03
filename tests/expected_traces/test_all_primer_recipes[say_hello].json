@@ -4,17 +4,13 @@
       "args": {},
       "name": "say_hello",
       "parent": 0,
-      "shortArgs": [
-        "()"
-      ]
+      "shortArgs": ["()"]
     }
   },
   {
     "1": {
       "result": "Hello world!",
-      "shortResult": [
-        "Hello world!"
-      ]
+      "shortResult": ["Hello world!"]
     }
   }
 ]

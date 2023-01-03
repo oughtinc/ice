@@ -9,9 +9,7 @@
       },
       "name": "answer_for_paper",
       "parent": 0,
-      "shortArgs": [
-        "keenan-2018-tiny.txt"
-      ]
+      "shortArgs": ["keenan-2018-tiny.txt"]
     }
   },
   {
@@ -66,9 +64,7 @@
       },
       "name": "classify_paragraph",
       "parent": 1,
-      "shortArgs": [
-        "Trachoma-control programs have dist..."
-      ]
+      "shortArgs": ["Trachoma-control programs have dist..."]
     }
   },
   {
@@ -203,10 +199,7 @@
   {
     "8": {
       "args": {
-        "choices": [
-          " Yes",
-          " No"
-        ],
+        "choices": [" Yes", " No"],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -266,18 +259,13 @@
         },
         null
       ],
-      "shortResult": [
-        "0.0649155225072023"
-      ]
+      "shortResult": ["0.0649155225072023"]
     }
   },
   {
     "9": {
       "args": {
-        "choices": [
-          " Yes",
-          " No"
-        ],
+        "choices": [" Yes", " No"],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -331,18 +319,13 @@
         },
         null
       ],
-      "shortResult": [
-        "0.2340068525087361"
-      ]
+      "shortResult": ["0.2340068525087361"]
     }
   },
   {
     "10": {
       "args": {
-        "choices": [
-          " Yes",
-          " No"
-        ],
+        "choices": [" Yes", " No"],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -402,18 +385,13 @@
         },
         null
       ],
-      "shortResult": [
-        "0.19000058663144304"
-      ]
+      "shortResult": ["0.19000058663144304"]
     }
   },
   {
     "11": {
       "args": {
-        "choices": [
-          " Yes",
-          " No"
-        ],
+        "choices": [" Yes", " No"],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -474,18 +452,13 @@
         },
         null
       ],
-      "shortResult": [
-        "0.4886685449054451"
-      ]
+      "shortResult": ["0.4886685449054451"]
     }
   },
   {
     "12": {
       "args": {
-        "choices": [
-          " Yes",
-          " No"
-        ],
+        "choices": [" Yes", " No"],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -544,18 +517,13 @@
         },
         null
       ],
-      "shortResult": [
-        "0.28402129551508437"
-      ]
+      "shortResult": ["0.28402129551508437"]
     }
   },
   {
     "13": {
       "args": {
-        "choices": [
-          " Yes",
-          " No"
-        ],
+        "choices": [" Yes", " No"],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -612,72 +580,52 @@
         },
         null
       ],
-      "shortResult": [
-        "0.8547429543086006"
-      ]
+      "shortResult": ["0.8547429543086006"]
     }
   },
   {
     "2": {
       "result": 0.0649155225072023,
-      "shortResult": [
-        "0.0649155225072023"
-      ]
+      "shortResult": ["0.0649155225072023"]
     }
   },
   {
     "3": {
       "result": 0.2340068525087361,
-      "shortResult": [
-        "0.2340068525087361"
-      ]
+      "shortResult": ["0.2340068525087361"]
     }
   },
   {
     "4": {
       "result": 0.19000058663144304,
-      "shortResult": [
-        "0.19000058663144304"
-      ]
+      "shortResult": ["0.19000058663144304"]
     }
   },
   {
     "5": {
       "result": 0.4886685449054451,
-      "shortResult": [
-        "0.4886685449054451"
-      ]
+      "shortResult": ["0.4886685449054451"]
     }
   },
   {
     "6": {
       "result": 0.28402129551508437,
-      "shortResult": [
-        "0.28402129551508437"
-      ]
+      "shortResult": ["0.28402129551508437"]
     }
   },
   {
     "7": {
       "result": 0.8547429543086006,
-      "shortResult": [
-        "0.8547429543086006"
-      ]
+      "shortResult": ["0.8547429543086006"]
     }
   },
   {
     "1": {
       "result": [
-        0.0649155225072023,
-        0.2340068525087361,
-        0.19000058663144304,
-        0.4886685449054451,
-        0.28402129551508437,
-        0.8547429543086006
+        0.0649155225072023, 0.2340068525087361, 0.19000058663144304, 0.4886685449054451,
+        0.28402129551508437, 0.8547429543086006
       ],
-      "shortResult": [
-        "0.0649155225072023"
-      ]
+      "shortResult": ["0.0649155225072023"]
     }
   }
 ]

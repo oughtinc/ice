@@ -12,9 +12,7 @@
       },
       "name": "verify_answer",
       "parent": 0,
-      "shortArgs": [
-        "Beth bakes 4x 2 dozen batches of co..."
-      ]
+      "shortArgs": ["Beth bakes 4x 2 dozen batches of co..."]
     }
   },
   {
@@ -30,18 +28,13 @@
       },
       "name": "check_step",
       "parent": 1,
-      "shortArgs": [
-        "Beth bakes 4x 2 dozen batches of co..."
-      ]
+      "shortArgs": ["Beth bakes 4x 2 dozen batches of co..."]
     }
   },
   {
     "3": {
       "args": {
-        "choices": [
-          " Yes",
-          " No"
-        ],
+        "choices": [" Yes", " No"],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -80,9 +73,7 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": [
-                        "\n"
-                      ]
+                      "__fstring__": ["\n"]
                     }
                   },
                   {
@@ -108,9 +99,7 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": [
-                        "\n"
-                      ]
+                      "__fstring__": ["\n"]
                     }
                   },
                   {
@@ -136,9 +125,7 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": [
-                        "\n"
-                      ]
+                      "__fstring__": ["\n"]
                     }
                   },
                   {
@@ -197,25 +184,19 @@
         },
         null
       ],
-      "shortResult": [
-        "0.39836915192886757"
-      ]
+      "shortResult": ["0.39836915192886757"]
     }
   },
   {
     "2": {
       "result": 0.39836915192886757,
-      "shortResult": [
-        "0.39836915192886757"
-      ]
+      "shortResult": ["0.39836915192886757"]
     }
   },
   {
     "1": {
       "result": 0.39836915192886757,
-      "shortResult": [
-        "0.39836915192886757"
-      ]
+      "shortResult": ["0.39836915192886757"]
     }
   }
 ]

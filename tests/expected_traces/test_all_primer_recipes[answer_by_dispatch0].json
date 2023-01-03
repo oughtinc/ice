@@ -6,21 +6,13 @@
       },
       "name": "answer_by_dispatch",
       "parent": 0,
-      "shortArgs": [
-        "How many people live in Germany?"
-      ]
+      "shortArgs": ["How many people live in Germany?"]
     }
   },
   {
     "2": {
       "args": {
-        "choices": [
-          "1",
-          "2",
-          "3",
-          "4",
-          "5"
-        ],
+        "choices": ["1", "2", "3", "4", "5"],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -59,9 +51,7 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": [
-                        "\n"
-                      ]
+                      "__fstring__": ["\n"]
                     }
                   },
                   {
@@ -87,9 +77,7 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": [
-                        "\n"
-                      ]
+                      "__fstring__": ["\n"]
                     }
                   },
                   {
@@ -144,39 +132,17 @@
         },
         null
       ],
-      "shortResult": [
-        "0.3460965933309753"
-      ]
+      "shortResult": ["0.3460965933309753"]
     }
   },
   {
     "1": {
       "result": [
-        [
-          [
-            "1",
-            0.3460965933309753
-          ],
-          "Web search"
-        ],
-        [
-          [
-            "2",
-            0.18704412463151252
-          ],
-          "Computation"
-        ],
-        [
-          [
-            "3",
-            0.1647221659982181
-          ],
-          "Reasoning"
-        ]
+        [["1", 0.3460965933309753], "Web search"],
+        [["2", 0.18704412463151252], "Computation"],
+        [["3", 0.1647221659982181], "Reasoning"]
       ],
-      "shortResult": [
-        "1"
-      ]
+      "shortResult": ["1"]
     }
   }
 ]

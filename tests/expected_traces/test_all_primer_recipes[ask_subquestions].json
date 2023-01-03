@@ -6,9 +6,7 @@
       },
       "name": "ask_subquestions",
       "parent": 0,
-      "shortArgs": [
-        "What is the effect of creatine on c..."
-      ]
+      "shortArgs": ["What is the effect of creatine on c..."]
     }
   },
   {
@@ -36,28 +34,19 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 1,
-      "shortArgs": [
-        "Decompose the following question in...",
-        "\"\nSubquestions:\n-"
-      ]
+      "shortArgs": ["Decompose the following question in...", "\"\nSubquestions:\n-"]
     }
   },
   {
     "2": {
       "result": "Low either deep painting finally certain approach.",
-      "shortResult": [
-        "Low either deep painting finally ce..."
-      ]
+      "shortResult": ["Low either deep painting finally ce..."]
     }
   },
   {
     "1": {
-      "result": [
-        "Low either deep painting finally certain approach."
-      ],
-      "shortResult": [
-        "Low either deep painting finally ce..."
-      ]
+      "result": ["Low either deep painting finally certain approach."],
+      "shortResult": ["Low either deep painting finally ce..."]
     }
   }
 ]

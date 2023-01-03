@@ -6,9 +6,7 @@
       },
       "name": "answer_by_computation",
       "parent": 0,
-      "shortArgs": [
-        "Foot space school movement trouble..."
-      ]
+      "shortArgs": ["Foot space school movement trouble..."]
     }
   },
   {
@@ -18,9 +16,7 @@
       },
       "name": "choose_computation",
       "parent": 1,
-      "shortArgs": [
-        "Foot space school movement trouble..."
-      ]
+      "shortArgs": ["Foot space school movement trouble..."]
     }
   },
   {
@@ -57,17 +53,13 @@
   {
     "3": {
       "result": "Oil price cup court information somebody its.",
-      "shortResult": [
-        "Oil price cup court information som..."
-      ]
+      "shortResult": ["Oil price cup court information som..."]
     }
   },
   {
     "2": {
       "result": "Oil price cup court information somebody its.",
-      "shortResult": [
-        "Oil price cup court information som..."
-      ]
+      "shortResult": ["Oil price cup court information som..."]
     }
   },
   {
@@ -118,17 +110,13 @@
   {
     "4": {
       "result": "Forget hour child pay traditional region.",
-      "shortResult": [
-        "Forget hour child pay traditional r..."
-      ]
+      "shortResult": ["Forget hour child pay traditional r..."]
     }
   },
   {
     "1": {
       "result": "Forget hour child pay traditional region.",
-      "shortResult": [
-        "Forget hour child pay traditional r..."
-      ]
+      "shortResult": ["Forget hour child pay traditional r..."]
     }
   }
 ]

@@ -3,10 +3,10 @@ This module doesn't contain any tests directly.
 The filename just starts with test_ so that pytest rewrites asserts.
 Call check_trace() in another test after calling a traced function.
 """
-
 import json
 import os
 import random
+
 from contextlib import contextmanager
 from pathlib import Path
 

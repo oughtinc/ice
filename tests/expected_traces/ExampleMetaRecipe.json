@@ -13,9 +13,7 @@
       },
       "name": "main",
       "parent": 0,
-      "shortArgs": [
-        "test"
-      ]
+      "shortArgs": ["test"]
     }
   },
   {
@@ -29,17 +27,13 @@
       "cls": "ExampleMetaRecipe",
       "name": "run",
       "parent": 1,
-      "shortArgs": [
-        "()"
-      ]
+      "shortArgs": ["()"]
     }
   },
   {
     "3": {
       "args": {
-        "input": [
-          "MetaRecipe"
-        ],
+        "input": ["MetaRecipe"],
         "self": {
           "class_name": "MesaRecipe",
           "mode": "test"
@@ -48,39 +42,25 @@
       "cls": "MesaRecipe",
       "name": "run",
       "parent": 2,
-      "shortArgs": [
-        "MetaRecipe"
-      ]
+      "shortArgs": ["MetaRecipe"]
     }
   },
   {
     "3": {
-      "result": [
-        "MetaRecipe",
-        "MesaRecipe.first_node",
-        "MesaRecipe.second_node"
-      ],
-      "shortResult": [
-        "MetaRecipe",
-        "MesaRecipe.first_node",
-        "MesaRecipe.second_node"
-      ]
+      "result": ["MetaRecipe", "MesaRecipe.first_node", "MesaRecipe.second_node"],
+      "shortResult": ["MetaRecipe", "MesaRecipe.first_node", "MesaRecipe.second_node"]
     }
   },
   {
     "2": {
       "result": "MetaRecipe ---> MesaRecipe.first_node ---> MesaRecipe.second_node ---> MetaRecipe.collect_result",
-      "shortResult": [
-        "MetaRecipe ---> MesaRecipe.first_no..."
-      ]
+      "shortResult": ["MetaRecipe ---> MesaRecipe.first_no..."]
     }
   },
   {
     "1": {
       "result": null,
-      "shortResult": [
-        "()"
-      ]
+      "shortResult": ["()"]
     }
   }
 ]

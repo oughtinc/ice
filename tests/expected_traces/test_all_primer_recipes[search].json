@@ -6,9 +6,7 @@
       },
       "name": "search",
       "parent": 0,
-      "shortArgs": [
-        "Who is the president of the United..."
-      ]
+      "shortArgs": ["Who is the president of the United..."]
     }
   },
   {
@@ -16,9 +14,7 @@
       "result": {
         "error": "Invalid API key. Your API key should be here: https://serpapi.com/manage-api-key"
       },
-      "shortResult": [
-        "Invalid API key. Your API key shoul..."
-      ]
+      "shortResult": ["Invalid API key. Your API key shoul..."]
     }
   }
 ]

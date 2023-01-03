@@ -6,9 +6,7 @@
       },
       "name": "answer_by_amplification",
       "parent": 0,
-      "shortArgs": [
-        "What is the effect of creatine on c..."
-      ]
+      "shortArgs": ["What is the effect of creatine on c..."]
     }
   },
   {
@@ -18,9 +16,7 @@
       },
       "name": "ask_subquestions",
       "parent": 1,
-      "shortArgs": [
-        "What is the effect of creatine on c..."
-      ]
+      "shortArgs": ["What is the effect of creatine on c..."]
     }
   },
   {
@@ -48,28 +44,19 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 2,
-      "shortArgs": [
-        "Decompose the following question in...",
-        "\"\nSubquestions:\n-"
-      ]
+      "shortArgs": ["Decompose the following question in...", "\"\nSubquestions:\n-"]
     }
   },
   {
     "3": {
       "result": "Four less avoid office pay family them.",
-      "shortResult": [
-        "Four less avoid office pay family t..."
-      ]
+      "shortResult": ["Four less avoid office pay family t..."]
     }
   },
   {
     "2": {
-      "result": [
-        "Four less avoid office pay family them."
-      ],
-      "shortResult": [
-        "Four less avoid office pay family t..."
-      ]
+      "result": ["Four less avoid office pay family them."],
+      "shortResult": ["Four less avoid office pay family t..."]
     }
   },
   {
@@ -79,9 +66,7 @@
       },
       "name": "answer",
       "parent": 1,
-      "shortArgs": [
-        "Four less avoid office pay family t..."
-      ]
+      "shortArgs": ["Four less avoid office pay family t..."]
     }
   },
   {
@@ -109,35 +94,25 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 4,
-      "shortArgs": [
-        "Answer the following question:\n\nQue...",
-        "\"\nAnswer: \""
-      ]
+      "shortArgs": ["Answer the following question:\n\nQue...", "\"\nAnswer: \""]
     }
   },
   {
     "5": {
       "result": "We tree section support individual.",
-      "shortResult": [
-        "We tree section support individual."
-      ]
+      "shortResult": ["We tree section support individual."]
     }
   },
   {
     "4": {
       "result": "We tree section support individual.",
-      "shortResult": [
-        "We tree section support individual."
-      ]
+      "shortResult": ["We tree section support individual."]
     }
   },
   {
     "1": {
       "result": [
-        [
-          "Four less avoid office pay family them.",
-          "We tree section support individual."
-        ]
+        ["Four less avoid office pay family them.", "We tree section support individual."]
       ],
       "shortResult": [
         "Four less avoid office pay family t...",

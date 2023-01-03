@@ -6,9 +6,7 @@
       },
       "name": "eval_selective",
       "parent": 0,
-      "shortArgs": [
-        "Pass both left character explain si..."
-      ]
+      "shortArgs": ["Pass both left character explain si..."]
     }
   },
   {
@@ -18,9 +16,7 @@
       },
       "name": "choose_computation",
       "parent": 1,
-      "shortArgs": [
-        "Pass both left character explain si..."
-      ]
+      "shortArgs": ["Pass both left character explain si..."]
     }
   },
   {
@@ -57,17 +53,13 @@
   {
     "3": {
       "result": "Example with several perhaps sound write.",
-      "shortResult": [
-        "Example with several perhaps sound..."
-      ]
+      "shortResult": ["Example with several perhaps sound..."]
     }
   },
   {
     "2": {
       "result": "Example with several perhaps sound write.",
-      "shortResult": [
-        "Example with several perhaps sound..."
-      ]
+      "shortResult": ["Example with several perhaps sound..."]
     }
   },
   {

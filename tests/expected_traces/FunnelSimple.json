@@ -4,9 +4,7 @@
       "args": {
         "args": {},
         "gold_standard_splits": null,
-        "input_files": [
-          "./papers/keenan-2018-tiny.txt"
-        ],
+        "input_files": ["./papers/keenan-2018-tiny.txt"],
         "json_out": null,
         "mode": "test",
         "output_file": null,
@@ -15,9 +13,7 @@
       },
       "name": "main",
       "parent": 0,
-      "shortArgs": [
-        "test"
-      ]
+      "shortArgs": ["test"]
     }
   },
   {
@@ -35,9 +31,7 @@
       "cls": "FunnelSimple",
       "name": "run",
       "parent": 1,
-      "shortArgs": [
-        "keenan-2018-tiny.txt"
-      ]
+      "shortArgs": ["keenan-2018-tiny.txt"]
     }
   },
   {
@@ -55,25 +49,19 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 2,
-      "shortArgs": [
-        "Summarize the adherence rate of thi..."
-      ]
+      "shortArgs": ["Summarize the adherence rate of thi..."]
     }
   },
   {
     "3": {
       "result": "Support page teacher expert.",
-      "shortResult": [
-        "Support page teacher expert."
-      ]
+      "shortResult": ["Support page teacher expert."]
     }
   },
   {
     "2": {
       "result": "Support page teacher expert.",
-      "shortResult": [
-        "Support page teacher expert."
-      ]
+      "shortResult": ["Support page teacher expert."]
     }
   },
   {
@@ -88,9 +76,7 @@
       "cls": "FunnelSimple",
       "name": "evaluation_report",
       "parent": 1,
-      "shortArgs": [
-        "()"
-      ]
+      "shortArgs": ["()"]
     }
   },
   {
@@ -101,10 +87,7 @@
             "answer": "Support page teacher expert.",
             "answer_rating": null,
             "classification_eq": [],
-            "classifications": [
-              null,
-              null
-            ],
+            "classifications": [null, null],
             "document_id": "keenan-2018.pdf",
             "elicit_commit": null,
             "evaluated_excerpts": {
@@ -122,10 +105,7 @@
             "failure_modes": null,
             "gold_standard": {
               "answer": "Azithromycin was administered to 90% of participants.",
-              "classifications": [
-                "explicit",
-                null
-              ],
+              "classifications": ["explicit", null],
               "document_id": "keenan-2018.pdf",
               "experiment": "Oral azithromycin for childhood mortality",
               "question_short_name": "adherence",
@@ -140,17 +120,13 @@
         ],
         "technique_name": "FunnelSimple"
       },
-      "shortResult": [
-        "FunnelSimple"
-      ]
+      "shortResult": ["FunnelSimple"]
     }
   },
   {
     "1": {
       "result": null,
-      "shortResult": [
-        "()"
-      ]
+      "shortResult": ["()"]
     }
   }
 ]

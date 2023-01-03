@@ -4,9 +4,7 @@
       "args": {
         "args": {},
         "gold_standard_splits": null,
-        "input_files": [
-          "./papers/keenan-2018-tiny.txt"
-        ],
+        "input_files": ["./papers/keenan-2018-tiny.txt"],
         "json_out": null,
         "mode": "test",
         "output_file": null,
@@ -15,9 +13,7 @@
       },
       "name": "main",
       "parent": 0,
-      "shortArgs": [
-        "test"
-      ]
+      "shortArgs": ["test"]
     }
   },
   {
@@ -39,9 +35,7 @@
       "cls": "PlaceboSimpleInstruct",
       "name": "run",
       "parent": 1,
-      "shortArgs": [
-        "keenan-2018-tiny.txt"
-      ]
+      "shortArgs": ["keenan-2018-tiny.txt"]
     }
   },
   {
@@ -59,25 +53,19 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 2,
-      "shortArgs": [
-        "Human: What is a placebo-controll..."
-      ]
+      "shortArgs": ["Human: What is a placebo-controll..."]
     }
   },
   {
     "3": {
       "result": "Hold kid fall we somebody determine father.",
-      "shortResult": [
-        "Hold kid fall we somebody determine..."
-      ]
+      "shortResult": ["Hold kid fall we somebody determine..."]
     }
   },
   {
     "2": {
       "result": "Hold kid fall we somebody determine father.",
-      "shortResult": [
-        "Hold kid fall we somebody determine..."
-      ]
+      "shortResult": ["Hold kid fall we somebody determine..."]
     }
   },
   {
@@ -96,9 +84,7 @@
       "cls": "PlaceboSimpleInstruct",
       "name": "evaluation_report",
       "parent": 1,
-      "shortArgs": [
-        "()"
-      ]
+      "shortArgs": ["()"]
     }
   },
   {
@@ -109,10 +95,7 @@
             "answer": "Hold kid fall we somebody determine father.",
             "answer_rating": null,
             "classification_eq": [],
-            "classifications": [
-              "Placebo",
-              "Placebo"
-            ],
+            "classifications": ["Placebo", "Placebo"],
             "document_id": "keenan-2018.pdf",
             "elicit_commit": null,
             "evaluated_excerpts": {
@@ -130,10 +113,7 @@
             "failure_modes": null,
             "gold_standard": {
               "answer": "the vehicle of the oral azithromycin suspension, bottled and labeled identically to azithromycin",
-              "classifications": [
-                "Placebo",
-                "Placebo"
-              ],
+              "classifications": ["Placebo", "Placebo"],
               "document_id": "keenan-2018.pdf",
               "experiment": "Oral azithromycin for childhood mortality",
               "question_short_name": "placebo",
@@ -148,17 +128,13 @@
         ],
         "technique_name": "PlaceboSimpleInstruct"
       },
-      "shortResult": [
-        "PlaceboSimpleInstruct"
-      ]
+      "shortResult": ["PlaceboSimpleInstruct"]
     }
   },
   {
     "1": {
       "result": null,
-      "shortResult": [
-        "()"
-      ]
+      "shortResult": ["()"]
     }
   }
 ]
