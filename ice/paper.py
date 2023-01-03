@@ -177,4 +177,4 @@ class Paper(BaseModel):
         return "\n\n".join(str(p) for p in self.paragraphs)
 
     def dict(self, *args, **kwargs):
-        return super().dict(*args, **kwargs, exclude={"paragraphs"})
+        return super().dict(*args, **(kwargs | {"exclude": {"paragraphs"}}))
