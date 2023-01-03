@@ -200,9 +200,9 @@ class _Recorder:
         self.id = id
 
     def __call__(self, **kwargs):
-        emit(
-            {self.id: {"records": {trace_var.get().next_counter(): emit_block(kwargs)}}}
-        )
+        trc = trace_var.get()
+        assert trc is not None
+        emit({self.id: {"records": {trc.next_counter(): emit_block(kwargs)}}})
 
     def __repr__(self):
         # So this can be used in `diskcache()` functions
@@ -229,7 +229,9 @@ def trace(fn):
 
         @wraps(fn)
         async def inner_wrapper(*args, **kwargs):
-            id = trace_var.get().next_counter()
+            trc = trace_var.get()
+            assert trc is not None
+            id = trc.next_counter()
             parent_id = parent_id_var.get()
             parent_id_var.set(id)
 
