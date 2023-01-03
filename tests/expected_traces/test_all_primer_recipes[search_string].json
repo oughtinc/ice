@@ -6,7 +6,9 @@
       },
       "name": "search_string",
       "parent": 0,
-      "shortArgs": ["Who is the president of the United..."]
+      "shortArgs": [
+        "Who is the president of the United..."
+      ]
     }
   },
   {
@@ -16,7 +18,9 @@
       },
       "name": "search",
       "parent": 1,
-      "shortArgs": ["Who is the president of the United..."]
+      "shortArgs": [
+        "Who is the president of the United..."
+      ]
     }
   },
   {
@@ -24,13 +28,17 @@
       "result": {
         "error": "Invalid API key. Your API key should be here: https://serpapi.com/manage-api-key"
       },
-      "shortResult": ["Invalid API key. Your API key shoul..."]
+      "shortResult": [
+        "Invalid API key. Your API key shoul..."
+      ]
     }
   },
   {
     "1": {
       "result": "No results found",
-      "shortResult": ["No results found"]
+      "shortResult": [
+        "No results found"
+      ]
     }
   }
 ]

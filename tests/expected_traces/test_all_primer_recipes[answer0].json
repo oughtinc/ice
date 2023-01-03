@@ -7,7 +7,9 @@
       },
       "name": "answer",
       "parent": 0,
-      "shortArgs": ["We're running a hackathon on 9/9/20..."]
+      "shortArgs": [
+        "We're running a hackathon on 9/9/20..."
+      ]
     }
   },
   {
@@ -51,13 +53,17 @@
   {
     "2": {
       "result": "Impact such raise rock include reveal product.",
-      "shortResult": ["Impact such raise rock include reve..."]
+      "shortResult": [
+        "Impact such raise rock include reve..."
+      ]
     }
   },
   {
     "1": {
       "result": "Impact such raise rock include reveal product.",
-      "shortResult": ["Impact such raise rock include reve..."]
+      "shortResult": [
+        "Impact such raise rock include reve..."
+      ]
     }
   }
 ]

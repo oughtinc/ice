@@ -7,7 +7,9 @@
       },
       "name": "chain_of_thought",
       "parent": 0,
-      "shortArgs": ["What would happen if the average te..."]
+      "shortArgs": [
+        "What would happen if the average te..."
+      ]
     }
   },
   {
@@ -40,19 +42,26 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 1,
-      "shortArgs": ["Answer the following question:\n\nQue...", "\"\nAnswer: \""]
+      "shortArgs": [
+        "Answer the following question:\n\nQue...",
+        "\"\nAnswer: \""
+      ]
     }
   },
   {
     "2": {
       "result": "Strategy check teacher benefit easy daughter offer not.",
-      "shortResult": ["Strategy check teacher benefit easy..."]
+      "shortResult": [
+        "Strategy check teacher benefit easy..."
+      ]
     }
   },
   {
     "1": {
       "result": "Strategy check teacher benefit easy daughter offer not.",
-      "shortResult": ["Strategy check teacher benefit easy..."]
+      "shortResult": [
+        "Strategy check teacher benefit easy..."
+      ]
     }
   }
 ]

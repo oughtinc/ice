@@ -10,7 +10,9 @@
       },
       "name": "answer_for_paper",
       "parent": 0,
-      "shortArgs": ["keenan-2018-tiny.txt"]
+      "shortArgs": [
+        "keenan-2018-tiny.txt"
+      ]
     }
   },
   {
@@ -65,7 +67,9 @@
       },
       "name": "classify_paragraph",
       "parent": 1,
-      "shortArgs": ["Trachoma-control programs have dist..."]
+      "shortArgs": [
+        "Trachoma-control programs have dist..."
+      ]
     }
   },
   {
@@ -200,7 +204,10 @@
   {
     "8": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -260,13 +267,18 @@
         },
         null
       ],
-      "shortResult": ["0.06912975562195772"]
+      "shortResult": [
+        "0.06912975562195772"
+      ]
     }
   },
   {
     "9": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -320,13 +332,18 @@
         },
         null
       ],
-      "shortResult": ["0.5885897655296813"]
+      "shortResult": [
+        "0.5885897655296813"
+      ]
     }
   },
   {
     "10": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -386,13 +403,18 @@
         },
         null
       ],
-      "shortResult": ["0.6895009268381735"]
+      "shortResult": [
+        "0.6895009268381735"
+      ]
     }
   },
   {
     "11": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -453,13 +475,18 @@
         },
         null
       ],
-      "shortResult": ["0.8480539145945312"]
+      "shortResult": [
+        "0.8480539145945312"
+      ]
     }
   },
   {
     "12": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -518,13 +545,18 @@
         },
         null
       ],
-      "shortResult": ["0.8059322152862854"]
+      "shortResult": [
+        "0.8059322152862854"
+      ]
     }
   },
   {
     "13": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -581,43 +613,57 @@
         },
         null
       ],
-      "shortResult": ["0.7367277951774727"]
+      "shortResult": [
+        "0.7367277951774727"
+      ]
     }
   },
   {
     "2": {
       "result": 0.06912975562195772,
-      "shortResult": ["0.06912975562195772"]
+      "shortResult": [
+        "0.06912975562195772"
+      ]
     }
   },
   {
     "3": {
       "result": 0.5885897655296813,
-      "shortResult": ["0.5885897655296813"]
+      "shortResult": [
+        "0.5885897655296813"
+      ]
     }
   },
   {
     "4": {
       "result": 0.6895009268381735,
-      "shortResult": ["0.6895009268381735"]
+      "shortResult": [
+        "0.6895009268381735"
+      ]
     }
   },
   {
     "5": {
       "result": 0.8480539145945312,
-      "shortResult": ["0.8480539145945312"]
+      "shortResult": [
+        "0.8480539145945312"
+      ]
     }
   },
   {
     "6": {
       "result": 0.8059322152862854,
-      "shortResult": ["0.8059322152862854"]
+      "shortResult": [
+        "0.8059322152862854"
+      ]
     }
   },
   {
     "7": {
       "result": 0.7367277951774727,
-      "shortResult": ["0.7367277951774727"]
+      "shortResult": [
+        "0.7367277951774727"
+      ]
     }
   },
   {

@@ -6,7 +6,9 @@
       },
       "name": "answer_by_search",
       "parent": 0,
-      "shortArgs": ["Who is the president of the United..."]
+      "shortArgs": [
+        "Who is the president of the United..."
+      ]
     }
   },
   {
@@ -16,7 +18,9 @@
       },
       "name": "search",
       "parent": 1,
-      "shortArgs": ["Who is the president of the United..."]
+      "shortArgs": [
+        "Who is the president of the United..."
+      ]
     }
   },
   {
@@ -24,7 +28,9 @@
       "result": {
         "error": "Invalid API key. Your API key should be here: https://serpapi.com/manage-api-key"
       },
-      "shortResult": ["Invalid API key. Your API key shoul..."]
+      "shortResult": [
+        "Invalid API key. Your API key shoul..."
+      ]
     }
   },
   {
@@ -68,13 +74,17 @@
   {
     "3": {
       "result": "Mouth item identify school good general foot watch.",
-      "shortResult": ["Mouth item identify school good gen..."]
+      "shortResult": [
+        "Mouth item identify school good gen..."
+      ]
     }
   },
   {
     "1": {
       "result": "Mouth item identify school good general foot watch.",
-      "shortResult": ["Mouth item identify school good gen..."]
+      "shortResult": [
+        "Mouth item identify school good gen..."
+      ]
     }
   }
 ]

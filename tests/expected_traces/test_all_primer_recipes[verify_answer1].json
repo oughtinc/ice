@@ -12,18 +12,24 @@
       },
       "name": "verify_answer",
       "parent": 0,
-      "shortArgs": ["Beth bakes 4x 2 dozen batches of co..."]
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
     }
   },
   {
     "2": {
       "args": {
         "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
-        "steps": ["Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies"]
+        "steps": [
+          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies"
+        ]
       },
       "name": "check_step",
       "parent": 1,
-      "shortArgs": ["Beth bakes 4x 2 dozen batches of co..."]
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
     }
   },
   {
@@ -37,7 +43,9 @@
       },
       "name": "check_step",
       "parent": 1,
-      "shortArgs": ["Beth bakes 4x 2 dozen batches of co..."]
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
     }
   },
   {
@@ -52,7 +60,9 @@
       },
       "name": "check_step",
       "parent": 1,
-      "shortArgs": ["Beth bakes 4x 2 dozen batches of co..."]
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
     }
   },
   {
@@ -68,13 +78,18 @@
       },
       "name": "check_step",
       "parent": 1,
-      "shortArgs": ["Beth bakes 4x 2 dozen batches of co..."]
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
     }
   },
   {
     "6": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -146,13 +161,18 @@
         },
         null
       ],
-      "shortResult": ["0.8373631169115912"]
+      "shortResult": [
+        "0.8373631169115912"
+      ]
     }
   },
   {
     "7": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -191,7 +211,9 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": ["\n"]
+                      "__fstring__": [
+                        "\n"
+                      ]
                     }
                   },
                   {
@@ -250,13 +272,18 @@
         },
         null
       ],
-      "shortResult": ["0.5893574265254758"]
+      "shortResult": [
+        "0.5893574265254758"
+      ]
     }
   },
   {
     "8": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -295,7 +322,9 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": ["\n"]
+                      "__fstring__": [
+                        "\n"
+                      ]
                     }
                   },
                   {
@@ -321,7 +350,9 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": ["\n"]
+                      "__fstring__": [
+                        "\n"
+                      ]
                     }
                   },
                   {
@@ -380,13 +411,18 @@
         },
         null
       ],
-      "shortResult": ["0.3065178684882638"]
+      "shortResult": [
+        "0.3065178684882638"
+      ]
     }
   },
   {
     "9": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -425,7 +461,9 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": ["\n"]
+                      "__fstring__": [
+                        "\n"
+                      ]
                     }
                   },
                   {
@@ -451,7 +489,9 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": ["\n"]
+                      "__fstring__": [
+                        "\n"
+                      ]
                     }
                   },
                   {
@@ -477,7 +517,9 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": ["\n"]
+                      "__fstring__": [
+                        "\n"
+                      ]
                     }
                   },
                   {
@@ -536,31 +578,41 @@
         },
         null
       ],
-      "shortResult": ["0.616542665612891"]
+      "shortResult": [
+        "0.616542665612891"
+      ]
     }
   },
   {
     "2": {
       "result": 0.8373631169115912,
-      "shortResult": ["0.8373631169115912"]
+      "shortResult": [
+        "0.8373631169115912"
+      ]
     }
   },
   {
     "3": {
       "result": 0.5893574265254758,
-      "shortResult": ["0.5893574265254758"]
+      "shortResult": [
+        "0.5893574265254758"
+      ]
     }
   },
   {
     "4": {
       "result": 0.3065178684882638,
-      "shortResult": ["0.3065178684882638"]
+      "shortResult": [
+        "0.3065178684882638"
+      ]
     }
   },
   {
     "5": {
       "result": 0.616542665612891,
-      "shortResult": ["0.616542665612891"]
+      "shortResult": [
+        "0.616542665612891"
+      ]
     }
   },
   {
@@ -578,9 +630,14 @@
           0.3065178684882638,
           "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies"
         ],
-        [0.616542665612891, "So, the final answer is 6 cookies per person."]
+        [
+          0.616542665612891,
+          "So, the final answer is 6 cookies per person."
+        ]
       ],
-      "shortResult": ["0.8373631169115912"]
+      "shortResult": [
+        "0.8373631169115912"
+      ]
     }
   }
 ]

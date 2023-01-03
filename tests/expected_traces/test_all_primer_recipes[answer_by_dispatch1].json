@@ -6,7 +6,9 @@
       },
       "name": "answer_by_dispatch",
       "parent": 0,
-      "shortArgs": ["How many people live in Germany?"]
+      "shortArgs": [
+        "How many people live in Germany?"
+      ]
     }
   },
   {
@@ -16,13 +18,21 @@
       },
       "name": "select_action",
       "parent": 1,
-      "shortArgs": ["How many people live in Germany?"]
+      "shortArgs": [
+        "How many people live in Germany?"
+      ]
     }
   },
   {
     "3": {
       "args": {
-        "choices": ["1", "2", "3", "4", "5"],
+        "choices": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -61,7 +71,9 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": ["\n"]
+                      "__fstring__": [
+                        "\n"
+                      ]
                     }
                   },
                   {
@@ -87,7 +99,9 @@
                     "formatted": "\n",
                     "source": "F(\"\\n\")",
                     "value": {
-                      "__fstring__": ["\n"]
+                      "__fstring__": [
+                        "\n"
+                      ]
                     }
                   },
                   {
@@ -142,7 +156,9 @@
         },
         null
       ],
-      "shortResult": ["0.19152525923958227"]
+      "shortResult": [
+        "0.19152525923958227"
+      ]
     }
   },
   {
@@ -155,7 +171,9 @@
           "name": "answer_by_computation"
         }
       },
-      "shortResult": ["Computation"]
+      "shortResult": [
+        "Computation"
+      ]
     }
   },
   {
@@ -165,7 +183,9 @@
       },
       "name": "answer_by_computation",
       "parent": 1,
-      "shortArgs": ["How many people live in Germany?"]
+      "shortArgs": [
+        "How many people live in Germany?"
+      ]
     }
   },
   {
@@ -175,7 +195,9 @@
       },
       "name": "choose_computation",
       "parent": 4,
-      "shortArgs": ["How many people live in Germany?"]
+      "shortArgs": [
+        "How many people live in Germany?"
+      ]
     }
   },
   {
@@ -212,13 +234,17 @@
   {
     "6": {
       "result": "Whether similar sort environment remember available technology.",
-      "shortResult": ["Whether similar sort environment re..."]
+      "shortResult": [
+        "Whether similar sort environment re..."
+      ]
     }
   },
   {
     "5": {
       "result": "Whether similar sort environment remember available technology.",
-      "shortResult": ["Whether similar sort environment re..."]
+      "shortResult": [
+        "Whether similar sort environment re..."
+      ]
     }
   },
   {
@@ -269,19 +295,25 @@
   {
     "7": {
       "result": "Friend detail alone less note.",
-      "shortResult": ["Friend detail alone less note."]
+      "shortResult": [
+        "Friend detail alone less note."
+      ]
     }
   },
   {
     "4": {
       "result": "Friend detail alone less note.",
-      "shortResult": ["Friend detail alone less note."]
+      "shortResult": [
+        "Friend detail alone less note."
+      ]
     }
   },
   {
     "1": {
       "result": "Friend detail alone less note.",
-      "shortResult": ["Friend detail alone less note."]
+      "shortResult": [
+        "Friend detail alone less note."
+      ]
     }
   }
 ]

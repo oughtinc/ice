@@ -7,7 +7,9 @@
       },
       "name": "sequential_action",
       "parent": 0,
-      "shortArgs": ["How far would all the film frames t..."]
+      "shortArgs": [
+        "How far would all the film frames t..."
+      ]
     }
   },
   {
@@ -18,13 +20,18 @@
       },
       "name": "is_info_sufficient",
       "parent": 1,
-      "shortArgs": ["How far would all the film frames t..."]
+      "shortArgs": [
+        "How far would all the film frames t..."
+      ]
     }
   },
   {
     "3": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": {
           "__fstring__": [
@@ -54,7 +61,9 @@
       "cls": "FakeAgent",
       "name": "classify",
       "parent": 2,
-      "shortArgs": ["render_context(question, log)"]
+      "shortArgs": [
+        "render_context(question, log)"
+      ]
     }
   },
   {
@@ -66,13 +75,17 @@
         },
         null
       ],
-      "shortResult": ["0.7252623521653822"]
+      "shortResult": [
+        "0.7252623521653822"
+      ]
     }
   },
   {
     "2": {
       "result": true,
-      "shortResult": ["True"]
+      "shortResult": [
+        "True"
+      ]
     }
   },
   {
@@ -83,7 +96,9 @@
       },
       "name": "answer_directly",
       "parent": 1,
-      "shortArgs": ["How far would all the film frames t..."]
+      "shortArgs": [
+        "How far would all the film frames t..."
+      ]
     }
   },
   {
@@ -126,25 +141,33 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 4,
-      "shortArgs": ["render_context(question, log)"]
+      "shortArgs": [
+        "render_context(question, log)"
+      ]
     }
   },
   {
     "5": {
       "result": "Option million hope break another station.",
-      "shortResult": ["Option million hope break another s..."]
+      "shortResult": [
+        "Option million hope break another s..."
+      ]
     }
   },
   {
     "4": {
       "result": "Option million hope break another station.",
-      "shortResult": ["Option million hope break another s..."]
+      "shortResult": [
+        "Option million hope break another s..."
+      ]
     }
   },
   {
     "1": {
       "result": "Option million hope break another station.",
-      "shortResult": ["Option million hope break another s..."]
+      "shortResult": [
+        "Option million hope break another s..."
+      ]
     }
   }
 ]

@@ -7,7 +7,9 @@
       },
       "name": "answer_by_amplification",
       "parent": 0,
-      "shortArgs": ["What is the effect of creatine on c..."]
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
     }
   },
   {
@@ -18,7 +20,9 @@
       },
       "name": "get_subs",
       "parent": 1,
-      "shortArgs": ["What is the effect of creatine on c..."]
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
     }
   },
   {
@@ -28,7 +32,9 @@
       },
       "name": "ask_subquestions",
       "parent": 2,
-      "shortArgs": ["What is the effect of creatine on c..."]
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
     }
   },
   {
@@ -56,19 +62,28 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Decompose the following question in...", "\"\nSubquestions:\n-"]
+      "shortArgs": [
+        "Decompose the following question in...",
+        "\"\nSubquestions:\n-"
+      ]
     }
   },
   {
     "4": {
       "result": "Moment meet decide beautiful.",
-      "shortResult": ["Moment meet decide beautiful."]
+      "shortResult": [
+        "Moment meet decide beautiful."
+      ]
     }
   },
   {
     "3": {
-      "result": ["Moment meet decide beautiful."],
-      "shortResult": ["Moment meet decide beautiful."]
+      "result": [
+        "Moment meet decide beautiful."
+      ],
+      "shortResult": [
+        "Moment meet decide beautiful."
+      ]
     }
   },
   {
@@ -79,7 +94,9 @@
       },
       "name": "answer_by_amplification",
       "parent": 2,
-      "shortArgs": ["Moment meet decide beautiful."]
+      "shortArgs": [
+        "Moment meet decide beautiful."
+      ]
     }
   },
   {
@@ -107,27 +124,40 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 5,
-      "shortArgs": ["Answer the following question, usin...", "\"\nAnswer: \""]
+      "shortArgs": [
+        "Answer the following question, usin...",
+        "\"\nAnswer: \""
+      ]
     }
   },
   {
     "6": {
       "result": "Happen newspaper few office model late month school.",
-      "shortResult": ["Happen newspaper few office model l..."]
+      "shortResult": [
+        "Happen newspaper few office model l..."
+      ]
     }
   },
   {
     "5": {
       "result": "Happen newspaper few office model late month school.",
-      "shortResult": ["Happen newspaper few office model l..."]
+      "shortResult": [
+        "Happen newspaper few office model l..."
+      ]
     }
   },
   {
     "2": {
       "result": [
-        ["Moment meet decide beautiful.", "Happen newspaper few office model late month school."]
+        [
+          "Moment meet decide beautiful.",
+          "Happen newspaper few office model late month school."
+        ]
       ],
-      "shortResult": ["Moment meet decide beautiful.", "Happen newspaper few office model l..."]
+      "shortResult": [
+        "Moment meet decide beautiful.",
+        "Happen newspaper few office model l..."
+      ]
     }
   },
   {
@@ -193,19 +223,25 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 1,
-      "shortArgs": ["background_text"]
+      "shortArgs": [
+        "background_text"
+      ]
     }
   },
   {
     "7": {
       "result": "Suggest only second against conference together.",
-      "shortResult": ["Suggest only second against confere..."]
+      "shortResult": [
+        "Suggest only second against confere..."
+      ]
     }
   },
   {
     "1": {
       "result": "Suggest only second against conference together.",
-      "shortResult": ["Suggest only second against confere..."]
+      "shortResult": [
+        "Suggest only second against confere..."
+      ]
     }
   }
 ]

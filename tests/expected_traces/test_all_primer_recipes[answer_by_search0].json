@@ -6,7 +6,9 @@
       },
       "name": "answer_by_search",
       "parent": 0,
-      "shortArgs": ["Who is the president of the United..."]
+      "shortArgs": [
+        "Who is the president of the United..."
+      ]
     }
   },
   {
@@ -16,7 +18,9 @@
       },
       "name": "choose_query",
       "parent": 1,
-      "shortArgs": ["Who is the president of the United..."]
+      "shortArgs": [
+        "Who is the president of the United..."
+      ]
     }
   },
   {
@@ -53,13 +57,17 @@
   {
     "3": {
       "result": "Push cold school animal property week.",
-      "shortResult": ["Push cold school animal property we..."]
+      "shortResult": [
+        "Push cold school animal property we..."
+      ]
     }
   },
   {
     "2": {
       "result": "Push cold school animal property week.",
-      "shortResult": ["Push cold school animal property we..."]
+      "shortResult": [
+        "Push cold school animal property we..."
+      ]
     }
   },
   {
@@ -69,7 +77,9 @@
       },
       "name": "search",
       "parent": 1,
-      "shortArgs": ["Push cold school animal property we..."]
+      "shortArgs": [
+        "Push cold school animal property we..."
+      ]
     }
   },
   {
@@ -77,7 +87,9 @@
       "result": {
         "error": "Invalid API key. Your API key should be here: https://serpapi.com/manage-api-key"
       },
-      "shortResult": ["Invalid API key. Your API key shoul..."]
+      "shortResult": [
+        "Invalid API key. Your API key shoul..."
+      ]
     }
   },
   {
@@ -128,13 +140,17 @@
   {
     "5": {
       "result": "Road prove personal expect agreement billion such.",
-      "shortResult": ["Road prove personal expect agreemen..."]
+      "shortResult": [
+        "Road prove personal expect agreemen..."
+      ]
     }
   },
   {
     "1": {
       "result": "Road prove personal expect agreement billion such.",
-      "shortResult": ["Road prove personal expect agreemen..."]
+      "shortResult": [
+        "Road prove personal expect agreemen..."
+      ]
     }
   }
 ]

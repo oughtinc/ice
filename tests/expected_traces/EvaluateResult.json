@@ -13,7 +13,9 @@
       },
       "name": "main",
       "parent": 0,
-      "shortArgs": ["test"]
+      "shortArgs": [
+        "test"
+      ]
     }
   },
   {
@@ -30,7 +32,9 @@
       "cls": "EvaluateResult",
       "name": "run",
       "parent": 1,
-      "shortArgs": ["()"]
+      "shortArgs": [
+        "()"
+      ]
     }
   },
   {
@@ -48,19 +52,26 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 2,
-      "shortArgs": ["Compare the following results from..."]
+      "shortArgs": [
+        "Compare the following results from..."
+      ]
     }
   },
   {
     "3": {
       "result": "Major behavior mention high beat.",
-      "shortResult": ["Major behavior mention high beat."]
+      "shortResult": [
+        "Major behavior mention high beat."
+      ]
     }
   },
   {
     "4": {
       "args": {
-        "choices": [" Yes", " No"],
+        "choices": [
+          " Yes",
+          " No"
+        ],
         "default": null,
         "prompt": "Compare the following results from a machine learning model to a gold standard. What (if any) information is in the gold standard but not in the model result? Does the model result capture all important information from the gold standard? Yes or No.\n\n###\n\nQuestion A: What was the placebo in this study?\n\nGold standard result A: Placebo gelatin capsules made of starch, talcum, kaolin, sucrose, and colouring. They were made by the same manufacturer as the active capsules and could not be distinguished from the active capsules by sight\n\nModel result A: The placebo was made by the same manufacturer as the active capsules.\n\nWhat (if any) information is in gold standard A but not in model result A?\n- The specific composition of the placebo gelatin capsules (starch, talcum, kaolin, sucrose, and colouring)\n- The fact that the placebo capsules could not be distinguished from the active capsules by sight\n\nDoes model result A capture all important information from gold standard A? No\n\n###\n\nQuestion B: What was the image processing method?\n\nGold standard result B: The images were cleaned and aligned using common methods. The brain activity was measured using a statistical model that compared different types of stimuli (faces, houses, chairs, words, numbers, and a blank screen).\n\nModel result B: The images were preprocessed using a standard pipeline that included skull stripping, motion correction, spatial normalization, and smoothing. The functional data were analyzed using a general linear model (GLM) with six task conditions (face, house, chair, word, number, and fixation) as regressors of interest and six motion parameters as nuisance regressors.\n\nWhat (if any) information is in gold standard B but not in model result B? None\n\nDoes model result B capture all important information from gold standard B? Yes\n\n###\n\nQuestion C: What was the test battery?\n\nGold standard result C: The participants completed a battery of neuropsychological tests that assessed memory, attention, executive function, language, and visuospatial skills. The scores were adjusted for age and education. They were expressed as standard deviations from the average.\n\nModel result C: The participants took a series of tests that measured different aspects of their cognitive abilities, such as remembering words, repeating numbers, switching tasks, naming objects, and drawing a clock.\n\nWhat (if any) information is in gold standard C but not in model result C?\n- The analysis of test scores (adjusted for age and education, expressed as standard deviations from the average)\n\nDoes model result C capture all important information from gold standard C? No\n\n###\n\nQuestion D: What was the study design?\n\nGold standard result D: The study used a randomized controlled trial design with four groups: a group that learned mindfulness techniques, a group that learned cognitive strategies, a group that learned both, and a group that received no treatment. The interventions lasted for eight weeks and consisted of meditation, yoga, cognitive exercises, and coping skills.\n\nModel result D: The participants were randomly assigned to one of four groups: a mindfulness-based stress reduction (MBSR) group, a cognitive-behavioral therapy (CBT) group, a combination of MBSR and CBT (MBSR+CBT) group, or a wait-list control group. The MBSR group received eight weekly sessions of mindfulness meditation and yoga, the CBT group received eight weekly sessions of cognitive restructuring and coping skills training, and the MBSR+CBT group received both interventions.\n\nWhat (if any) information is in gold standard D but not in model result D? None\n\nDoes model result D capture all important information from gold standard D? Yes\n\n###\n\nQuestion E: What was the placebo in the study?\n\nGold standard result E: The placebo is the treatment given to the control group that is designed to be indistinguishable from the real treatment but has no real effect. So in this case, the placebo for Group 5 would be chloroquine, proguanil, iron and folic acid pills that look identical to the real pills but contain no active ingredients. So the subjects would think they are taking the real treatment but are actually taking inactive pills.\n\nModel result E: Placebo gelatin capsules made of starch, talcum, kaolin, sucrose, and colouring. They were made by the same manufacturer as the active capsules and could not be distinguished from the active capsules by sight\n\nWhat (if any) information is in gold standard E but not in model result E? Major behavior mention high beat.\n\nDoes model result E capture all important information from gold standard E?",
         "self": {
@@ -71,7 +82,9 @@
       "cls": "FakeAgent",
       "name": "classify",
       "parent": 2,
-      "shortArgs": ["Compare the following results from..."]
+      "shortArgs": [
+        "Compare the following results from..."
+      ]
     }
   },
   {
@@ -83,7 +96,9 @@
         },
         null
       ],
-      "shortResult": ["0.988207128381771"]
+      "shortResult": [
+        "0.988207128381771"
+      ]
     }
   },
   {
@@ -93,13 +108,17 @@
         "missing_info": "Major behavior mention high beat.",
         "p_complete": 0.988207128381771
       },
-      "shortResult": ["Major behavior mention high beat."]
+      "shortResult": [
+        "Major behavior mention high beat."
+      ]
     }
   },
   {
     "1": {
       "result": null,
-      "shortResult": ["()"]
+      "shortResult": [
+        "()"
+      ]
     }
   }
 ]

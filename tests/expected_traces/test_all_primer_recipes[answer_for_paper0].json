@@ -8,7 +8,9 @@
       },
       "name": "answer_for_paper",
       "parent": 0,
-      "shortArgs": ["keenan-2018-tiny.txt"]
+      "shortArgs": [
+        "keenan-2018-tiny.txt"
+      ]
     }
   },
   {

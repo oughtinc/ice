@@ -4,7 +4,9 @@
       "args": {
         "args": {},
         "gold_standard_splits": null,
-        "input_files": ["./papers/keenan-2018-tiny.txt"],
+        "input_files": [
+          "./papers/keenan-2018-tiny.txt"
+        ],
         "json_out": null,
         "mode": "test",
         "output_file": null,
@@ -13,7 +15,9 @@
       },
       "name": "main",
       "parent": 0,
-      "shortArgs": ["test"]
+      "shortArgs": [
+        "test"
+      ]
     }
   },
   {
@@ -30,19 +34,25 @@
       "cls": "AdherenceKeywordBaseline",
       "name": "run",
       "parent": 1,
-      "shortArgs": ["keenan-2018-tiny.txt"]
+      "shortArgs": [
+        "keenan-2018-tiny.txt"
+      ]
     }
   },
   {
     "2": {
       "result": [],
-      "shortResult": ["()"]
+      "shortResult": [
+        "()"
+      ]
     }
   },
   {
     "1": {
       "result": null,
-      "shortResult": ["()"]
+      "shortResult": [
+        "()"
+      ]
     }
   }
 ]

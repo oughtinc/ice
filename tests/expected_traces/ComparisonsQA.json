@@ -4,7 +4,9 @@
       "args": {
         "args": {},
         "gold_standard_splits": null,
-        "input_files": ["./papers/keenan-2018-tiny.txt"],
+        "input_files": [
+          "./papers/keenan-2018-tiny.txt"
+        ],
         "json_out": null,
         "mode": "test",
         "output_file": null,
@@ -13,7 +15,9 @@
       },
       "name": "main",
       "parent": 0,
-      "shortArgs": ["test"]
+      "shortArgs": [
+        "test"
+      ]
     }
   },
   {
@@ -34,7 +38,9 @@
       "cls": "ComparisonsQA",
       "name": "run",
       "parent": 1,
-      "shortArgs": ["keenan-2018-tiny.txt"]
+      "shortArgs": [
+        "keenan-2018-tiny.txt"
+      ]
     }
   },
   {
@@ -53,7 +59,9 @@
       "cls": "RankParagraphs",
       "name": "run",
       "parent": 2,
-      "shortArgs": ["keenan-2018-tiny.txt"]
+      "shortArgs": [
+        "keenan-2018-tiny.txt"
+      ]
     }
   },
   {
@@ -65,19 +73,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "4": {
       "result": "Realize environment street manage whom.",
-      "shortResult": ["Realize environment street manage w..."]
+      "shortResult": [
+        "Realize environment street manage w..."
+      ]
     }
   },
   {
@@ -89,19 +104,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "5": {
       "result": "Campaign common know save help nation option.",
-      "shortResult": ["Campaign common know save help nati..."]
+      "shortResult": [
+        "Campaign common know save help nati..."
+      ]
     }
   },
   {
@@ -113,19 +135,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "6": {
       "result": "Career care deep lawyer hour onto production.",
-      "shortResult": ["Career care deep lawyer hour onto p..."]
+      "shortResult": [
+        "Career care deep lawyer hour onto p..."
+      ]
     }
   },
   {
@@ -137,19 +166,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "7": {
       "result": "Television follow owner send ahead season.",
-      "shortResult": ["Television follow owner send ahead..."]
+      "shortResult": [
+        "Television follow owner send ahead..."
+      ]
     }
   },
   {
@@ -161,19 +197,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "8": {
       "result": "Every region especially some drug learn detail.",
-      "shortResult": ["Every region especially some drug l..."]
+      "shortResult": [
+        "Every region especially some drug l..."
+      ]
     }
   },
   {
@@ -185,19 +228,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "9": {
       "result": "Customer majority area image eight computer hospital know.",
-      "shortResult": ["Customer majority area image eight..."]
+      "shortResult": [
+        "Customer majority area image eight..."
+      ]
     }
   },
   {
@@ -209,19 +259,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "10": {
       "result": "Only ready treat school treat.",
-      "shortResult": ["Only ready treat school treat."]
+      "shortResult": [
+        "Only ready treat school treat."
+      ]
     }
   },
   {
@@ -233,19 +290,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "11": {
       "result": "Form read specific remember little third discover.",
-      "shortResult": ["Form read specific remember little..."]
+      "shortResult": [
+        "Form read specific remember little..."
+      ]
     }
   },
   {
@@ -257,19 +321,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "12": {
       "result": "Executive role lot she attack candidate simple.",
-      "shortResult": ["Executive role lot she attack candi..."]
+      "shortResult": [
+        "Executive role lot she attack candi..."
+      ]
     }
   },
   {
@@ -281,19 +352,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "13": {
       "result": "Do operation fine color forward.",
-      "shortResult": ["Do operation fine color forward."]
+      "shortResult": [
+        "Do operation fine color forward."
+      ]
     }
   },
   {
@@ -305,19 +383,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "14": {
       "result": "Father fall much continue responsibility.",
-      "shortResult": ["Father fall much continue responsib..."]
+      "shortResult": [
+        "Father fall much continue responsib..."
+      ]
     }
   },
   {
@@ -329,19 +414,26 @@
         "self": {
           "class_name": "FakeAgent"
         },
-        "stop": [" ", "\n"],
+        "stop": [
+          " ",
+          "\n"
+        ],
         "verbose": false
       },
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Which of paragraphs A and B better..."]
+      "shortArgs": [
+        "Which of paragraphs A and B better..."
+      ]
     }
   },
   {
     "15": {
       "result": "Magazine million can customer.",
-      "shortResult": ["Magazine million can customer."]
+      "shortResult": [
+        "Magazine million can customer."
+      ]
     }
   },
   {
@@ -395,7 +487,9 @@
           ]
         }
       ],
-      "shortResult": ["Trachoma-control programs have dist..."]
+      "shortResult": [
+        "Trachoma-control programs have dist..."
+      ]
     }
   },
   {
@@ -413,25 +507,33 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 2,
-      "shortArgs": ["Answer the question \"What were the..."]
+      "shortArgs": [
+        "Answer the question \"What were the..."
+      ]
     }
   },
   {
     "16": {
       "result": "Write special apply eight statement spend.",
-      "shortResult": ["Write special apply eight statement..."]
+      "shortResult": [
+        "Write special apply eight statement..."
+      ]
     }
   },
   {
     "2": {
       "result": "Write special apply eight statement spend.",
-      "shortResult": ["Write special apply eight statement..."]
+      "shortResult": [
+        "Write special apply eight statement..."
+      ]
     }
   },
   {
     "1": {
       "result": null,
-      "shortResult": ["()"]
+      "shortResult": [
+        "()"
+      ]
     }
   }
 ]

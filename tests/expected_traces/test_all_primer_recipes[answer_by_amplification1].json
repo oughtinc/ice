@@ -6,7 +6,9 @@
       },
       "name": "answer_by_amplification",
       "parent": 0,
-      "shortArgs": ["What is the effect of creatine on c..."]
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
     }
   },
   {
@@ -16,7 +18,9 @@
       },
       "name": "get_subs",
       "parent": 1,
-      "shortArgs": ["What is the effect of creatine on c..."]
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
     }
   },
   {
@@ -26,7 +30,9 @@
       },
       "name": "ask_subquestions",
       "parent": 2,
-      "shortArgs": ["What is the effect of creatine on c..."]
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
     }
   },
   {
@@ -54,19 +60,28 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 3,
-      "shortArgs": ["Decompose the following question in...", "\"\nSubquestions:\n-"]
+      "shortArgs": [
+        "Decompose the following question in...",
+        "\"\nSubquestions:\n-"
+      ]
     }
   },
   {
     "4": {
       "result": "Thousand hair beautiful few head.",
-      "shortResult": ["Thousand hair beautiful few head."]
+      "shortResult": [
+        "Thousand hair beautiful few head."
+      ]
     }
   },
   {
     "3": {
-      "result": ["Thousand hair beautiful few head."],
-      "shortResult": ["Thousand hair beautiful few head."]
+      "result": [
+        "Thousand hair beautiful few head."
+      ],
+      "shortResult": [
+        "Thousand hair beautiful few head."
+      ]
     }
   },
   {
@@ -77,7 +92,9 @@
       },
       "name": "answer",
       "parent": 2,
-      "shortArgs": ["Thousand hair beautiful few head."]
+      "shortArgs": [
+        "Thousand hair beautiful few head."
+      ]
     }
   },
   {
@@ -105,36 +122,58 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 5,
-      "shortArgs": ["Answer the following question, usin...", "\"\nAnswer: \""]
+      "shortArgs": [
+        "Answer the following question, usin...",
+        "\"\nAnswer: \""
+      ]
     }
   },
   {
     "6": {
       "result": "Again wide prevent.",
-      "shortResult": ["Again wide prevent."]
+      "shortResult": [
+        "Again wide prevent."
+      ]
     }
   },
   {
     "5": {
       "result": "Again wide prevent.",
-      "shortResult": ["Again wide prevent."]
+      "shortResult": [
+        "Again wide prevent."
+      ]
     }
   },
   {
     "2": {
-      "result": [["Thousand hair beautiful few head.", "Again wide prevent."]],
-      "shortResult": ["Thousand hair beautiful few head.", "Again wide prevent."]
+      "result": [
+        [
+          "Thousand hair beautiful few head.",
+          "Again wide prevent."
+        ]
+      ],
+      "shortResult": [
+        "Thousand hair beautiful few head.",
+        "Again wide prevent."
+      ]
     }
   },
   {
     "7": {
       "args": {
         "question": "What is the effect of creatine on cognition?",
-        "subs": [["Thousand hair beautiful few head.", "Again wide prevent."]]
+        "subs": [
+          [
+            "Thousand hair beautiful few head.",
+            "Again wide prevent."
+          ]
+        ]
       },
       "name": "answer",
       "parent": 1,
-      "shortArgs": ["What is the effect of creatine on c..."]
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
     }
   },
   {
@@ -200,25 +239,33 @@
       "cls": "FakeAgent",
       "name": "complete",
       "parent": 7,
-      "shortArgs": ["background_text"]
+      "shortArgs": [
+        "background_text"
+      ]
     }
   },
   {
     "8": {
       "result": "Recently note sell provide ok expect.",
-      "shortResult": ["Recently note sell provide ok expec..."]
+      "shortResult": [
+        "Recently note sell provide ok expec..."
+      ]
     }
   },
   {
     "7": {
       "result": "Recently note sell provide ok expect.",
-      "shortResult": ["Recently note sell provide ok expec..."]
+      "shortResult": [
+        "Recently note sell provide ok expec..."
+      ]
     }
   },
   {
     "1": {
       "result": "Recently note sell provide ok expect.",
-      "shortResult": ["Recently note sell provide ok expec..."]
+      "shortResult": [
+        "Recently note sell provide ok expec..."
+      ]
     }
   }
 ]
