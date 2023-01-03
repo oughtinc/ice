@@ -1,0 +1,20 @@
+[
+  {
+    "1": {
+      "args": {},
+      "name": "say_hello",
+      "parent": 0,
+      "shortArgs": [
+        "()"
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Hello world!",
+      "shortResult": [
+        "Hello world!"
+      ]
+    }
+  }
+]

@@ -1,0 +1,59 @@
+[
+  {
+    "1": {
+      "args": {
+        "args": {},
+        "gold_standard_splits": null,
+        "input_files": [
+          "./papers/keenan-2018-tiny.txt"
+        ],
+        "json_out": null,
+        "mode": "test",
+        "output_file": null,
+        "question_short_name": null,
+        "recipe_name": "AllQuotesRecipe"
+      },
+      "name": "main",
+      "parent": 0,
+      "shortArgs": [
+        "test"
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "paper": {
+          "document_id": "keenan-2018-tiny.txt"
+        },
+        "self": {
+          "class_name": "AllQuotesRecipe",
+          "mode": "test",
+          "question_short_name_to_test": "placebo"
+        }
+      },
+      "cls": "AllQuotesRecipe",
+      "name": "run",
+      "parent": 1,
+      "shortArgs": [
+        "keenan-2018-tiny.txt"
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": [],
+      "shortResult": [
+        "()"
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": null,
+      "shortResult": [
+        "()"
+      ]
+    }
+  }
+]

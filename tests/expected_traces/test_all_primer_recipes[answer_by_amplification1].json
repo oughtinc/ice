@@ -1,0 +1,271 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "What is the effect of creatine on cognition?"
+      },
+      "name": "answer_by_amplification",
+      "parent": 0,
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "question": "What is the effect of creatine on cognition?"
+      },
+      "name": "get_subs",
+      "parent": 1,
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "question": "What is the effect of creatine on cognition?"
+      },
+      "name": "ask_subquestions",
+      "parent": 2,
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
+    }
+  },
+  {
+    "4": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "Decompose the following question into 2-5 subquestions that would help you answer the question. Make the questions stand alone, so that they can be answered without the context of the original question.\n\nQuestion: \"",
+            {
+              "formatted": "What is the effect of creatine on cognition?",
+              "source": "question",
+              "value": "What is the effect of creatine on cognition?"
+            },
+            "\"\nSubquestions:\n-"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": null,
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 3,
+      "shortArgs": [
+        "Decompose the following question in...",
+        "\"\nSubquestions:\n-"
+      ]
+    }
+  },
+  {
+    "4": {
+      "result": "Thousand hair beautiful few head.",
+      "shortResult": [
+        "Thousand hair beautiful few head."
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": [
+        "Thousand hair beautiful few head."
+      ],
+      "shortResult": [
+        "Thousand hair beautiful few head."
+      ]
+    }
+  },
+  {
+    "5": {
+      "args": {
+        "question": "Thousand hair beautiful few head.",
+        "subs": []
+      },
+      "name": "answer",
+      "parent": 2,
+      "shortArgs": [
+        "Thousand hair beautiful few head."
+      ]
+    }
+  },
+  {
+    "6": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "Answer the following question, using the background information above where helpful:\n\nQuestion: \"",
+            {
+              "formatted": "Thousand hair beautiful few head.",
+              "source": "question",
+              "value": "Thousand hair beautiful few head."
+            },
+            "\"\nAnswer: \""
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 5,
+      "shortArgs": [
+        "Answer the following question, usin...",
+        "\"\nAnswer: \""
+      ]
+    }
+  },
+  {
+    "6": {
+      "result": "Again wide prevent.",
+      "shortResult": [
+        "Again wide prevent."
+      ]
+    }
+  },
+  {
+    "5": {
+      "result": "Again wide prevent.",
+      "shortResult": [
+        "Again wide prevent."
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": [
+        [
+          "Thousand hair beautiful few head.",
+          "Again wide prevent."
+        ]
+      ],
+      "shortResult": [
+        "Thousand hair beautiful few head.",
+        "Again wide prevent."
+      ]
+    }
+  },
+  {
+    "7": {
+      "args": {
+        "question": "What is the effect of creatine on cognition?",
+        "subs": [
+          [
+            "Thousand hair beautiful few head.",
+            "Again wide prevent."
+          ]
+        ]
+      },
+      "name": "answer",
+      "parent": 1,
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
+    }
+  },
+  {
+    "8": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            {
+              "formatted": "Here is relevant background information:\n\nQ: Thousand hair beautiful few head.\nA: Again wide prevent.\n\n",
+              "source": "background_text",
+              "value": {
+                "__fstring__": [
+                  "Here is relevant background information:\n\n",
+                  {
+                    "formatted": "Q: Thousand hair beautiful few head.\nA: Again wide prevent.",
+                    "source": "subs_text",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "Q: Thousand hair beautiful few head.\nA: Again wide prevent.",
+                          "source": "list((F(f\"Q: {q}\\nA: {a}\") for (q, a) in subs))[0]",
+                          "value": {
+                            "__fstring__": [
+                              "Q: ",
+                              {
+                                "formatted": "Thousand hair beautiful few head.",
+                                "source": "q",
+                                "value": "Thousand hair beautiful few head."
+                              },
+                              "\nA: ",
+                              {
+                                "formatted": "Again wide prevent.",
+                                "source": "a",
+                                "value": "Again wide prevent."
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "\n\n"
+                ]
+              }
+            },
+            "Answer the following question, using the background information above where helpful:\n\nQuestion: \"",
+            {
+              "formatted": "What is the effect of creatine on cognition?",
+              "source": "question",
+              "value": "What is the effect of creatine on cognition?"
+            },
+            "\"\nAnswer: \""
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 7,
+      "shortArgs": [
+        "background_text"
+      ]
+    }
+  },
+  {
+    "8": {
+      "result": "Recently note sell provide ok expect.",
+      "shortResult": [
+        "Recently note sell provide ok expec..."
+      ]
+    }
+  },
+  {
+    "7": {
+      "result": "Recently note sell provide ok expect.",
+      "shortResult": [
+        "Recently note sell provide ok expec..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Recently note sell provide ok expect.",
+      "shortResult": [
+        "Recently note sell provide ok expec..."
+      ]
+    }
+  }
+]

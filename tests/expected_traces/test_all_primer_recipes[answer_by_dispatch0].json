@@ -1,0 +1,182 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "How many people live in Germany?"
+      },
+      "name": "answer_by_dispatch",
+      "parent": 0,
+      "shortArgs": [
+        "How many people live in Germany?"
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "choices": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "default": null,
+        "prompt": {
+          "__fstring__": [
+            "You want to answer the question \"",
+            {
+              "formatted": "How many people live in Germany?",
+              "source": "question",
+              "value": "How many people live in Germany?"
+            },
+            "\".\n\nYou have the following options:\n\n",
+            {
+              "formatted": "1. Run a web search using Google. This is helpful if the question depends on obscure facts or current information, such as the weather or the latest news.\n2. Run a computation in Python. This is helpful if the question depends on calculation or other mechanical processes that you can specify in a short program.\n3. Write out the reasoning steps. This is helpful if the question involves logical deduction or evidence-based reasoning.",
+              "source": "action_types_str",
+              "value": {
+                "__fstring__": [
+                  {
+                    "formatted": "1. Run a web search using Google. This is helpful if the question depends on obscure facts or current information, such as the weather or the latest news.",
+                    "source": "([\n            F(f\"{i+1}. {action_type.description}\")\n            for i, action_type in enumerate(action_types)\n        ])[0]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "1",
+                          "source": "i+1",
+                          "value": 1
+                        },
+                        ". ",
+                        {
+                          "formatted": "Run a web search using Google. This is helpful if the question depends on obscure facts or current information, such as the weather or the latest news.",
+                          "source": "action_type.description",
+                          "value": "Run a web search using Google. This is helpful if the question depends on obscure facts or current information, such as the weather or the latest news."
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "\n",
+                    "source": "F(\"\\n\")",
+                    "value": {
+                      "__fstring__": [
+                        "\n"
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "2. Run a computation in Python. This is helpful if the question depends on calculation or other mechanical processes that you can specify in a short program.",
+                    "source": "([\n            F(f\"{i+1}. {action_type.description}\")\n            for i, action_type in enumerate(action_types)\n        ])[1]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "2",
+                          "source": "i+1",
+                          "value": 2
+                        },
+                        ". ",
+                        {
+                          "formatted": "Run a computation in Python. This is helpful if the question depends on calculation or other mechanical processes that you can specify in a short program.",
+                          "source": "action_type.description",
+                          "value": "Run a computation in Python. This is helpful if the question depends on calculation or other mechanical processes that you can specify in a short program."
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "\n",
+                    "source": "F(\"\\n\")",
+                    "value": {
+                      "__fstring__": [
+                        "\n"
+                      ]
+                    }
+                  },
+                  {
+                    "formatted": "3. Write out the reasoning steps. This is helpful if the question involves logical deduction or evidence-based reasoning.",
+                    "source": "([\n            F(f\"{i+1}. {action_type.description}\")\n            for i, action_type in enumerate(action_types)\n        ])[2]",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "3",
+                          "source": "i+1",
+                          "value": 3
+                        },
+                        ". ",
+                        {
+                          "formatted": "Write out the reasoning steps. This is helpful if the question involves logical deduction or evidence-based reasoning.",
+                          "source": "action_type.description",
+                          "value": "Write out the reasoning steps. This is helpful if the question involves logical deduction or evidence-based reasoning."
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "\n\nQ: Which of these options do you want to use before you answer the question? Choose the option that will most help you give an accurate answer.\nA: I want to use option #"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "classify",
+      "parent": 1,
+      "shortArgs": [
+        "You want to answer the question \"",
+        "\".\n\nYou have the following options:...",
+        "Q: Which of these options do you..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": [
+        {
+          "1": 0.3460965933309753,
+          "2": 0.18704412463151252,
+          "3": 0.1647221659982181,
+          "4": 0.21709105340941567,
+          "5": 0.08504606262987853
+        },
+        null
+      ],
+      "shortResult": [
+        "0.3460965933309753"
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": [
+        [
+          [
+            "1",
+            0.3460965933309753
+          ],
+          "Web search"
+        ],
+        [
+          [
+            "2",
+            0.18704412463151252
+          ],
+          "Computation"
+        ],
+        [
+          [
+            "3",
+            0.1647221659982181
+          ],
+          "Reasoning"
+        ]
+      ],
+      "shortResult": [
+        "1"
+      ]
+    }
+  }
+]

@@ -1,0 +1,247 @@
+[
+  {
+    "1": {
+      "args": {
+        "depth": 1,
+        "question": "What is the effect of creatine on cognition?"
+      },
+      "name": "answer_by_amplification",
+      "parent": 0,
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "depth": 0,
+        "question": "What is the effect of creatine on cognition?"
+      },
+      "name": "get_subs",
+      "parent": 1,
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "question": "What is the effect of creatine on cognition?"
+      },
+      "name": "ask_subquestions",
+      "parent": 2,
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
+    }
+  },
+  {
+    "4": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "Decompose the following question into 2-5 subquestions that would help you answer the question. Make the questions stand alone, so that they can be answered without the context of the original question.\n\nQuestion: \"",
+            {
+              "formatted": "What is the effect of creatine on cognition?",
+              "source": "question",
+              "value": "What is the effect of creatine on cognition?"
+            },
+            "\"\nSubquestions:\n-"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": null,
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 3,
+      "shortArgs": [
+        "Decompose the following question in...",
+        "\"\nSubquestions:\n-"
+      ]
+    }
+  },
+  {
+    "4": {
+      "result": "Moment meet decide beautiful.",
+      "shortResult": [
+        "Moment meet decide beautiful."
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": [
+        "Moment meet decide beautiful."
+      ],
+      "shortResult": [
+        "Moment meet decide beautiful."
+      ]
+    }
+  },
+  {
+    "5": {
+      "args": {
+        "depth": 0,
+        "question": "Moment meet decide beautiful."
+      },
+      "name": "answer_by_amplification",
+      "parent": 2,
+      "shortArgs": [
+        "Moment meet decide beautiful."
+      ]
+    }
+  },
+  {
+    "6": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "Answer the following question, using the background information above where helpful:\n\nQuestion: \"",
+            {
+              "formatted": "Moment meet decide beautiful.",
+              "source": "question",
+              "value": "Moment meet decide beautiful."
+            },
+            "\"\nAnswer: \""
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 5,
+      "shortArgs": [
+        "Answer the following question, usin...",
+        "\"\nAnswer: \""
+      ]
+    }
+  },
+  {
+    "6": {
+      "result": "Happen newspaper few office model late month school.",
+      "shortResult": [
+        "Happen newspaper few office model l..."
+      ]
+    }
+  },
+  {
+    "5": {
+      "result": "Happen newspaper few office model late month school.",
+      "shortResult": [
+        "Happen newspaper few office model l..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": [
+        [
+          "Moment meet decide beautiful.",
+          "Happen newspaper few office model late month school."
+        ]
+      ],
+      "shortResult": [
+        "Moment meet decide beautiful.",
+        "Happen newspaper few office model l..."
+      ]
+    }
+  },
+  {
+    "7": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            {
+              "formatted": "Here is relevant background information:\n\nQ: Moment meet decide beautiful.\nA: Happen newspaper few office model late month school.\n\n",
+              "source": "background_text",
+              "value": {
+                "__fstring__": [
+                  "Here is relevant background information:\n\n",
+                  {
+                    "formatted": "Q: Moment meet decide beautiful.\nA: Happen newspaper few office model late month school.",
+                    "source": "subs_text",
+                    "value": {
+                      "__fstring__": [
+                        {
+                          "formatted": "Q: Moment meet decide beautiful.\nA: Happen newspaper few office model late month school.",
+                          "source": "list((F(f\"Q: {q}\\nA: {a}\") for (q, a) in subs))[0]",
+                          "value": {
+                            "__fstring__": [
+                              "Q: ",
+                              {
+                                "formatted": "Moment meet decide beautiful.",
+                                "source": "q",
+                                "value": "Moment meet decide beautiful."
+                              },
+                              "\nA: ",
+                              {
+                                "formatted": "Happen newspaper few office model late month school.",
+                                "source": "a",
+                                "value": "Happen newspaper few office model late month school."
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "\n\n"
+                ]
+              }
+            },
+            "Answer the following question, using the background information above where helpful:\n\nQuestion: \"",
+            {
+              "formatted": "What is the effect of creatine on cognition?",
+              "source": "question",
+              "value": "What is the effect of creatine on cognition?"
+            },
+            "\"\nAnswer: \""
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 1,
+      "shortArgs": [
+        "background_text"
+      ]
+    }
+  },
+  {
+    "7": {
+      "result": "Suggest only second against conference together.",
+      "shortResult": [
+        "Suggest only second against confere..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Suggest only second against conference together.",
+      "shortResult": [
+        "Suggest only second against confere..."
+      ]
+    }
+  }
+]

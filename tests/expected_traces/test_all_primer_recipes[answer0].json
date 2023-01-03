@@ -1,0 +1,69 @@
+[
+  {
+    "1": {
+      "args": {
+        "context": "We're running a hackathon on 9/9/2022 to decompose complex reasoning tasks into subtasks that are easier to automate & evaluate with language models. Our team is currently breaking down reasoning about the quality of evidence in randomized controlled trials into smaller tasks e.g. placebo, intervention adherence rate, blinding procedure, etc.",
+        "question": "What is happening on 9/9/2022?"
+      },
+      "name": "answer",
+      "parent": 0,
+      "shortArgs": [
+        "We're running a hackathon on 9/9/20..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "Background text: \"",
+            {
+              "formatted": "We're running a hackathon on 9/9/2022 to decompose complex reasoning tasks into subtasks that are easier to automate & evaluate with language models. Our team is currently breaking down reasoning about the quality of evidence in randomized controlled trials into smaller tasks e.g. placebo, intervention adherence rate, blinding procedure, etc.",
+              "source": "context",
+              "value": "We're running a hackathon on 9/9/2022 to decompose complex reasoning tasks into subtasks that are easier to automate & evaluate with language models. Our team is currently breaking down reasoning about the quality of evidence in randomized controlled trials into smaller tasks e.g. placebo, intervention adherence rate, blinding procedure, etc."
+            },
+            "\"\n\nAnswer the following question about the background text above:\n\nQuestion: \"",
+            {
+              "formatted": "What is happening on 9/9/2022?",
+              "source": "question",
+              "value": "What is happening on 9/9/2022?"
+            },
+            "\"\nAnswer: \""
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 1,
+      "shortArgs": [
+        "Background text: \"",
+        "\"\n\nAnswer the following question ab...",
+        "\"\nAnswer: \""
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": "Impact such raise rock include reveal product.",
+      "shortResult": [
+        "Impact such raise rock include reve..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Impact such raise rock include reveal product.",
+      "shortResult": [
+        "Impact such raise rock include reve..."
+      ]
+    }
+  }
+]

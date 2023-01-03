@@ -1,0 +1,67 @@
+[
+  {
+    "1": {
+      "args": {
+        "answer_prefix": "Let's think step by step.",
+        "question": "What would happen if the average temperature in Northern California went up by 5 degrees Fahrenheit?"
+      },
+      "name": "chain_of_thought",
+      "parent": 0,
+      "shortArgs": [
+        "What would happen if the average te..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "Answer the following question:\n\nQuestion: \"",
+            {
+              "formatted": "What would happen if the average temperature in Northern California went up by 5 degrees Fahrenheit?",
+              "source": "question",
+              "value": "What would happen if the average temperature in Northern California went up by 5 degrees Fahrenheit?"
+            },
+            "\"\nAnswer: \"",
+            {
+              "formatted": "Let's think step by step.",
+              "source": "answer_prefix",
+              "value": "Let's think step by step."
+            }
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 1,
+      "shortArgs": [
+        "Answer the following question:\n\nQue...",
+        "\"\nAnswer: \""
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": "Strategy check teacher benefit easy daughter offer not.",
+      "shortResult": [
+        "Strategy check teacher benefit easy..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Strategy check teacher benefit easy daughter offer not.",
+      "shortResult": [
+        "Strategy check teacher benefit easy..."
+      ]
+    }
+  }
+]

@@ -1,0 +1,63 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "What is the effect of creatine on cognition?"
+      },
+      "name": "ask_subquestions",
+      "parent": 0,
+      "shortArgs": [
+        "What is the effect of creatine on c..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "Decompose the following question into 2-5 subquestions that would help you answer the question. Make the questions stand alone, so that they can be answered without the context of the original question.\n\nQuestion: \"",
+            {
+              "formatted": "What is the effect of creatine on cognition?",
+              "source": "question",
+              "value": "What is the effect of creatine on cognition?"
+            },
+            "\"\nSubquestions:\n-"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": null,
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 1,
+      "shortArgs": [
+        "Decompose the following question in...",
+        "\"\nSubquestions:\n-"
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": "Low either deep painting finally certain approach.",
+      "shortResult": [
+        "Low either deep painting finally ce..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": [
+        "Low either deep painting finally certain approach."
+      ],
+      "shortResult": [
+        "Low either deep painting finally ce..."
+      ]
+    }
+  }
+]

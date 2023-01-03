@@ -1,0 +1,156 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "Who is the president of the United States?"
+      },
+      "name": "answer_by_search",
+      "parent": 0,
+      "shortArgs": [
+        "Who is the president of the United..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "question": "Who is the president of the United States?"
+      },
+      "name": "choose_query",
+      "parent": 1,
+      "shortArgs": [
+        "Who is the president of the United..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "\nYou're trying to answer the question ",
+            {
+              "formatted": "Who is the president of the United States?",
+              "source": "question",
+              "value": "Who is the president of the United States?"
+            },
+            ". You get to type in a search query to Google, and then you'll be shown the results. What query do you want to search for?\n\nQuery: \"\n"
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 2,
+      "shortArgs": [
+        "You're trying to answer the questi...",
+        ". You get to type in a search query..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": "Push cold school animal property week.",
+      "shortResult": [
+        "Push cold school animal property we..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": "Push cold school animal property week.",
+      "shortResult": [
+        "Push cold school animal property we..."
+      ]
+    }
+  },
+  {
+    "4": {
+      "args": {
+        "query": "Push cold school animal property week."
+      },
+      "name": "search",
+      "parent": 1,
+      "shortArgs": [
+        "Push cold school animal property we..."
+      ]
+    }
+  },
+  {
+    "4": {
+      "result": {
+        "error": "Invalid API key. Your API key should be here: https://serpapi.com/manage-api-key"
+      },
+      "shortResult": [
+        "Invalid API key. Your API key shoul..."
+      ]
+    }
+  },
+  {
+    "5": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "Search results from Google for the query \"",
+            {
+              "formatted": "Push cold school animal property week.",
+              "source": "query",
+              "value": "Push cold school animal property week."
+            },
+            "\": \"",
+            {
+              "formatted": "No results found",
+              "source": "context",
+              "value": "No results found"
+            },
+            "\"\n\nAnswer the following question, using the search results if helpful:\n\nQuestion: \"",
+            {
+              "formatted": "Who is the president of the United States?",
+              "source": "question",
+              "value": "Who is the president of the United States?"
+            },
+            "\"\nAnswer: \""
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 1,
+      "shortArgs": [
+        "Search results from Google for the...",
+        "\": \"",
+        "\"\n\nAnswer the following question, u...",
+        "..."
+      ]
+    }
+  },
+  {
+    "5": {
+      "result": "Road prove personal expect agreement billion such.",
+      "shortResult": [
+        "Road prove personal expect agreemen..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Road prove personal expect agreement billion such.",
+      "shortResult": [
+        "Road prove personal expect agreemen..."
+      ]
+    }
+  }
+]

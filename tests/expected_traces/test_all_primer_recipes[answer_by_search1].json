@@ -1,0 +1,90 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "Who is the president of the United States?"
+      },
+      "name": "answer_by_search",
+      "parent": 0,
+      "shortArgs": [
+        "Who is the president of the United..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "query": "Who is the president of the United States?"
+      },
+      "name": "search",
+      "parent": 1,
+      "shortArgs": [
+        "Who is the president of the United..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": {
+        "error": "Invalid API key. Your API key should be here: https://serpapi.com/manage-api-key"
+      },
+      "shortResult": [
+        "Invalid API key. Your API key shoul..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "default": "",
+        "max_tokens": 100,
+        "prompt": {
+          "__fstring__": [
+            "Search results from Google: \"",
+            {
+              "formatted": "No results found",
+              "source": "context",
+              "value": "No results found"
+            },
+            "\"\n\nAnswer the following question, using the search results if helpful:\n\nQuestion: \"",
+            {
+              "formatted": "Who is the president of the United States?",
+              "source": "question",
+              "value": "Who is the president of the United States?"
+            },
+            "\"\nAnswer: \""
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 1,
+      "shortArgs": [
+        "Search results from Google: \"",
+        "\"\n\nAnswer the following question, u...",
+        "\"\nAnswer: \""
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": "Mouth item identify school good general foot watch.",
+      "shortResult": [
+        "Mouth item identify school good gen..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Mouth item identify school good general foot watch.",
+      "shortResult": [
+        "Mouth item identify school good gen..."
+      ]
+    }
+  }
+]

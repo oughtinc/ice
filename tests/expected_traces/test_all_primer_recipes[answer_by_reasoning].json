@@ -1,0 +1,148 @@
+[
+  {
+    "1": {
+      "args": {
+        "question": "What would happen if the average temperature in Northern California went up by 5 degrees Fahrenheit?"
+      },
+      "name": "answer_by_reasoning",
+      "parent": 0,
+      "shortArgs": [
+        "What would happen if the average te..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "args": {
+        "question": "What would happen if the average temperature in Northern California went up by 5 degrees Fahrenheit?"
+      },
+      "name": "get_reasoning",
+      "parent": 1,
+      "shortArgs": [
+        "What would happen if the average te..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "Answer the following question:\n\nQuestion: \"",
+            {
+              "formatted": "What would happen if the average temperature in Northern California went up by 5 degrees Fahrenheit?",
+              "source": "question",
+              "value": "What would happen if the average temperature in Northern California went up by 5 degrees Fahrenheit?"
+            },
+            "\"\nAnswer: \"Let's think step by step."
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 2,
+      "shortArgs": [
+        "Answer the following question:\n\nQue...",
+        "\"\nAnswer: \"Let's think step by step..."
+      ]
+    }
+  },
+  {
+    "3": {
+      "result": "Participant professional past measure.",
+      "shortResult": [
+        "Participant professional past measu..."
+      ]
+    }
+  },
+  {
+    "2": {
+      "result": "Participant professional past measure.",
+      "shortResult": [
+        "Participant professional past measu..."
+      ]
+    }
+  },
+  {
+    "4": {
+      "args": {
+        "question": "What would happen if the average temperature in Northern California went up by 5 degrees Fahrenheit?",
+        "reasoning": "Participant professional past measure."
+      },
+      "name": "get_answer",
+      "parent": 1,
+      "shortArgs": [
+        "What would happen if the average te..."
+      ]
+    }
+  },
+  {
+    "5": {
+      "args": {
+        "default": "",
+        "max_tokens": 256,
+        "prompt": {
+          "__fstring__": [
+            "Answer the following question using the reasoning shown below:\n\nQuestion: \"",
+            {
+              "formatted": "What would happen if the average temperature in Northern California went up by 5 degrees Fahrenheit?",
+              "source": "question",
+              "value": "What would happen if the average temperature in Northern California went up by 5 degrees Fahrenheit?"
+            },
+            "\"\nReasoning: \"",
+            {
+              "formatted": "Participant professional past measure.",
+              "source": "reasoning",
+              "value": "Participant professional past measure."
+            },
+            "\"\nShort answer: \""
+          ]
+        },
+        "self": {
+          "class_name": "FakeAgent"
+        },
+        "stop": "\"",
+        "verbose": false
+      },
+      "cls": "FakeAgent",
+      "name": "complete",
+      "parent": 4,
+      "shortArgs": [
+        "Answer the following question using...",
+        "\"\nReasoning: \"",
+        "\"\nShort answer: \""
+      ]
+    }
+  },
+  {
+    "5": {
+      "result": "Still fear public better process so.",
+      "shortResult": [
+        "Still fear public better process so..."
+      ]
+    }
+  },
+  {
+    "4": {
+      "result": "Still fear public better process so.",
+      "shortResult": [
+        "Still fear public better process so..."
+      ]
+    }
+  },
+  {
+    "1": {
+      "result": "Still fear public better process so.",
+      "shortResult": [
+        "Still fear public better process so..."
+      ]
+    }
+  }
+]
