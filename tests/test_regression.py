@@ -49,7 +49,7 @@ def check_trace(name: str):
     if os.environ.get("FIX_TESTS"):
         json_dump = json.dumps(actual, indent=2, sort_keys=True)
         if len(json_dump) < 50_000:
-            path.write_text(json_dump)
+            path.write_text(json_dump + "\n")
         elif path.exists():
             raise ValueError(
                 f"Trace has become too large: {path} ({len(json_dump)} bytes)"
