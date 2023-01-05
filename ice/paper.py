@@ -146,6 +146,8 @@ class Paragraph(BaseModel):
 class Paper(BaseModel):
     paragraphs: list[Paragraph]
     document_id: str = "unknown"
+    title: str | None = None
+    authors: list[str] | None = None
 
     @classmethod
     def load(cls, file: Path) -> "Paper":
@@ -165,10 +167,49 @@ class Paper(BaseModel):
             dict(paragraphs=paragraph_dicts, document_id=document_id)
         )
 
+    @classmethod
+    def from_elicit_result(cls, result: dict) -> "Paper":
+        document_id = result["paperId"]
+        title = result["title"]
+        authors = result["authors"]
+        abstract = [
+            Paragraph(
+                sentences=p["sentences"],
+                sections=[Section.parse_obj(sec) for sec in p["sections"]],
+                sectionType="abstract",
+            )
+            for p in result["abstract"]["paragraphs"]
+        ]
+        if not result["body"]["value"]:
+            return cls(
+                paragraphs=abstract,
+                document_id=document_id,
+                title=title,
+                authors=authors,
+            )
+        body_pars = result["body"]["value"]["paragraphs"]
+        body = [
+            Paragraph(
+                sentences=p["sentences"],
+                sections=[Section.parse_obj(sec) for sec in p["sections"]],
+                sectionType=p["sectionType"],
+            )
+            for p in body_pars
+        ]
+        return cls(
+            paragraphs=abstract + body,
+            document_id=document_id,
+            title=title,
+            authors=authors,
+        )
+
     def sentences(self) -> Iterator[str]:
         for paragraph in self.paragraphs:
             for sentence in paragraph.sentences:
                 yield sentence
+
+    def abstract(self) -> list[Paragraph]:
+        return [p for p in self.paragraphs if p.section_type == "abstract"]
 
     def nonempty_paragraphs(self) -> list[Paragraph]:
         return [p for p in self.paragraphs if not p.is_empty()]
