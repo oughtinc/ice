@@ -22,7 +22,7 @@ config = dotenv_values(root_dir / ".env")
 
 @diskcache()
 # try 5 times, because sometimes preview apps take a while to start responding again after they have an issue
-@retry(stop=stop_after_attempt(5), wait=wait_random_exponential(2))
+@retry(stop=stop_after_attempt(5), wait=wait_random_exponential(2), reraise=True)
 def send_elicit_request(*, request_body, endpoint: str):
     if not settings.ELICIT_AUTH_TOKEN:
         raise ValueError(
@@ -42,6 +42,7 @@ def send_elicit_request(*, request_body, endpoint: str):
         headers=headers,
         timeout=40,
     ) as r:
+        r.raise_for_status()
         for chunk in r.iter_text():
             chunks.append(chunk)
 

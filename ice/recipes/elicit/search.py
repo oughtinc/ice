@@ -1,7 +1,9 @@
+from urllib.parse import urljoin
 from structlog import get_logger
 
 from ice.recipe import recipe
 from ice.recipes.elicit.common import send_elicit_request
+import httpx
 
 log = get_logger()
 
@@ -23,18 +25,32 @@ def make_request_body(
     )
 
 
+async def get_elicit_backend() -> str:
+    BACKEND_URL = "https://elicit.org/api/backend"
+    async with httpx.AsyncClient() as client:
+        response = await client.get(BACKEND_URL)
+        # Response is plain text, e.g. "https://prod.elicit.org/elicit-red/lit-review"
+        response.raise_for_status()
+        return response.text
+
+
 async def elicit_search(
     question: str = "What is the effect of creatine on cognition?",
     num_papers: int = 4,
-    # TODO: Dynamically consult https://elicit.org/api/backend
-    endpoint: str = "https://prod.elicit.org/elicit-red/lit-review",
+    has_pdf_filter: bool = False,
+    backend: str | None = None,
 ):
     """
     Search Elicit for papers related to a question.
     """
+
+    backend = backend or await get_elicit_backend()
+
+    endpoint = backend.rstrip("/") + "/lit-review"
+
     log.info(f"Searching Elicit for query: {question}, endpoint: {endpoint}")
 
-    filters = None
+    filters = dict(has_pdf=has_pdf_filter)
 
     request_body = make_request_body(
         query=question, num_papers=num_papers, filters=filters
