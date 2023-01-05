@@ -12,7 +12,7 @@ ICE is a Python library and trace visualizer for language model programs.
 ## Features
 
 - Run language model recipes in different modes: humans, human+LM, LM
-- Inspect the execution traces in your browser for debugging
+- [Inspect the execution traces in your browser for debugging](https://github.com/oughtinc/ice/wiki/ICE-UI-guide)
 - Define and use new language model agents, e.g. chain-of-thought agents
 - Run recipes quickly by parallelizing language model calls
 - Reuse component recipes such as question-answering, ranking, and verification
