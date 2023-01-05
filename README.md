@@ -97,3 +97,24 @@ We welcome community contributions:
 For larger contributions, make an issue for discussion before submitting a PR.
 
 And for even larger contributions, join us - [we're hiring](https://ought.org/careers)!
+
+## How to cite
+
+If you use ICE, please cite:
+
+> [Iterated Decomposition: Improving Science Q&A by Supervising Reasoning Processes](https://arxiv.org/abs/2301.01751). Justin Reppert, Ben Rachbach, Charlie George, Luke Stebbing Jungwon Byun, Maggie Appleton, Andreas Stuhlmüller (2023). Ought Technical Report. arXiv:2301.01751 [cs.CL]
+
+Bibtex:
+
+```bibtex
+@article{reppert2023iterated,
+  author = {Justin Reppert and Ben Rachbach and Charlie George and Luke Stebbing and Jungwon Byun and Maggie Appleton and Andreas Stuhlm\"{u}ller},
+  archivePrefix = {arXiv},
+  eprint = {2301.01751},
+  primaryClass = {cs.CL},
+  title = {Iterated Decomposition: Improving Science Q&A by Supervising Reasoning Processes},
+  year = 2023,
+  keywords = {language models, decomposition, workflow, debugging},
+  url = {https://arxiv.org/abs/2301.01751}
+}
+```
