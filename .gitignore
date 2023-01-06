@@ -3,7 +3,6 @@
 **/.vscode
 **/*.egg-info
 /.coverage
-/.env
 /.git
 /.mypy_cache
 /.pre-commit-home
@@ -17,3 +16,6 @@
 !/papers/keenan-2018.pdf
 /ui/node_modules
 /venv/
+
+.ought-ice
+**/gold_standards
