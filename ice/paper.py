@@ -148,6 +148,7 @@ class Paper(BaseModel):
     document_id: str = "unknown"
     title: str | None = None
     authors: list[str] | None = None
+    original: dict | None = None
 
     @classmethod
     def load(cls, file: Path) -> "Paper":
@@ -186,6 +187,7 @@ class Paper(BaseModel):
                 document_id=document_id,
                 title=title,
                 authors=authors,
+                original=result,
             )
         body_pars = result["body"]["value"]["paragraphs"]
         body = [
@@ -201,6 +203,7 @@ class Paper(BaseModel):
             document_id=document_id,
             title=title,
             authors=authors,
+            original=result,
         )
 
     def sentences(self) -> Iterator[str]:

@@ -1,4 +1,6 @@
+from typing import Sequence
 from urllib.parse import urljoin
+from ice.paper import Paper
 from structlog import get_logger
 
 from ice.recipe import recipe
@@ -32,6 +34,18 @@ async def get_elicit_backend() -> str:
         # Response is plain text, e.g. "https://prod.elicit.org/elicit-red/lit-review"
         response.raise_for_status()
         return response.text
+
+
+def elicit_results_to_papers(elicit_results: dict) -> Sequence[Paper]:
+    return [
+        Paper.from_elicit_result(paper) for paper in elicit_results["papers"].values()
+    ]
+
+
+async def elicit_paper_search(question: str, num_papers: int = 4, full_text: bool = True) -> Sequence[Paper]:
+    return elicit_results_to_papers(
+        await elicit_search(question, num_papers, full_text)
+    )
 
 
 async def elicit_search(
