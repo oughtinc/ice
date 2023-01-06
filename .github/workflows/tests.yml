@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10"] # TODO: other python versions
+        python-version: ["3.10", "3.11"]
     name: Tests
     steps:
       - name: Checkout code
