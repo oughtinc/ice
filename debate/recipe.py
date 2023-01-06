@@ -1,7 +1,10 @@
+from prompt import *
+
 from ice.agents.base import Agent
 from ice.recipe import recipe
-#from ice.recipes.primer.debate.prompt import *
-from prompt import *
+
+# from ice.recipes.primer.debate.prompt import *
+
 
 async def turn(debate: Debate, agent: Agent, agent_name: Name, turns_left: int):
     prompt = render_debate_prompt(agent_name, debate, turns_left)
