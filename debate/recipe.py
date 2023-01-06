@@ -1,7 +1,11 @@
+
+# import pdb
+# pdb.set_trace()
+
 from ice.agents.base import Agent
 from ice.recipe import recipe
-#from ice.recipes.primer.debate.prompt import *
 from prompt import *
+
 
 async def turn(debate: Debate, agent: Agent, agent_name: Name, turns_left: int):
     prompt = render_debate_prompt(agent_name, debate, turns_left)
@@ -9,7 +13,8 @@ async def turn(debate: Debate, agent: Agent, agent_name: Name, turns_left: int):
     return (agent_name, answer.strip('" '))
 
 
-async def debate(question: str = "Is water wet?"):
+async def debate(question: str):
+
     agents = [recipe.agent(), recipe.agent()]
     agent_names = ["Alice", "Bob"]
     debate = initialize_debate(question)
