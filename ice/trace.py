@@ -167,7 +167,7 @@ def emit_block(x) -> tuple[int, int]:
 def add_fields(**fields: str):
     if trace_enabled():
         id = parent_id_var.get()
-        emit({f"{id}.fields.{key}": value for key, value in fields.items()})
+        emit({id: {"fields": fields}})
 
 
 def _encode_json(x) -> str:
@@ -198,7 +198,7 @@ class _Recorder:
         self.id = id
 
     def __call__(self, **kwargs):
-        emit({f"{id}.records.{make_id()}": emit_block(kwargs)})
+        emit({self.id: {"records": {make_id(): emit_block(kwargs)}}})
 
     def __repr__(self):
         # So this can be used in `diskcache()` functions
@@ -256,12 +256,7 @@ def trace(fn):
             if self:
                 call_event["cls"] = self.__class__.__name__
 
-            emit(
-                {
-                    id: call_event,
-                    f"{parent_id}.children.{id}": True,
-                }
-            )
+            emit({id: call_event})
 
             if recorder_name:
                 kwargs[recorder_name] = _Recorder(id)
@@ -270,9 +265,11 @@ def trace(fn):
             result_json = to_json_value(result)
             emit(
                 {
-                    f"{id}.result": emit_block(result_json),
-                    f"{id}.shortResult": get_strings(result_json),
-                    f"{id}.end": monotonic_ns(),
+                    id: dict(
+                        result=emit_block(result_json),
+                        shortResult=get_strings(result_json),
+                        end=monotonic_ns(),
+                    )
                 }
             )
             return result

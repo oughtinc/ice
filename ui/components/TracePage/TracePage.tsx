@@ -1,7 +1,7 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import classNames from "classnames";
 import produce from "immer";
-import { isEmpty, last, memoize, set } from "lodash";
+import { isEmpty, last, memoize, merge } from "lodash";
 import {
   createContext,
   Dispatch,
@@ -119,20 +119,28 @@ const TreeContext = createContext<{
   isVisible: (id: string) => boolean;
 } | null>(null);
 
-const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
-  Object.entries(updates).forEach(([path, value]) => {
-    set(calls, path, value);
-    if (path.endsWith(".fields.davinci_equivalent_tokens")) {
-      const tokens = Number(value);
-      if (isNaN(tokens)) return;
-      const callId = path.split(".")[0];
-      let call = calls[callId];
-      while (call) {
-        call.totalTokens = (call.totalTokens ?? 0) + tokens;
-        call = calls[call.parent];
-      }
-    }
-  });
+const applyUpdates = (calls: Calls, updates: Record<string, any>) => {
+  merge(calls, updates);
+  const [callId, value] = Object.values(updates);
+  const call = calls[callId];
+  const parent = calls[call.parent];
+  if (parent) {
+    parent.children = parent.children || {};
+    parent.children[callId] = call;
+  }
+  addTokens(calls, call, value);
+};
+
+const addTokens = (calls: Calls, call: CallInfo, value: any) => {
+  const tokens = Number(value?.fields?.davinci_equivalent_tokens);
+  if (isNaN(tokens)) {
+    return;
+  }
+  while (call) {
+    call.totalTokens = (call.totalTokens ?? 0) + tokens;
+    call = calls[call.parent];
+  }
+};
 
 const urlPrefix = (traceId: string) => {
   const base = recipes[traceId] ? "https://oughtinc.github.io/static" : "/api";
