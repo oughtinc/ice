@@ -24,6 +24,7 @@ async def debate(question: str):
             response = await turn(debate, agent, agent_name, turns_left)
             debate.append(response)
             turns_left -= 1
+
     return render_debate(debate)
 
 
