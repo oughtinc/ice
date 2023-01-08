@@ -17,11 +17,11 @@ class TestDebates:
         return self.current_prompt
     def get_prompts(self):
 
-        return self.listOfPrompts
+        return self.prompts_list
 
     def get_questions(self):
 
-        return self.listOfQuestions
+        return self.questions_list
         # "Should we legalize all drugs?",
         # "Is water wet?"
 
@@ -36,7 +36,7 @@ class TestDebates:
 
         prompts_list = self.get_prompts()
 
-        for prompt in listOfPrompts:
+        for prompt in prompts_list:
 
             # increment our current prompt
             self.current_prompt = self.current_prompt + 1

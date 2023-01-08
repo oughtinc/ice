@@ -7,7 +7,7 @@ def render_debate_prompt(agent_name: str, debate: Debate, turns_left: int) -> st
     test_debates_instance = testDebates.TestDebates.get_instance()
     # retrieve correct prompt
     prompts_list = test_debates_instance.get_prompts()
-    promptIn = prompts_list[current]
+    promptIn = prompts_list[test_debates_instance.get_current_prompt()]
 
     prompt = f"""
     "You are {agent_name}. There are {turns_left} turns left in the debate. {promptIn}
