@@ -1,8 +1,8 @@
-
 from prompt import *
 
 from ice.agents.base import Agent
 from ice.recipe import recipe
+
 
 async def turn(debate: Debate, agent: Agent, agent_name: Name, turns_left: int):
 
