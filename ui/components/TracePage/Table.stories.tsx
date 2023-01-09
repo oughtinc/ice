@@ -5,6 +5,13 @@ import { Table } from "./Table";
 const meta: Meta<typeof Table> = {
   title: "TracePage/Table",
   component: Table,
+  decorators: [
+    Story => (
+      <div style={{ height: "240px" }}>
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 export default meta;
