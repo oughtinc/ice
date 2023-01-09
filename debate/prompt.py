@@ -1,12 +1,15 @@
 from utils import *
-from testDebates import test_debates_instance
+import testDebates
 
-def render_debate_prompt(agent_name: str, debate: Debate, turns_left: int) -> str:
+def render_debate_prompt(agent_name: str, debate: Debate, turns_left: int, current_prompt: int) -> str:
 
+    test_debates_instance = testDebates.TestDebates()
     # retrieve correct prompt
     prompts_list = test_debates_instance.get_prompts()
-    print("CURRENT: " + str(test_debates_instance.get_current_prompt()))
-    promptIn = prompts_list[test_debates_instance.get_current_prompt()]
+
+    print("CURRENT NUM: " + str(current_prompt))
+    print("CURRENT: " + str(test_debates_instance.get_prompts()))
+    promptIn = prompts_list[current_prompt]
 
     prompt = f"""
     "You are {agent_name}. There are {turns_left} turns left in the debate. {promptIn}
@@ -16,4 +19,4 @@ def render_debate_prompt(agent_name: str, debate: Debate, turns_left: int) -> st
 
 
     return prompt
-print(render_debate_prompt("Bob", my_debate, 5))
+# print(render_debate_prompt("Bob", my_debate, 5))

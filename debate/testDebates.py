@@ -1,8 +1,8 @@
 import os
 
-test_debates_instance = None
 class TestDebates:
 
+    current_prompt = 0
     def __init__(self):
 
         self.current_prompt = 0
@@ -52,19 +52,17 @@ class TestDebates:
 
             # increment our current prompt
             test_debates_instance.increment_current_prompt()
-
-def create_instance():
-    global test_debates_instance
-    test_debates_instance = TestDebates()
-    print(test_debates_instance)
+#
+# def create_instance():
+#     global test_debates_instance
+#     test_debates_instance = TestDebates()
+#     print(test_debates_instance)
 
 # Initialize our class of prompts/questions
 if __name__ == '__main__':
-    print(test_debates_instance)
 
     # initialize instance
-    create_instance()
+    test_debates_instance = TestDebates()
 
-    print(test_debates_instance)
     # immediately start the program based on the prompts/questions
     test_debates_instance.execute_debate()

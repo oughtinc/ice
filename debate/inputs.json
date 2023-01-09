@@ -1,0 +1,6 @@
+{
+  "input_questions": ["You are trying to win the debate using reason and evidence. Don't repeat yourself. No more than 1-2 sentences per turn.",
+      "You are trying to win the debate."]
+  "current_prompt": 0
+  "inputPrompts": ["Should we legalize all drugs?"]
+  }
