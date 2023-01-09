@@ -25,6 +25,6 @@ jobs:
       - name: Run all tests
         run: pytest --cov . -x
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # TODO should we prompt this?
           OPENAI_ORG_ID: ${{ secrets.OPENAI_ORG_ID }}
           OUGHT_INFERENCE_API_KEY: ${{ secrets.OUGHT_INFERENCE_API_KEY }}

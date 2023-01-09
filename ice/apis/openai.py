@@ -1,20 +1,15 @@
 from collections.abc import Mapping
 
 import httpx
-
-from httpx import Response
-from httpx import TimeoutException
+from httpx import Response, TimeoutException
 from structlog.stdlib import get_logger
 from tenacity import retry
-from tenacity.retry import retry_any
-from tenacity.retry import retry_if_exception
-from tenacity.retry import retry_if_exception_type
+from tenacity.retry import retry_any, retry_if_exception, retry_if_exception_type
 from tenacity.wait import wait_random_exponential
 
 from ice.cache import diskcache
 from ice.settings import settings
-from ice.trace import add_fields
-from ice.trace import trace
+from ice.trace import add_fields, trace
 
 log = get_logger()
 
@@ -40,16 +35,18 @@ def log_attempt_number(retry_state):
             f"Attempt #{retry_state.attempt_number} ({OPENAI_ORG_ID = })..."
         )
 
+def make_headers() -> dict[str, str]:
+    headers = {
+        "Content-Type": "application/json",
+        # TODO add a header for this
+        "Authorization": f"Bearer {settings.get_setting_with_prompting('OPENAI_API_KEY')}",
+    }
+    if settings.OPENAI_ORG_ID:
+        headers["OpenAI-Organization"] = settings.OPENAI_ORG_ID
+    return headers
 
 RETRYABLE_STATUS_CODES = {408, 429, 502, 503, 504}
 OPENAI_BASE_URL = "https://api.openai.com/v1"
-OPENAI_DEFAULT_HEADERS = {
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
-}
-if settings.OPENAI_ORG_ID:
-    OPENAI_DEFAULT_HEADERS["OpenAI-Organization"] = settings.OPENAI_ORG_ID
-
 
 def is_retryable_HttpError(e: BaseException) -> bool:
     return (
@@ -109,7 +106,7 @@ async def _post(
         response = await client.post(
             f"{OPENAI_BASE_URL}/{endpoint}",
             json=json,
-            headers=OPENAI_DEFAULT_HEADERS,
+            headers=make_headers(),
             timeout=timeout,
         )
         if response.status_code == 429:
