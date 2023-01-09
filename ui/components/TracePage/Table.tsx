@@ -12,14 +12,14 @@ export const Table = ({
 }: {
   rows: StringToScalar[];
   rowIds?: string[];
-  onFocusChange?: ({ rowId }: { rowId: string | undefined }) => void;
+  onFocusChange?: (rowId?: string) => void;
 }) => (
   <AgGridReact<StringToScalar>
     className="ag-theme-alpine w-full h-full"
     columnDefs={uniq(rows.flatMap(Object.keys)).map(field => ({ field }))}
     defaultColDef={{ filter: true, sortable: true, resizable: true }}
     onCellFocused={({ rowIndex }) =>
-      onFocusChange?.({ rowId: rowIndex === null ? undefined : rowIds?.[rowIndex] })
+      onFocusChange?.(rowIndex === null ? undefined : rowIds?.[rowIndex])
     }
     pagination={rows.length > 100}
     rowData={rows}

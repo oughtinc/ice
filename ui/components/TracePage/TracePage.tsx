@@ -924,7 +924,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
             <Table
               rows={highlightedCalls.map(({ fields = {} }) => fields)}
               rowIds={highlightedCalls.map(({ id }) => id)}
-              onFocusChange={({ rowId }) => setSelectedId(rowId)}
+              onFocusChange={setSelectedId}
             />
           </Allotment.Pane>
         </Allotment>
