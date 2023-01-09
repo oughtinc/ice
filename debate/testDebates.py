@@ -2,17 +2,19 @@ import os
 
 class TestDebates:
 
-    current_prompt = 0
-    def __init__(self):
+    def __init__(self, file_name):
+        JSON_loaded = open(file_name)
+        self.file_name = file_name
+        self.input_data = json.loads(JSON_loaded)
 
-        self.current_prompt = 0
-        self.prompts_list = ["You are trying to win the debate using reason and evidence. Don't repeat yourself. No more than 1-2 sentences per turn.",
-        "You are trying to win the debate."]
-        self.questions_list = ["Is a hotdog a taco?"]
+    def reset_prompt_count(self, file_name):
 
+        self.input_data["count"] = 0
+        with open(file_name, "w") as outfile:
+            json.dump(self.input_data, outfile)
     # getters
     def get_current_prompt(self):
-        return self.current_prompt
+        return self.input_data
 
     def increment_current_prompt(self):
         self.current_prompt = self.current_prompt + 1
@@ -26,14 +28,6 @@ class TestDebates:
         return self.questions_list
         # "Should we legalize all drugs?",
         # "Is water wet?"
-
-
-    # @staticmethod
-    # def get_instance():
-    #     if(TestDebates._instance == None):
-    #         TestDebates._instance = TestDebates()
-    #         print("new instance of testDebates")
-    #     return TestDebates._instance
 
     # we need a bash prompt that will
     # execute recipe file with the above inputs
@@ -52,11 +46,6 @@ class TestDebates:
 
             # increment our current prompt
             test_debates_instance.increment_current_prompt()
-#
-# def create_instance():
-#     global test_debates_instance
-#     test_debates_instance = TestDebates()
-#     print(test_debates_instance)
 
 # Initialize our class of prompts/questions
 if __name__ == '__main__':
