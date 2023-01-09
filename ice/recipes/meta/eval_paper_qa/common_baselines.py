@@ -23,8 +23,30 @@ from ice.recipes.program_search.nodes.answer.types import Demonstration
 from ice.recipes.program_search.nodes.select.select import as_bool
 from ice.recipes.program_search.nodes.select.select import (
     select_results_using_top_monot5_paragraph,
+    select_results_using_elicit_prompt,
 )
 from ice.utils import map_async
+
+
+def top_n(values: Sequence[tuple[str, float]], n: int) -> Sequence[str]:
+    """Return the top n values in an unordered sequence of values and scores."""
+    top_n_idxs = sorted(
+        range(len(values)), key=lambda idx: values[idx][1], reverse=True
+    )[:n]
+    return [values[idx][0] for idx in top_n_idxs]
+
+
+async def top_n_answer(
+    paper: Paper,
+    question: str,
+    n: int,
+) -> Sequence[str] | str:
+    answer: str | Sequence[str]
+    all_paras = [str(p) for p in paper.paragraphs]
+    scored_paras = await select_results_using_elicit_prompt(question, all_paras)
+    top_n_paras = top_n(scored_paras, n)
+    answer = await elicit_answer_prompt(question, "\n\n".join(top_n_paras))
+    return top_n_paras, answer
 
 
 async def _cheating_qa_baseline(
