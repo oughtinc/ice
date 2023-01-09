@@ -2,7 +2,6 @@ import testDebates
 
 from utils import *
 
-
 def render_debate_prompt(agent_name: str, debate: Debate, turns_left: int) -> str:
 
     test_debates_instance = testDebates.TestDebates("debate/inputs.json")
