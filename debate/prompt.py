@@ -1,5 +1,7 @@
-from utils import *
 import testDebates
+
+from utils import *
+
 
 def render_debate_prompt(agent_name: str, debate: Debate, turns_left: int) -> str:
 
@@ -16,6 +18,7 @@ def render_debate_prompt(agent_name: str, debate: Debate, turns_left: int) -> st
     You: "
     """.strip()
 
-
     return prompt
+
+
 print(render_debate_prompt("Bob", my_debate, 5, test_debates_instance.get_))

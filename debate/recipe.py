@@ -1,14 +1,12 @@
-
 # import pdb
 # pdb.set_trace()
+from prompt import *
 
 from ice.agents.base import Agent
 from ice.recipe import recipe
-from prompt import *
 
 
 async def turn(debate: Debate, agent: Agent, agent_name: Name, turns_left: int):
-
 
     prompt = render_debate_prompt(agent_name, debate, turns_left)
     answer = await agent.complete(prompt=prompt, stop="\n")
@@ -29,5 +27,6 @@ async def debate(question: str):
             turns_left -= 1
 
     return render_debate(debate)
+
 
 recipe.main(debate)

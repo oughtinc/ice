@@ -1,8 +1,8 @@
-import os
 import json
+import os
+
 
 class TestDebates:
-
     def __init__(self, file_name):
         JSON_loaded = open(file_name)
         self.file_name = file_name
@@ -47,15 +47,16 @@ class TestDebates:
         for prompt in prompts_list:
 
             for question in questions_list:
-                command = f"python debate/recipe.py --question \"{question}\" "
+                command = f'python debate/recipe.py --question "{question}" '
                 os.system(command)
 
             # increment our current prompt
             test_debates_instance.increment_current_prompt()
         reset_prompt_count()
 
+
 # Initialize our class of prompts/questions
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     # initialize instance
     test_debates_instance = TestDebates("debate/inputs.json")
