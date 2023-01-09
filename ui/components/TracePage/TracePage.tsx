@@ -920,7 +920,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
               </ArcherContainer>
             </div>
           </div>
-          <Allotment.Pane className="call-table" preferredSize={500}>
+          <Allotment.Pane className="call-table" preferredSize={200}>
             <Table
               rows={highlightedCalls.map(({ fields = {} }) => fields)}
               rowIds={highlightedCalls.map(({ id }) => id)}
