@@ -1,7 +1,7 @@
 from utils import *
 import testDebates
 
-def render_debate_prompt(agent_name: str, debate: Debate, turns_left: int, current_prompt: int) -> str:
+def render_debate_prompt(agent_name: str, debate: Debate, turns_left: int) -> str:
 
     test_debates_instance = testDebates.TestDebates("debate/inputs.json")
     # retrieve correct prompt
@@ -18,4 +18,4 @@ def render_debate_prompt(agent_name: str, debate: Debate, turns_left: int, curre
 
 
     return prompt
-# print(render_debate_prompt("Bob", my_debate, 5))
+print(render_debate_prompt("Bob", my_debate, 5, test_debates_instance.get_))

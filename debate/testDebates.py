@@ -52,6 +52,7 @@ class TestDebates:
 
             # increment our current prompt
             test_debates_instance.increment_current_prompt()
+        reset_prompt_count()
 
 # Initialize our class of prompts/questions
 if __name__ == '__main__':

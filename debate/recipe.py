@@ -7,10 +7,10 @@ from ice.recipe import recipe
 from prompt import *
 
 
-async def turn(debate: Debate, agent: Agent, agent_name: Name, turns_left: int, current_prompt: int):
+async def turn(debate: Debate, agent: Agent, agent_name: Name, turns_left: int):
 
 
-    prompt = render_debate_prompt(agent_name, debate, turns_left, current_prompt)
+    prompt = render_debate_prompt(agent_name, debate, turns_left)
     answer = await agent.complete(prompt=prompt, stop="\n")
     return (agent_name, answer.strip('" '))
 
