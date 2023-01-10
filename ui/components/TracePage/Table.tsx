@@ -1,7 +1,7 @@
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import { uniq } from "lodash";
+import { isEmpty, uniq } from "lodash";
 import { Fragment } from "react";
 
 export type StringToScalar = Record<string, boolean | number | string | null>;
@@ -16,7 +16,7 @@ export const Table = ({
   onFocusChange?: (rowId?: string) => void;
 }) => {
   const pagination = rows.length > 100;
-  return (
+  return rows.every(isEmpty) ? null : (
     // AgGridReact doesn't respect changes to 'pagination' while the component is mounted.
     <Fragment key={String(pagination)}>
       <AgGridReact<StringToScalar>
