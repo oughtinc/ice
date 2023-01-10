@@ -63,7 +63,9 @@ const SelectHighlightedFunction = () => {
 };
 
 export const isHighlighted = (call: CallInfo, highlightedFunction?: CallFunction) =>
-  call.name == highlightedFunction?.name && call.cls == highlightedFunction?.cls;
+  highlightedFunction &&
+  call.name == highlightedFunction.name &&
+  call.cls == highlightedFunction.cls;
 
 export const getHighlightedCalls = (highlightedFunction: CallFunction | undefined, calls: Calls) =>
   Object.values(calls).filter(call => isHighlighted(call, highlightedFunction));
