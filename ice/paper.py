@@ -149,6 +149,7 @@ class Paper(BaseModel):
     title: str | None = None
     authors: list[str] | None = None
     original: dict | None = None
+    abstract_summary: str | None = None
 
     @classmethod
     def load(cls, file: Path) -> "Paper":
@@ -173,6 +174,7 @@ class Paper(BaseModel):
         document_id = result["paperId"]
         title = result["title"]
         authors = result["authors"]
+        abstract_summary = result["claim"]["value"] if result["claim"]["status"] == "success" else ""
         abstract = [
             Paragraph(
                 sentences=p["sentences"],
@@ -204,6 +206,7 @@ class Paper(BaseModel):
             title=title,
             authors=authors,
             original=result,
+            abstract_summary=abstract_summary,
         )
 
     def sentences(self) -> Iterator[str]:
