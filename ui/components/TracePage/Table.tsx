@@ -21,7 +21,7 @@ export const Table = ({
   const noColumns = rows.every(isEmpty);
   return noRows || noColumns ? (
     <Alert className="m-4 w-fit">
-      {noRows ? "No function is selected" : "The selection function has no columns"}
+      {noRows ? "No function is selected" : "The selected function has no columns"}
     </Alert>
   ) : (
     // AgGridReact doesn't respect changes to 'pagination' while the component is mounted.
