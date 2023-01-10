@@ -1,11 +1,9 @@
 import math
-
 from typing import Any
 
 from structlog.stdlib import get_logger
 
-from ice.agents.base import Agent
-from ice.agents.base import Stop
+from ice.agents.base import Agent, Stop
 from ice.apis.openai import openai_complete
 from ice.environment import env
 from ice.utils import longest_common_prefix

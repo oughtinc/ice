@@ -35,18 +35,20 @@ def log_attempt_number(retry_state):
             f"Attempt #{retry_state.attempt_number} ({OPENAI_ORG_ID = })..."
         )
 
+
 def make_headers() -> dict[str, str]:
     headers = {
         "Content-Type": "application/json",
-        # TODO add a header for this
-        "Authorization": f"Bearer {settings.get_setting_with_prompting('OPENAI_API_KEY')}",
+        "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
     }
     if settings.OPENAI_ORG_ID:
         headers["OpenAI-Organization"] = settings.OPENAI_ORG_ID
     return headers
 
+
 RETRYABLE_STATUS_CODES = {408, 429, 502, 503, 504}
 OPENAI_BASE_URL = "https://api.openai.com/v1"
+
 
 def is_retryable_HttpError(e: BaseException) -> bool:
     return (
@@ -155,7 +157,6 @@ async def openai_complete(
     }
     if logit_bias:
         params["logit_bias"] = logit_bias  # type: ignore[assignment]
-
     response = await _post("completions", json=params, cache_id=cache_id)
     if isinstance(response, TooLongRequestError):
         raise response

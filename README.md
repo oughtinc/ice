@@ -65,6 +65,12 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
    npm --prefix ui run dev
    ```
 
+2. If you're working on the backend, you might find it helpful to remove the cache of language model calls:
+
+   ```shell
+   rm -r ~/.ought-ice/cache
+   ```
+
 ## Terminology
 
 - **Recipes** are decompositions of a task into subtasks.

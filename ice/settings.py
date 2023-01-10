@@ -1,14 +1,14 @@
+import sys
 from os import environ
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
 from pydantic import BaseSettings
 
 if TYPE_CHECKING:
     AnyHttpUrl = str
-
 else:
-    from pydantic import AnyHttpUrl
+    from pydantic import AnyHttpUrl  # TODO why is this grayed out?
 
 
 OUGHT_ICE_DIR = Path(environ.get("OUGHT_ICE_DIR", Path.home() / ".ought-ice"))
@@ -17,15 +17,8 @@ _env_path = OUGHT_ICE_DIR / ".env"
 
 
 class Settings(BaseSettings):
-    # TODO there's gotta be a cleaner way to do this-
-    # maybe a way to have a base class that has all the
-    # settings, and then a subclass that has the
-    # settings that are prompted for?
-    OPENAI_API_KEY: str = ""  # TODO prompt this
     OPENAI_ORG_ID: str = ""
-    OUGHT_INFERENCE_API_KEY: str = ""  # TODO prompt and save this
     OUGHT_INFERENCE_URL: AnyHttpUrl = "https://prod.elicit.org"
-    ELICIT_AUTH_TOKEN: str = ""  # TODO prompt and save this
     GOLD_STANDARDS_CSV_PATH: Path = (
         Path(__file__).parent.parent / "gold_standards/gold_standards.csv"
     )
@@ -36,20 +29,40 @@ class Settings(BaseSettings):
     OUGHT_ICE_AUTO_BROWSER: bool = True
     PAPER_DIR: Path = Path(__file__).parent.parent / "papers"
 
-    def get_setting_with_prompting(self, setting_name: str) -> str:
-        # TODO there has to be a cleaner way to do this hmmmm
-        # TODO add prompting
-        # TODO squash these commits
-        if getattr(self, setting_name) == "":
-            value = input(f"Enter {setting_name}: ")
-            # TODO are get/setattr really what they appear to be
+    # note these attributes are read differently- see __getattribute__
+    OPENAI_API_KEY: str = ""  
+    OUGHT_INFERENCE_API_KEY: str = ""  
+    ELICIT_AUTH_TOKEN: str = ""  
+
+    def __get_and_store(self, setting_name: str, prompt: Optional[str] = None) -> str:
+        # We use __getattribute__ to read these attributes, so that we can
+        # prompt the user for them if they are not already set.
+        if prompt is None:
+            prompt = f"Enter {setting_name}: "
+        if self.__dict__[setting_name] == "":
+            # TODO someday: one way this stinks is that starting the server will
+            # bury this prompt. (the server is started in a background process
+            # and has some log messages). i don't know if there's a clean way
+            # to fix this without re-architecting some stuff. 
+            value = input(prompt)
             setattr(self, setting_name, value)
-            # TODO test this
             with open(_env_path, "a") as f:
-                f.write(f"{setting_name}={value}")
-        return getattr(self, setting_name)
+                f.write(f"{setting_name}=\"{value}\"\n")
+        return self.__dict__[setting_name]
 
+    def __getattribute__(self, __name: str) -> Any:
+        match __name:
+            case "OPENAI_API_KEY":
+                return self.__get_and_store("OPENAI_API_KEY", "Enter OpenAI API key (you can get this from https://beta.openai.com/account/api-keys): ")
+            case "OUGHT_INFERENCE_API_KEY":
+                return self.__get_and_store("OUGHT_INFERENCE_API_KEY")
+            case "ELICIT_AUTH_TOKEN":
+                return self.__get_and_store("ELICIT_AUTH_TOKEN")
+            case _:
+                return super().__getattribute__(__name)
 
+# Note that fields are loaded from pydantic in a particular priority ordering. See
+# https://docs.pydantic.dev/usage/settings/#field-value-priority
 settings = Settings(
     _env_file=_env_path if _env_path.exists() else None, _env_file_encoding="utf-8"
 )

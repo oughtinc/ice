@@ -4,11 +4,9 @@ import sys
 import time
 
 import httpx
-
 from structlog import get_logger
 
-from ice.settings import server_url
-from ice.settings import settings
+from ice.settings import server_url, settings
 
 log = get_logger()
 
@@ -35,7 +33,7 @@ def ensure_server_running():
     if is_server_running():
         return
 
-    log.info("Starting server, set OUGHT_ICE_AUTO_SERVER=0 to disable.")
+    log.info("Starting server, set OUGHT_ICE_AUTO_SERVER=0 to disable. hi")
     subprocess.Popen(
         [sys.executable, "-m", "ice.server", "start"],
         env=os.environ,
