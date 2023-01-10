@@ -8,7 +8,7 @@ from pydantic import BaseSettings
 if TYPE_CHECKING:
     AnyHttpUrl = str
 else:
-    from pydantic import AnyHttpUrl  # TODO why is this grayed out?
+    from pydantic import AnyHttpUrl
 
 
 OUGHT_ICE_DIR = Path(environ.get("OUGHT_ICE_DIR", Path.home() / ".ought-ice"))
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     OUGHT_ICE_AUTO_BROWSER: bool = True
     PAPER_DIR: Path = Path(__file__).parent.parent / "papers"
 
-    # note these attributes are read differently- see __getattribute__
+    # note these attributes are read differently- see [__getattribute__]
     OPENAI_API_KEY: str = ""  
     OUGHT_INFERENCE_API_KEY: str = ""  
     ELICIT_AUTH_TOKEN: str = ""  
