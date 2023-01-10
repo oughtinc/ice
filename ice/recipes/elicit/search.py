@@ -11,7 +11,7 @@ log = get_logger()
 
 
 def make_request_body(
-    query: str, num_papers: int = 4, filters: dict | None = None
+    query: str, num_papers: int = 4, page: int = 0, filters: dict | None = None
 ) -> dict:
     """
     Make the request body for the Elicit search endpoint.
@@ -20,8 +20,8 @@ def make_request_body(
         filters = {}
     return dict(
         query=query,
-        start=0,
-        stop=num_papers,
+        start=page * num_papers,
+        stop=(page + 1) * num_papers,
         qaColumns=[],
         filters=filters,
     )
@@ -42,15 +42,16 @@ def elicit_results_to_papers(elicit_results: dict) -> Sequence[Paper]:
     ]
 
 
-async def elicit_paper_search(question: str, num_papers: int = 4, full_text: bool = True) -> Sequence[Paper]:
+async def elicit_paper_search(question: str, num_papers: int = 4, page: int = 0, full_text: bool = True) -> Sequence[Paper]:
     return elicit_results_to_papers(
-        await elicit_search(question, num_papers, full_text)
+        await elicit_search(question, num_papers, page, full_text)
     )
 
 
 async def elicit_search(
     question: str = "What is the effect of creatine on cognition?",
     num_papers: int = 4,
+    page: int = 0,
     has_pdf_filter: bool = False,
     backend: str | None = None,
 ):
@@ -67,7 +68,7 @@ async def elicit_search(
     filters = dict(has_pdf=has_pdf_filter)
 
     request_body = make_request_body(
-        query=question, num_papers=num_papers, filters=filters
+        query=question, num_papers=num_papers, page=page, filters=filters
     )
 
     response = send_elicit_request(
