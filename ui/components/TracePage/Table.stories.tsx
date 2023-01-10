@@ -26,3 +26,15 @@ export const CarTable: Story = {
     ],
   },
 };
+
+export const TableWithNoColumns: Story = {
+  args: {
+    rows: [{}, {}, {}],
+  },
+};
+
+export const TableWithNoRows: Story = {
+  args: {
+    rows: [],
+  },
+};
