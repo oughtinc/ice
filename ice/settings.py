@@ -1,7 +1,10 @@
 import json
+
 from os import environ
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Any
+from typing import Optional
+from typing import TYPE_CHECKING
 
 from pydantic import BaseSettings
 
@@ -30,9 +33,9 @@ class Settings(BaseSettings):
     PAPER_DIR: Path = Path(__file__).parent.parent / "papers"
 
     # note these attributes are read differently- see [__getattribute__]
-    OPENAI_API_KEY: str = ""  
-    OUGHT_INFERENCE_API_KEY: str = ""  
-    ELICIT_AUTH_TOKEN: str = ""  
+    OPENAI_API_KEY: str = ""
+    OUGHT_INFERENCE_API_KEY: str = ""
+    ELICIT_AUTH_TOKEN: str = ""
 
     def __get_and_store(self, setting_name: str, prompt: Optional[str] = None) -> str:
         # We use [__getattribute__] to read these attributes, so that we can
@@ -43,7 +46,7 @@ class Settings(BaseSettings):
             # TODO someday: one way this stinks is that starting the server will
             # bury this prompt. (the server is started in a background process
             # and has some log messages). i don't know if there's a clean way
-            # to fix this without re-architecting some stuff. 
+            # to fix this without re-architecting some stuff.
             value = input(prompt)
             setattr(self, setting_name, value)
             with open(_env_path, "a") as f:
@@ -54,13 +57,17 @@ class Settings(BaseSettings):
     def __getattribute__(self, __name: str) -> Any:
         match __name:
             case "OPENAI_API_KEY":
-                return self.__get_and_store("OPENAI_API_KEY", "Enter OpenAI API key (you can get this from https://beta.openai.com/account/api-keys): ")
+                return self.__get_and_store(
+                    "OPENAI_API_KEY",
+                    "Enter OpenAI API key (you can get this from https://beta.openai.com/account/api-keys): ",
+                )
             case "OUGHT_INFERENCE_API_KEY":
                 return self.__get_and_store("OUGHT_INFERENCE_API_KEY")
             case "ELICIT_AUTH_TOKEN":
                 return self.__get_and_store("ELICIT_AUTH_TOKEN")
             case _:
                 return super().__getattribute__(__name)
+
 
 # Note that fields are loaded from pydantic in a particular priority ordering. See
 # https://docs.pydantic.dev/usage/settings/#field-value-priority

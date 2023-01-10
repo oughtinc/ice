@@ -4,9 +4,11 @@ import sys
 import time
 
 import httpx
+
 from structlog import get_logger
 
-from ice.settings import server_url, settings
+from ice.settings import server_url
+from ice.settings import settings
 
 log = get_logger()
 

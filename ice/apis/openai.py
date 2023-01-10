@@ -1,15 +1,20 @@
 from collections.abc import Mapping
 
 import httpx
-from httpx import Response, TimeoutException
+
+from httpx import Response
+from httpx import TimeoutException
 from structlog.stdlib import get_logger
 from tenacity import retry
-from tenacity.retry import retry_any, retry_if_exception, retry_if_exception_type
+from tenacity.retry import retry_any
+from tenacity.retry import retry_if_exception
+from tenacity.retry import retry_if_exception_type
 from tenacity.wait import wait_random_exponential
 
 from ice.cache import diskcache
 from ice.settings import settings
-from ice.trace import add_fields, trace
+from ice.trace import add_fields
+from ice.trace import trace
 
 log = get_logger()
 
