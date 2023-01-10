@@ -1,4 +1,4 @@
-import sys
+import json
 from os import environ
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     ELICIT_AUTH_TOKEN: str = ""  
 
     def __get_and_store(self, setting_name: str, prompt: Optional[str] = None) -> str:
-        # We use __getattribute__ to read these attributes, so that we can
+        # We use [__getattribute__] to read these attributes, so that we can
         # prompt the user for them if they are not already set.
         if prompt is None:
             prompt = f"Enter {setting_name}: "
@@ -47,7 +47,8 @@ class Settings(BaseSettings):
             value = input(prompt)
             setattr(self, setting_name, value)
             with open(_env_path, "a") as f:
-                f.write(f"{setting_name}=\"{value}\"\n")
+                # [json.dumps] to escape quotes
+                f.write(f"{setting_name}={json.dumps(value)}\n")
         return self.__dict__[setting_name]
 
     def __getattribute__(self, __name: str) -> Any:
