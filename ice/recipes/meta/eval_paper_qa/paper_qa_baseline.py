@@ -5,7 +5,7 @@ from fvalues import F
 from ice.paper import Paper
 from ice.paper import Paragraph
 from ice.recipe import recipe
-from ice.recipes.meta.eval_paper_qa.qa import answer
+from ice.recipes.meta.eval_paper_qa.qa_baseline import answer
 from ice.utils import map_async
 
 

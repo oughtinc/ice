@@ -6,8 +6,8 @@ from ice.apis.openai import TooLongRequestError
 from ice.formatter.transform.value import numbered_list
 from ice.paper import Paper
 from ice.recipe import recipe
-from ice.recipes.meta.eval_paper_qa.paper_qa import answer_for_paper
-from ice.recipes.meta.eval_paper_qa.qa import answer
+from ice.recipes.meta.eval_paper_qa.paper_qa_baseline import answer_for_paper
+from ice.recipes.meta.eval_paper_qa.qa_baseline import answer
 from ice.recipes.meta.eval_paper_qa.quick_list import quick_list
 from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
