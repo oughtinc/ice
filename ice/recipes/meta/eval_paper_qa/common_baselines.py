@@ -6,14 +6,14 @@ from ice.apis.openai import TooLongRequestError
 from ice.formatter.transform.value import numbered_list
 from ice.paper import Paper
 from ice.recipe import recipe
+from ice.recipes.meta.eval_paper_qa.paper_qa_baseline import answer_for_paper
+from ice.recipes.meta.eval_paper_qa.qa_baseline import answer
 from ice.recipes.meta.eval_paper_qa.quick_list import quick_list
 from ice.recipes.meta.eval_paper_qa.types import PaperQaAnswer
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 from ice.recipes.meta.eval_paper_qa.types import PaperQaMethod
 from ice.recipes.meta.eval_paper_qa.utils import convert_demonstration_example
 from ice.recipes.meta.eval_paper_qa.utils import identify_gs_str
-from ice.recipes.primer.paper_qa import answer_for_paper
-from ice.recipes.primer.qa import answer
 from ice.recipes.program_search.nodes.answer.answer import demonstration_answer
 from ice.recipes.program_search.nodes.answer.answer import (
     demonstration_answer_with_reasoning,

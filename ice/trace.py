@@ -16,7 +16,7 @@ from inspect import (
     signature,
 )
 from time import monotonic_ns
-from typing import IO, Any, Optional, cast
+from typing import IO, Any, Optional, Union, cast
 
 import ulid
 from structlog import get_logger
@@ -96,7 +96,9 @@ class Trace:
 
             import webbrowser
 
-            log.info("Opening trace in browser, set OUGHT_ICE_AUTO_BROWSER=0 to disable.")
+            log.info(
+                "Opening trace in browser, set OUGHT_ICE_AUTO_BROWSER=0 to disable."
+            )
             webbrowser.open(self.url)
 
     def _open(self, name: str) -> IO[str]:
@@ -157,7 +159,10 @@ def emit_block(x) -> tuple[int, int]:
         return 0, 0
 
 
-def add_fields(**fields: str):
+Scalar = Union[bool, int, float, str, None]
+
+
+def add_fields(**fields: Scalar):
     if trace_enabled():
         id = parent_id_var.get()
         emit({f"{id}.fields.{key}": value for key, value in fields.items()})

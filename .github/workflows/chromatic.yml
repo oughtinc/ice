@@ -21,6 +21,8 @@ jobs:
         run: npm install
       - name: Publish to Chromatic
         uses: chromaui/action@v1
+        env:
+          NODE_OPTIONS: --max_old_space_size=8192
         with:
           workingDir: ui
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}

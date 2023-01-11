@@ -165,5 +165,5 @@ async def openai_complete(
     response = await _post("completions", json=params, cache_id=cache_id)
     if isinstance(response, TooLongRequestError):
         raise response
-    add_fields(davinci_equivalent_tokens=str(get_davinci_equivalent_tokens(response)))
+    add_fields(davinci_equivalent_tokens=get_davinci_equivalent_tokens(response))
     return response

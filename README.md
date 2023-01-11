@@ -44,12 +44,6 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
 
 1. Set required secrets in `~/.ought-ice/.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format.
 
-1. Start ICE in its own terminal and leave it running:
-
-   ```shell
-   python -m ice.server
-   ```
-
 1. To learn more, go through [the Primer](https://primer.ought.org/).
 
 ## Developing ICE
