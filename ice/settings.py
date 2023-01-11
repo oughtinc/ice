@@ -1,10 +1,7 @@
 import json
-
 from os import environ
 from pathlib import Path
-from typing import Any
-from typing import Optional
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
 from pydantic import BaseSettings
 
@@ -54,8 +51,8 @@ class Settings(BaseSettings):
                 f.write(f"{setting_name}={json.dumps(value)}\n")
         return self.__dict__[setting_name]
 
-    def __getattribute__(self, __name: str) -> Any:
-        match __name:
+    def __getattribute__(self, name: str) -> Any:
+        match name:
             case "OPENAI_API_KEY":
                 return self.__get_and_store(
                     "OPENAI_API_KEY",
@@ -66,14 +63,14 @@ class Settings(BaseSettings):
             case "ELICIT_AUTH_TOKEN":
                 return self.__get_and_store("ELICIT_AUTH_TOKEN")
             case _:
-                return super().__getattribute__(__name)
+                return super().__getattribute__(name)
 
 
 # Note that fields are loaded from pydantic in a particular priority ordering. See
 # https://docs.pydantic.dev/usage/settings/#field-value-priority
 settings = Settings(
     _env_file=_env_path if _env_path.exists() else None, _env_file_encoding="utf-8"
-)
+) 
 
 CACHE_DIR = OUGHT_ICE_DIR / "cache"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
