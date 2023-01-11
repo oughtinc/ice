@@ -35,8 +35,9 @@ from ice.settings import OUGHT_ICE_DIR
 from ice.settings import server_url
 from ice.settings import settings
 
+from .logging import log_lock
+
 log = get_logger()
-log_lock = threading.Lock()
 
 
 def make_id() -> str:

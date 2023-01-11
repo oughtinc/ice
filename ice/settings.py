@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 else:
     from pydantic import AnyHttpUrl
 
-from . import trace
+from .logging import log_lock
 
 OUGHT_ICE_DIR = Path(environ.get("OUGHT_ICE_DIR", Path.home() / ".ought-ice"))
 
@@ -44,11 +44,7 @@ class Settings(BaseSettings):
         if prompt is None:
             prompt = f"Enter {setting_name}: "
         if self.__dict__[setting_name] == "":
-            # TODO someday: one way this stinks is that starting the server will
-            # bury this prompt. (the server is started in a background process
-            # and has some log messages). i don't know if there's a clean way
-            # to fix this without re-architecting some stuff.
-            with trace.log_lock:
+            with log_lock:
                 value = input(prompt)
             setattr(self, setting_name, value)
             with open(_env_path, "a") as f:

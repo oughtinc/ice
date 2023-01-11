@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import threading
 
 from structlog import configure
 from structlog import get_logger
@@ -25,6 +26,8 @@ import transformers  # noqa
 # and avoid suppressing other warnings.
 if previous_verbosity:  # Setting to None raises an error
     os.environ["TRANSFORMERS_VERBOSITY"] = previous_verbosity
+
+log_lock = threading.Lock()
 
 
 def init_logging():
