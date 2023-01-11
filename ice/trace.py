@@ -92,6 +92,7 @@ class Trace:
         return f"{server_url()}/traces/{self.id}"
 
     def _server_and_browser(self):
+        # We use this lock to avoid the server threads from burying the input prompt in [settings.py].
         with log_lock:
             is_running = None
             if settings.OUGHT_ICE_AUTO_SERVER:

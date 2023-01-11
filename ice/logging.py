@@ -27,6 +27,7 @@ import transformers  # noqa
 if previous_verbosity:  # Setting to None raises an error
     os.environ["TRANSFORMERS_VERBOSITY"] = previous_verbosity
 
+# Used to prevent interleaved logging from multiple thread. See [Settings.__get_and_store].
 log_lock = threading.Lock()
 
 
