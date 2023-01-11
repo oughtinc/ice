@@ -2,10 +2,15 @@ import logging
 import os
 import signal
 
+from collections.abc import Awaitable
+from collections.abc import Callable
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi import Request
+from fastapi import Response
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import FileResponse
 from starlette.responses import PlainTextResponse
 
@@ -16,7 +21,22 @@ logger = logging.getLogger(__name__)
 
 dist_dir = Path(__file__).parent / "ui"
 
+
 app = FastAPI()
+
+
+# Add cache-control: no-transform header to all responses
+# because otherwise cloudflare brotli compression breaks the trace viewer
+async def add_no_transform_header(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+):
+    response = await call_next(request)
+    response.headers.update({"cache-control": "no-transform"})
+    return response
+
+
+app.add_middleware(BaseHTTPMiddleware, dispatch=add_no_transform_header)
+
 app.include_router(traces.router)
 app.mount(
     "/api/traces/", StaticFiles(directory=traces_dir), name="static"
