@@ -58,13 +58,14 @@ class Settings(BaseSettings):
             case "OPENAI_API_KEY":
                 return self.__get_and_store(
                     "OPENAI_API_KEY",
-                    prompt = "Enter OpenAI API key (you can get this from https://beta.openai.com/account/api-keys): "
+                    prompt="Enter OpenAI API key (you can get this from https://beta.openai.com/account/api-keys): ",
                 )
             case "OUGHT_INFERENCE_API_KEY":
                 return self.__get_and_store("OUGHT_INFERENCE_API_KEY")
             case "ELICIT_AUTH_TOKEN":
-                return self.__get_and_store("ELICIT_AUTH_TOKEN",
-                    prompt = "Enter Elicit Auth Token (you can find it by checking idToken in cookies for Elicit. The cookie should NOT start with Bearer; it should just be a string of letters and numbers): "
+                return self.__get_and_store(
+                    "ELICIT_AUTH_TOKEN",
+                    prompt="Enter Elicit Auth Token (you can find it by checking idToken in cookies for Elicit. The cookie should NOT start with Bearer; it should just be a string of letters and numbers): ",
                 )
             case _:
                 return super().__getattribute__(name)
