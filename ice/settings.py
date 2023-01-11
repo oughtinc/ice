@@ -43,31 +43,26 @@ class Settings(BaseSettings):
         # prompt the user for them if they are not already set.
         if prompt is None:
             prompt = f"Enter {setting_name}: "
-        if self.__dict__[setting_name] == "":
-            with log_lock:
-                value = input(prompt)
-            setattr(self, setting_name, value)
-            with open(_env_path, "a") as f:
-                # [json.dumps] to escape quotes
-                f.write(f"{setting_name}={json.dumps(value)}\n")
-        return self.__dict__[setting_name]
+        with log_lock:
+            value = input(prompt)
+        setattr(self, setting_name, value)
+        with open(_env_path, "a") as f:
+            # [json.dumps] to escape quotes
+            f.write(f"{setting_name}={json.dumps(value)}\n")
+        return value
 
     def __getattribute__(self, name: str) -> Any:
-        match name:
-            case "OPENAI_API_KEY":
-                return self.__get_and_store(
-                    "OPENAI_API_KEY",
-                    prompt="Enter OpenAI API key (you can get this from https://beta.openai.com/account/api-keys): ",
-                )
-            case "OUGHT_INFERENCE_API_KEY":
-                return self.__get_and_store("OUGHT_INFERENCE_API_KEY")
-            case "ELICIT_AUTH_TOKEN":
-                return self.__get_and_store(
-                    "ELICIT_AUTH_TOKEN",
-                    prompt="Enter Elicit Auth Token (you can find it by checking idToken in cookies for Elicit. The cookie should NOT start with Bearer; it should just be a string of letters and numbers): ",
-                )
-            case _:
-                return super().__getattribute__(name)
+        result = super().__getattribute__(name)
+        prompts = dict(
+            OPENAI_API_KEY="Enter OpenAI API key (you can get this from https://beta.openai.com/account/api-keys): ",
+            OUGHT_INFERENCE_API_KEY=None,
+            ELICIT_AUTH_TOKEN="Enter Elicit Auth Token (you can find it by checking idToken in cookies for Elicit. "
+            "The cookie should NOT start with Bearer; it should just be a string of letters and numbers): ",
+        )
+        if name in prompts and not result:
+            return self.__get_and_store(name, prompts[name])
+        else:
+            return result
 
 
 # Note that fields are loaded from pydantic in a particular priority ordering. See
