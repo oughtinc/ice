@@ -21,6 +21,7 @@ from typing import Any
 from typing import cast
 from typing import IO
 from typing import Optional
+from typing import Union
 
 import ulid
 
@@ -164,7 +165,10 @@ def emit_block(x) -> tuple[int, int]:
         return 0, 0
 
 
-def add_fields(**fields: str):
+Scalar = Union[bool, int, float, str, None]
+
+
+def add_fields(**fields: Scalar):
     if trace_enabled():
         id = parent_id_var.get()
         emit({f"{id}.fields.{key}": value for key, value in fields.items()})

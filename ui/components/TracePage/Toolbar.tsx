@@ -62,7 +62,18 @@ const SelectHighlightedFunction = () => {
   );
 };
 
-const highlightedAncestors = (highlightedFunction: CallFunction | undefined, calls: Calls) => {
+export const isHighlighted = (call: CallInfo, highlightedFunction?: CallFunction) =>
+  highlightedFunction &&
+  call.name == highlightedFunction.name &&
+  call.cls == highlightedFunction.cls;
+
+export const getHighlightedCalls = (highlightedFunction: CallFunction | undefined, calls: Calls) =>
+  Object.values(calls).filter(call => isHighlighted(call, highlightedFunction));
+
+export const highlightedAncestors = (
+  highlightedFunction: CallFunction | undefined,
+  calls: Calls,
+) => {
   const result: Record<string, true> = {};
   if (!highlightedFunction) return result;
   for (let call of Object.values(calls)) {
@@ -75,10 +86,6 @@ const highlightedAncestors = (highlightedFunction: CallFunction | undefined, cal
   }
   return result;
 };
-
-export function isHighlighted(call: CallInfo, highlightedFunction?: CallFunction) {
-  return call.name == highlightedFunction?.name && call.cls == highlightedFunction?.cls;
-}
 
 export const Toolbar = () => {
   const { highlightedFunction, setExpandedById, othersHidden, setOthersHidden, calls } =
