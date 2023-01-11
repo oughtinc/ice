@@ -41,14 +41,18 @@ def log_attempt_number(retry_state):
         )
 
 
+def make_headers() -> dict[str, str]:
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
+    }
+    if settings.OPENAI_ORG_ID:
+        headers["OpenAI-Organization"] = settings.OPENAI_ORG_ID
+    return headers
+
+
 RETRYABLE_STATUS_CODES = {408, 429, 502, 503, 504}
 OPENAI_BASE_URL = "https://api.openai.com/v1"
-OPENAI_DEFAULT_HEADERS = {
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
-}
-if settings.OPENAI_ORG_ID:
-    OPENAI_DEFAULT_HEADERS["OpenAI-Organization"] = settings.OPENAI_ORG_ID
 
 
 def is_retryable_HttpError(e: BaseException) -> bool:
@@ -109,7 +113,7 @@ async def _post(
         response = await client.post(
             f"{OPENAI_BASE_URL}/{endpoint}",
             json=json,
-            headers=OPENAI_DEFAULT_HEADERS,
+            headers=make_headers(),
             timeout=timeout,
         )
         if response.status_code == 429:
@@ -158,7 +162,6 @@ async def openai_complete(
     }
     if logit_bias:
         params["logit_bias"] = logit_bias  # type: ignore[assignment]
-
     response = await _post("completions", json=params, cache_id=cache_id)
     if isinstance(response, TooLongRequestError):
         raise response
