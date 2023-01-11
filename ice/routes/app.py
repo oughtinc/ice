@@ -25,6 +25,8 @@ dist_dir = Path(__file__).parent / "ui"
 app = FastAPI()
 
 
+# Add cache-control: no-transform header to all responses
+# because otherwise cloudflare brotli compression breaks the trace viewer
 async def add_no_transform_header(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ):
