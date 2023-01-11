@@ -1,11 +1,13 @@
-from typing import Sequence
+from collections.abc import Sequence
 from urllib.parse import urljoin
-from ice.paper import Paper
+
+import httpx
+
 from structlog import get_logger
 
+from ice.paper import Paper
 from ice.recipe import recipe
 from ice.recipes.elicit.common import send_elicit_request
-import httpx
 
 log = get_logger()
 
@@ -42,7 +44,9 @@ def elicit_results_to_papers(elicit_results: dict) -> Sequence[Paper]:
     ]
 
 
-async def elicit_paper_search(question: str, num_papers: int = 4, page: int = 0, full_text: bool = True) -> Sequence[Paper]:
+async def elicit_paper_search(
+    question: str, num_papers: int = 4, page: int = 0, full_text: bool = True
+) -> Sequence[Paper]:
     return elicit_results_to_papers(
         await elicit_search(question, num_papers, page, full_text)
     )

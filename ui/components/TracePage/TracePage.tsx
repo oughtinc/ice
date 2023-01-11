@@ -1,4 +1,6 @@
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
+import { Allotment } from "allotment";
+import "allotment/dist/style.css";
 import classNames from "classnames";
 import produce from "immer";
 import { isEmpty, last, memoize, set } from "lodash";
@@ -17,12 +19,11 @@ import {
 import { ArcherContainer, ArcherElement } from "react-archer";
 import { ArcherContainerHandle } from "react-archer/lib/ArcherContainer/ArcherContainer.types";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import Separator from "./Separator";
 import Spinner from "./Spinner";
 import { recipes } from "/helpers/recipes";
 import * as COLORS from "/styles/colors.json";
 import { useParams } from "react-router";
-import { isHighlighted, Toolbar } from "/components/TracePage/Toolbar";
+import { getHighlightedCalls, isHighlighted, Toolbar } from "/components/TracePage/Toolbar";
 import { CallFunction, CallName, getFormattedName } from "/components/TracePage/CallName";
 import { CallIconButton } from "./CallIconButton";
 import {
@@ -31,6 +32,7 @@ import {
   FString,
   RawFStringPart,
 } from "/components/TracePage/FString";
+import { StringToScalar, Table } from "./Table";
 
 const elicitStyle = {
   "hljs-keyword": { color: COLORS.indigo[600] }, // use primary color for keywords
@@ -64,6 +66,7 @@ type InputOutputContentProps = {
 };
 
 export interface CallInfo extends InputOutputContentProps {
+  id: string; // unique ID
   parent: string; // outer call ID
   start: number; // start time
   name: string; // function name
@@ -71,7 +74,7 @@ export interface CallInfo extends InputOutputContentProps {
   shortArgs: string; // short representation of args
   shortResult?: string[]; // short representation of return value
   children?: Calls; // nested calls
-  fields?: Record<string, string>; // short arbitrary fields associated with the call
+  fields?: StringToScalar; // short arbitrary fields associated with the call
   func: BlockAddress<FuncBlock>; // long info about the function itself
   end?: number; // end time
   totalTokens?: number;
@@ -122,6 +125,10 @@ const TreeContext = createContext<{
 const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
   Object.entries(updates).forEach(([path, value]) => {
     set(calls, path, value);
+
+    const id = path.split(".")[0];
+    calls[id].id = id;
+
     if (path.endsWith(".fields.davinci_equivalent_tokens")) {
       const tokens = Number(value);
       if (isNaN(tokens)) return;
@@ -354,13 +361,9 @@ const useCallInfo = (id: string) => {
   };
 };
 
-interface SelectedCallInfo extends CallInfo {
-  id: string;
-}
-
-const useSelectedCallInfo = (): SelectedCallInfo | undefined => {
+const useSelectedCallInfo = (): CallInfo | undefined => {
   const { calls, selectedId } = useTreeContext();
-  return selectedId ? { ...calls[selectedId], id: selectedId } : undefined;
+  return selectedId ? calls[selectedId] : undefined;
 };
 
 const useExpanded = (id: string) => {
@@ -641,7 +644,7 @@ const DetailPane = () => {
 };
 
 type DetailPaneContentProps = {
-  info: SelectedCallInfo;
+  info: CallInfo;
 };
 
 type Tab = "io" | "src";
@@ -788,7 +791,15 @@ const stripIndent = (source: string): string => {
 };
 
 const Trace = ({ traceId }: { traceId: string }) => {
-  const { selectedId, rootId, setSelectedId, getExpanded, setExpanded } = useTreeContext();
+  const {
+    calls,
+    selectedId,
+    rootId,
+    setSelectedId,
+    getExpanded,
+    setExpanded,
+    highlightedFunction,
+  } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
   // const params = useParams()
 
@@ -796,7 +807,6 @@ const Trace = ({ traceId }: { traceId: string }) => {
     (update: (id: string) => string | undefined) => {
       setSelectedId(id => {
         const res = update(id as any) || id;
-        console.log(res);
         return id && res;
       });
     },
@@ -829,7 +839,6 @@ const Trace = ({ traceId }: { traceId: string }) => {
                 }
               }),
             ArrowDown: () => {
-              console.log(rootId, selectedId);
               maybeSetSelectedId(id => getExpandedChildren(id)[0] || nextFrom(id));
             },
             ArrowLeft: () =>
@@ -855,6 +864,14 @@ const Trace = ({ traceId }: { traceId: string }) => {
 
   useEffect(() => {
     const keyListener = (event: KeyboardEvent) => {
+      // Ignore events when the table is in focus.
+      if (
+        event.target instanceof Node &&
+        document.querySelector(".call-table")?.contains(event.target)
+      ) {
+        return;
+      }
+
       const binding = bindings[event.key];
       if (binding) {
         event.stopPropagation();
@@ -867,8 +884,6 @@ const Trace = ({ traceId }: { traceId: string }) => {
     return () => window.removeEventListener("keydown", keyListener);
   }, [bindings]);
 
-  const [detailWidth, setDetailWidth] = useState(500);
-
   const firstRoot = getChildren(traceId)[0];
 
   const archerContainerRef = useRef<ArcherContainerHandle | null>(null);
@@ -876,36 +891,50 @@ const Trace = ({ traceId }: { traceId: string }) => {
     archerContainerRef.current?.refreshScreen();
   }, []);
 
+  const highlightedCalls = getHighlightedCalls(highlightedFunction, calls);
+
   return (
-    <div className="flex flex-col h-full min-h-screen max-h-screen">
-      <div className="flex divide-x divide-gray-100 flex-1 overflow-clip">
-        <div className="flex-1 p-6 overflow-y-auto flex-shrink-0">
-          <Toolbar />
-          <ArcherContainer
-            ref={archerContainerRef}
-            noCurves
-            strokeColor="#E2E8F0"
-            strokeWidth={1}
-            startMarker={false}
-            endMarker={false}
-          >
-            {firstRoot ? (
-              <CallChildren id={firstRoot} refreshArcherArrows={refreshArcherArrows} />
-            ) : (
-              <div className="flex justify-center items-center h-full">
-                <Spinner size="medium" />
-              </div>
-            )}
-          </ArcherContainer>
-        </div>
+    <div className="h-screen">
+      <Allotment>
+        <Allotment vertical>
+          <div className="w-full h-full overflow-auto">
+            <div className="sticky top-0 z-10 bg-white p-4">
+              <Toolbar />
+            </div>
+            <div className="pl-4">
+              <ArcherContainer
+                ref={archerContainerRef}
+                noCurves
+                strokeColor="#E2E8F0"
+                strokeWidth={1}
+                startMarker={false}
+                endMarker={false}
+              >
+                {firstRoot ? (
+                  <CallChildren id={firstRoot} refreshArcherArrows={refreshArcherArrows} />
+                ) : (
+                  <div className="flex justify-center items-center h-full">
+                    <Spinner size="medium" />
+                  </div>
+                )}
+              </ArcherContainer>
+            </div>
+          </div>
+          <Allotment.Pane className="call-table" preferredSize={200}>
+            <Table
+              rows={highlightedCalls.map(({ fields = {} }) => fields)}
+              rowIds={highlightedCalls.map(({ id }) => id)}
+              onFocusChange={setSelectedId}
+            />
+          </Allotment.Pane>
+        </Allotment>
 
-        <Separator detailWidth={detailWidth} setDetailWidth={setDetailWidth} />
-
-        <div className="bg-gray-50 overflow-y-auto flex-shrink-0" style={{ width: detailWidth }}>
-          <DetailPane />
-        </div>
-      </div>
-      {/* {Object.keys(params)} */}
+        <Allotment.Pane preferredSize={500}>
+          <div className="bg-gray-50 w-full h-full overflow-auto">
+            <DetailPane />
+          </div>
+        </Allotment.Pane>
+      </Allotment>
     </div>
   );
 };

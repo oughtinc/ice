@@ -174,7 +174,9 @@ class Paper(BaseModel):
         document_id = result["paperId"]
         title = result["title"]
         authors = result["authors"]
-        abstract_summary = result["claim"]["value"] if result["claim"]["status"] == "success" else ""
+        abstract_summary = (
+            result["claim"]["value"] if result["claim"]["status"] == "success" else ""
+        )
         abstract = [
             Paragraph(
                 sentences=p["sentences"],
