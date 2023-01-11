@@ -22,8 +22,10 @@ from ice.recipes.program_search.nodes.answer.answer import elicit_answer_prompt
 from ice.recipes.program_search.nodes.answer.types import Demonstration
 from ice.recipes.program_search.nodes.select.select import as_bool
 from ice.recipes.program_search.nodes.select.select import (
-    select_results_using_top_monot5_paragraph,
     select_results_using_elicit_prompt,
+)
+from ice.recipes.program_search.nodes.select.select import (
+    select_results_using_top_monot5_paragraph,
 )
 from ice.utils import map_async
 
