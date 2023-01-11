@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Toolbar to highlight all call nodes of a specific function/method, expand their ancestors to reveal them, and hide other irrelevant nodes.
-- Integration with the new [fvalues](https://github.com/oughtinc/fvalues) library, highlighting dynamic parts of formatted strings in the detail pane.
+- [Toolbar to highlight all call nodes of a specific function/method](https://github.com/oughtinc/ice/wiki/ICE-UI-guide#highlighting-functions), expand their ancestors to reveal them, and hide other irrelevant nodes.
+- [Integration](https://github.com/oughtinc/ice/wiki/ICE-UI-guide#transparent-f-strings-using-fvalues) with the new [fvalues](https://github.com/oughtinc/fvalues) library, highlighting dynamic parts of formatted strings in the detail pane.
 - Show the total cost of OpenAI API calls in each call node, assuming a price of $0.02 per 1000 tokens.
 - When running a recipe:
   - Automatically start the server in a background process if it's not already running. This can be disabled by setting the environment variable `OUGHT_ICE_AUTO_SERVER=0`. Run `python -m ice.server stop` to kill the process.

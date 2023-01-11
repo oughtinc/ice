@@ -12,7 +12,7 @@ ICE is a Python library and trace visualizer for language model programs.
 ## Features
 
 - Run language model recipes in different modes: humans, human+LM, LM
-- Inspect the execution traces in your browser for debugging
+- [Inspect the execution traces in your browser for debugging](https://github.com/oughtinc/ice/wiki/ICE-UI-guide)
 - Define and use new language model agents, e.g. chain-of-thought agents
 - Run recipes quickly by parallelizing language model calls
 - Reuse component recipes such as question-answering, ranking, and verification
@@ -44,12 +44,6 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
 
 1. Set required secrets in `~/.ought-ice/.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format.
 
-1. Start ICE in its own terminal and leave it running:
-
-   ```shell
-   python -m ice.server
-   ```
-
 1. To learn more, go through [the Primer](https://primer.ought.org/).
 
 ## Developing ICE
@@ -75,7 +69,7 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
 
   Agents don't know which recipe is calling them. Agents don’t maintain state between subtasks. Agents generally try to complete all subtasks they're asked to complete (however badly), but some will not have implementations for certain task types.
 
-- The **mode** in which a recipe runs is a global setting that can affect every agent call. For instance, whether to use humans or agents. Recipes can also run with certain `RecipeSettings`, which can map a task type to a specific `agent_name`, which can modify which agent is used for that specfic type of task.
+- The **mode** in which a recipe runs is a global setting that can affect every agent call. For instance, whether to use humans or agents. Recipes can also run with certain `RecipeSettings`, which can map a task type to a specific `agent_name`, which can modify which agent is used for that specific type of task.
 
 ## Additional resources
 
@@ -97,3 +91,24 @@ We welcome community contributions:
 For larger contributions, make an issue for discussion before submitting a PR.
 
 And for even larger contributions, join us - [we're hiring](https://ought.org/careers)!
+
+## How to cite
+
+If you use ICE, please cite:
+
+> [Iterated Decomposition: Improving Science Q&A by Supervising Reasoning Processes](https://arxiv.org/abs/2301.01751). Justin Reppert, Ben Rachbach, Charlie George, Luke Stebbing Jungwon Byun, Maggie Appleton, Andreas Stuhlmüller (2023). Ought Technical Report. arXiv:2301.01751 [cs.CL]
+
+Bibtex:
+
+```bibtex
+@article{reppert2023iterated,
+  author = {Justin Reppert and Ben Rachbach and Charlie George and Luke Stebbing and Jungwon Byun and Maggie Appleton and Andreas Stuhlm\"{u}ller},
+  archivePrefix = {arXiv},
+  eprint = {2301.01751},
+  primaryClass = {cs.CL},
+  title = {Iterated Decomposition: Improving Science Q&A by Supervising Reasoning Processes},
+  year = 2023,
+  keywords = {language models, decomposition, workflow, debugging},
+  url = {https://arxiv.org/abs/2301.01751}
+}
+```
