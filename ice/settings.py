@@ -1,7 +1,10 @@
 import json
+
 from os import environ
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Any
+from typing import Optional
+from typing import TYPE_CHECKING
 
 from pydantic import BaseSettings
 
@@ -72,7 +75,7 @@ class Settings(BaseSettings):
 # https://docs.pydantic.dev/usage/settings/#field-value-priority
 settings = Settings(
     _env_file=_env_path if _env_path.exists() else None, _env_file_encoding="utf-8"
-) 
+)
 
 CACHE_DIR = OUGHT_ICE_DIR / "cache"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
