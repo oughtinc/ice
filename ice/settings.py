@@ -1,10 +1,7 @@
 import json
-
 from os import environ
 from pathlib import Path
-from typing import Any
-from typing import Optional
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
 from pydantic import BaseSettings
 
@@ -13,6 +10,7 @@ if TYPE_CHECKING:
 else:
     from pydantic import AnyHttpUrl
 
+from . import trace
 
 OUGHT_ICE_DIR = Path(environ.get("OUGHT_ICE_DIR", Path.home() / ".ought-ice"))
 
@@ -47,7 +45,8 @@ class Settings(BaseSettings):
             # bury this prompt. (the server is started in a background process
             # and has some log messages). i don't know if there's a clean way
             # to fix this without re-architecting some stuff.
-            value = input(prompt)
+            with trace.log_lock:
+                value = input(prompt)
             setattr(self, setting_name, value)
             with open(_env_path, "a") as f:
                 # [json.dumps] to escape quotes

@@ -1,40 +1,32 @@
 import hashlib
 import json
 import threading
-
 from abc import ABCMeta
 from asyncio import create_task
 from collections.abc import Callable
 from contextvars import ContextVar
-from functools import lru_cache
-from functools import partial
-from functools import wraps
-from inspect import getdoc
-from inspect import getsource
-from inspect import isclass
-from inspect import iscoroutinefunction
-from inspect import isfunction
-from inspect import Parameter
-from inspect import signature
+from functools import lru_cache, partial, wraps
+from inspect import (
+    Parameter,
+    getdoc,
+    getsource,
+    isclass,
+    iscoroutinefunction,
+    isfunction,
+    signature,
+)
 from time import monotonic_ns
-from typing import Any
-from typing import cast
-from typing import IO
-from typing import Optional
+from typing import IO, Any, Optional, cast
 
 import ulid
-
 from structlog import get_logger
 
-from ice.json_value import JSONValue
-from ice.json_value import to_json_value
-from ice.server import ensure_server_running
-from ice.server import is_server_running
-from ice.settings import OUGHT_ICE_DIR
-from ice.settings import server_url
-from ice.settings import settings
+from ice.json_value import JSONValue, to_json_value
+from ice.server import ensure_server_running, is_server_running
+from ice.settings import OUGHT_ICE_DIR, server_url, settings
 
 log = get_logger()
+log_lock = threading.Lock()
 
 
 def make_id() -> str:
@@ -89,22 +81,23 @@ class Trace:
         return f"{server_url()}/traces/{self.id}"
 
     def _server_and_browser(self):
-        is_running = None
-        if settings.OUGHT_ICE_AUTO_SERVER:
-            ensure_server_running()
-            is_running = True
+        with log_lock:
+            is_running = None
+            if settings.OUGHT_ICE_AUTO_SERVER:
+                ensure_server_running()
+                is_running = True
 
-        if not settings.OUGHT_ICE_AUTO_BROWSER:
-            return
+            if not settings.OUGHT_ICE_AUTO_BROWSER:
+                return
 
-        is_running = is_running or is_server_running()
-        if not is_running:
-            return
+            is_running = is_running or is_server_running()
+            if not is_running:
+                return
 
-        import webbrowser
+            import webbrowser
 
-        log.info("Opening trace in browser, set OUGHT_ICE_AUTO_BROWSER=0 to disable.")
-        webbrowser.open(self.url)
+            log.info("Opening trace in browser, set OUGHT_ICE_AUTO_BROWSER=0 to disable.")
+            webbrowser.open(self.url)
 
     def _open(self, name: str) -> IO[str]:
         return open(self.dir / f"{name}.jsonl", "a")
