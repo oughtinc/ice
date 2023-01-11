@@ -219,6 +219,18 @@ class Paper(BaseModel):
     def abstract(self) -> list[Paragraph]:
         return [p for p in self.paragraphs if p.section_type == "abstract"]
 
+    def section_headings(self) -> list[tuple[int, str]]:
+        heading_titles: set[str] = set()
+        section_headings: list[int, str] = []
+
+        for paragraph in self.paragraphs:
+            for i, section in enumerate(paragraph.sections):
+                if section.title not in heading_titles:
+                    section_headings.append([i, section.title])
+                    heading_titles.add(section.title)
+
+        return section_headings
+
     def nonempty_paragraphs(self) -> list[Paragraph]:
         return [p for p in self.paragraphs if not p.is_empty()]
 
