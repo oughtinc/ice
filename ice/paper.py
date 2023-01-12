@@ -148,6 +148,9 @@ class Paper(BaseModel):
     document_id: str = "unknown"
     title: str | None = None
     authors: list[str] | None = None
+    venue: str | None = None
+    year: int | None = None
+    citation_count: int | None = None
     original: dict | None = None
     abstract_summary: str | None = None
 
@@ -174,6 +177,9 @@ class Paper(BaseModel):
         document_id = result["paperId"]
         title = result["title"]
         authors = result["authors"]
+        venue = result["venue"]
+        year = result["year"]
+        citation_count = result["citationCount"]
         abstract_summary = (
             result["claim"]["value"] if result["claim"]["status"] == "success" else ""
         )
@@ -207,6 +213,9 @@ class Paper(BaseModel):
             document_id=document_id,
             title=title,
             authors=authors,
+            venue=venue,
+            citation_count=citation_count,
+            year=year,
             original=result,
             abstract_summary=abstract_summary,
         )
