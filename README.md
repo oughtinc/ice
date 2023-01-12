@@ -55,9 +55,12 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
    source venv/bin/activate
    pip install --upgrade pip
    pip install -e '.[dev]' --config-settings editable_mode=compat
+   pre-commit install
    npm --prefix ui ci
    npm --prefix ui run dev
    ```
+
+Note that you don't technically _need_ to run `pre-commit install`, but _not_ doing so may cause your commits to fail CI. (Which can be noisy, including by generating commits that will e.g. fix formatting.)
 
 ## Terminology
 
