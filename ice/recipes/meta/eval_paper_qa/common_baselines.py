@@ -42,7 +42,7 @@ async def top_n_answer(
     paper: Paper,
     question: str,
     n: int,
-) -> Sequence[str] | str:
+) -> tuple[Sequence[str], str]:
     answer: str | Sequence[str]
     all_paras = [str(p) for p in paper.paragraphs]
     scored_paras = await select_results_using_elicit_prompt(question, all_paras)
