@@ -208,7 +208,7 @@ class _Recorder:
         self.id = id
 
     def __call__(self, **kwargs):
-        emit({f"{id}.records.{make_id()}": emit_block(kwargs)})
+        emit({f"{self.id}.records.{make_id()}": emit_block(kwargs)})
 
     def __repr__(self):
         # So this can be used in `diskcache()` functions
