@@ -1,11 +1,7 @@
-from collections.abc import Sequence
-from urllib.parse import urljoin
-
 import httpx
 
 from structlog import get_logger
 
-from ice.paper import Paper
 from ice.recipe import recipe
 from ice.recipes.elicit.common import send_elicit_request
 
