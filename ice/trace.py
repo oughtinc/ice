@@ -35,6 +35,8 @@ from ice.settings import OUGHT_ICE_DIR
 from ice.settings import server_url
 from ice.settings import settings
 
+from .logging import log_lock
+
 log = get_logger()
 
 
@@ -90,22 +92,28 @@ class Trace:
         return f"{server_url()}/traces/{self.id}"
 
     def _server_and_browser(self):
-        is_running = None
-        if settings.OUGHT_ICE_AUTO_SERVER:
-            ensure_server_running()
-            is_running = True
+        # We use this lock to prevent logging from here (which runs in a
+        # background thread) from burying the input prompt in
+        # [Settings.__get_and_store].
+        with log_lock:
+            is_running = None
+            if settings.OUGHT_ICE_AUTO_SERVER:
+                ensure_server_running()
+                is_running = True
 
-        if not settings.OUGHT_ICE_AUTO_BROWSER:
-            return
+            if not settings.OUGHT_ICE_AUTO_BROWSER:
+                return
 
-        is_running = is_running or is_server_running()
-        if not is_running:
-            return
+            is_running = is_running or is_server_running()
+            if not is_running:
+                return
 
-        import webbrowser
+            import webbrowser
 
-        log.info("Opening trace in browser, set OUGHT_ICE_AUTO_BROWSER=0 to disable.")
-        webbrowser.open(self.url)
+            log.info(
+                "Opening trace in browser, set OUGHT_ICE_AUTO_BROWSER=0 to disable."
+            )
+            webbrowser.open(self.url)
 
     def _open(self, name: str) -> IO[str]:
         return open(self.dir / f"{name}.jsonl", "a")

@@ -14,7 +14,6 @@ from ice.cache import diskcache
 from ice.settings import settings
 from ice.utils import deep_merge
 
-
 script_dir = Path(__file__).parent
 root_dir = script_dir.parent.parent.parent
 config = dotenv_values(root_dir / ".env")
@@ -24,11 +23,6 @@ config = dotenv_values(root_dir / ".env")
 # try 5 times, because sometimes preview apps take a while to start responding again after they have an issue
 @retry(stop=stop_after_attempt(5), wait=wait_random_exponential(2))
 def send_elicit_request(*, request_body, endpoint: str):
-    if not settings.ELICIT_AUTH_TOKEN:
-        raise ValueError(
-            "ELICIT_AUTH_TOKEN not found. Please look it up by checking idToken in cookies for Elicit. The token should NOT start with Bearer, it should just be a string of letters and numbers."
-        )
-
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {settings.ELICIT_AUTH_TOKEN}",
