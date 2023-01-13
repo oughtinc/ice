@@ -153,6 +153,7 @@ class Paper(BaseModel):
     citation_count: int | None = None
     original: dict | None = None
     abstract_summary: str | None = None
+    url: str | None = None
 
     @classmethod
     def load(cls, file: Path) -> "Paper":
@@ -175,6 +176,7 @@ class Paper(BaseModel):
     @classmethod
     def from_elicit_result(cls, result: dict) -> "Paper":
         document_id = result["paperId"]
+        url = result["semanticScholarUrl"]
         title = result["title"]
         authors = result["authors"]
         venue = result["venue"]
@@ -218,6 +220,7 @@ class Paper(BaseModel):
             year=year,
             original=result,
             abstract_summary=abstract_summary,
+            url=url,
         )
 
     def sentences(self) -> Iterator[str]:
