@@ -1,8 +1,12 @@
+import ast
+import inspect
 import itertools
 import os
 import subprocess
+import textwrap
 import threading as td
 import time
+import types
 
 from collections import defaultdict
 from collections.abc import Awaitable
@@ -390,3 +394,13 @@ def n_tokens(text: str) -> int:
 
 def latest_commit_hash():
     return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode("utf-8").strip()
+
+
+def get_docstring_from_code(code: types.CodeType) -> str:
+    source = inspect.getsource(code)
+    source_in_class = f"class C:\n{textwrap.indent(source, '    ')}"
+    tree = ast.parse(source_in_class)
+    result = ast.get_docstring(tree.body[0].body[0])
+    if result:
+        result = result.rstrip()
+    return result

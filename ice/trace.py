@@ -1,21 +1,17 @@
 import hashlib
 import json
+import opcode
+import sys
 import threading
+import types
 
 from abc import ABCMeta
-from asyncio import create_task
-from collections.abc import Callable
 from contextvars import ContextVar
 from functools import lru_cache
-from functools import partial
-from functools import wraps
-from inspect import getdoc
 from inspect import getsource
 from inspect import isclass
 from inspect import iscoroutinefunction
 from inspect import isfunction
-from inspect import Parameter
-from inspect import signature
 from time import monotonic_ns
 from typing import Any
 from typing import cast
@@ -33,11 +29,12 @@ from ice.server import is_server_running
 from ice.settings import OUGHT_ICE_DIR
 from ice.settings import server_url
 from ice.settings import settings
+from ice.utils import get_docstring_from_code
 
 log = get_logger()
 
 
-parent_id_var: ContextVar[int] = ContextVar("id")
+call_id_stack: ContextVar[list[int]] = ContextVar("ids")
 
 traces_dir = OUGHT_ICE_DIR / "traces"
 traces_dir.mkdir(parents=True, exist_ok=True)
@@ -77,7 +74,7 @@ class Trace:
         self._current_block_value: str
 
         self._counter = 0
-        parent_id_var.set(0)
+        call_id_stack.set([0])
         log.info(f"Trace: {self.url}")
         threading.Thread(target=self._server_and_browser).start()
 
@@ -147,6 +144,7 @@ trace_var: ContextVar[Optional[Trace]] = ContextVar("trace", default=None)
 
 def enable_trace():
     trace_var.set(Trace())
+    sys.settrace(tracefunc)
 
 
 def trace_enabled():
@@ -166,10 +164,15 @@ def emit_block(x) -> tuple[int, int]:
         return 0, 0
 
 
+def current_call_id() -> int:
+    stack = call_id_stack.get()
+    if stack:
+        return stack[-1]
+
+
 def add_fields(**fields: str):
     if trace_enabled():
-        id = parent_id_var.get()
-        emit({id: {"fields": fields}})
+        emit({current_call_id(): {"fields": fields}})
 
 
 def _encode_json(x) -> str:
@@ -180,29 +183,16 @@ def _encode_json(x) -> str:
 
 # To add records to the trace, use the following code:
 #
-# async def f(self, arg1, arg2, record = recorder):
-#     record(k1=v1, k2=v2)
+#     recorder(k1=v1, k2=v2)
 #
-# You can name 'record' anything and pass it any JSON-serializable keyword arguments.
-#
-# You MUST set its default value to 'recorder'. This allows @trace to know where to
-# inject the recorder, and it ensures that your function will work even if tracing is
-# disabled.
+# You can pass it any JSON-serializable keyword arguments.
 
 
-Recorder = Callable[..., None]
-
-recorder: Recorder = lambda **kwargs: None
-
-
-class _Recorder:
-    def __init__(self, id: int):
-        self.id = id
-
+class Recorder:
     def __call__(self, **kwargs):
         trc = trace_var.get()
         assert trc is not None
-        emit({self.id: {"records": {trc.next_counter(): emit_block(kwargs)}}})
+        emit({current_call_id(): {"records": {trc.next_counter(): emit_block(kwargs)}}})
 
     def __repr__(self):
         # So this can be used in `diskcache()` functions
@@ -212,6 +202,72 @@ class _Recorder:
         return "ice.trace._Recorder"
 
 
+recorder = Recorder()
+
+traced_codes = set()
+
+
+def tracefunc(frame: types.FrameType, event: str, arg):
+    if event not in ("call", "return"):
+        return
+
+    code = frame.f_code
+    if code not in traced_codes:
+        return
+
+    if event == "call":
+        if frame.f_lasti != -1:
+            return
+
+        trc = trace_var.get()
+        assert trc is not None
+        id = trc.next_counter()
+        stack = call_id_stack.get()
+        call_id_stack.set(stack + [id])
+
+        arg_dict = frame.f_locals
+        arg_dict_json = to_json_value(arg_dict)
+        call_event = dict(
+            parent=stack[-1],
+            start=monotonic_ns(),
+            name=code.co_name,
+            shortArgs=get_strings(arg_dict_json),
+            func=emit_block(func_info(code)),
+            args=emit_block(arg_dict_json),
+        )
+        self = arg_dict.get("self")
+        if self:
+            call_event["cls"] = self.__class__.__name__
+
+        emit({id: call_event})
+    else:
+        code_byte = code.co_code[frame.f_lasti]
+        opname = opcode.opname[code_byte]
+        if opname != "RETURN_VALUE" and arg is not None or opname == "LOAD_CONST":
+            return
+
+        result_json = to_json_value(arg)
+        *stack, call_id = call_id_stack.get()
+        call_id_stack.set(stack)
+
+        emit(
+            {
+                call_id: dict(
+                    result=emit_block(result_json),
+                    shortResult=get_strings(result_json),
+                    end=monotonic_ns(),
+                )
+            }
+        )
+        if len(stack) <= 1:
+            # We're at the top of the stack, so we're done with this trace.
+            # trace_var.set(None)  # TODO this currently breaks regression testing
+            sys.settrace(None)
+            return
+
+    return tracefunc
+
+
 def trace(fn):
     if isclass(fn):
         for key, value in fn.__dict__.items():
@@ -219,70 +275,10 @@ def trace(fn):
                 setattr(fn, key, trace(value))
         return fn
 
-    if not iscoroutinefunction(fn):
-        return fn
+    if isfunction(fn) and iscoroutinefunction(fn):
+        traced_codes.add(fn.__code__)
 
-    @wraps(fn)
-    async def wrapper(*args, **kwargs):
-        if not trace_enabled():
-            return await fn(*args, **kwargs)
-
-        @wraps(fn)
-        async def inner_wrapper(*args, **kwargs):
-            trc = trace_var.get()
-            assert trc is not None
-            id = trc.next_counter()
-            parent_id = parent_id_var.get()
-            parent_id_var.set(id)
-
-            sig = signature(fn)
-            bound_args = sig.bind(*args, **kwargs)
-            bound_args.apply_defaults()
-            arg_dict = {}
-            recorder_name = None
-            for k, v in bound_args.arguments.items():
-                p = sig.parameters[k]
-                if p.default is recorder:
-                    recorder_name = k
-                if p.kind == Parameter.VAR_KEYWORD:
-                    arg_dict.update(v)
-                else:
-                    arg_dict[k] = v
-
-            arg_dict_json = to_json_value(arg_dict)
-            call_event = dict(
-                parent=parent_id,
-                start=monotonic_ns(),
-                name=fn.__name__ if hasattr(fn, "__name__") else repr(fn),
-                shortArgs=get_strings(arg_dict_json),
-                func=emit_block(func_info(fn)),
-                args=emit_block(arg_dict_json),
-            )
-            self = arg_dict.get("self")
-            if self:
-                call_event["cls"] = self.__class__.__name__
-
-            emit({id: call_event})
-
-            if recorder_name:
-                kwargs[recorder_name] = _Recorder(id)
-
-            result = await fn(*args, **kwargs)
-            result_json = to_json_value(result)
-            emit(
-                {
-                    id: dict(
-                        result=emit_block(result_json),
-                        shortResult=get_strings(result_json),
-                        end=monotonic_ns(),
-                    )
-                }
-            )
-            return result
-
-        return await create_task(inner_wrapper(*args, **kwargs))
-
-    return wrapper
+    return fn
 
 
 def to_json_serializable(self):
@@ -364,8 +360,8 @@ def _get_first_descendant(value: JSONValue) -> Any:
 
 
 @lru_cache()
-def func_info(fn):
+def func_info(code: types.CodeType) -> dict:
     return dict(
-        doc=getdoc(fn),
-        source=getsource(fn.func) if isinstance(fn, partial) else getsource(fn),
+        doc=get_docstring_from_code(code),
+        source=getsource(code),
     )

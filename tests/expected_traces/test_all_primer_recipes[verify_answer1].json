@@ -35,57 +35,6 @@
   {
     "3": {
       "args": {
-        "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
-        "steps": [
-          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
-          "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies"
-        ]
-      },
-      "name": "check_step",
-      "parent": 1,
-      "shortArgs": [
-        "Beth bakes 4x 2 dozen batches of co..."
-      ]
-    }
-  },
-  {
-    "4": {
-      "args": {
-        "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
-        "steps": [
-          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
-          "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
-          "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies"
-        ]
-      },
-      "name": "check_step",
-      "parent": 1,
-      "shortArgs": [
-        "Beth bakes 4x 2 dozen batches of co..."
-      ]
-    }
-  },
-  {
-    "5": {
-      "args": {
-        "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
-        "steps": [
-          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
-          "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
-          "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies",
-          "So, the final answer is 6 cookies per person."
-        ]
-      },
-      "name": "check_step",
-      "parent": 1,
-      "shortArgs": [
-        "Beth bakes 4x 2 dozen batches of co..."
-      ]
-    }
-  },
-  {
-    "6": {
-      "args": {
         "choices": [
           " Yes",
           " No"
@@ -153,7 +102,7 @@
     }
   },
   {
-    "6": {
+    "3": {
       "result": [
         {
           " No": 0.1626368830884087,
@@ -167,7 +116,31 @@
     }
   },
   {
-    "7": {
+    "2": {
+      "result": 0.8373631169115912,
+      "shortResult": [
+        "0.8373631169115912"
+      ]
+    }
+  },
+  {
+    "4": {
+      "args": {
+        "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+        "steps": [
+          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+          "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies"
+        ]
+      },
+      "name": "check_step",
+      "parent": 1,
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
+    }
+  },
+  {
+    "5": {
       "args": {
         "choices": [
           " Yes",
@@ -254,7 +227,7 @@
       },
       "cls": "FakeAgent",
       "name": "classify",
-      "parent": 3,
+      "parent": 4,
       "shortArgs": [
         "Consider this question: \"",
         "\"\n\nHere are the first few steps of...",
@@ -264,7 +237,7 @@
     }
   },
   {
-    "7": {
+    "5": {
       "result": [
         {
           " No": 0.41064257347452415,
@@ -278,7 +251,32 @@
     }
   },
   {
-    "8": {
+    "4": {
+      "result": 0.5893574265254758,
+      "shortResult": [
+        "0.5893574265254758"
+      ]
+    }
+  },
+  {
+    "6": {
+      "args": {
+        "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+        "steps": [
+          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+          "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+          "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies"
+        ]
+      },
+      "name": "check_step",
+      "parent": 1,
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
+      ]
+    }
+  },
+  {
+    "7": {
       "args": {
         "choices": [
           " Yes",
@@ -393,7 +391,7 @@
       },
       "cls": "FakeAgent",
       "name": "classify",
-      "parent": 4,
+      "parent": 6,
       "shortArgs": [
         "Consider this question: \"",
         "\"\n\nHere are the first few steps of...",
@@ -403,7 +401,7 @@
     }
   },
   {
-    "8": {
+    "7": {
       "result": [
         {
           " No": 0.6934821315117362,
@@ -413,6 +411,32 @@
       ],
       "shortResult": [
         "0.3065178684882638"
+      ]
+    }
+  },
+  {
+    "6": {
+      "result": 0.3065178684882638,
+      "shortResult": [
+        "0.3065178684882638"
+      ]
+    }
+  },
+  {
+    "8": {
+      "args": {
+        "question": "Beth bakes 4x 2 dozen batches of cookies in a week. If these cookies are shared amongst 16 people equally, how many cookies does each person consume?",
+        "steps": [
+          "Beth bakes 4x 2 dozen batches of cookies for a total of 4*2 = 8 dozen cookies",
+          "There are 12 cookies in a dozen and she makes 8 dozen cookies for a total of 12*8 = 96 cookies",
+          "She splits the 96 cookies equally amongst 16 people so they each eat 96/16 = 6 cookies",
+          "So, the final answer is 6 cookies per person."
+        ]
+      },
+      "name": "check_step",
+      "parent": 1,
+      "shortArgs": [
+        "Beth bakes 4x 2 dozen batches of co..."
       ]
     }
   },
@@ -560,7 +584,7 @@
       },
       "cls": "FakeAgent",
       "name": "classify",
-      "parent": 5,
+      "parent": 8,
       "shortArgs": [
         "Consider this question: \"",
         "\"\n\nHere are the first few steps of...",
@@ -584,31 +608,7 @@
     }
   },
   {
-    "2": {
-      "result": 0.8373631169115912,
-      "shortResult": [
-        "0.8373631169115912"
-      ]
-    }
-  },
-  {
-    "3": {
-      "result": 0.5893574265254758,
-      "shortResult": [
-        "0.5893574265254758"
-      ]
-    }
-  },
-  {
-    "4": {
-      "result": 0.3065178684882638,
-      "shortResult": [
-        "0.3065178684882638"
-      ]
-    }
-  },
-  {
-    "5": {
+    "8": {
       "result": 0.616542665612891,
       "shortResult": [
         "0.616542665612891"

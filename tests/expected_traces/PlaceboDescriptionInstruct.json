@@ -26,10 +26,7 @@
         "paper": {
           "document_id": "keenan-2018-tiny.txt"
         },
-        "record": {
-          "class_name": "function",
-          "name": "<lambda>"
-        },
+        "record": "ice.trace._Recorder",
         "self": {
           "agent_str": "instruct",
           "class_name": "PlaceboDescriptionInstruct",

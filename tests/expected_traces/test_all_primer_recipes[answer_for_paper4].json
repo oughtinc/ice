@@ -51,159 +51,6 @@
   {
     "3": {
       "args": {
-        "paragraph": {
-          "section_type": "main",
-          "sections": [
-            {
-              "number": "1",
-              "title": "Introduction"
-            }
-          ],
-          "sentences": [
-            "Trachoma-control programs have distributed more than 600 million doses of oral azithromycin in an effort to elimi- nate the ocular strains of chlamydia that cause the disease.1,2 Azithromycin has been effective against trachoma, although it has caused gastro- intestinal side effects and selected for macrolide- resistant strains of Streptococcus pneumoniae and Escherichia coli.3-8 Investigators have also noted possible benefits of azithromycin for prevention of a number of infectious diseases including malaria, infectious diarrhea, and pneumonia.9-14 The results of a case\u2013control study and a cluster- randomized trial in an area of Ethiopia in which trachoma is endemic suggested that mass distri- bution of azithromycin might reduce childhood mortality.15,16 Some experts believed that a mor- tality benefit was, indeed, possible, although it would probably be smaller in magnitude than what was found in these studies.17"
-          ]
-        },
-        "question": "Result decide list."
-      },
-      "name": "classify_paragraph",
-      "parent": 1,
-      "shortArgs": [
-        "Trachoma-control programs have dist..."
-      ]
-    }
-  },
-  {
-    "4": {
-      "args": {
-        "paragraph": {
-          "section_type": "main",
-          "sections": [
-            {
-              "number": "2",
-              "title": "Eligibility"
-            }
-          ],
-          "sentences": [
-            "MORDOR (Macrolides Oraux pour R\u00e9duire les D\u00e9c\u00e8s avec un Oeil sur la R\u00e9sistance) was a cluster-randomized trial conducted in the Mala- wian district of Mangochi, in the Nigerien dis- tricts of Boboye and Loga, and in the Tanzanian districts of Kilosa and Gairo, with communities as the unit of randomization.",
-            "The community that served as the randomization unit was a health surveillance assistance area in Malawi, a grappe (i.e., a cluster of households representing the smallest government health unit) in Niger, and a hamlet in Tanzania.",
-            "None of the districts\nwere eligible for mass distributions of azithro- mycin for trachoma on the basis of the most recent mapping, and none of the children who participated in the trial had previously received azithromycin.",
-            "Enrollment was based on census information available before the trial.",
-            "Commu- nities with a population between 200 and 2000 inhabitants on the most recent census were eli- gible for enrollment (see the Supplementary Ap- pendix, available with the full text of this article at NEJM.org).",
-            "Communities remained in the trial even if the population drifted out of this range.",
-            "All children 1 to 59 months of age (truncated to month) who weighed at least 3800 g were eligi- ble to receive azithromycin or placebo."
-          ]
-        },
-        "question": "Result decide list."
-      },
-      "name": "classify_paragraph",
-      "parent": 1,
-      "shortArgs": [
-        "MORDOR (Macrolides Oraux pour R\u00e9dui...",
-        "The community that served as the ra...",
-        "None of the districts\nwere eligible...",
-        "..."
-      ]
-    }
-  },
-  {
-    "5": {
-      "args": {
-        "paragraph": {
-          "section_type": "main",
-          "sections": [
-            {
-              "number": "3",
-              "title": "Randomization and Masking"
-            }
-          ],
-          "sentences": [
-            "Lists of communities from the most recent pre- trial census were submitted to the data coordi- nating center at the University of California, San Francisco (UCSF).",
-            "For each country, communities were randomly assigned in equal proportions to 1 of 10 letters, with 5 letters coded for azithro- mycin and 5 for placebo (more information is provided in the statistical analysis plan in the protocol, available at NEJM.org).",
-            "Randomization was performed with the sample function in R soft- ware, version 3.1 (R Foundation for Statistical Computing).",
-            "Only key trial personnel were aware of which letters corresponded to each group.",
-            "Participants, observers, investigators, and data- cleaning team members were unaware of the group assignments.",
-            "Centralized randomization and simultaneous assignment of communities facilitated complete concealment of the assign- ments.",
-            "The placebo contained the vehicle of the oral azithromycin suspension and was bottled and labeled identically to azithromycin.",
-            "Both placebo and azithromycin were donated by Pfizer, which reviewed the protocol but had no other role in the trial."
-          ]
-        },
-        "question": "Result decide list."
-      },
-      "name": "classify_paragraph",
-      "parent": 1,
-      "shortArgs": [
-        "Lists of communities from the most...",
-        "For each country, communities were...",
-        "Randomization was performed with th...",
-        "..."
-      ]
-    }
-  },
-  {
-    "6": {
-      "args": {
-        "paragraph": {
-          "section_type": "main",
-          "sections": [
-            {
-              "number": "4",
-              "title": "Intervention"
-            }
-          ],
-          "sentences": [
-            "Each child 1 to 59 months of age at the time of the census was offered a single directly observed dose of oral azithromycin or placebo (according to the randomization of their community).",
-            "Chil- dren were given a volume of suspension corre- sponding to at least 20 mg per kilogram of body weight, calculated with the use of a height stick (see the protocol), in accordance with the coun- try\u2019s trachoma program guidelines, or by weight for children unable to stand.",
-            "Children who were known to be allergic to macrolides were not given azithromycin or placebo.",
-            "Azithromycin or placebo was administered at the time of the census or during additional visits in an attempt to achieve at least 80% coverage.",
-            "Administration of trial medication or placebo was documented in the mobile application for each child, and com- munity coverage was calculated relative to the census.",
-            "The parents or guardians of the children and the local health posts were instructed to contact a village representative regarding any adverse events noted within 7 days after admin- istration of azithromycin or placebo; the village representative reported the events to the site coor- dinator, who in turn reported the events to UCSF."
-          ]
-        },
-        "question": "Result decide list."
-      },
-      "name": "classify_paragraph",
-      "parent": 1,
-      "shortArgs": [
-        "Each child 1 to 59 months of age at...",
-        "Chil- dren were given a volume of s...",
-        "Children who were known to be aller...",
-        "..."
-      ]
-    }
-  },
-  {
-    "7": {
-      "args": {
-        "paragraph": {
-          "section_type": "main",
-          "sections": [
-            {
-              "number": "5",
-              "title": "Primary Results"
-            }
-          ],
-          "sentences": [
-            "The results of a 12-month interim analysis for efficacy did not meet the prespecified criterion for early stopping, which was a P value of less than 0.001 for the difference between groups.",
-            "At the end of the trial, the annual mortality rate for eligible children in the three countries combined was 14.6 deaths per 1000 person-years in com- munities that received azithromycin (9.1 per 1000 person-years in Malawi, 22.5 in Niger, and 5.4 in Tanzania) and 16.5 deaths per 1000 person- years in communities that received placebo (9.6 per 1000 person-years in Malawi, 27.5 in Niger, and 5.5 in Tanzania).",
-            "Community-level, intention- to-treat analysis showed that over all four inter- censal periods, mortality was 13.5% lower over- all (95% confidence interval [CI], 6.7 to 19.8) in the azithromycin group than in the placebo group (P<0.001).",
-            "The proportion of children whose census status was recorded as moved or unknown did not differ significantly between the groups (P=0.71 and P=0.36, respectively)."
-          ]
-        },
-        "question": "Result decide list."
-      },
-      "name": "classify_paragraph",
-      "parent": 1,
-      "shortArgs": [
-        "The results of a 12-month interim a...",
-        "At the end of the trial, the annual...",
-        "Community-level, intention- to-trea...",
-        "..."
-      ]
-    }
-  },
-  {
-    "8": {
-      "args": {
         "choices": [
           " Yes",
           " No"
@@ -259,7 +106,7 @@
     }
   },
   {
-    "8": {
+    "3": {
       "result": [
         {
           " No": 0.9308702443780423,
@@ -273,7 +120,39 @@
     }
   },
   {
-    "9": {
+    "2": {
+      "result": 0.06912975562195772,
+      "shortResult": [
+        "0.06912975562195772"
+      ]
+    }
+  },
+  {
+    "4": {
+      "args": {
+        "paragraph": {
+          "section_type": "main",
+          "sections": [
+            {
+              "number": "1",
+              "title": "Introduction"
+            }
+          ],
+          "sentences": [
+            "Trachoma-control programs have distributed more than 600 million doses of oral azithromycin in an effort to elimi- nate the ocular strains of chlamydia that cause the disease.1,2 Azithromycin has been effective against trachoma, although it has caused gastro- intestinal side effects and selected for macrolide- resistant strains of Streptococcus pneumoniae and Escherichia coli.3-8 Investigators have also noted possible benefits of azithromycin for prevention of a number of infectious diseases including malaria, infectious diarrhea, and pneumonia.9-14 The results of a case\u2013control study and a cluster- randomized trial in an area of Ethiopia in which trachoma is endemic suggested that mass distri- bution of azithromycin might reduce childhood mortality.15,16 Some experts believed that a mor- tality benefit was, indeed, possible, although it would probably be smaller in magnitude than what was found in these studies.17"
+          ]
+        },
+        "question": "Result decide list."
+      },
+      "name": "classify_paragraph",
+      "parent": 1,
+      "shortArgs": [
+        "Trachoma-control programs have dist..."
+      ]
+    }
+  },
+  {
+    "5": {
       "args": {
         "choices": [
           " Yes",
@@ -315,7 +194,7 @@
       },
       "cls": "FakeAgent",
       "name": "classify",
-      "parent": 3,
+      "parent": 4,
       "shortArgs": [
         "Here is a paragraph from a research...",
         "\"\n\nQuestion: Does this paragraph an...",
@@ -324,7 +203,7 @@
     }
   },
   {
-    "9": {
+    "5": {
       "result": [
         {
           " No": 0.4114102344703187,
@@ -338,7 +217,48 @@
     }
   },
   {
-    "10": {
+    "4": {
+      "result": 0.5885897655296813,
+      "shortResult": [
+        "0.5885897655296813"
+      ]
+    }
+  },
+  {
+    "6": {
+      "args": {
+        "paragraph": {
+          "section_type": "main",
+          "sections": [
+            {
+              "number": "2",
+              "title": "Eligibility"
+            }
+          ],
+          "sentences": [
+            "MORDOR (Macrolides Oraux pour R\u00e9duire les D\u00e9c\u00e8s avec un Oeil sur la R\u00e9sistance) was a cluster-randomized trial conducted in the Mala- wian district of Mangochi, in the Nigerien dis- tricts of Boboye and Loga, and in the Tanzanian districts of Kilosa and Gairo, with communities as the unit of randomization.",
+            "The community that served as the randomization unit was a health surveillance assistance area in Malawi, a grappe (i.e., a cluster of households representing the smallest government health unit) in Niger, and a hamlet in Tanzania.",
+            "None of the districts\nwere eligible for mass distributions of azithro- mycin for trachoma on the basis of the most recent mapping, and none of the children who participated in the trial had previously received azithromycin.",
+            "Enrollment was based on census information available before the trial.",
+            "Commu- nities with a population between 200 and 2000 inhabitants on the most recent census were eli- gible for enrollment (see the Supplementary Ap- pendix, available with the full text of this article at NEJM.org).",
+            "Communities remained in the trial even if the population drifted out of this range.",
+            "All children 1 to 59 months of age (truncated to month) who weighed at least 3800 g were eligi- ble to receive azithromycin or placebo."
+          ]
+        },
+        "question": "Result decide list."
+      },
+      "name": "classify_paragraph",
+      "parent": 1,
+      "shortArgs": [
+        "MORDOR (Macrolides Oraux pour R\u00e9dui...",
+        "The community that served as the ra...",
+        "None of the districts\nwere eligible...",
+        "..."
+      ]
+    }
+  },
+  {
+    "7": {
       "args": {
         "choices": [
           " Yes",
@@ -386,7 +306,7 @@
       },
       "cls": "FakeAgent",
       "name": "classify",
-      "parent": 4,
+      "parent": 6,
       "shortArgs": [
         "Here is a paragraph from a research...",
         "\"\n\nQuestion: Does this paragraph an...",
@@ -395,7 +315,7 @@
     }
   },
   {
-    "10": {
+    "7": {
       "result": [
         {
           " No": 0.3104990731618265,
@@ -409,7 +329,49 @@
     }
   },
   {
-    "11": {
+    "6": {
+      "result": 0.6895009268381735,
+      "shortResult": [
+        "0.6895009268381735"
+      ]
+    }
+  },
+  {
+    "8": {
+      "args": {
+        "paragraph": {
+          "section_type": "main",
+          "sections": [
+            {
+              "number": "3",
+              "title": "Randomization and Masking"
+            }
+          ],
+          "sentences": [
+            "Lists of communities from the most recent pre- trial census were submitted to the data coordi- nating center at the University of California, San Francisco (UCSF).",
+            "For each country, communities were randomly assigned in equal proportions to 1 of 10 letters, with 5 letters coded for azithro- mycin and 5 for placebo (more information is provided in the statistical analysis plan in the protocol, available at NEJM.org).",
+            "Randomization was performed with the sample function in R soft- ware, version 3.1 (R Foundation for Statistical Computing).",
+            "Only key trial personnel were aware of which letters corresponded to each group.",
+            "Participants, observers, investigators, and data- cleaning team members were unaware of the group assignments.",
+            "Centralized randomization and simultaneous assignment of communities facilitated complete concealment of the assign- ments.",
+            "The placebo contained the vehicle of the oral azithromycin suspension and was bottled and labeled identically to azithromycin.",
+            "Both placebo and azithromycin were donated by Pfizer, which reviewed the protocol but had no other role in the trial."
+          ]
+        },
+        "question": "Result decide list."
+      },
+      "name": "classify_paragraph",
+      "parent": 1,
+      "shortArgs": [
+        "Lists of communities from the most...",
+        "For each country, communities were...",
+        "Randomization was performed with th...",
+        "..."
+      ]
+    }
+  },
+  {
+    "9": {
       "args": {
         "choices": [
           " Yes",
@@ -458,7 +420,7 @@
       },
       "cls": "FakeAgent",
       "name": "classify",
-      "parent": 5,
+      "parent": 8,
       "shortArgs": [
         "Here is a paragraph from a research...",
         "\"\n\nQuestion: Does this paragraph an...",
@@ -467,7 +429,7 @@
     }
   },
   {
-    "11": {
+    "9": {
       "result": [
         {
           " No": 0.15194608540546886,
@@ -481,7 +443,47 @@
     }
   },
   {
-    "12": {
+    "8": {
+      "result": 0.8480539145945312,
+      "shortResult": [
+        "0.8480539145945312"
+      ]
+    }
+  },
+  {
+    "10": {
+      "args": {
+        "paragraph": {
+          "section_type": "main",
+          "sections": [
+            {
+              "number": "4",
+              "title": "Intervention"
+            }
+          ],
+          "sentences": [
+            "Each child 1 to 59 months of age at the time of the census was offered a single directly observed dose of oral azithromycin or placebo (according to the randomization of their community).",
+            "Chil- dren were given a volume of suspension corre- sponding to at least 20 mg per kilogram of body weight, calculated with the use of a height stick (see the protocol), in accordance with the coun- try\u2019s trachoma program guidelines, or by weight for children unable to stand.",
+            "Children who were known to be allergic to macrolides were not given azithromycin or placebo.",
+            "Azithromycin or placebo was administered at the time of the census or during additional visits in an attempt to achieve at least 80% coverage.",
+            "Administration of trial medication or placebo was documented in the mobile application for each child, and com- munity coverage was calculated relative to the census.",
+            "The parents or guardians of the children and the local health posts were instructed to contact a village representative regarding any adverse events noted within 7 days after admin- istration of azithromycin or placebo; the village representative reported the events to the site coor- dinator, who in turn reported the events to UCSF."
+          ]
+        },
+        "question": "Result decide list."
+      },
+      "name": "classify_paragraph",
+      "parent": 1,
+      "shortArgs": [
+        "Each child 1 to 59 months of age at...",
+        "Chil- dren were given a volume of s...",
+        "Children who were known to be aller...",
+        "..."
+      ]
+    }
+  },
+  {
+    "11": {
       "args": {
         "choices": [
           " Yes",
@@ -528,7 +530,7 @@
       },
       "cls": "FakeAgent",
       "name": "classify",
-      "parent": 6,
+      "parent": 10,
       "shortArgs": [
         "Here is a paragraph from a research...",
         "\"\n\nQuestion: Does this paragraph an...",
@@ -537,7 +539,7 @@
     }
   },
   {
-    "12": {
+    "11": {
       "result": [
         {
           " No": 0.19406778471371455,
@@ -547,6 +549,44 @@
       ],
       "shortResult": [
         "0.8059322152862854"
+      ]
+    }
+  },
+  {
+    "10": {
+      "result": 0.8059322152862854,
+      "shortResult": [
+        "0.8059322152862854"
+      ]
+    }
+  },
+  {
+    "12": {
+      "args": {
+        "paragraph": {
+          "section_type": "main",
+          "sections": [
+            {
+              "number": "5",
+              "title": "Primary Results"
+            }
+          ],
+          "sentences": [
+            "The results of a 12-month interim analysis for efficacy did not meet the prespecified criterion for early stopping, which was a P value of less than 0.001 for the difference between groups.",
+            "At the end of the trial, the annual mortality rate for eligible children in the three countries combined was 14.6 deaths per 1000 person-years in com- munities that received azithromycin (9.1 per 1000 person-years in Malawi, 22.5 in Niger, and 5.4 in Tanzania) and 16.5 deaths per 1000 person- years in communities that received placebo (9.6 per 1000 person-years in Malawi, 27.5 in Niger, and 5.5 in Tanzania).",
+            "Community-level, intention- to-treat analysis showed that over all four inter- censal periods, mortality was 13.5% lower over- all (95% confidence interval [CI], 6.7 to 19.8) in the azithromycin group than in the placebo group (P<0.001).",
+            "The proportion of children whose census status was recorded as moved or unknown did not differ significantly between the groups (P=0.71 and P=0.36, respectively)."
+          ]
+        },
+        "question": "Result decide list."
+      },
+      "name": "classify_paragraph",
+      "parent": 1,
+      "shortArgs": [
+        "The results of a 12-month interim a...",
+        "At the end of the trial, the annual...",
+        "Community-level, intention- to-trea...",
+        "..."
       ]
     }
   },
@@ -596,7 +636,7 @@
       },
       "cls": "FakeAgent",
       "name": "classify",
-      "parent": 7,
+      "parent": 12,
       "shortArgs": [
         "Here is a paragraph from a research...",
         "\"\n\nQuestion: Does this paragraph an...",
@@ -619,47 +659,7 @@
     }
   },
   {
-    "2": {
-      "result": 0.06912975562195772,
-      "shortResult": [
-        "0.06912975562195772"
-      ]
-    }
-  },
-  {
-    "3": {
-      "result": 0.5885897655296813,
-      "shortResult": [
-        "0.5885897655296813"
-      ]
-    }
-  },
-  {
-    "4": {
-      "result": 0.6895009268381735,
-      "shortResult": [
-        "0.6895009268381735"
-      ]
-    }
-  },
-  {
-    "5": {
-      "result": 0.8480539145945312,
-      "shortResult": [
-        "0.8480539145945312"
-      ]
-    }
-  },
-  {
-    "6": {
-      "result": 0.8059322152862854,
-      "shortResult": [
-        "0.8059322152862854"
-      ]
-    }
-  },
-  {
-    "7": {
+    "12": {
       "result": 0.7367277951774727,
       "shortResult": [
         "0.7367277951774727"
