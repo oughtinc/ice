@@ -11,6 +11,7 @@
 /dist/
 /ice/routes/ui/
 /ice/version.py
+/papers/*.csv
 /papers/*.pdf
 /papers/*.txt
 !/papers/keenan-2018-tiny.txt
