@@ -7,6 +7,7 @@ from typing import Optional
 from typing import TYPE_CHECKING
 
 from pydantic import BaseSettings
+from structlog import get_logger
 
 from .logging import log_lock
 
@@ -14,6 +15,8 @@ if TYPE_CHECKING:
     AnyHttpUrl = str
 else:
     from pydantic import AnyHttpUrl
+
+log = get_logger()
 
 
 class Settings(BaseSettings):
@@ -47,6 +50,7 @@ class Settings(BaseSettings):
         with open(_env_path, "a") as f:
             # [json.dumps] to escape quotes
             f.write(f"{setting_name}={json.dumps(value)}\n")
+        log.info(f"Saved {setting_name} to {_env_path}")
         return value
 
     def __getattribute__(self, name: str) -> Any:
