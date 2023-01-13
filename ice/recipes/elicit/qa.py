@@ -1,12 +1,14 @@
+from urllib.parse import urljoin
+
 from structlog.stdlib import get_logger
 
 from ice.recipe import recipe
 from ice.recipes.elicit.common import send_elicit_request
+from ice.recipes.elicit.search import get_elicit_backend
 
 log = get_logger()
 
-# TODO: Dynamically consult https://elicit.org/api/backend
-ELICIT_QA_ENDPOINT = "https://prod.elicit.org/elicit-red/full-text-qa"
+ELICIT_QA_ENDPOINT = "full-text-qa"
 
 
 def get_span_container(paper, source):
@@ -57,9 +59,9 @@ async def elicit_qa(
         for paper in (papers or dict()).values()
     ]
     request_body = {"rootQuestion": root_question, "cells": cells}
-    response = send_elicit_request(
-        request_body=request_body, endpoint=ELICIT_QA_ENDPOINT
-    )
+    backend = await get_elicit_backend()
+    endpoint = urljoin(backend, ELICIT_QA_ENDPOINT)
+    response = send_elicit_request(request_body=request_body, endpoint=endpoint)
     # Augment the response with the text of the extract spans
     response = augment_qa_response(response, papers)
     return response

@@ -164,6 +164,7 @@ Answer:"""
         prompt=prompt,
         stop=None,
         max_tokens=200,
+        model="text-davinci-003",
     )
 
     return completion["choices"][0]["text"]

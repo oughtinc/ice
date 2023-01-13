@@ -1,3 +1,5 @@
+import httpx
+
 from structlog import get_logger
 
 from ice.recipe import recipe
@@ -7,7 +9,7 @@ log = get_logger()
 
 
 def make_request_body(
-    query: str, num_papers: int = 4, filters: dict | None = None
+    query: str, num_papers: int = 4, page: int = 0, filters: dict | None = None
 ) -> dict:
     """
     Make the request body for the Elicit search endpoint.
@@ -16,28 +18,43 @@ def make_request_body(
         filters = {}
     return dict(
         query=query,
-        start=0,
-        stop=num_papers,
+        start=page * num_papers,
+        stop=(page + 1) * num_papers,
         qaColumns=[],
         filters=filters,
     )
 
 
+async def get_elicit_backend() -> str:
+    BACKEND_URL = "https://elicit.org/api/backend"
+    async with httpx.AsyncClient() as client:
+        response = await client.get(BACKEND_URL)
+        # Response is plain text, e.g. "https://prod.elicit.org/elicit-red/lit-review"
+        response.raise_for_status()
+        return response.text
+
+
 async def elicit_search(
     question: str = "What is the effect of creatine on cognition?",
     num_papers: int = 4,
-    # TODO: Dynamically consult https://elicit.org/api/backend
-    endpoint: str = "https://prod.elicit.org/elicit-red/lit-review",
+    page: int = 0,
+    has_pdf_filter: bool = False,
+    backend: str | None = None,
 ):
     """
     Search Elicit for papers related to a question.
     """
+
+    backend = backend or await get_elicit_backend()
+
+    endpoint = backend.rstrip("/") + "/lit-review"
+
     log.info(f"Searching Elicit for query: {question}, endpoint: {endpoint}")
 
-    filters = None
+    filters = dict(has_pdf=has_pdf_filter)
 
     request_body = make_request_body(
-        query=question, num_papers=num_papers, filters=filters
+        query=question, num_papers=num_papers, page=page, filters=filters
     )
 
     response = send_elicit_request(
