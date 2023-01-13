@@ -8,12 +8,13 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseSettings
 
+from .logging import log_lock
+
 if TYPE_CHECKING:
     AnyHttpUrl = str
 else:
     from pydantic import AnyHttpUrl
 
-from .logging import log_lock
 
 OUGHT_ICE_DIR = Path(environ.get("OUGHT_ICE_DIR", Path.home() / ".ought-ice"))
 
@@ -43,7 +44,8 @@ class Settings(BaseSettings):
         # prompt the user for them if they are not already set.
         if prompt is None:
             prompt = f"Enter {setting_name}: "
-        # We use this lock to avoid the server threads from burying the input prompt.
+        # We use this lock to avoid the server threads from burying the input
+        # prompt. See [Settings.__get_and_store].
         with log_lock:
             value = input(prompt)
         setattr(self, setting_name, value)
