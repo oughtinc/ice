@@ -16,11 +16,6 @@ else:
     from pydantic import AnyHttpUrl
 
 
-OUGHT_ICE_DIR = Path(environ.get("OUGHT_ICE_DIR", Path.home() / ".ought-ice"))
-
-_env_path = OUGHT_ICE_DIR / ".env"
-
-
 class Settings(BaseSettings):
     OPENAI_ORG_ID: str = ""
     OUGHT_INFERENCE_URL: AnyHttpUrl = "https://prod.elicit.org"
@@ -67,6 +62,10 @@ class Settings(BaseSettings):
         else:
             return result
 
+
+OUGHT_ICE_DIR = Path(environ.get("OUGHT_ICE_DIR", Path.home() / ".ought-ice"))
+
+_env_path = OUGHT_ICE_DIR / ".env"
 
 # Note that fields are loaded from pydantic in a particular priority ordering. See
 # https://docs.pydantic.dev/usage/settings/#field-value-priority
