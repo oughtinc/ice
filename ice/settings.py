@@ -44,8 +44,8 @@ class Settings(BaseSettings):
         # prompt the user for them if they are not already set.
         if prompt is None:
             prompt = f"Enter {setting_name}: "
-        # We use this lock to avoid the server threads from burying the input
-        # prompt. See [Settings.__get_and_store].
+        # We use this lock to prevent logging from another thread
+        # from burying the input prompt. See [Trace._server_and_browser].
         with log_lock:
             value = input(prompt)
         setattr(self, setting_name, value)
