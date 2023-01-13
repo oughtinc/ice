@@ -38,20 +38,6 @@ async def get_elicit_backend() -> str:
         return response.text
 
 
-def elicit_results_to_papers(elicit_results: dict) -> Sequence[Paper]:
-    return [
-        Paper.from_elicit_result(paper) for paper in elicit_results["papers"].values()
-    ]
-
-
-async def elicit_paper_search(
-    question: str, num_papers: int = 4, page: int = 0, full_text: bool = True
-) -> Sequence[Paper]:
-    return elicit_results_to_papers(
-        await elicit_search(question, num_papers, page, full_text)
-    )
-
-
 async def elicit_search(
     question: str = "What is the effect of creatine on cognition?",
     num_papers: int = 4,
