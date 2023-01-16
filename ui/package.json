@@ -9,7 +9,7 @@
     "allotment": "^1.17.1",
     "classnames": "^2.3.2",
     "framer-motion": "^7.6.19",
-    "immer": "^9.0.17",
+    "immer": "^9.0.18",
     "lodash": "^4.17.21",
     "phosphor-react": "^1.4.1",
     "react": "^18.2.0",
