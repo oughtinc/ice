@@ -4,14 +4,15 @@ import opcode
 import sys
 import threading
 import types
+import inspect
 
 from abc import ABCMeta
 from contextvars import ContextVar
 from functools import lru_cache
 from inspect import getsource
 from inspect import isclass
-from inspect import iscoroutinefunction
 from inspect import isfunction
+from pathlib import Path
 from time import monotonic_ns
 from typing import Any
 from typing import cast
@@ -204,7 +205,65 @@ class Recorder:
 
 recorder = Recorder()
 
-traced_codes = set()
+_trace_conditions = []
+trace_when = _trace_conditions.append
+
+_traced_files = set()
+trace_when(lambda code: code.co_filename in _traced_files)
+trace_file = _traced_files.add
+
+_traced_folders = []
+trace_when(lambda code: any(code.co_filename.startswith(f) for f in _traced_folders))
+
+
+def trace_folder(folder: str | Path):
+    _traced_folders.append(str(folder).rstrip("/") + "/")
+
+
+_traced_file_ranges = []
+
+
+@trace_when
+def _trace_range(code):
+    filename = code.co_filename
+    lineno = code.co_firstlineno
+    return any(
+        filename == f and start <= lineno <= end
+        for f, start, end in _traced_file_ranges
+    )
+
+
+def trace(fn):
+    if isclass(fn) or isfunction(fn):
+        try:
+            lines, start = inspect.getsourcelines(fn)
+        except Exception:
+            return fn
+        end = start + len(lines)
+        filename = inspect.getsourcefile(fn)
+        _traced_file_ranges.append((filename, start, end))
+
+    return fn
+
+
+_dont_trace_codes = set()
+
+
+def dont_trace(fn: types.FunctionType):
+    _dont_trace_codes.add(fn.__code__)
+    return fn
+
+
+@lru_cache(maxsize=None)
+def should_trace(code: types.CodeType) -> bool:
+    if (
+        code.co_name.startswith("<")
+        or code in _dont_trace_codes
+        or not (code.co_flags & inspect.CO_COROUTINE & ~inspect.CO_ASYNC_GENERATOR)
+    ):
+        return False
+
+    return any(cond(code) for cond in _trace_conditions)
 
 
 def tracefunc(frame: types.FrameType, event: str, arg):
@@ -212,7 +271,7 @@ def tracefunc(frame: types.FrameType, event: str, arg):
         return
 
     code = frame.f_code
-    if code not in traced_codes:
+    if not should_trace(code):
         return
 
     if event == "call":
@@ -268,19 +327,6 @@ def tracefunc(frame: types.FrameType, event: str, arg):
     return tracefunc
 
 
-def trace(fn):
-    if isclass(fn):
-        for key, value in fn.__dict__.items():
-            if isfunction(value):
-                setattr(fn, key, trace(value))
-        return fn
-
-    if isfunction(fn) and iscoroutinefunction(fn):
-        traced_codes.add(fn.__code__)
-
-    return fn
-
-
 def to_json_serializable(self):
     namespace = dict(class_name=self.__class__.__name__)
     for attr in dir(self):
@@ -294,17 +340,18 @@ def to_json_serializable(self):
 
 class TracedABCMeta(ABCMeta):
     def __new__(mcls, name, bases, namespace):
-        return super().__new__(
-            mcls,
-            name,
-            bases,
-            {k: trace(v) for k, v in namespace.items()}
-            | dict(dict=to_json_serializable),
+        return trace(
+            super().__new__(
+                mcls,
+                name,
+                bases,
+                namespace,
+            )
         )
 
 
 class TracedABC(metaclass=TracedABCMeta):
-    ...
+    dict = to_json_serializable
 
 
 # TODO this and the functions it calls needs to be replaced with a better system

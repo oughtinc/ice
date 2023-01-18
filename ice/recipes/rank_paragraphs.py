@@ -6,6 +6,7 @@ from tqdm import tqdm
 from ice.paper import Paper
 from ice.paper import Paragraph
 from ice.recipe import Recipe
+from ice.trace import dont_trace
 from ice.utils import nsmallest_async
 
 log = get_logger()
@@ -34,6 +35,7 @@ class RankParagraphs(Recipe):
         paragraphs A and B better answer question Q?"
         """
 
+        @dont_trace
         async def cmp(a: Paragraph, b: Paragraph) -> int:
             progress_bar.update(1)
             answer = (

@@ -1,6 +1,7 @@
 from structlog import get_logger
 
 from ice.recipe import Recipe
+from ice.trace import dont_trace
 
 log = get_logger()
 
@@ -9,10 +10,12 @@ class MesaRecipe(Recipe):
     async def run(self, input: list[str]) -> list[str]:
         assert input, "MesaRecipe requires an 'input' argument"
 
+        @dont_trace
         async def first_node():
             output = input + ["MesaRecipe.first_node"]
             return output
 
+        @dont_trace
         async def second_node(pred: list[str]):
             output = pred + ["MesaRecipe.second_node"]
             return output
