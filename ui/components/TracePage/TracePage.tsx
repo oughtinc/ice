@@ -1,3 +1,4 @@
+// TODO unused imports
 import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
@@ -24,14 +25,9 @@ import { recipes } from "/helpers/recipes";
 import * as COLORS from "/styles/colors.json";
 import { useParams } from "react-router";
 import { getHighlightedCalls, isHighlighted, Toolbar } from "/components/TracePage/Toolbar";
-import { CallFunction, CallName, getFormattedName } from "/components/TracePage/CallName";
+import { CallFunction, CallName } from "/components/TracePage/CallName";
+import { DetailRenderer } from "./DetailRenderer";
 import { CallIconButton } from "./CallIconButton";
-import {
-  FlattenedFStringPart,
-  flattenFString,
-  FString,
-  RawFStringPart,
-} from "/components/TracePage/FString";
 import { StringToScalar, Table } from "./Table";
 
 const elicitStyle = {
@@ -56,7 +52,7 @@ const getContentLength = async (url: string) => {
 };
 
 // Detailed values of a function call to show in the sidebar.
-type InputOutputContentProps = {
+export type InputOutputContentProps = {
   // Call arguments, i.e. inputs
   args: BlockAddress<Record<string, unknown>>;
   // The full return value
@@ -548,83 +544,8 @@ const ResultComponent = ({ value }: { value: string[] }): JSX.Element => {
   );
 };
 
-type JsonChild =
-  | { type: "array"; values: unknown[] }
-  | { type: "object"; values: [string, unknown][] }
-  | { type: "value"; value: unknown; fstring?: FlattenedFStringPart[] };
-
-const getStructuralType = (data: unknown) => {
-  if (typeof data === "object" && data && !Array.isArray(data)) return "object";
-  if (Array.isArray(data)) return "array";
-  return "value";
-};
-
-const TypeIdentifiers = {
-  object: <span className="shrink-0 font-mono mr-[8px]">{"{}"}</span>,
-  array: <span className="shrink-0 font-mono mr-[8px]">{"[]"}</span>,
-  value: null,
-};
-
-const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
-  const toast = useToast();
-  const view: JsonChild = useMemo(() => {
-    if (typeof data === "object" && data) {
-      // Array or Object
-      if (Array.isArray(data)) return { type: "array", values: data };
-      if ("__fstring__" in data) {
-        const parts = data.__fstring__ as RawFStringPart[];
-        const flattenedParts = flattenFString(parts);
-        const value = flattenedParts
-          .map(part => (typeof part === "string" ? part : part.value))
-          .join("");
-        return { type: "value", value, fstring: flattenedParts };
-      }
-      return { type: "object", values: Object.entries(data) };
-    }
-    return { type: "value", value: data };
-  }, [data]);
-
-  if (view.type === "array" || view.type === "object") {
-    return (
-      <div className={classNames("flex", root ? undefined : "ml-4")}>
-        <div>
-          {view.type === "array"
-            ? view.values.map((el, index) => (
-                <div key={index} className="mb-1">
-                  <span className="text-gray-600">{`${index + 1}. `}</span>
-                  {TypeIdentifiers[getStructuralType(el)]}
-                  <DetailRenderer data={el} />
-                </div>
-              ))
-            : view.values.map(([key, value], index) => (
-                <div key={index} className="mb-1">
-                  <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
-                  {TypeIdentifiers[getStructuralType(value)]}
-                  <DetailRenderer data={value} />
-                </div>
-              ))}
-          {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
-        </div>
-      </div>
-    );
-  }
-  const value = `${view.value}`;
-  return value ? (
-    <span
-      className="inline whitespace-pre-wrap"
-      onClick={() => {
-        navigator.clipboard.writeText(value);
-        toast({ title: "Copied to clipboard", duration: 1000 });
-      }}
-    >
-      {view.fstring ? <FString parts={view.fstring} /> : value}
-    </span>
-  ) : (
-    <span className="text-gray-600">empty</span>
-  );
-};
-
 const Json = ({ name, value }: { name: string; value: unknown }) => {
+  console.log(`Rendering ${name} with value ${JSON.stringify(value)}`);
   return (
     <div>
       <div className="mb-2 font-medium">{name}</div>
@@ -723,7 +644,7 @@ const excludeMetadata = (source: Record<string, unknown> | undefined) => {
   );
 };
 
-const InputOutputContent = ({ args, records, result }: InputOutputContentProps) => {
+export const InputOutputContent = ({ args, records, result }: InputOutputContentProps) => {
   const { getBlockValue } = useTreeContext();
   return (
     <>

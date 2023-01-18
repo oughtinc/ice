@@ -48,27 +48,29 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
 
 ## Developing ICE
 
-1. If you want to make changes to ICE itself, clone the repository, then install it in editable mode:
+- If you want to make changes to ICE itself, clone the repository, then install it in editable mode:
 
-   ```shell
-   python3.10 -m venv venv
-   source venv/bin/activate
-   pip install --upgrade pip
-   pip install -e '.[dev]' --config-settings editable_mode=compat
-   pre-commit install
-   npm --prefix ui ci
-   npm --prefix ui run dev
-   ```
+  ```shell
+  python3.10 -m venv venv
+  source venv/bin/activate
+  pip install --upgrade pip
+  pip install -e '.[dev]' --config-settings editable_mode=compat
+  pre-commit install
+  npm --prefix ui ci
+  npm --prefix ui run dev
+  ```
 
-2. If you're working on the backend, you might find it helpful to remove the cache of language model calls:
+- If you're working on the backend, you might find it helpful to remove the cache of language model calls:
 
-   ```shell
-   rm -r ~/.ought-ice/cache
-   ```
+  ```shell
+  rm -r ~/.ought-ice/cache
+  ```
 
-3. `pre-commit` complains if your code doesn't pass certain checks. It runs when you commit, and will possibly reject your commit and make you have to fix the problem(s) before you can commit again. (So you should probably use the same commit message you used the first time.)
+- `pre-commit` complains if your code doesn't pass certain checks. It runs when you commit, and will possibly reject your commit and make you have to fix the problem(s) before you can commit again. (So you should probably use the same commit message you used the first time.)
 
-Note that you don't technically _need_ to run `pre-commit install`, but _not_ doing so may cause your commits to fail CI. (Which can be noisy, including by generating commits that will e.g. fix formatting.)
+  - Note that you don't technically _need_ to run `pre-commit install`, but _not_ doing so may cause your commits to fail CI. (Which can be noisy, including by generating commits that will e.g. fix formatting.)
+
+- Storybook is a framework for developing UI components. The stories are housed in `ui/components`. For an example, check out `ui/components/TracePage/FString.stories.tsx`.
 
 ## Terminology
 
