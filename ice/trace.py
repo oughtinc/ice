@@ -266,6 +266,9 @@ def should_trace(code: types.CodeType) -> bool:
     return any(cond(code) for cond in _trace_conditions)
 
 
+current_frames = set()
+
+
 def tracefunc(frame: types.FrameType, event: str, arg):
     if event not in ("call", "return"):
         return
@@ -275,8 +278,9 @@ def tracefunc(frame: types.FrameType, event: str, arg):
         return
 
     if event == "call":
-        if frame.f_lasti != -1:
+        if frame in current_frames:
             return
+        current_frames.add(frame)
 
         trc = trace_var.get()
         assert trc is not None
@@ -302,8 +306,14 @@ def tracefunc(frame: types.FrameType, event: str, arg):
     else:
         code_byte = code.co_code[frame.f_lasti]
         opname = opcode.opname[code_byte]
-        if opname != "RETURN_VALUE" and arg is not None or opname == "LOAD_CONST":
+        if (
+            opname != "RETURN_VALUE"
+            and arg is not None
+            or opname in ("LOAD_CONST", "YIELD_VALUE")
+        ):
             return
+
+        current_frames.remove(frame)
 
         result_json = to_json_value(arg)
         *stack, call_id = call_id_stack.get()
