@@ -175,6 +175,7 @@ const TreeProvider = ({ traceId, children }: { traceId: string; children: ReactN
   const isMounted = useRef(true);
 
   useEffect(() => {
+    isMounted.current = true;
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const poll = async () => {
