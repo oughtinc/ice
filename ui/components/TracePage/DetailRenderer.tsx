@@ -94,7 +94,8 @@ class ObjectRenderer extends Component<Propz, ObjectRendererState> {
       if (structuralType === "array") return true;
       if (structuralType === "object") {
         // empty objects are ok
-        const isFString = "__fstring__" in value;
+        // TODO someday use something like existential types to clean up this code
+        const isFString = typeof value === "object" && value && "__fstring__" in value;
         return !isFString;
       }
       return false;
