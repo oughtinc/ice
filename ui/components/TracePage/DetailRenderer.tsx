@@ -31,13 +31,35 @@ interface Props {
   values: unknown[];
 }
 
-class ArrayRenderer extends Component<Props, number> {
+interface ArrayRendererState {
+  expanded: boolean[];
+}
+
+class ArrayRenderer extends Component<Props, ArrayRendererState> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      expanded: this.props.values.map(() => true),
+    } as ArrayRendererState;
+  }
+
   override render() {
     return this.props.values.map((el, index) => (
       <div key={index} className="mb-1">
         <span className="text-gray-600">{`${index + 1}. `}</span>
         {TypeIdentifiers[getStructuralType(el)]}
-        <DetailRenderer data={el} />
+        {isCollapsible(el) ? (
+          <ClickableDownArrow
+            handleClick={() => {
+              this.setState(state => {
+                const expanded = state.expanded.slice();
+                expanded[index] = !expanded[index];
+                return { expanded };
+              });
+            }}
+          />
+        ) : null}
+        {this.state.expanded[index] ? <DetailRenderer data={el} /> : null}
       </div>
     ));
   }
@@ -62,17 +84,28 @@ class ClickableDownArrow extends Component<ClickyProps> {
 }
 
 interface IsExpandedMap {
-  // key -> isExpanded
   [key: string]: boolean;
 }
 
-// TODO what about for arrays of objects?
 interface ObjectRendererState {
   isExpanded: IsExpandedMap;
 }
 
-// TODO do we need to add down arrows to top level array for array renderer?
+function isCollapsible(value: unknown): boolean {
+  const structuralType = getStructuralType(value);
+  if (structuralType === "value") return false;
+  // empty arrays are ok
+  if (structuralType === "array") return true;
+  if (structuralType === "object") {
+    // empty objects are ok
+    // TODO someday use something like existential types to clean up this code
+    const isFString = typeof value === "object" && value && "__fstring__" in value;
+    return !isFString;
+  }
+  return false;
+}
 
+// TODO review all
 class ObjectRenderer extends Component<Propz, ObjectRendererState> {
   constructor(props: Propz) {
     super(props);
@@ -86,26 +119,10 @@ class ObjectRenderer extends Component<Propz, ObjectRendererState> {
   }
 
   override render() {
-    // TODO lift out?
-    function isCollapsible(value: unknown): boolean {
-      const structuralType = getStructuralType(value);
-      if (structuralType === "value") return false;
-      // empty arrays are ok
-      if (structuralType === "array") return true;
-      if (structuralType === "object") {
-        // empty objects are ok
-        // TODO someday use something like existential types to clean up this code
-        const isFString = typeof value === "object" && value && "__fstring__" in value;
-        return !isFString;
-      }
-      return false;
-    }
-
     return this.props.values.map(([key, value], index) => (
       <div key={index} className="mb-1">
         <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
         {TypeIdentifiers[getStructuralType(value)]}
-
         {isCollapsible(value) ? (
           <ClickableDownArrow
             handleClick={() =>
@@ -192,6 +209,7 @@ function renderForValue(view: ValueView) {
 
 export const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
   const view: JsonChild = useMemo(() => {
+    // TODO this seems wrong? what was it before?
     if (typeof data === "object" && data) {
       return buildViewForArrayOrObject(data);
     } // TODO methods and constructors?

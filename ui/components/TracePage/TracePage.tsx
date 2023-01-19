@@ -1,5 +1,4 @@
-// TODO unused imports
-import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
+import { Button, Collapse, Skeleton } from "@chakra-ui/react";
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
 import classNames from "classnames";

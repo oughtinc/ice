@@ -11,8 +11,6 @@ export default meta;
 
 type Story = StoryObj<typeof DetailRenderer>;
 
-// TODO how to set up a storybook test for this? such that the clicks are handled
-
 export const Nested: Story = {
   args: {
     data: {
@@ -31,10 +29,18 @@ export const Nested: Story = {
       emptyArray: [],
       emptyObject: {},
       duplicateName: [500],
-      // TODO add some validation about fstrings- easy to break this; maybe just types ?
       containingDuplicateName: {
         duplicateName: [501],
       },
+      arrayOfObjects: [
+        {
+          foo: "bar",
+          foo3: "yooooo",
+        },
+        {
+          foo2: "baz",
+        },
+      ],
     },
   },
 };
