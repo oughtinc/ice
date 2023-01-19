@@ -40,6 +40,7 @@ async def elicit_search(
     page: int = 0,
     has_pdf_filter: bool = False,
     backend: str | None = None,
+    filters: dict | None = None,
 ):
     """
     Search Elicit for papers related to a question.
@@ -50,11 +51,14 @@ async def elicit_search(
     endpoint = backend.rstrip("/") + "/lit-review"
 
     log.info(f"Searching Elicit for query: {question}, endpoint: {endpoint}")
+    
+    all_filters = dict(has_pdf=has_pdf_filter)
 
-    filters = dict(has_pdf=has_pdf_filter)
+    if filters is not None:
+        all_filters = {**filters, **all_filters}
 
     request_body = make_request_body(
-        query=question, num_papers=num_papers, page=page, filters=filters
+        query=question, num_papers=num_papers, page=page, filters=all_filters
     )
 
     response = send_elicit_request(
