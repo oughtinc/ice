@@ -544,7 +544,6 @@ const ResultComponent = ({ value }: { value: string[] }): JSX.Element => {
 };
 
 const Json = ({ name, value }: { name: string; value: unknown }) => {
-  console.log(`Rendering ${name} with value ${JSON.stringify(value)}`);
   return (
     <div>
       <div className="mb-2 font-medium">{name}</div>
