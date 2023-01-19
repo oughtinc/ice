@@ -212,7 +212,7 @@ export const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }
     // TODO this seems wrong? what was it before?
     if (typeof data === "object" && data) {
       return buildViewForArrayOrObject(data);
-    } // TODO methods and constructors?
+    }
     return { type: "value", value: data };
   }, [data]);
 
