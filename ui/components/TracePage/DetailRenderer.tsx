@@ -209,7 +209,6 @@ function renderForValue(view: ValueView) {
 
 export const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
   const view: JsonChild = useMemo(() => {
-    // TODO this seems wrong? what was it before?
     if (typeof data === "object" && data) {
       return buildViewForArrayOrObject(data);
     }
