@@ -51,8 +51,7 @@ interface ClickyProps {
   handleClick: () => void;
 }
 
-// TODO maybe take out this class now that we have caretdown
-class DownArrow extends Component<ClickyProps> {
+class ClickableDownArrow extends Component<ClickyProps> {
   override render() {
     return (
       <button>
@@ -62,29 +61,27 @@ class DownArrow extends Component<ClickyProps> {
   }
 }
 
-interface IsExpanded {
+interface IsExpandedMap {
+  // key -> isExpanded
   [key: string]: boolean;
 }
 
-interface Florida {
-  // because it's a state
-  isExpanded: IsExpanded; // key -> isExpanded
+// TODO what about for arrays of objects?
+interface ObjectRendererState {
+  isExpanded: IsExpandedMap;
 }
 
 // TODO do we need to add down arrows to top level array for array renderer?
 
-// TODO make the structural type use enums instead of strings
-// TODO also only present an arrow depending on the number of children
-class ObjectRenderer extends Component<Propz, Florida> {
+class ObjectRenderer extends Component<Propz, ObjectRendererState> {
   constructor(props: Propz) {
     super(props);
-    // props but make it a dictionary
+    const allExpanded = props.values.reduce((acc, [key, _]) => {
+      acc[key] = true;
+      return acc;
+    }, {} as IsExpandedMap);
     this.state = {
-      // TODO lol copilot you goof there's probably a better way to do this
-      isExpanded: props.values.reduce((acc, [key, _]) => {
-        acc[key] = true;
-        return acc;
-      }, {} as IsExpanded),
+      isExpanded: allExpanded,
     };
   }
 
@@ -93,13 +90,10 @@ class ObjectRenderer extends Component<Propz, Florida> {
     function isCollapsible(value: unknown): boolean {
       const structuralType = getStructuralType(value);
       if (structuralType === "value") return false;
+      // empty arrays are ok
       if (structuralType === "array") return true;
       if (structuralType === "object") {
-        // TODO what about unit testing this
-        // TODO what about empty objects
-        // TODO what about empty arrays
-        // TODO what about empty strings
-        // TODO what about objects with the property __fstring__
+        // empty objects are ok
         const isFString = "__fstring__" in value;
         return !isFString;
       }
@@ -112,14 +106,12 @@ class ObjectRenderer extends Component<Propz, Florida> {
         {TypeIdentifiers[getStructuralType(value)]}
 
         {isCollapsible(value) ? (
-          <DownArrow
+          <ClickableDownArrow
             handleClick={() =>
-              // TODO do we need to use the callback form of setState?
               this.setState(() => {
-                // TODO do we need to copy the map? or is it fine to mutate it?
-                const newMap = this.state.isExpanded;
-                newMap[key] = !this.state.isExpanded[key];
-                return { isExpanded: newMap };
+                return {
+                  isExpanded: { ...this.state.isExpanded, [key]: !this.state.isExpanded[key] },
+                };
               })
             }
           />
@@ -130,12 +122,7 @@ class ObjectRenderer extends Component<Propz, Florida> {
   }
 }
 
-// TODO name maybe should be different
-type FStringyData = {
-  __fstring__: unknown;
-};
-
-function buildViewForFString(data: FStringyData): JsonChild {
+function buildViewForFString(data: { __fstring__: unknown }): JsonChild {
   const parts = data.__fstring__ as RawFStringPart[];
   const flattenedParts = flattenFString(parts);
   const value = flattenedParts.map(part => (typeof part === "string" ? part : part.value)).join("");
@@ -150,11 +137,25 @@ function buildViewForArrayOrObject(data: object): JsonChild {
   return { type: "object", values: Object.entries(data) };
 }
 
-function renderForArrayOrObject(view: JsonChild, root?: boolean) {
-  // TODO what's a more idiomatic way to handle this? probably with subtyping
-  if (view.type !== "array" && view.type !== "object") {
-    throw new Error("renderForArrayOrObject called with non-array or non-object");
-  }
+interface ArrayView {
+  type: "array";
+  values: unknown[];
+}
+
+interface ObjectView {
+  type: "object";
+  values: [string, unknown][];
+}
+
+interface ValueView {
+  type: "value";
+  value: unknown;
+  fstring?: FlattenedFStringPart[];
+}
+
+type ArrayOrObjectView = ArrayView | ObjectView;
+
+function renderForArrayOrObject(view: ArrayOrObjectView, root?: boolean) {
   return (
     <div className={classNames("flex", root ? undefined : "ml-4")}>
       <div>
@@ -170,11 +171,8 @@ function renderForArrayOrObject(view: JsonChild, root?: boolean) {
   );
 }
 
-function renderForValue(view: JsonChild) {
+function renderForValue(view: ValueView) {
   const toast = useToast();
-  if (view.type !== "value") {
-    throw new Error("renderForValue called with non-value");
-  }
   const value = `${view.value}`;
   return value ? (
     <span

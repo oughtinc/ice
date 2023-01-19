@@ -7,13 +7,9 @@ const meta: Meta<typeof DetailRenderer> = {
   component: DetailRenderer,
 };
 
-// TODO surely we can automate all this jargon
-
 export default meta;
 
 type Story = StoryObj<typeof DetailRenderer>;
-
-// TODO ensure that the fstrings in subparts are rendered with a test :)
 
 // TODO how to set up a storybook test for this? such that the clicks are handled
 
@@ -22,8 +18,6 @@ export const Nested: Story = {
     data: {
       foo: "bar",
       baz: {
-        // TODO is this the expected behavior with nested fstrings?
-        // TODO and them only being on one line?
         __fstring__: [
           "inner ",
           {
@@ -34,6 +28,8 @@ export const Nested: Story = {
       },
       qux: [1, 2, 3],
       oneElement: [1],
+      emptyArray: [],
+      emptyObject: {},
       duplicateName: [500],
       // TODO add some validation about fstrings- easy to break this; maybe just types ?
       containingDuplicateName: {
