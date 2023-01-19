@@ -15,6 +15,8 @@ type Story = StoryObj<typeof DetailRenderer>;
 
 // TODO ensure that the fstrings in subparts are rendered with a test :)
 
+// TODO how to set up a storybook test for this? such that the clicks are handled
+
 /* not a complex json document- just an fstring */
 export const HelloWorld: Story = {
   args: {
@@ -51,6 +53,7 @@ export const Nested: Story = {
         ],
       },
       qux: [1, 2, 3],
+      oneElement: [1],
     },
   },
 };

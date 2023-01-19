@@ -8,17 +8,27 @@ import {
 } from "/components/TracePage/FString";
 import classNames from "classnames";
 import { Component, useMemo } from "react";
+import { CaretDown } from "phosphor-react";
 
-type JsonChild =
-  | { type: "array"; values: unknown[] }
-  | { type: "object"; values: [string, unknown][] }
-  | { type: "value"; value: unknown; fstring?: FlattenedFStringPart[] };
+interface JsonChild {
+  typeIdentifier: string;
+}
 
-const getStructuralType = (data: unknown) => {
-  if (typeof data === "object" && data && !Array.isArray(data)) return "object";
-  if (Array.isArray(data)) return "array";
-  return "value";
-};
+interface ArrayChild extends JsonChild {
+  values: unknown[];
+  typeIdentifier: "array";
+}
+
+interface ObjectChild extends JsonChild {
+  values: [string, unknown][];
+  typeIdentifier: "object";
+}
+
+interface ValueChild extends JsonChild {
+  value: unknown;
+  fstring?: FlattenedFStringPart[];
+  typeIdentifier: "value";
+}
 
 const TypeIdentifiers = {
   object: <span className="shrink-0 font-mono mr-[8px]">{"{}"}</span>,
@@ -50,25 +60,13 @@ interface ClickyProps {
   handleClick: () => void;
 }
 
+// TODO maybe take out this class now that we have caretdown
 class DownArrow extends Component<ClickyProps> {
   override render() {
-    // TODO lol thanks copilot
     return (
-      <svg
-        className="inline-block w-4 h-4 mr-2 text-gray-500"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        onClick={this.props.handleClick}
-      >
-        <path
-          d="M7 10L12 15L17 10"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <button>
+        <CaretDown onClick={this.props.handleClick} />
+      </button>
     );
   }
 }
@@ -81,6 +79,8 @@ interface Florida {
   // because it's a state
   isExpanded: IsExpanded; // key -> isExpanded
 }
+
+// TODO do we need to add down arrows to top level array for array renderer?
 
 // TODO make the structural type use enums instead of strings
 // TODO also only present an arrow depending on the number of children
@@ -98,15 +98,31 @@ class ObjectRenderer extends Component<Propz, Florida> {
   }
 
   override render() {
+    // TODO lift out?
+    function isCollapsible(value: unknown): boolean {
+      const structuralType = getStructuralType(value);
+      if (structuralType === "value") return false;
+      if (structuralType === "array") return true;
+      if (structuralType === "object") {
+        // TODO what about unit testing this
+        // TODO what about empty objects
+        const isFString = "__fstring__" in value;
+        return !isFString;
+      }
+      return false;
+    }
+
     return this.props.values.map(([key, value], index) => (
       <div key={index} className="mb-1">
         <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
         {TypeIdentifiers[getStructuralType(value)]}
-        {getStructuralType(value) === "array" ? (
+
+        {isCollapsible(value) ? (
           <DownArrow
             handleClick={() =>
               // TODO do we need to use the callback form of setState?
               this.setState(() => {
+                // TODO do we need to copy the map? or is it fine to mutate it?
                 const newMap = this.state.isExpanded;
                 newMap[key] = !this.state.isExpanded[key];
                 return { isExpanded: newMap };
