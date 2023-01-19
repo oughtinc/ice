@@ -46,13 +46,75 @@ interface Propz {
   values: [string, unknown][];
 }
 
-class ObjectRenderer extends Component<Propz, number> {
+interface ClickyProps {
+  handleClick: () => void;
+}
+
+class DownArrow extends Component<ClickyProps> {
+  override render() {
+    // TODO lol thanks copilot
+    return (
+      <svg
+        className="inline-block w-4 h-4 mr-2 text-gray-500"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        onClick={this.props.handleClick}
+      >
+        <path
+          d="M7 10L12 15L17 10"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+}
+
+interface IsExpanded {
+  [key: string]: boolean;
+}
+
+interface Florida {
+  // because it's a state
+  isExpanded: IsExpanded; // key -> isExpanded
+}
+
+// TODO make the structural type use enums instead of strings
+// TODO also only present an arrow depending on the number of children
+class ObjectRenderer extends Component<Propz, Florida> {
+  constructor(props: Propz) {
+    super(props);
+    // props but make it a dictionary
+    this.state = {
+      // TODO lol copilot you goof there's probably a better way to do this
+      isExpanded: props.values.reduce((acc, [key, _]) => {
+        acc[key] = true;
+        return acc;
+      }, {} as IsExpanded),
+    };
+  }
+
   override render() {
     return this.props.values.map(([key, value], index) => (
       <div key={index} className="mb-1">
         <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
         {TypeIdentifiers[getStructuralType(value)]}
-        <DetailRenderer data={value} />
+        {getStructuralType(value) === "array" ? (
+          <DownArrow
+            handleClick={() =>
+              // TODO do we need to use the callback form of setState?
+              this.setState(() => {
+                const newMap = this.state.isExpanded;
+                newMap[key] = !this.state.isExpanded[key];
+                return { isExpanded: newMap };
+              })
+            }
+          />
+        ) : null}
+        {this.state.isExpanded[key] ? <DetailRenderer data={value} /> : null}
       </div>
     ));
   }
@@ -79,7 +141,7 @@ function buildViewForArrayOrObject(data: object): JsonChild {
 }
 
 function renderForArrayOrObject(view: JsonChild, root?: boolean) {
-  // TODO what's a more idiomatic way to handle this?
+  // TODO what's a more idiomatic way to handle this? probably with subtyping
   if (view.type !== "array" && view.type !== "object") {
     throw new Error("renderForArrayOrObject called with non-array or non-object");
   }
