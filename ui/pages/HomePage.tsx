@@ -47,6 +47,9 @@ export default function HomePage() {
         visualizer for compositional language model programs. This page hosts a collection of traces
         that demonstrate programs written in ICE.
       </p>
+      <div className="p-2 pl-0">
+        <Link to="traces/">You can view your own traces here.</Link>
+      </div>
       <RecipeGroup title="Elicit" recipes={elicitRecipes}>
         <p>
           <a href="https://elicit.org/">Elicit</a> is an AI research assistant. The traces below
