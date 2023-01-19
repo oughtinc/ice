@@ -35,13 +35,10 @@ export const Nested: Story = {
       qux: [1, 2, 3],
       oneElement: [1],
       duplicateName: [500],
+      // TODO add some validation about fstrings- easy to break this; maybe just types ?
       containingDuplicateName: {
         duplicateName: [501],
       },
-      /*      fakeFString: {
-              __fstring__: 100,
-              barbarbar: 1e9
-            }, */
     },
   },
 };
