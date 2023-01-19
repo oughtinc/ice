@@ -24,7 +24,19 @@ PDF_PARSER_URL = "https://test.elicit.org/elicit-previews/james/oug-3083-support
 
 SectionType = Literal["abstract", "main", "back"]
 
-nltk.download("punkt", quiet=True)
+
+def requires_punkt(f):
+    """Assumes that f can be rerun with no serious side-effects"""
+
+    def wrapped_f(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except LookupError:
+            # make it obvious when we're doing an expensive download for the first time
+            nltk.download("punkt", quiet=False)
+            return f(*args, **kwargs)
+
+    return wrapped_f
 
 
 def get_full_document_id(document_id: str) -> str:
@@ -54,6 +66,7 @@ def is_likely_section_title(text: str):
     return (starts_with_number(text) and len(text) < 200) or text == "Abstract"
 
 
+@requires_punkt
 def split_sentences(text: str) -> list[str]:
     return sent_tokenize(text)
 
