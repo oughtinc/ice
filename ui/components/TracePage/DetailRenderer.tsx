@@ -10,25 +10,16 @@ import classNames from "classnames";
 import { Component, useMemo } from "react";
 import { CaretDown } from "phosphor-react";
 
-interface JsonChild {
-  typeIdentifier: string;
-}
+type JsonChild =
+  | { type: "array"; values: unknown[] }
+  | { type: "object"; values: [string, unknown][] }
+  | { type: "value"; value: unknown; fstring?: FlattenedFStringPart[] };
 
-interface ArrayChild extends JsonChild {
-  values: unknown[];
-  typeIdentifier: "array";
-}
-
-interface ObjectChild extends JsonChild {
-  values: [string, unknown][];
-  typeIdentifier: "object";
-}
-
-interface ValueChild extends JsonChild {
-  value: unknown;
-  fstring?: FlattenedFStringPart[];
-  typeIdentifier: "value";
-}
+const getStructuralType = (data: unknown) => {
+  if (typeof data === "object" && data && !Array.isArray(data)) return "object";
+  if (Array.isArray(data)) return "array";
+  return "value";
+};
 
 const TypeIdentifiers = {
   object: <span className="shrink-0 font-mono mr-[8px]">{"{}"}</span>,
@@ -106,6 +97,9 @@ class ObjectRenderer extends Component<Propz, Florida> {
       if (structuralType === "object") {
         // TODO what about unit testing this
         // TODO what about empty objects
+        // TODO what about empty arrays
+        // TODO what about empty strings
+        // TODO what about objects with the property __fstring__
         const isFString = "__fstring__" in value;
         return !isFString;
       }

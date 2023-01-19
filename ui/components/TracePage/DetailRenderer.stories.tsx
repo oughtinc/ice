@@ -17,26 +17,6 @@ type Story = StoryObj<typeof DetailRenderer>;
 
 // TODO how to set up a storybook test for this? such that the clicks are handled
 
-/* not a complex json document- just an fstring */
-export const HelloWorld: Story = {
-  args: {
-    data: {
-      __fstring__: [
-        "Hello ",
-        { source: "name", value: "world", formatted: "world" },
-        ", goodbye ",
-        {
-          source: "name",
-          value: "world",
-          formatted: "world",
-        },
-        ".",
-      ],
-    },
-  },
-};
-
-/* a complex json document */
 export const Nested: Story = {
   args: {
     data: {
@@ -54,6 +34,14 @@ export const Nested: Story = {
       },
       qux: [1, 2, 3],
       oneElement: [1],
+      duplicateName: [500],
+      containingDuplicateName: {
+        duplicateName: [501],
+      },
+      /*      fakeFString: {
+              __fstring__: 100,
+              barbarbar: 1e9
+            }, */
     },
   },
 };
