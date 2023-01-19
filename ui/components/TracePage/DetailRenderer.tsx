@@ -27,7 +27,7 @@ const TypeIdentifiers = {
   value: null,
 };
 
-interface Props {
+interface ArrayRendererProps {
   values: unknown[];
 }
 
@@ -35,8 +35,8 @@ interface ArrayRendererState {
   expanded: boolean[];
 }
 
-class ArrayRenderer extends Component<Props, ArrayRendererState> {
-  constructor(props: Props) {
+class ArrayRenderer extends Component<ArrayRendererProps, ArrayRendererState> {
+  constructor(props: ArrayRendererProps) {
     super(props);
     this.state = {
       expanded: this.props.values.map(() => true),
@@ -65,15 +65,11 @@ class ArrayRenderer extends Component<Props, ArrayRendererState> {
   }
 }
 
-interface Propz {
-  values: [string, unknown][];
-}
-
-interface ClickyProps {
+interface ClickableDownArrowProps {
   handleClick: () => void;
 }
 
-class ClickableDownArrow extends Component<ClickyProps> {
+class ClickableDownArrow extends Component<ClickableDownArrowProps> {
   override render() {
     return (
       <button>
@@ -81,14 +77,6 @@ class ClickableDownArrow extends Component<ClickyProps> {
       </button>
     );
   }
-}
-
-interface IsExpandedMap {
-  [key: string]: boolean;
-}
-
-interface ObjectRendererState {
-  isExpanded: IsExpandedMap;
 }
 
 function isCollapsible(value: unknown): boolean {
@@ -105,9 +93,20 @@ function isCollapsible(value: unknown): boolean {
   return false;
 }
 
-// TODO review all
-class ObjectRenderer extends Component<Propz, ObjectRendererState> {
-  constructor(props: Propz) {
+interface ObjectRendererProps {
+  values: [string, unknown][];
+}
+
+interface IsExpandedMap {
+  [key: string]: boolean;
+}
+
+interface ObjectRendererState {
+  isExpanded: IsExpandedMap;
+}
+
+class ObjectRenderer extends Component<ObjectRendererProps, ObjectRendererState> {
+  constructor(props: ObjectRendererProps) {
     super(props);
     const allExpanded = props.values.reduce((acc, [key, _]) => {
       acc[key] = true;
@@ -171,9 +170,7 @@ interface ValueView {
   fstring?: FlattenedFStringPart[];
 }
 
-type ArrayOrObjectView = ArrayView | ObjectView;
-
-function renderForArrayOrObject(view: ArrayOrObjectView, root?: boolean) {
+function renderForArrayOrObject(view: ArrayView | ObjectView, root?: boolean) {
   return (
     <div className={classNames("flex", root ? undefined : "ml-4")}>
       <div>
