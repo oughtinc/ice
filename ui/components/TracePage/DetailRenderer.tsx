@@ -1,4 +1,4 @@
-import { Button, Collapse, Skeleton, useToast } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 import { getFormattedName } from "/components/TracePage/CallName";
 import {
   FlattenedFStringPart,
@@ -7,19 +7,7 @@ import {
   RawFStringPart,
 } from "/components/TracePage/FString";
 import classNames from "classnames";
-import {
-  Component,
-  createContext,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { Component, useMemo } from "react";
 
 type JsonChild =
   | { type: "array"; values: unknown[] }
@@ -39,8 +27,6 @@ const TypeIdentifiers = {
 };
 
 interface Props {
-  //    view: { type: "array"; values: unknown[] };
-  //    view: JsonChild
   values: unknown[];
 }
 
@@ -55,9 +41,8 @@ class ArrayRenderer extends Component<Props, number> {
     ));
   }
 }
+
 interface Propz {
-  //    view: { type: "array"; values: unknown[] };
-  //    view: JsonChild
   values: [string, unknown][];
 }
 
@@ -73,39 +58,50 @@ class ObjectRenderer extends Component<Propz, number> {
   }
 }
 
-export const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
-  const toast = useToast();
-  const view: JsonChild = useMemo(() => {
-    if (typeof data === "object" && data) {
-      // Array or Object
-      if (Array.isArray(data)) return { type: "array", values: data };
-      if ("__fstring__" in data) {
-        const parts = data.__fstring__ as RawFStringPart[];
-        const flattenedParts = flattenFString(parts);
-        const value = flattenedParts
-          .map(part => (typeof part === "string" ? part : part.value))
-          .join("");
-        return { type: "value", value, fstring: flattenedParts };
-      }
-      return { type: "object", values: Object.entries(data) };
-    }
-    return { type: "value", value: data };
-  }, [data]);
+// TODO name maybe should be different
+type FStringyData = {
+  __fstring__: unknown;
+};
 
-  if (view.type === "array" || view.type === "object") {
-    return (
-      <div className={classNames("flex", root ? undefined : "ml-4")}>
-        <div>
-          {view.type === "array" ? (
-            <ArrayRenderer values={view.values} />
-          ) : (
-            <ObjectRenderer values={view.values} />
-          )}
+function buildViewForFString(data: FStringyData): JsonChild {
+  const parts = data.__fstring__ as RawFStringPart[];
+  const flattenedParts = flattenFString(parts);
+  const value = flattenedParts.map(part => (typeof part === "string" ? part : part.value)).join("");
+  return { type: "value", value, fstring: flattenedParts };
+}
 
-          {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
-        </div>
+function buildViewForArrayOrObject(data: object): JsonChild {
+  if (Array.isArray(data)) return { type: "array", values: data };
+  if ("__fstring__" in data) {
+    return buildViewForFString(data);
+  }
+  return { type: "object", values: Object.entries(data) };
+}
+
+function renderForArrayOrObject(view: JsonChild, root?: boolean) {
+  // TODO what's a more idiomatic way to handle this?
+  if (view.type !== "array" && view.type !== "object") {
+    throw new Error("renderForArrayOrObject called with non-array or non-object");
+  }
+  return (
+    <div className={classNames("flex", root ? undefined : "ml-4")}>
+      <div>
+        {view.type === "array" ? (
+          <ArrayRenderer values={view.values} />
+        ) : (
+          <ObjectRenderer values={view.values} />
+        )}
+
+        {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
       </div>
-    );
+    </div>
+  );
+}
+
+function renderForValue(view: JsonChild) {
+  const toast = useToast();
+  if (view.type !== "value") {
+    throw new Error("renderForValue called with non-value");
   }
   const value = `${view.value}`;
   return value ? (
@@ -121,4 +117,18 @@ export const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }
   ) : (
     <span className="text-gray-600">empty</span>
   );
+}
+
+export const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
+  const view: JsonChild = useMemo(() => {
+    if (typeof data === "object" && data) {
+      return buildViewForArrayOrObject(data);
+    } // TODO methods and constructors?
+    return { type: "value", value: data };
+  }, [data]);
+
+  if (view.type === "array" || view.type === "object") {
+    return renderForArrayOrObject(view, root);
+  }
+  return renderForValue(view);
 };
