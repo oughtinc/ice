@@ -114,7 +114,7 @@ async def _post(
             f"{OPENAI_BASE_URL}/{endpoint}",
             json=json,
             headers=make_headers(),
-            timeout=timeout,
+            timeout=timeout or 20,
         )
         if response.status_code == 429:
             raise RateLimitError(response)
