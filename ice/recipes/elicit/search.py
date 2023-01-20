@@ -52,13 +52,11 @@ async def elicit_search(
 
     log.info(f"Searching Elicit for query: {question}, endpoint: {endpoint}")
 
-    all_filters = dict(has_pdf=has_pdf_filter)
-
-    if filters is not None:
-        all_filters = {**filters, **all_filters}
-
     request_body = make_request_body(
-        query=question, num_papers=num_papers, page=page, filters=all_filters
+        query=question,
+        num_papers=num_papers,
+        page=page,
+        filters=(filters or {}) | dict(has_pdf=has_pdf_filter),
     )
 
     response = send_elicit_request(
