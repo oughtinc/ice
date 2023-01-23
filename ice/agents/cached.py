@@ -1,8 +1,9 @@
+from typing import Optional
+
 from ice.agents.base import Agent
 from ice.agents.base import Stop
 from ice.settings import CACHE_DIR
 from ice.sqlite_shelf import SQLiteShelf
-from typing import Optional
 
 
 def get_cache_key(fn_name: str, input: str):

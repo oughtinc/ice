@@ -1,5 +1,6 @@
-from structlog.stdlib import get_logger
 from typing import Optional
+
+from structlog.stdlib import get_logger
 
 from ice.recipe import Recipe
 from ice.recipes.evaluate_result import EvaluateResult

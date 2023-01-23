@@ -1,7 +1,8 @@
 import random
 
-from faker import Faker
 from typing import Optional
+
+from faker import Faker
 
 from ice.agents.base import Agent
 from ice.agents.base import Stop

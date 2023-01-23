@@ -1,9 +1,9 @@
 from collections.abc import Sequence
 from typing import ClassVar
 from typing import Literal
+from typing import Optional
 from typing import Type
 from typing import Union
-from typing import Optional
 
 from pydantic import BaseModel
 from pydantic import root_validator

@@ -1,6 +1,6 @@
 from collections.abc import Mapping
-from typing import Union
 from typing import Optional
+from typing import Union
 
 import httpx
 

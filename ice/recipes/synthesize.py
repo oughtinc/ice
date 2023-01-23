@@ -1,4 +1,5 @@
 from typing import Optional
+
 from transformers import GPT2TokenizerFast
 
 from ice.recipe import recipe

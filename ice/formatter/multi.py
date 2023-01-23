@@ -1,11 +1,12 @@
 import enum
 import string
+
 from collections import Counter
 from collections.abc import Mapping
 from collections.abc import Sequence
 from typing import final
-from typing import Union
 from typing import Optional
+from typing import Union
 
 from structlog.stdlib import get_logger
 from typing_extensions import TypeGuard

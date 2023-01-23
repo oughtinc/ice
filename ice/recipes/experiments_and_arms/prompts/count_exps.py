@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from collections.abc import Sized
-from typing import Union
 from typing import Optional
+from typing import Union
 
 from structlog.stdlib import get_logger
 

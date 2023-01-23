@@ -1,5 +1,6 @@
-from fvalues import F
 from typing import Optional
+
+from fvalues import F
 
 from ice.recipes.primer.debate.types import *
 

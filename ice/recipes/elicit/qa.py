@@ -1,5 +1,5 @@
-from urllib.parse import urljoin
 from typing import Optional
+from urllib.parse import urljoin
 
 from structlog.stdlib import get_logger
 

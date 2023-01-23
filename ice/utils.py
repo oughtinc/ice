@@ -15,9 +15,9 @@ from functools import cache
 from random import Random
 from typing import Any
 from typing import Generic
+from typing import Optional
 from typing import TypeVar
 from typing import Union
-from typing import Optional
 
 import anyio
 import tqdm

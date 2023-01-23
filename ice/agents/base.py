@@ -1,6 +1,7 @@
-from ice.trace import TracedABC
-from typing import Union
 from typing import Optional
+from typing import Union
+
+from ice.trace import TracedABC
 
 Stop = Optional[Union[str, list[str]]]
 

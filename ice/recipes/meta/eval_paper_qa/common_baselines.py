@@ -1,8 +1,8 @@
 from collections.abc import Callable
 from collections.abc import Sequence
 from functools import partial
-from typing import Union
 from typing import Optional
+from typing import Union
 
 from ice.apis.openai import TooLongRequestError
 from ice.formatter.transform.value import numbered_list
@@ -99,7 +99,10 @@ cheating_qa_baseline_list_answer: PaperQaMethod[Sequence[str]] = partial(
 
 
 async def _paper_qa_baseline(
-    paper: Paper, question, gold_support: Optional[Sequence[str]], enumerate_answer: bool
+    paper: Paper,
+    question,
+    gold_support: Optional[Sequence[str]],
+    enumerate_answer: bool,
 ) -> PaperQaAnswer:
     gold_support  # unused
     answer: Union[str, Sequence[str]]

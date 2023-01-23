@@ -3,6 +3,7 @@ import asyncio
 import json
 
 from pathlib import Path
+from typing import Optional
 
 import defopt
 
@@ -20,7 +21,6 @@ from ice.recipe import Recipe
 from ice.trace import enable_trace
 from ice.trace import trace
 from ice.utils import map_async
-from typing import Optional
 
 
 log = get_logger()

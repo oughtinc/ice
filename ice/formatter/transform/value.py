@@ -15,7 +15,9 @@ class ValueTransform(_Transform, Generic[T_contra]):
     Implement to functionally transform the value.
     """
 
-    def __init__(self, value: T_contra, transform: Callable[[T_contra], Union[str, int]]):
+    def __init__(
+        self, value: T_contra, transform: Callable[[T_contra], Union[str, int]]
+    ):
         self.value = value
         self._transform = transform
 

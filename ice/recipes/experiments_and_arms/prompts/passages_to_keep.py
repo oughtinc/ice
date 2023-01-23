@@ -1,8 +1,8 @@
 from collections.abc import Sequence
 from itertools import chain
 from typing import cast
-from typing import Union
 from typing import Optional
+from typing import Union
 
 from structlog.stdlib import get_logger
 

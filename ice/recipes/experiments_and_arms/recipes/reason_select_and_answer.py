@@ -1,8 +1,8 @@
 from collections.abc import Awaitable
 from collections.abc import Callable
 from collections.abc import Sequence
-from typing import TypeVar
 from typing import Optional
+from typing import TypeVar
 
 from structlog.stdlib import get_logger
 

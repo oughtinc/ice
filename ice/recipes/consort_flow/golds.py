@@ -1,7 +1,7 @@
 import itertools
-from typing import Optional
 
 from collections.abc import Sequence
+from typing import Optional
 
 from pydantic import BaseModel
 from tqdm import tqdm

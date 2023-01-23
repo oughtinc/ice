@@ -1,6 +1,7 @@
 import asyncio
 import importlib
 import sys
+
 from abc import abstractmethod
 from collections.abc import Awaitable
 from collections.abc import Callable
@@ -8,16 +9,17 @@ from functools import wraps
 from inspect import iscoroutinefunction
 from pathlib import Path
 from traceback import print_exc
+from typing import cast
+from typing import final
 from typing import Generic
+from typing import no_type_check
 from typing import Optional
 from typing import TypeVar
 from typing import Union
-from typing import cast
-from typing import final
-from typing import no_type_check
 
 import defopt
 import pandas as pd
+
 from merge_args import merge_args
 from pydantic import BaseSettings
 from structlog.stdlib import get_logger
@@ -31,9 +33,9 @@ from ice.evaluation.evaluate_recipe_result import RecipeResult
 from ice.evaluation.evaluation_report import EvaluationReport
 from ice.mode import Mode
 from ice.paper import Paper
-from ice.trace import TracedABC
 from ice.trace import enable_trace
 from ice.trace import trace
+from ice.trace import TracedABC
 from ice.utils import map_async
 
 RecipeSettings = TypeVar("RecipeSettings", bound=BaseSettings)

@@ -1,7 +1,7 @@
 from collections import Counter
 from collections.abc import Sequence
-from typing import Union
 from typing import Optional
+from typing import Union
 
 from typing_extensions import assert_never
 

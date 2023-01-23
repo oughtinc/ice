@@ -1,10 +1,10 @@
 import math  # noqa: F401
-from typing import Optional
 
 from abc import ABC
 from abc import abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Optional
 
 from fvalues import F
 

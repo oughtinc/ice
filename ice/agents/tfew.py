@@ -1,5 +1,6 @@
-from anyio.to_thread import run_sync
 from typing import Optional
+
+from anyio.to_thread import run_sync
 
 from ice.agents.base import Agent
 from ice.nn.tfew import load_inference_model

@@ -1,9 +1,9 @@
 from collections.abc import Mapping
 from collections.abc import Sized
 from typing import Generic
+from typing import Optional
 from typing import TypeVar
 from typing import Union
-from typing import Optional
 
 from numerizer.consts import DIRECT_SINGLE_NUMS
 

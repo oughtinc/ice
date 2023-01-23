@@ -2,8 +2,8 @@ from collections.abc import Callable
 from collections.abc import Sequence
 from functools import partial
 from itertools import chain
-from typing import Union
 from typing import Optional
+from typing import Union
 
 from ice.apis.openai import TooLongRequestError
 from ice.metrics.gold_standards import get_gold_standard

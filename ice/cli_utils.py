@@ -1,8 +1,8 @@
 import importlib.util
 import os.path
 
-from typing import Type
 from typing import Optional
+from typing import Type
 
 from ice.environment import env
 from ice.recipe import Recipe

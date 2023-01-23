@@ -1,9 +1,9 @@
 import json
 import re
-from typing import Optional
 
 from collections.abc import Sequence
 from itertools import islice
+from typing import Optional
 
 from pydantic import BaseModel
 from pydantic import validator

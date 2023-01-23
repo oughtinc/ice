@@ -1,6 +1,7 @@
 import typing as t
-from typing import Union
+
 from typing import Optional
+from typing import Union
 
 from pydantic import BaseModel
 from pydantic.generics import GenericModel

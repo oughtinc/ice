@@ -1,9 +1,10 @@
+from typing import Optional
+
 from ice.agents.base import Agent
 from ice.agents.base import Stop
 from ice.environment import env
 from ice.utils import max_by_value
 from ice.utils import quoted
-from typing import Optional
 
 
 class AugmentedAgent(Agent):

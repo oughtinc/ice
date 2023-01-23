@@ -3,11 +3,11 @@ from typing import ClassVar
 from typing import Generic
 from typing import Literal
 from typing import NewType
+from typing import Optional
 from typing import Protocol
 from typing import runtime_checkable
 from typing import TypeVar
 from typing import Union
-from typing import Optional
 
 from pydantic import BaseModel
 from pydantic import root_validator

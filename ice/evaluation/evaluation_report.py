@@ -1,8 +1,8 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
 from statistics import mean
-from typing import Union
 from typing import Optional
+from typing import Union
 
 import pandas as pd
 

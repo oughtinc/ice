@@ -1,9 +1,9 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Generic
+from typing import Optional
 from typing import Protocol
 from typing import TypeVar
-from typing import Optional
 
 from ice.paper import Paper
 from ice.recipes.meta.eval_text_classification import BinaryClassificationMetrics

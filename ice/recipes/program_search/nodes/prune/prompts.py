@@ -1,11 +1,11 @@
 import math
-from typing import Union
-from typing import Optional
 
 from collections.abc import Mapping
 from collections.abc import Sequence
 from typing import cast
+from typing import Optional
 from typing import TypedDict
+from typing import Union
 
 from ice.formatter.multi import format_multi
 from ice.formatter.multi import stop

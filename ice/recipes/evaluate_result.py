@@ -1,6 +1,7 @@
+from typing import Optional
+
 from pydantic import BaseModel
 from structlog.stdlib import get_logger
-from typing import Optional
 
 from ice.recipe import Recipe
 from ice.utils import max_by_value

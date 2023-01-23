@@ -3,8 +3,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import cached_property
 from itertools import chain
-from typing import Union
 from typing import Optional
+from typing import Union
 
 import matplotlib.pyplot as plt
 import numpy as np

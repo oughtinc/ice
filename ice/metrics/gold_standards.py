@@ -7,11 +7,11 @@ from typing import Any
 from typing import ClassVar
 from typing import Generic
 from typing import Literal
+from typing import Optional
 from typing import overload
 from typing import Type
 from typing import TypeVar
 from typing import Union
-from typing import Optional
 
 import pandas as pd
 

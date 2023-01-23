@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from collections.abc import Sequence
-from typing import Union
 from typing import Optional
+from typing import Union
 
 from ice.formatter.multi import format_multi
 from ice.formatter.transform.dependent import CountWord
