@@ -496,6 +496,9 @@ Answer:"""
             return "Unclear"
         elif (par_cls, arm_cls) in [
             ("Not mentioned", "Unclear"),
+        ]:
+            return "Not mentioned"
+        elif (par_cls, arm_cls) in [
             ("No placebo", "Unclear"),
             ("Not mentioned", "No placebo"),
         ]:
