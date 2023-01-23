@@ -7,6 +7,12 @@ updates:
     directory: "/ui"
     schedule:
       interval: "weekly"
+    ignore:
+      # TODO: Fix incompatibilities with AG Grid 29
+      - dependency-name: "ag-grid-community"
+        versions: ["29.x"]
+      - dependency-name: "ag-grid-react"
+        versions: ["29.x"]
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
