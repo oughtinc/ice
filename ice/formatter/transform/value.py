@@ -2,6 +2,7 @@ from collections.abc import Callable
 from collections.abc import Sequence
 from typing import Generic
 from typing import TypeVar
+from typing import Union
 
 from ice.formatter.transform import _Transform
 
@@ -14,7 +15,7 @@ class ValueTransform(_Transform, Generic[T_contra]):
     Implement to functionally transform the value.
     """
 
-    def __init__(self, value: T_contra, transform: Callable[[T_contra], str | int]):
+    def __init__(self, value: T_contra, transform: Callable[[T_contra], Union[str, int]]):
         self.value = value
         self._transform = transform
 

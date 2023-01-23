@@ -1,4 +1,5 @@
 import json
+from typing import Union
 
 from collections.abc import Sequence
 

@@ -1,4 +1,5 @@
 from anyio.to_thread import run_sync
+from typing import Optional
 
 from ice.agents.base import Agent
 from ice.nn.tfew import load_inference_model
@@ -29,9 +30,9 @@ class TFew(Agent):
         *,
         prompt: str,
         choices: tuple[str, ...],
-        default: str | None = None,
+        default: Optional[str] = None,
         verbose: bool = False
-    ) -> tuple[dict[str, float], str | None]:
+    ) -> tuple[dict[str, float], Optional[str]]:
         inp = PromptedClassificationInput(prompt=prompt, choices=choices)
 
         def run_batch() -> PromptedClassificationOutput:

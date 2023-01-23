@@ -2,6 +2,8 @@ from collections.abc import Mapping
 from collections.abc import Sized
 from typing import Generic
 from typing import TypeVar
+from typing import Union
+from typing import Optional
 
 from numerizer.consts import DIRECT_SINGLE_NUMS
 
@@ -33,7 +35,7 @@ class CountWord(DependentTransform):
     a `special` mapping.
     """
 
-    def __init__(self, key: str, special: Mapping[int, str] | None = None):
+    def __init__(self, key: str, special: Optional[Mapping[int, str]] = None):
         self._key = key
         self.words = {int(v): k for k, v in DIRECT_SINGLE_NUMS.items()}
         if special:
@@ -43,7 +45,7 @@ class CountWord(DependentTransform):
     def key(self):
         return self._key
 
-    def transform(self, dependent: int | Sized) -> str:
+    def transform(self, dependent: Union[int, Sized]) -> str:
         count = dependent if isinstance(dependent, int) else len(dependent)
         try:
             return self.words[count]
@@ -53,7 +55,7 @@ class CountWord(DependentTransform):
 
 def plural_transform(
     key: str, singular_case: str, plural_case: str
-) -> DependentTransform[int | Sized]:
+) -> DependentTransform[Union[int, Sized]]:
     """
     Return the singular or plural case based on the
     value (if an `int`) or size of the placeholder
@@ -67,7 +69,7 @@ def plural_transform(
         def key(self):
             return self._key
 
-        def transform(self, dependent: int | Sized) -> str:
+        def transform(self, dependent: Union[int, Sized]) -> str:
             count = dependent if isinstance(dependent, int) else len(dependent)
             return singular_case if count == 1 else plural_case
 

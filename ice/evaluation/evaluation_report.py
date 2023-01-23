@@ -1,6 +1,8 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
 from statistics import mean
+from typing import Union
+from typing import Optional
 
 import pandas as pd
 
@@ -18,7 +20,7 @@ from ice.utils import latest_commit_hash
 SUBSTANTIVELY_CORRECT_MIN_ANSWER_RATING = 4
 
 
-def as_percent(decimal: float | None) -> str | None:
+def as_percent(decimal: Optional[float]) -> Optional[str]:
     if decimal is None:
         return None
     return "{:.0%}".format(decimal)
@@ -31,7 +33,7 @@ class ClassificationSummary:
     classification_options: set[str]
 
     @property
-    def proportion_correct(self) -> float | None:
+    def proportion_correct(self) -> Optional[float]:
         if self.num_evaluated == 0:
             return None
 
@@ -70,7 +72,7 @@ class EvaluationReport(BaseModel):
     results: Sequence[EvaluatedRecipeResult]
 
     @property
-    def mean_proportion_gs_found_across_papers(self) -> float | None:
+    def mean_proportion_gs_found_across_papers(self) -> Optional[float]:
         paper_scores = [
             result.evaluated_excerpts.proportion_gold_standards_found
             for result in self.results
@@ -82,7 +84,7 @@ class EvaluationReport(BaseModel):
         return float(mean(paper_scores))
 
     @property
-    def proportion_papers_with_gs_found(self) -> float | None:
+    def proportion_papers_with_gs_found(self) -> Optional[float]:
         gs_found = [
             result.evaluated_excerpts.num_gold_standards_found > 0
             for result in self.results
@@ -301,7 +303,7 @@ class EvaluationReport(BaseModel):
 - (proportion of gold standards where should answer: {self.answered_when_should_have.proportion_of_gs_where_should_answer:.0%})
 """
 
-    def to_rich_elements(self) -> list[str | Table]:
+    def to_rich_elements(self) -> list[Union[str, Table]]:
         return [
             f"""
 # Performance on papers

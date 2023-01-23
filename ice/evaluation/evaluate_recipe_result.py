@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from collections.abc import Sequence
 from statistics import mean
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -19,7 +20,7 @@ class MatchResult(BaseModel):
 class EvaluatedExcerpts(BaseModel):
     gold_standards_in_excerpts_results: Sequence[MatchResult]
     excerpts: Sequence[str]
-    average_recall: float | None
+    average_recall: Optional[float]
 
     @classmethod
     async def from_excerpts_and_gold_quotes(
@@ -95,7 +96,7 @@ Average ROUGE-L recall across all gold standards (for debugging): {self.average_
 """
 
     @property
-    def num_gold_standards_found(self) -> int | None:
+    def num_gold_standards_found(self) -> Optional[int]:
         if len(self.gold_standards_in_excerpts_results) == 0:
             return None
         return len(
@@ -107,7 +108,7 @@ Average ROUGE-L recall across all gold standards (for debugging): {self.average_
         )
 
     @property
-    def proportion_gold_standards_found(self) -> float | None:
+    def proportion_gold_standards_found(self) -> Optional[float]:
         num_gold_standards_found = self.num_gold_standards_found
         if (
             num_gold_standards_found is None
@@ -118,12 +119,14 @@ Average ROUGE-L recall across all gold standards (for debugging): {self.average_
 
 
 class EvaluatedClassification(BaseModel):
-    predicted: str | None
-    gold: str | None
-    classification_eq: Callable[[str | None, str | None], bool | None] | None
+    predicted: Optional[str]
+    gold: Optional[str]
+    classification_eq: Optional[
+        Callable[[Optional[str], Optional[str]], Optional[bool]]
+    ]
 
     @property
-    def is_correct(self) -> bool | None:
+    def is_correct(self) -> Optional[bool]:
         if self.classification_eq is None:
             if self.gold is None:
                 return None
@@ -150,19 +153,19 @@ class RecipeResult(BaseModel):
     answer: str
     experiment: str
     excerpts: Sequence[str]
-    result: object | None = None
-    classifications: Sequence[str | None] = []
+    result: Optional[object] = None
+    classifications: Sequence[Optional[str]] = []
     classification_eq: Sequence[
-        Callable[[str | None, str | None], bool | None] | None
+        Optional[Callable[[Optional[str], Optional[str]], Optional[bool]]]
     ] = []
-    elicit_commit: str | None
-    answer_rating: int | None
-    failure_modes: Sequence[str] | None
+    elicit_commit: Optional[str]
+    answer_rating: Optional[int]
+    failure_modes: Optional[Sequence[str]]
 
 
 class EvaluatedRecipeResult(RecipeResult):
     evaluated_excerpts: EvaluatedExcerpts
-    gold_standard: GoldStandard | None
+    gold_standard: Optional[GoldStandard]
 
     @classmethod
     async def from_recipe_result(

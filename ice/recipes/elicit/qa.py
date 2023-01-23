@@ -1,4 +1,5 @@
 from urllib.parse import urljoin
+from typing import Optional
 
 from structlog.stdlib import get_logger
 
@@ -52,7 +53,7 @@ def augment_qa_response(response, papers):
 async def elicit_qa(
     root_question: str = "What is the effect of creatine on cognition?",
     qa_question: str = "What was the population?",
-    papers: dict | None = None,
+    papers: Optional[dict] = None,
 ):
     cells = [
         dict(paper, column={"type": "custom_question", "value": qa_question})

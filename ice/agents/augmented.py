@@ -3,6 +3,7 @@ from ice.agents.base import Stop
 from ice.environment import env
 from ice.utils import max_by_value
 from ice.utils import quoted
+from typing import Optional
 
 
 class AugmentedAgent(Agent):
@@ -61,9 +62,9 @@ class AugmentedAgent(Agent):
         *,
         prompt: str,
         choices: tuple[str, ...],
-        default: str | None = None,
+        default: Optional[str] = None,
         verbose: bool = False,
-    ) -> tuple[dict[str, float], str | None]:
+    ) -> tuple[dict[str, float], Optional[str]]:
         (machine_probs, explanation) = await self.machine.classify(
             prompt=prompt,
             choices=choices,

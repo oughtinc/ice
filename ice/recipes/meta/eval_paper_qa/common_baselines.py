@@ -1,6 +1,8 @@
 from collections.abc import Callable
 from collections.abc import Sequence
 from functools import partial
+from typing import Union
+from typing import Optional
 
 from ice.apis.openai import TooLongRequestError
 from ice.formatter.transform.value import numbered_list
@@ -43,7 +45,7 @@ async def top_n_answer(
     question: str,
     n: int,
 ) -> tuple[Sequence[str], str]:
-    answer: str | Sequence[str]
+    answer: Union[str, Sequence[str]]
     all_paras = [str(p) for p in paper.paragraphs]
     scored_paras = await select_results_using_elicit_prompt(question, all_paras)
     top_n_paras = top_n(scored_paras, n)
@@ -54,7 +56,7 @@ async def top_n_answer(
 async def _cheating_qa_baseline(
     paper: Paper,
     question: str,
-    gold_support: Sequence[str] | None,
+    gold_support: Optional[Sequence[str]],
     enumerate_answer: bool,
 ):
     """Baseline that uses gold standard support, without searching the paper.
@@ -75,7 +77,7 @@ async def _cheating_qa_baseline(
     relevant_str = "\n\n".join(gs for gs in gold_support) if gold_support else ""
     if not relevant_str:
         raise ValueError("Method requires gold support")
-    response: str | Sequence[str] = await answer(
+    response: Union[str, Sequence[str]] = await answer(
         context=relevant_str, question=question
     )
     if enumerate_answer:
@@ -97,10 +99,10 @@ cheating_qa_baseline_list_answer: PaperQaMethod[Sequence[str]] = partial(
 
 
 async def _paper_qa_baseline(
-    paper: Paper, question, gold_support: Sequence[str] | None, enumerate_answer: bool
+    paper: Paper, question, gold_support: Optional[Sequence[str]], enumerate_answer: bool
 ) -> PaperQaAnswer:
     gold_support  # unused
-    answer: str | Sequence[str]
+    answer: Union[str, Sequence[str]]
     all_paras = [str(p).casefold().strip() for p in paper.paragraphs if str(p).strip()]
     answer, predicted_paras = await answer_for_paper(paper, question, top_n=1)
     predicted_paras = [p.casefold().strip() for p in predicted_paras]
@@ -114,10 +116,10 @@ async def _paper_qa_baseline(
 
 
 async def _elicit_paper_qa_baseline(
-    paper: Paper, question, gold_support: Sequence[str] | None
+    paper: Paper, question, gold_support: Optional[Sequence[str]]
 ) -> PaperQaAnswer:
     gold_support  # unused
-    answer: str | Sequence[str]
+    answer: Union[str, Sequence[str]]
     all_paras = [str(p).casefold().strip() for p in paper.paragraphs if str(p).strip()]
     top_paragraph = await select_results_using_top_monot5_paragraph(
         question=question,
@@ -169,11 +171,11 @@ async def _demonstration_answer(
 async def preselected_few_shot_qa_baseline(
     paper: Paper,
     question: str,
-    gold_support: Sequence[str] | None,
+    gold_support: Optional[Sequence[str]],
     enumerate_answer: bool,
     few_shot_demonstration_func: Callable[[str], Sequence[PaperQaGoldStandard]],
-    selections: Sequence[str] | None = None,
-    paper_division_func: Callable[[Paper], Sequence[str]] | None = None,
+    selections: Optional[Sequence[str]] = None,
+    paper_division_func: Optional[Callable[[Paper], Sequence[str]]] = None,
     reasoning: bool = False,
 ):
     demonstration_examples = few_shot_demonstration_func(paper.document_id)

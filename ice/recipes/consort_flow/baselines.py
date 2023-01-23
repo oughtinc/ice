@@ -2,6 +2,8 @@ from collections.abc import Callable
 from collections.abc import Sequence
 from functools import partial
 from itertools import chain
+from typing import Union
+from typing import Optional
 
 from ice.apis.openai import TooLongRequestError
 from ice.metrics.gold_standards import get_gold_standard
@@ -251,7 +253,7 @@ async def _all_options(
     question: str,
     gold_support: None,
     few_shot_demonstration_func: Callable[[str, bool], Sequence[PaperQaGoldStandard]],
-    prune_to_max: int | None = None,
+    prune_to_max: Optional[int] = None,
     do_prune_reasoning: bool = False,
     do_few_shot_selection: bool = False,
     do_decontext_at_answer: bool = False,
@@ -308,7 +310,7 @@ async def _all_options(
         try:
             relevant_str = "\n\n".join([s[0] for s in selections])
             if not do_demonstration_answer:
-                answer: str | Sequence[str] = await answer_like_elicit_qa(
+                answer: Union[str, Sequence[str]] = await answer_like_elicit_qa(
                     question=question, passage=relevant_str
                 )
                 if do_return_list:

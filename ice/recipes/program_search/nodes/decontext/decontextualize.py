@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 from itertools import count
+from typing import Optional
 
 from tqdm import tqdm
 
@@ -17,7 +18,7 @@ from ice.recipes.program_search.types import sentences
 async def local_decontext(
     texts: Sequence[Selection],
     to_decontext: Selection,
-    questions: Sequence[str] | None = None,
+    questions: Optional[Sequence[str]] = None,
 ) -> Decontext:
     context = " ".join((str(text) for text in texts))
     prompt = decontext_prompt(context, passage=str(to_decontext), questions=questions)

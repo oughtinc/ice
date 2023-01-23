@@ -20,6 +20,7 @@ from ice.recipe import Recipe
 from ice.trace import enable_trace
 from ice.trace import trace
 from ice.utils import map_async
+from typing import Optional
 
 
 log = get_logger()
@@ -28,14 +29,14 @@ log = get_logger()
 def main_cli(
     *,
     mode: Mode = "machine",
-    output_file: str | None = None,
-    json_out: str | None = None,
-    recipe_name: str | None = None,
-    input_files: list[str] | None = None,
-    gold_standard_splits: list[str] | None = None,
-    question_short_name: str | None = None,
+    output_file: Optional[str] = None,
+    json_out: Optional[str] = None,
+    recipe_name: Optional[str] = None,
+    input_files: Optional[list[str]] = None,
+    gold_standard_splits: Optional[list[str]] = None,
+    question_short_name: Optional[str] = None,
     trace: bool = True,
-    args: dict | None = None,
+    args: Optional[dict] = None,
 ):
     """
     ::
@@ -70,12 +71,12 @@ def main_cli(
 async def main(
     *,
     mode: Mode,
-    output_file: str | None,
-    json_out: str | None,
-    recipe_name: str | None,
-    input_files: list[str] | None,
-    gold_standard_splits: list[str] | None,
-    question_short_name: str | None,
+    output_file: Optional[str],
+    json_out: Optional[str],
+    recipe_name: Optional[str],
+    input_files: Optional[list[str]],
+    gold_standard_splits: Optional[list[str]],
+    question_short_name: Optional[str],
     args: dict,
 ):
     # User selects recipe
@@ -109,7 +110,7 @@ async def main(
     await evaluate_results(recipe, results_json, output_file)
 
 
-async def get_recipe(recipe_name: str | None, mode: Mode) -> Recipe:
+async def get_recipe(recipe_name: Optional[str], mode: Mode) -> Recipe:
     """
     Get the recipe instance based on the user input or selection.
     """
@@ -118,9 +119,9 @@ async def get_recipe(recipe_name: str | None, mode: Mode) -> Recipe:
 
 
 async def get_papers(
-    input_files: list[str] | None,
-    gold_standard_splits: list[str] | None,
-    question_short_name: str | None,
+    input_files: Optional[list[str]],
+    gold_standard_splits: Optional[list[str]],
+    question_short_name: Optional[str],
 ) -> list[Paper]:
     """
     Get the list of papers based on the user input or selection.
@@ -186,8 +187,8 @@ async def run_recipe_over_papers(
 async def print_results(
     recipe: Recipe,
     results_by_doc: dict[str, RecipeResult],
-    output_file: str | None,
-    json_out: str | None,
+    output_file: Optional[str],
+    json_out: Optional[str],
 ) -> list[dict]:
     """
     Print the results to the output file or stdout, and return the JSON representation of the results.
@@ -227,7 +228,7 @@ async def print_results(
 
 
 async def evaluate_results(
-    recipe: Recipe, results_json: list[dict], output_file: str | None
+    recipe: Recipe, results_json: list[dict], output_file: Optional[str]
 ):
     """
     Evaluate the results using the recipe's evaluation report and

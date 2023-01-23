@@ -1,6 +1,7 @@
 from ice.agents.base import Agent
 from ice.agents.base import Stop
 from ice.environment import env
+from typing import Optional
 
 
 class HumanAgent(Agent):
@@ -39,9 +40,9 @@ class HumanAgent(Agent):
         *,
         prompt: str,
         choices: tuple[str, ...],
-        default: str | None = None,
+        default: Optional[str] = None,
         verbose: bool = False,
-    ) -> tuple[dict[str, float], str | None]:
+    ) -> tuple[dict[str, float], Optional[str]]:
         choice = await env().select(
             prompt=prompt, choices=list(choices), default=default
         )

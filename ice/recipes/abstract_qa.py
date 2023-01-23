@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from ice.recipe import recipe
 
@@ -7,7 +8,7 @@ from ice.recipe import recipe
 class Abstract:
     title: str
     authors: list[str]
-    year: int | None
+    year: Optional[int]
     text: str
 
 

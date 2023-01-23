@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Annotated
 from typing import Literal
 from typing import Optional
+from typing import Union
 
 import nltk
 import requests
@@ -28,16 +29,13 @@ nltk.download("punkt", quiet=True)
 
 
 def get_full_document_id(document_id: str) -> str:
-    match document_id:
-        case "abebe-2018-tiny.txt":
-            return "abebe-2018.pdf"
-        case "keenan-2018-tiny.txt":
-            return "keenan-2018.pdf"
-        case _:
-            return document_id
+    return {
+        "abebe-2018-tiny.txt": "abebe-2018.pdf",
+        "keenan-2018-tiny.txt": "keenan-2018.pdf",
+    }.get(document_id, document_id)
 
 
-def get_paper_paths(paper_dir: Path | None = None) -> list[Path]:
+def get_paper_paths(paper_dir: Optional[Path] = None) -> list[Path]:
     if paper_dir is None:
         script_path = Path(__file__).parent.parent
         paper_dir = script_path / "papers/"
@@ -177,4 +175,5 @@ class Paper(BaseModel):
         return "\n\n".join(str(p) for p in self.paragraphs)
 
     def dict(self, *args, **kwargs):
-        return super().dict(*args, **(kwargs | {"exclude": {"paragraphs"}}))
+        kwargs["exclude"] = {"paragraphs"}
+        return super().dict(*args, **kwargs)

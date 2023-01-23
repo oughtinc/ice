@@ -1,5 +1,7 @@
 from collections.abc import Sequence
 from collections.abc import Sized
+from typing import Union
+from typing import Optional
 
 from structlog.stdlib import get_logger
 
@@ -31,7 +33,9 @@ Let's think about what each excerpt tells us, if anything, about the number of e
 Here's all the information in this paper about how many experiments there were: {answer}
 """.strip()
 
-COUNT_EXPERIMENTS_EXAMPLES: list[dict[str, ValueTransform[Sequence[str]] | str]] = [
+COUNT_EXPERIMENTS_EXAMPLES: list[
+    dict[str, Union[ValueTransform[Sequence[str]], str]]
+] = [
     dict(
         paragraphs=numbered_list(
             [
@@ -59,7 +63,7 @@ COUNT_EXPERIMENTS_EXAMPLES: list[dict[str, ValueTransform[Sequence[str]] | str]]
 ]
 
 COUNT_EXPERIMENTS_SHARED: dict[
-    str, OrdinalWord | DependentTransform[int | Sized]
+    str, Union[OrdinalWord, DependentTransform[Union[int, Sized]]]
 ] = dict(
     ordinal=OrdinalWord(capitalize=True),
     maybe_plural_excerpts=plural_transform(
@@ -81,12 +85,12 @@ COUNT_EXPERIMENTS_REASONING_STOP = ("\n\nHere's all",)
 def make_count_experiments_prompt_func(num_shots: int) -> MultipartReasoningPrompt:
     def count_experiments_prompt(
         paragraphs: Sequence[str],
-        helpfulness: str | None = None,
-        reasoning: str | None = None,
+        helpfulness: Optional[str] = None,
+        reasoning: Optional[str] = None,
     ) -> str:
         helpfulness  # ignored
         last_example: dict[
-            str, ValueTransform[Sequence[str]] | str | StopSentinel
+            str, Union[ValueTransform[Sequence[str]], str, StopSentinel]
         ] = dict(
             paragraphs=numbered_list(paragraphs),
             reasoning=reasoning if reasoning else stop("Excerpt 1"),

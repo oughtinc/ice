@@ -1,4 +1,5 @@
 import math  # noqa: F401
+from typing import Optional
 
 from abc import ABC
 from abc import abstractmethod
@@ -240,7 +241,7 @@ def get_best_action_index(action_choice_probs):
 async def gather_info(
     *,
     question: str,
-    log: Log | None = None,
+    log: Optional[Log] = None,
     max_actions: int = 3,
 ) -> Log:
     if log is None:

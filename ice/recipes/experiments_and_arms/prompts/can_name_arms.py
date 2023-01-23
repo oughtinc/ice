@@ -1,5 +1,7 @@
 from collections.abc import Callable
 from collections.abc import Sequence
+from typing import Union
+from typing import Optional
 
 from ice.formatter.multi import format_multi
 from ice.formatter.transform.dependent import CountWord
@@ -13,7 +15,7 @@ from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
 
 
 CAN_WE_NAME_ARMS_EXAMPLES: list[
-    dict[str, ValueTransform[Sequence[str]] | str | int]
+    dict[str, Union[ValueTransform[Sequence[str]], str, int]]
 ] = [
     dict(
         paragraphs=numbered_list(
@@ -125,7 +127,7 @@ Therefore, {do_or_does_the_above_excerpts} provide insight into what the trial a
 """
 
 
-def can_we_name_experiments_stop_seq(reasoning: str | None) -> Sequence[str]:
+def can_we_name_experiments_stop_seq(reasoning: Optional[str]) -> Sequence[str]:
     return ["\n\n"] if reasoning else ["Therefore, "]
 
 
@@ -136,8 +138,8 @@ def make_can_we_name_arms_prompt(
     def from_num_shot(num_shot: int):
         def make_can_we_name_arms_prompt(
             paragraphs: Sequence[str],
-            helpfulness: str | None = None,
-            reasoning: str | None = None,
+            helpfulness: Optional[str] = None,
+            reasoning: Optional[str] = None,
         ) -> str:
             last_example: dict = start_last_example(
                 helpfulness=helpfulness, reasoning=reasoning, pre_final="Excerpt 1"

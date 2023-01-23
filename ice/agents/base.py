@@ -1,10 +1,12 @@
 from ice.trace import TracedABC
+from typing import Union
+from typing import Optional
 
-Stop = str | list[str] | None
+Stop = Optional[Union[str, list[str]]]
 
 
 class Agent(TracedABC):
-    label: str | None = None
+    label: Optional[str] = None
 
     async def complete(
         self,
@@ -22,9 +24,9 @@ class Agent(TracedABC):
         *,
         prompt: str,
         choices: tuple[str, ...],
-        default: str | None = None,
+        default: Optional[str] = None,
         verbose: bool = False,
-    ) -> tuple[dict[str, float], str | None]:
+    ) -> tuple[dict[str, float], Optional[str]]:
         raise NotImplementedError
 
     # Methods below may be deprecated in the future:
@@ -35,7 +37,7 @@ class Agent(TracedABC):
         context: str,
         question: str,
         verbose: bool = False,
-        default: float | None = None,
+        default: Optional[float] = None,
     ) -> float:
         raise NotImplementedError
 

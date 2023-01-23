@@ -2,6 +2,7 @@ from collections.abc import Awaitable
 from collections.abc import Callable
 from collections.abc import Sequence
 from typing import TypeVar
+from typing import Optional
 
 from structlog.stdlib import get_logger
 
@@ -50,8 +51,8 @@ async def reasoning_sample(
 
 async def greedy_continuation(
     texts: Sequence[str],
-    helpfulness: str | None,
-    reasoning: str | None,
+    helpfulness: Optional[str],
+    reasoning: Optional[str],
     prompt_func: MultipartReasoningPrompt,
     max_tokens: int,
     final_answer_processor: Callable[[dict], T1],
@@ -108,7 +109,7 @@ async def _get_helpfulness(
 
 async def _get_final_answer(
     texts: Sequence[str],
-    helpfulness: str | None,
+    helpfulness: Optional[str],
     reasoning: str,
     prompt_func: MultipartReasoningPrompt,
     final_answer_processor: Callable[[dict], T1],
@@ -146,7 +147,7 @@ async def reason_select_and_answer(
     reasoning_stop: tuple[str, ...],
     prompt_func: Callable[[int], MultipartReasoningPrompt],
     get_reasoning: Callable[[str], str],
-    get_helpfulness: Callable[[str], str] | None,
+    get_helpfulness: Optional[Callable[[str], str]],
     final_answer_processor: Callable[[dict], T1],
 ) -> PassageWithReasoning[T1]:
     """Prompt chaining technique that samples reasoning, then optionally greedily generates helpfulness, then a final answer.
@@ -250,7 +251,7 @@ async def answer_with_best_reasoning(
     reasoning_stop: tuple[str, ...],
     prompt_func: Callable[[int], MultipartReasoningPrompt],
     get_reasoning: Callable[[str], str],
-    get_helpfulness: Callable[[str], str] | None,
+    get_helpfulness: Optional[Callable[[str], str]],
     final_answer_processor: Callable[[dict], T1],
 ) -> T2:
     """Sample multiple reasonings, greedily generating helpfulness (optional) and a final answer based on the reasoning.

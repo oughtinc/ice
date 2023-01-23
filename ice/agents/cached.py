@@ -2,6 +2,7 @@ from ice.agents.base import Agent
 from ice.agents.base import Stop
 from ice.settings import CACHE_DIR
 from ice.sqlite_shelf import SQLiteShelf
+from typing import Optional
 
 
 def get_cache_key(fn_name: str, input: str):
@@ -53,9 +54,9 @@ class CachedAgent(Agent):
         *,
         prompt: str,
         choices: tuple[str, ...],
-        default: str | None = None,
+        default: Optional[str] = None,
         verbose: bool = False,
-    ) -> tuple[dict[str, float], str | None]:
+    ) -> tuple[dict[str, float], Optional[str]]:
         key = get_cache_key("classify", prompt)
         if key in self.cache:
             return self.cache[key]

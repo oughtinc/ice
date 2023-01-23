@@ -1,6 +1,8 @@
 from collections.abc import Callable
 from collections.abc import Sequence
 from collections.abc import Sized
+from typing import Union
+from typing import Optional
 
 from structlog.stdlib import get_logger
 
@@ -37,7 +39,7 @@ In summary, the {experiments_count_word} experiment{maybe_plural_experiments} {w
 
 
 NAME_EXPERIMENTS_EXAMPLES: list[
-    dict[str, ValueTransform[Sequence[str]] | str | int]
+    dict[str, Union[ValueTransform[Sequence[str]], str, int]]
 ] = [
     dict(
         paragraphs=numbered_list(
@@ -68,7 +70,7 @@ NAME_EXPERIMENTS_EXAMPLES: list[
 ]
 
 NAME_EXPERIMENTS_SHARED: dict[
-    str, OrdinalWord | DependentTransform[int | Sized]
+    str, Union[OrdinalWord, DependentTransform[Union[int, Sized]]]
 ] = dict(
     ordinal=OrdinalWord(capitalize=True, finally_case="Finally"),
     maybe_plural_excerpts=plural_transform(
@@ -104,12 +106,12 @@ def make_name_exps_from_count(
     def make_name_experiments_prompt_func(num_shots: int) -> MultipartReasoningPrompt:
         def name_experiments_prompt(
             paragraphs: Sequence[str],
-            helpfulness: str | None = None,
-            reasoning: str | None = None,
+            helpfulness: Optional[str] = None,
+            reasoning: Optional[str] = None,
         ) -> str:
             helpfulness  # ignored
             last_example: dict[
-                str, ValueTransform[Sequence[str]] | str | StopSentinel | int
+                str, Union[ValueTransform[Sequence[str]], str, StopSentinel, int]
             ] = dict(
                 paragraphs=numbered_list(paragraphs),
                 reasoning=reasoning if reasoning else stop("Excerpt 1"),

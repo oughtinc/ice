@@ -1,4 +1,6 @@
 import typing as t
+from typing import Union
+from typing import Optional
 
 from pydantic import BaseModel
 from pydantic.generics import GenericModel
@@ -14,7 +16,7 @@ class Selection(BaseModel):
     p: Paper
     start: int
     end: int
-    is_gs: bool | None = None
+    is_gs: Optional[bool] = None
 
     # TODO: validate on creation
 
@@ -59,7 +61,7 @@ def text_to_selection(text: str, selections: t.Sequence[Selection]):
 
 
 class Decontext(Selection):
-    questions: t.Sequence[str] | None
+    questions: Optional[t.Sequence[str]]
     out: str
 
     def __str__(self):
@@ -67,7 +69,7 @@ class Decontext(Selection):
 
 
 class Trace(BaseModel):
-    components: t.Sequence[str | Selection]
+    components: t.Sequence[Union[str, Selection]]
 
 
 T = t.TypeVar("T")

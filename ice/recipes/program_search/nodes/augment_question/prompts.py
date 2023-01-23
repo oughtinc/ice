@@ -1,4 +1,6 @@
 import re
+from typing import Union
+from typing import Optional
 
 from collections.abc import Sequence
 from typing import TypedDict
@@ -14,7 +16,7 @@ from ice.formatter.transform.value import ValueTransform
 log = get_logger()
 
 
-EXAMPLES: list[dict[str, str | ValueTransform | StopSentinel]] = [
+EXAMPLES: list[dict[str, Union[str, ValueTransform, StopSentinel]]] = [
     dict(
         question="What was the effect size?",
         selections=numbered_list(
@@ -91,7 +93,7 @@ def make_augment_question_prompt(
     *,
     question: str,
     existing_selections: Sequence[str],
-    examples: list[RenderableAugmentQuestionExample] | None = None,
+    examples: Optional[list[RenderableAugmentQuestionExample]] = None,
 ) -> str:
     all_examples = (examples or EXAMPLES) + [
         dict(

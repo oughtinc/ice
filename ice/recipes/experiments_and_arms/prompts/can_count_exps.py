@@ -1,4 +1,6 @@
 from collections.abc import Sequence
+from typing import Union
+from typing import Optional
 
 from ice.formatter.multi import format_multi
 from ice.formatter.multi import stop
@@ -26,7 +28,7 @@ Answer: {answer}""".strip()
 
 
 CAN_WE_COUNT_EXPERIMENTS_EXAMPLES: list[
-    dict[str, ValueTransform[Sequence[str]] | str]
+    dict[str, Union[ValueTransform[Sequence[str]], str]]
 ] = [
     dict(
         paragraphs=numbered_list(
@@ -53,8 +55,8 @@ Excerpt 4 also explains some analytic methodology; because it seems to compare t
 def make_can_we_count_experiments_prompt(num_shots: int) -> MultipartReasoningPrompt:
     def can_we_count_experiments_prompt(
         paragraphs: Sequence[str],
-        helpfulness: str | None = None,
-        reasoning: str | None = None,
+        helpfulness: Optional[str] = None,
+        reasoning: Optional[str] = None,
     ) -> str:
         last_example = start_last_example(
             helpfulness=helpfulness,

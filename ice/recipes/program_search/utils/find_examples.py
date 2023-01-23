@@ -2,6 +2,7 @@ from collections.abc import Mapping
 from collections.abc import Sequence
 from enum import Enum
 from typing import TypeVar
+from typing import Union
 
 from ice.metrics.base import Sample
 from ice.metrics.nubia import Nubia

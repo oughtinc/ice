@@ -1,6 +1,8 @@
 from collections.abc import Mapping
 from collections.abc import Sequence
 from typing import cast
+from typing import Union
+from typing import Optional
 
 import numpy as np
 
@@ -51,7 +53,7 @@ async def select(
     question: str,
     texts: Sequence[str],
     existing: Sequence[str],
-    examples: list[RenderableSelectionExample] | None = None,
+    examples: Optional[list[RenderableSelectionExample]] = None,
 ) -> Sequence[str]:
     """Select additional texts by comparing logprobs of indices considered by the model.
 
@@ -103,7 +105,7 @@ async def select_reduce(
     question: str,
     texts: Sequence[Sequence[str]],
     do_prune: bool = False,
-    examples: list[RenderableSelectionExample] | None = None,
+    examples: Optional[list[RenderableSelectionExample]] = None,
 ) -> Sequence[str]:
     """Select texts that answer the question by reducing over `select`
 
@@ -137,7 +139,7 @@ async def windowed_select(
     texts: Sequence[str],
     n: int,
     step: int,
-    examples: list[RenderableSelectionExample] | None = None,
+    examples: Optional[list[RenderableSelectionExample]] = None,
 ) -> Sequence[bool]:
     """Select texts that answer the question via
 
@@ -195,8 +197,10 @@ def to_paragraphs(paper: Paper) -> Sequence[str]:
 
 
 async def elicit_negative_few_shot_example(
-    example: PaperQaGoldStandard, threshold: float = 1.16, max_examples: int | None = 4
-) -> Demonstration | None:
+    example: PaperQaGoldStandard,
+    threshold: float = 1.16,
+    max_examples: Optional[int] = 4,
+) -> Optional[Demonstration]:
     paragraphs = to_paragraphs(example.paper)
     gold_support = set(example.gold_support)
     assert gold_support.issubset(
@@ -250,7 +254,7 @@ async def _score_support(
 async def positive_few_shot_example(
     example: PaperQaGoldStandard,
     threshold: float = 1.16,
-    max_examples: int | None = 4,
+    max_examples: Optional[int] = 4,
     add_noise: bool = False,
 ) -> Demonstration:
     paragraphs = to_paragraphs(example.paper)

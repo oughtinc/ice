@@ -1,4 +1,5 @@
 from collections import Counter
+from typing import Optional
 
 from structlog.stdlib import get_logger
 
@@ -60,9 +61,9 @@ class OpenAIReasoningAgent(Agent):
         *,
         prompt: str,
         choices: tuple[str, ...],
-        default: str | None = None,
+        default: Optional[str] = None,
         verbose: bool = False,
-    ) -> tuple[dict[str, float], str | None]:
+    ) -> tuple[dict[str, float], Optional[str]]:
         # Generate the prompt for the reasoning task
         answer_prefix = self._answer_prefix(prompt)
         reasoning_prompt = self._generate_reasoning_prompt(prompt)
@@ -110,7 +111,7 @@ class OpenAIReasoningAgent(Agent):
         response: dict,
         answer_prefix: str,
         stop: Stop = None,
-        choices: tuple[str, ...] | None = None,
+        choices: Optional[tuple[str, ...]] = None,
     ) -> tuple[Counter[str], list[str]]:
         # Extract the response texts
         response_texts = [choice["text"] for choice in response["choices"]]

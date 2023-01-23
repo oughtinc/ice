@@ -1,5 +1,6 @@
 import json
 import re
+from typing import Optional
 
 from collections.abc import Sequence
 from itertools import islice
@@ -22,7 +23,7 @@ VAL_PATH = "/code/datasets/qasper-dev-v0.3.json"
 class RawAnswer(BaseModel):
     unanswerable: bool
     extractive_spans: list[str]
-    yes_no: bool | None
+    yes_no: Optional[bool]
     free_form_answer: str
     evidence: list[str]
 
@@ -32,7 +33,7 @@ class RawAnswer(BaseModel):
 
     # TODO: Skip where any evidence starts with FLOAT_SELECTED
 
-    def canonical_answer(self) -> str | None:
+    def canonical_answer(self) -> Optional[str]:
         if self.unanswerable:
             return "Not mentioned"
         answers = tuple(
@@ -96,7 +97,7 @@ def _replace_references(paragraph: str) -> str:
     return re.sub(TABFIGREF_PATTERN, _match_to_subsequent_int_value, unbibref)
 
 
-def _get_answers(question_dict: dict) -> tuple[str | None, list[str]]:
+def _get_answers(question_dict: dict) -> tuple[Optional[str], list[str]]:
     answer_dict = question_dict["answers"][0][
         "answer"
     ]  # We'll only use the first answer
