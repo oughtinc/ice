@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Annotated
 from typing import Literal
 from typing import Optional
-from typing import Union
 
 import nltk
 import requests

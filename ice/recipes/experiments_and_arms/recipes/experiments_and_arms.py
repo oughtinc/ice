@@ -1,7 +1,6 @@
 import json
 
 from collections.abc import Sequence
-from typing import Union
 
 from ice.evaluation.evaluate_recipe_result import RecipeResult
 from ice.paper import Paper

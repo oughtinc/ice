@@ -2,7 +2,6 @@ from collections.abc import Mapping
 from collections.abc import Sequence
 from typing import cast
 from typing import Optional
-from typing import Union
 
 import numpy as np
 
