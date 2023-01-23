@@ -4,6 +4,7 @@ Make a dataframe that contains the paragraphs that contain the gold standard quo
 import asyncio
 
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 
@@ -56,7 +57,7 @@ def get_recall(quote, paragraph):
 @diskcache()
 def get_containing_paragraph(
     document_id: str, quote: str, verbose: bool = False
-) -> Paragraph | None:
+) -> Optional[Paragraph]:
     """
     Given a document ID and a quote, return the paragraph that the quote is in.
     """

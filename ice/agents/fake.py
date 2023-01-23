@@ -1,5 +1,7 @@
 import random
 
+from typing import Optional
+
 from faker import Faker
 
 from ice.agents.base import Agent
@@ -32,9 +34,9 @@ class FakeAgent(Agent):
         *,
         prompt: str,
         choices: tuple[str, ...],
-        default: str | None = None,
+        default: Optional[str] = None,
         verbose: bool = False,
-    ) -> tuple[dict[str, float], str | None]:
+    ) -> tuple[dict[str, float], Optional[str]]:
         probs = [random.random() for _ in choices]
         total = sum(probs)
         probs = [p / total for p in probs]

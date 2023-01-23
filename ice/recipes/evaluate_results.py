@@ -1,3 +1,5 @@
+from typing import Optional
+
 from structlog.stdlib import get_logger
 
 from ice.recipe import Recipe
@@ -11,9 +13,9 @@ log = get_logger()
 class EvaluateResults(Recipe):
     async def run(
         self,
-        question: str | None = None,
-        model_results: list[str] | None = None,
-        gold_results: list[str] | None = None,
+        question: Optional[str] = None,
+        model_results: Optional[list[str]] = None,
+        gold_results: Optional[list[str]] = None,
     ) -> list[ResultComparison]:
         """
         Compare two lists of results, model and gold standard.

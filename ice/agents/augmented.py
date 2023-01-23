@@ -1,3 +1,5 @@
+from typing import Optional
+
 from ice.agents.base import Agent
 from ice.agents.base import Stop
 from ice.environment import env
@@ -61,9 +63,9 @@ class AugmentedAgent(Agent):
         *,
         prompt: str,
         choices: tuple[str, ...],
-        default: str | None = None,
+        default: Optional[str] = None,
         verbose: bool = False,
-    ) -> tuple[dict[str, float], str | None]:
+    ) -> tuple[dict[str, float], Optional[str]]:
         (machine_probs, explanation) = await self.machine.classify(
             prompt=prompt,
             choices=choices,

@@ -9,11 +9,13 @@ from functools import wraps
 from inspect import iscoroutinefunction
 from pathlib import Path
 from traceback import print_exc
+from typing import cast
 from typing import final
 from typing import Generic
 from typing import no_type_check
-from typing import TypeGuard
+from typing import Optional
 from typing import TypeVar
+from typing import Union
 
 import defopt
 import pandas as pd
@@ -21,6 +23,7 @@ import pandas as pd
 from merge_args import merge_args
 from pydantic import BaseSettings
 from structlog.stdlib import get_logger
+from typing_extensions import TypeGuard
 
 from ice.agent import Agent
 from ice.agent import agent_policy
@@ -47,9 +50,13 @@ def is_list_of_recipe_result(value: object) -> TypeGuard[list[RecipeResult]]:
 
 
 class Recipe(TracedABC, Generic[RecipeSettings]):
-    defaults: Callable[["Recipe"], RecipeSettings] = lambda self: BaseSettings()
+    defaults: Callable[["Recipe"], RecipeSettings] = lambda self: cast(
+        RecipeSettings, BaseSettings()
+    )
 
-    def __init__(self, mode: Mode = "machine", settings: RecipeSettings | None = None):
+    def __init__(
+        self, mode: Mode = "machine", settings: Optional[RecipeSettings] = None
+    ):
         self.mode = mode
         self.s = settings or self.defaults()  # type: ignore[call-arg,misc]
         self.results: list[RecipeResult] = []
@@ -65,11 +72,11 @@ class Recipe(TracedABC, Generic[RecipeSettings]):
         raise NotImplementedError
 
     @final
-    def maybe_add_to_results(self, results: list[RecipeResult] | object):
+    def maybe_add_to_results(self, results: Union[list[RecipeResult], object]):
         if is_list_of_recipe_result(results):
             self.results.extend(results)
 
-    def to_json(self, results: list[RecipeResult] | object) -> list[dict]:
+    def to_json(self, results: Union[list[RecipeResult], object]) -> list[dict]:
         """Convert results to objects that can be serialized to JSON."""
         if is_list_of_recipe_result(results):
             return [result.dict() for result in results]
@@ -83,7 +90,7 @@ class Recipe(TracedABC, Generic[RecipeSettings]):
             ),
         )
 
-    def agent(self, agent_name: str | None = None) -> Agent:
+    def agent(self, agent_name: Optional[str] = None) -> Agent:
         return agent_policy(mode=self.mode, agent_name=agent_name)
 
     def max_concurrency(self) -> int:
@@ -110,7 +117,7 @@ def function_recipe_from_path(path: str) -> FunctionBasedRecipe:
 
 class RecipeHelper:
     def __init__(self):
-        self._mode: Mode | None = "machine"
+        self._mode: Optional[Mode] = "machine"
         self.all_recipes: list[FunctionBasedRecipe] = []
 
     def main(self, main: FunctionBasedRecipe):
@@ -179,7 +186,7 @@ class RecipeHelper:
             },
         )
 
-    def agent(self, agent_name: str | None = None) -> Agent:
+    def agent(self, agent_name: Optional[str] = None) -> Agent:
         assert self._mode
         return agent_policy(self._mode, agent_name)
 

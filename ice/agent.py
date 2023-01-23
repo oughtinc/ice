@@ -1,4 +1,5 @@
 from functools import cache
+from typing import Optional
 
 from ice.agents.approval import ApprovalAgent
 from ice.agents.augmented import AugmentedAgent
@@ -45,19 +46,19 @@ def _get_machine_agent(agent_name: str) -> Agent:
     return MACHINE_AGENTS[agent_name]()
 
 
-def _get_augmented_agent(agent_name: str | None = None) -> AugmentedAgent:
+def _get_augmented_agent(agent_name: Optional[str] = None) -> AugmentedAgent:
     h_agent = agent_policy(mode="human", agent_name=agent_name)
     m_agent = agent_policy(mode="machine", agent_name=agent_name)
     return AugmentedAgent(human=h_agent, machine=m_agent)
 
 
-def _get_approval_agent(agent_name: str | None = None) -> ApprovalAgent:
+def _get_approval_agent(agent_name: Optional[str] = None) -> ApprovalAgent:
     h_agent = agent_policy(mode="human", agent_name=agent_name)
     m_agent = agent_policy(mode="machine", agent_name=agent_name)
     return ApprovalAgent(base_agent=m_agent, approval_agent=h_agent)
 
 
-def agent_policy(mode: Mode, agent_name: str | None = None) -> Agent:
+def agent_policy(mode: Mode, agent_name: Optional[str] = None) -> Agent:
     if mode == "human":
         return HumanAgent()
     elif mode == "augmented":

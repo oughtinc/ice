@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 from datetime import datetime
+from typing import Optional
 
 from ice.metrics.base import reduce_scores_dict
 from ice.metrics.base import Sample
@@ -57,7 +58,7 @@ async def rouge_compare(hyp: Sequence[str], ref: Sequence[str]) -> RougeResult:
     return scores[0]
 
 
-def summarize_scores(scores: list[RougeResult]) -> RougeResult | None:
+def summarize_scores(scores: list[RougeResult]) -> Optional[RougeResult]:
     if not scores:
         return None
     summary: dict[str, dict[str, float]] = dict()

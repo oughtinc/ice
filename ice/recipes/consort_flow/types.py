@@ -1,7 +1,9 @@
 from collections.abc import Sequence
 from typing import ClassVar
 from typing import Literal
+from typing import Optional
 from typing import Type
+from typing import Union
 
 from pydantic import BaseModel
 from pydantic import root_validator
@@ -24,7 +26,7 @@ def _fix_keys(model_values: object, correct_key_mapping: dict[str, str]) -> obje
     return model_values
 
 
-def _not_yet_collected_is_none(value: object) -> object | None:
+def _not_yet_collected_is_none(value: object) -> Optional[object]:
     if value == NOT_YET_COLLECTED:
         return None
     return value
@@ -32,7 +34,7 @@ def _not_yet_collected_is_none(value: object) -> object | None:
 
 def _maybe_dict_to_sequence(
     constructor: Type[BaseModel], maybe_dict: object
-) -> object | Sequence[BaseModel]:
+) -> Union[object, Sequence[BaseModel]]:
     if isinstance(maybe_dict, dict):
         return [
             constructor.parse_obj(vals | dict(name=k)) for k, vals in maybe_dict.items()
@@ -41,21 +43,21 @@ def _maybe_dict_to_sequence(
 
 
 class SampleSize(BaseModel):
-    description: str | None = None
-    reasoning: str | None = None
-    n: int | Literal["Not mentioned"]
+    description: Optional[str] = None
+    reasoning: Optional[str] = None
+    n: Union[int, Literal["Not mentioned"]]
     quotes: Sequence[str]
 
 
 class Reason(BaseModel):
     name: str
-    description: str | None = None
-    reasoning: str | None = None
-    n: int | Literal["Not mentioned"]
+    description: Optional[str] = None
+    reasoning: Optional[str] = None
+    n: Union[int, Literal["Not mentioned"]]
 
 
 class SampleSizeWithReasons(SampleSize):
-    reasons: Literal["Not mentioned"] | Sequence[Reason] | None = None
+    reasons: Optional[Union[Literal["Not mentioned"], Sequence[Reason]]] = None
 
     @validator("reasons", pre=True)
     def validate_reasons(cls, v):
@@ -63,7 +65,7 @@ class SampleSizeWithReasons(SampleSize):
 
 
 class Received(BaseModel):
-    description: str | None = None
+    description: Optional[str] = None
     quotes: Sequence[str]
 
 
@@ -73,10 +75,10 @@ class Analysis(SampleSize):
 
 class Arm(BaseModel):
     name: str
-    allocated: None | Literal["Not mentioned"] | SampleSize
-    received: None | Literal["Not mentioned"] | Received
-    attrition: None | SampleSizeWithReasons
-    analyzed: None | Sequence[Analysis]
+    allocated: Union[Optional[Literal["Not mentioned"]], SampleSize]
+    received: Union[Optional[Literal["Not mentioned"]], Received]
+    attrition: Optional[SampleSizeWithReasons]
+    analyzed: Optional[Sequence[Analysis]]
 
     @validator("analyzed", pre=True)
     def validate_analyzed(cls, v):
@@ -100,8 +102,8 @@ class Arm(BaseModel):
 
 
 class Enrolment(BaseModel):
-    assessed: Literal["Not mentioned"] | SampleSize
-    excluded: Literal["Not mentioned"] | SampleSizeWithReasons
+    assessed: Union[Literal["Not mentioned"], SampleSize]
+    excluded: Union[Literal["Not mentioned"], SampleSizeWithReasons]
     randomized: SampleSize
 
     @root_validator(pre=True)
@@ -118,10 +120,10 @@ class Enrolment(BaseModel):
 
 class Experiment(BaseModel):
     name: str
-    description: str | None = None
-    reasoning: str | None = None
-    enrolment: Enrolment | None
-    arms: Sequence[Arm] | None
+    description: Optional[str] = None
+    reasoning: Optional[str] = None
+    enrolment: Optional[Enrolment]
+    arms: Optional[Sequence[Arm]]
 
     _enrolment_to_none = validator("enrolment", pre=True, allow_reuse=True)(
         _not_yet_collected_is_none

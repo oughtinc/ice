@@ -3,6 +3,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import cached_property
 from itertools import chain
+from typing import Optional
+from typing import Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,7 +20,7 @@ from ice.metrics.rouge import matches
 class BinaryClassificationMetrics:
     ground_truth: Sequence[bool]
     predictions: Sequence[bool]
-    scores: Sequence[float] | None = None
+    scores: Optional[Sequence[float]] = None
 
     def __post_init__(self):
         assert len(self.ground_truth) == len(
@@ -90,7 +92,7 @@ class BinaryClassificationMetrics:
         prd.plot()
         plt.savefig(filename)
 
-    def pr_thresholds(self, n: int | None = 20):
+    def pr_thresholds(self, n: Optional[int] = 20):
         if not self.scores:
             return None
         precisions, recalls, thresholds = precision_recall_curve(
@@ -103,7 +105,7 @@ class BinaryClassificationMetrics:
             for p, r, t in zip(precisions[idxs], recalls[idxs], thresholds[idxs])
         }
 
-    def as_dict(self) -> dict[str, int | float | None]:
+    def as_dict(self) -> dict[str, Optional[Union[int, float]]]:
         return dict(
             tp=int(self.tp),
             tn=int(self.tn),
@@ -154,7 +156,7 @@ async def fuzzy_text_classification_metrics(
     texts: Sequence[str],
     predictions: Sequence[bool],
     ground_truth: Sequence[str],
-    scores: Sequence[float] | None = None,
+    scores: Optional[Sequence[float]] = None,
     lcs_threshold: float = 0.7,
 ) -> BinaryClassificationMetrics:
     """Because labeled ground truths are often partial excerpts, use Rouge lcs-recall of ground truth to generate labels.

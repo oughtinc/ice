@@ -1,6 +1,7 @@
 import importlib.util
 import os.path
 
+from typing import Optional
 from typing import Type
 
 from ice.environment import env
@@ -63,7 +64,7 @@ async def ask_user_for_recipe_class() -> Type[Recipe]:
     return recipe_class
 
 
-async def select_recipe_class(*, recipe_name: str | None = None) -> Type[Recipe]:
+async def select_recipe_class(*, recipe_name: Optional[str] = None) -> Type[Recipe]:
     if recipe_name is not None:
         if is_filename(recipe_name):
             recipe_class = load_recipe_class_from_file(recipe_name)

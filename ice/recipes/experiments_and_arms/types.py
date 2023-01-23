@@ -3,9 +3,11 @@ from typing import ClassVar
 from typing import Generic
 from typing import Literal
 from typing import NewType
+from typing import Optional
 from typing import Protocol
 from typing import runtime_checkable
 from typing import TypeVar
+from typing import Union
 
 from pydantic import BaseModel
 from pydantic import root_validator
@@ -21,14 +23,14 @@ Stage = NewType("Stage", str)
 
 
 class Sample(BaseModel):
-    size: int | Literal["Unclear"] | None = None
-    stage: Stage | None = None
+    size: Optional[Union[int, Literal["Unclear"]]] = None
+    stage: Optional[Stage] = None
 
 
 class Arm(BaseModel):
     name: str
     description: str
-    sample: Sample | None = None
+    sample: Optional[Sample] = None
 
     @root_validator(pre=True)
     def fix_keys(cls, values):
@@ -78,9 +80,9 @@ ReasoningStage = Literal["reasoning", "helpfulness", "answer"]
 class PassageWithReasoning(GenericModel, Generic[T]):
     passage: Sequence[str]
     reasoning: str
-    helpfulness: str | None = None
-    score: float | None = None
-    final_answer: T | None = None
+    helpfulness: Optional[str] = None
+    score: Optional[float] = None
+    final_answer: Optional[T] = None
 
 
 @runtime_checkable
@@ -88,7 +90,7 @@ class MultipartReasoningPrompt(Protocol):
     def __call__(
         self,
         paragraphs: Sequence[str],
-        helpfulness: str | None = None,
-        reasoning: str | None = None,
+        helpfulness: Optional[str] = None,
+        reasoning: Optional[str] = None,
     ) -> str:
         pass

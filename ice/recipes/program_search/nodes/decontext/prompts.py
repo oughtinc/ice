@@ -1,4 +1,6 @@
 from collections.abc import Sequence
+from typing import Optional
+from typing import Union
 
 from ice.formatter.multi import format_multi
 from ice.formatter.multi import stop
@@ -6,7 +8,7 @@ from ice.formatter.multi import StopSentinel
 from ice.formatter.transform.value import numbered_list
 from ice.formatter.transform.value import ValueTransform
 
-QUESTION_FREE_EXAMPLES: list[dict[str, str | StopSentinel]] = [
+QUESTION_FREE_EXAMPLES: list[dict[str, Union[str, StopSentinel]]] = [
     dict(
         context="Lisa loves to play practical jokes.",
         passage="But sometimes she goes too far.",
@@ -30,7 +32,7 @@ QUESTION_FREE_EXAMPLES: list[dict[str, str | StopSentinel]] = [
 ]
 
 QUESTION_GUIDED_EXAMPLES: list[
-    dict[str, str | ValueTransform[Sequence[str]] | StopSentinel]
+    dict[str, Union[str, ValueTransform[Sequence[str]], StopSentinel]]
 ] = [
     dict(
         questions=numbered_list(["What were Prince's biggest concerts?"]),
@@ -73,9 +75,9 @@ Rewrite: {rewrite}""".strip()
 
 
 def decontext_prompt(
-    context: str, passage: str, questions: Sequence[str] | None = None
+    context: str, passage: str, questions: Optional[Sequence[str]] = None
 ) -> str:
-    last_example: dict[str, str | StopSentinel | ValueTransform] = dict(
+    last_example: dict[str, Union[str, StopSentinel, ValueTransform]] = dict(
         context=context, passage=passage, rewrite=stop("")
     )
     if questions:

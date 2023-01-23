@@ -1,5 +1,6 @@
 from typing import Any
 from typing import Literal
+from typing import Optional
 
 from pydantic import BaseModel
 from rich.pretty import pprint
@@ -299,7 +300,7 @@ class PlaceboTree(Recipe):
 
     async def classify_placebo(
         self, paper: Paper, arms: list[str], arm_descriptions: list[str]
-    ) -> tuple[str, str | None]:
+    ) -> tuple[str, Optional[str]]:
         """
         Classify whether the paper used a placebo by combining the results from
         classifying the arms and the paragraphs.
@@ -481,31 +482,33 @@ Answer:"""
         # TODO: Be more systematic about probability aggregation
         if par_prob == 1.0:
             return par_cls
-        match (par_cls, arm_cls):
-            case ("Placebo", "Unclear"):
-                return "Placebo"
-            case ("Unclear", "Placebo"):
-                return "Placebo"
-            case ("Not mentioned", "Placebo"):
-                return "Placebo"
-            case ("Placebo", "No placebo"):
-                return "Unclear"
-            case ("No placebo", "Placebo"):
-                return "Unclear"
-            case ("Unclear", "No placebo"):
-                return "Unclear"
-            case ("Not mentioned", "Unclear"):
-                return "Not mentioned"
-            case ("No placebo", "Unclear"):
-                return "No placebo"
-            case ("Not mentioned", "No placebo"):
-                return "No placebo"
-            case _:
-                assert par_cls == arm_cls
-                return par_cls
+        if (par_cls, arm_cls) in [
+            ("Placebo", "Unclear"),
+            ("Unclear", "Placebo"),
+            ("Not mentioned", "Placebo"),
+        ]:
+            return "Placebo"
+        elif (par_cls, arm_cls) in [
+            ("Placebo", "No placebo"),
+            ("No placebo", "Placebo"),
+            ("Unclear", "No placebo"),
+        ]:
+            return "Unclear"
+        elif (par_cls, arm_cls) in [
+            ("Not mentioned", "Unclear"),
+        ]:
+            return "Not mentioned"
+        elif (par_cls, arm_cls) in [
+            ("No placebo", "Unclear"),
+            ("Not mentioned", "No placebo"),
+        ]:
+            return "No placebo"
+        else:
+            assert par_cls == arm_cls
+            return par_cls
 
     async def describe_placebo(
-        self, paper: Paper, description_draft: str | None
+        self, paper: Paper, description_draft: Optional[str]
     ) -> str:
         """
         Describe the placebo or placebos used in the study, either by using the draft

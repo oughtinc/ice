@@ -1,3 +1,5 @@
+from typing import Optional
+
 from ice.evaluation.evaluate_recipe_result import RecipeResult
 from ice.metrics.gold_standards import get_gold_standard
 from ice.metrics.gold_standards import list_experiments
@@ -32,7 +34,7 @@ def create_recipe_result(paper_id: str, experiment: str, answer: str) -> RecipeR
     )
 
 
-def get_gold_placebo(paper_id: str, experiment: str) -> str | None:
+def get_gold_placebo(paper_id: str, experiment: str) -> Optional[str]:
     """
     Return the gold standard placebo description for the given paper and experiment.
     """

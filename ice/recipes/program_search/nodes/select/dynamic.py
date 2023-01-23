@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 from typing import Generic
+from typing import Optional
 
 from pydantic.generics import GenericModel
 
@@ -54,7 +55,7 @@ async def make_examples(
 
 def first_positive_example(
     examples: Sequence[SelectionExample],
-) -> SelectionExample | None:
+) -> Optional[SelectionExample]:
     try:
         return next(
             filter(
@@ -68,7 +69,7 @@ def first_positive_example(
 
 def best_negative_example(
     examples: Sequence[SelectionExample],
-) -> SelectionExample | None:
+) -> Optional[SelectionExample]:
     negative_examples = list(
         filter(lambda example: not example.positive_idxs, examples)
     )

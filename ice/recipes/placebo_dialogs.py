@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 from typing import Any
+from typing import Optional
 
 from pydantic import BaseModel
 from structlog.stdlib import get_logger
@@ -169,8 +170,8 @@ class PlaceboDialogs(Recipe):
 
         # Ask about the control group
 
-        control_placebo_prob: float | None = None
-        control_no_placebo_prob: float | None = None
+        control_placebo_prob: Optional[float] = None
+        control_no_placebo_prob: Optional[float] = None
         explicit_control_quotes = []
 
         explicit_control_p, state = await state.multiple_choice(

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from anyio.to_thread import run_sync
 
 from ice.agents.base import Agent
@@ -29,9 +31,9 @@ class TFew(Agent):
         *,
         prompt: str,
         choices: tuple[str, ...],
-        default: str | None = None,
+        default: Optional[str] = None,
         verbose: bool = False
-    ) -> tuple[dict[str, float], str | None]:
+    ) -> tuple[dict[str, float], Optional[str]]:
         inp = PromptedClassificationInput(prompt=prompt, choices=choices)
 
         def run_batch() -> PromptedClassificationOutput:
