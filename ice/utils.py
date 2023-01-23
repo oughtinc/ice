@@ -63,11 +63,11 @@ def deep_merge(base, nxt):
     return merge_strategy(merge_strategy, [], base, nxt)
 
 
+# TODO why is it important that these be covariant?
 InputType_co = TypeVar("InputType_co", covariant=True)
 ReturnType_co = TypeVar("ReturnType_co", covariant=True)
 
 
-# inspired by http://bluebirdjs.com/docs/api/promise.map.html
 async def map_async(
     input_list: Sequence[InputType_co],
     fn: Callable[[InputType_co], Coroutine[Any, Any, ReturnType_co]],
@@ -75,6 +75,13 @@ async def map_async(
     semaphore: anyio.Semaphore | None = None,
     show_progress_bar: bool = False,
 ) -> list[ReturnType_co]:
+    # TODO add more documentation
+    """
+    [max_concurrency] is the maximum number of concurrent calls to fn. It's often set
+    inside the recipe.
+
+    Inspired by http://bluebirdjs.com/docs/api/promise.map.html
+    """
     result_boxes: list[list[ReturnType_co]] = [[] for _ in input_list]
 
     if not semaphore:
@@ -191,6 +198,7 @@ async def _nsmallest_async(
             n - delta, partitions[key], cmp, semaphore, offset + delta, new_seed
         )
 
+    # TODO why do we not need [max_concurrency] inside the [map_async] call?
     partitions = defaultdict(list, await map_async(list(partitions), recurse))
     return (partitions[False] + [pivot] + partitions[True])[:n]
 

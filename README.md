@@ -70,6 +70,18 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
 
 Note that you don't technically _need_ to run `pre-commit install`, but _not_ doing so may cause your commits to fail CI. (Which can be noisy, including by generating commits that will e.g. fix formatting.)
 
+4. To run the tests:
+
+   ```shell
+   pytest
+   ```
+
+Also, since some tests are relatively slow, you might want to run the ever-useful `pytest -k` option to run only the tests you're interested in. For example, to run only the tests in `test_json.py`:
+
+```shell
+pytest -k test_json
+```
+
 ## Terminology
 
 - **Recipes** are decompositions of a task into subtasks.

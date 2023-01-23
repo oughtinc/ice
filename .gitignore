@@ -17,4 +17,5 @@
 !/papers/keenan-2018-tiny.txt
 !/papers/keenan-2018.pdf
 /ui/node_modules
+/ui/storybook-static
 /venv/
