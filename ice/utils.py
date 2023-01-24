@@ -90,11 +90,26 @@ async def map_async(
     if show_progress_bar:
         progress_bar = tqdm.tqdm(total=len(input_list))
 
+    from .work_queue import WorkQueue
+
+    # TODO what about unbounded work queues?
+    # also assert that the input isn't negative
+    wq = WorkQueue(max_concurrency or len(input_list))
+    wq.start()
+
     async def box_result(
         input: Any, result_box: list[ReturnType_co], semaphore: anyio.Semaphore
     ) -> None:
         async with semaphore:
-            result = await fn(input)
+            # TODO should we have our work queue take in stuff that produces coroutines instead?
+            def fn_wrapper(x):
+                coro = fn(x)
+                import asyncio
+
+                # TODO i think this will fail
+                return asyncio.create_task(coro)
+
+            result = await wq.do(fn_wrapper, input)
         # TODO why is it written like this?
         result_box.extend([result])
 
@@ -108,6 +123,7 @@ async def map_async(
     if show_progress_bar:
         progress_bar.close()
 
+    await wq.stop()  # TODO how to clean this up?
     return [result_box[0] for result_box in result_boxes]
 
 
