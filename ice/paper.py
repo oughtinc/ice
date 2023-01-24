@@ -1,6 +1,7 @@
 import re
 
 from collections.abc import Iterator
+from functools import cache
 from pathlib import Path
 from typing import Annotated
 from typing import Literal
@@ -24,7 +25,10 @@ PDF_PARSER_URL = "https://test.elicit.org/elicit-previews/james/oug-3083-support
 
 SectionType = Literal["abstract", "main", "back"]
 
-nltk.download("punkt", quiet=True)
+
+@cache
+def download_punkt():
+    nltk.download("punkt", quiet=False)
 
 
 def get_full_document_id(document_id: str) -> str:
@@ -52,6 +56,7 @@ def is_likely_section_title(text: str):
 
 
 def split_sentences(text: str) -> list[str]:
+    download_punkt()
     return sent_tokenize(text)
 
 
