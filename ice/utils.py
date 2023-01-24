@@ -95,6 +95,7 @@ async def map_async(
     ) -> None:
         async with semaphore:
             result = await fn(input)
+        # TODO why is it written like this?
         result_box.extend([result])
 
         if show_progress_bar:
