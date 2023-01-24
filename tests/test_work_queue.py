@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import uuid
 
 from collections.abc import Callable
@@ -6,6 +7,8 @@ from typing import Any
 from typing import Dict
 from typing import List
 from typing import TypeVar
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class WorkQueue:
@@ -16,6 +19,7 @@ class WorkQueue:
         self.queue: asyncio.Queue = asyncio.Queue()  # TODO why not use a regular queue?
         self.workers: List[asyncio.Task] = []
         self.results: Dict[uuid.UUID, Any] = {}
+        self.loop = asyncio.get_event_loop()
 
     T = TypeVar("T")
 
@@ -28,14 +32,24 @@ class WorkQueue:
         await self.queue.put((u, cv, f, arg))
         async with cv:
             await cv.wait()
-        result = self.results[u]  # TODO dunder?
+        result = self.results[u]
+        del self.results[u]
+        if isinstance(result, Exception):
+            raise result
+        return result
+
+    """
+        task_result = self.results[u]  # TODO dunder?
         del self.results[u]
         # TODO maybe better error handling here
-        return result
+        # TODO check for cancelling
+        match task_result.exception():
+            case None: return task_result.result()
+            case e: raise e"""
 
     def start(self):
         for _ in range(self.max_concurrency):
-            self.workers.append(asyncio.create_task(self._work()))
+            self.workers.append(self.loop.create_task(self._work()))
 
     async def stop(self):
         # TODO is this really 'force stop'?
@@ -45,25 +59,40 @@ class WorkQueue:
     async def _work(self):
         while True:
             uuid, cv, f, arg = await self.queue.get()
-            print(f"invoking f with {arg}")
-            task = f(arg)
-            result = await task
-            self.results[uuid] = result
-            async with cv:
-                cv.notify_all()
+            try:
+                task = f(arg)
+                logging.debug(f"about to await with {arg}")
+                await task
+                logging.debug(f"got result for {arg}")
+                self.results[uuid] = task
+            except Exception as e:
+                self.results[uuid] = e
+            finally:
+                async with cv:
+                    cv.notify_all()
 
 
 MAX_CONCURRENCY = 2
-MAX_TIME_TO_SLEEP = 3
-CONSTANT_RESULT = 1
+MAX_TIME_TO_SLEEP = 1
+
+n_current_accessing = 0
 
 
 async def task(time_to_sleep: float):
-    return await asyncio.sleep(time_to_sleep, result=time_to_sleep)
+    global n_current_accessing
+    n_current_accessing += 1
+    assert n_current_accessing <= MAX_CONCURRENCY - 1  # TODO properly handle errors
+    # TODO also add another test that asserts that we raise an error if we try to access more than MAX_CONCURRENCY
+    result = await asyncio.sleep(time_to_sleep, result=time_to_sleep)
+    n_current_accessing -= 1
+    return result
+    # return await asyncio.sleep(time_to_sleep, result=time_to_sleep)
 
 
 def f(time_to_sleep: float) -> asyncio.Task:
-    t = asyncio.create_task(task(time_to_sleep))
+    loop = asyncio.get_event_loop()
+    loop.set_exception_handler(lambda loop, context: print(context))
+    t = loop.create_task(task(time_to_sleep))
     t.set_name(f"task {time_to_sleep}")
     return t
 
@@ -73,13 +102,12 @@ def test_work_queue():
         queue = WorkQueue(max_concurrency=MAX_CONCURRENCY)
         queue.start()
         enqueued = []
-        times = range(10 + MAX_CONCURRENCY * 2, 0, -1)
+        times = range(MAX_CONCURRENCY * 2, 0, -1)
         for time_to_sleep in times:
             enqueued += [queue.do(f, time_to_sleep)]
         results = []
         for x in asyncio.as_completed(enqueued):
             results += [await x]
-            print(f"got result {results[-1]}")
         assert set(results) == set(times)
         await queue.stop()
 
