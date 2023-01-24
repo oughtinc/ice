@@ -34,14 +34,11 @@ from ice.server import is_server_running
 from ice.settings import OUGHT_ICE_DIR
 from ice.settings import server_url
 from ice.settings import settings
+from ice.utils import make_id
 
 from .logging import log_lock
 
 log = get_logger()
-
-
-def make_id() -> str:
-    return ulid.new().str
 
 
 parent_id_var: ContextVar[str] = ContextVar("id")
