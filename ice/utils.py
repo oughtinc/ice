@@ -21,12 +21,22 @@ from typing import Union
 
 import anyio
 import tqdm
+import ulid
 
 from more_itertools import windowed
 from structlog.stdlib import get_logger
 from transformers import GPT2TokenizerFast
 
 log = get_logger()
+
+
+def make_id() -> str:
+    """Return a lexicographically sortable unique ID."""
+    if hasattr(ulid, "new"):
+        # Use the ulid-py version if python-ulid has been clobbered.
+        return ulid.new().str
+    # Otherwise use the python-ulid version.
+    return str(ulid.ULID())
 
 
 def _merge(recurse, path: list, base: dict, nxt: dict) -> dict:
