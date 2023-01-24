@@ -23,8 +23,6 @@ from typing import IO
 from typing import Optional
 from typing import Union
 
-import ulid
-
 from structlog import get_logger
 
 from ice.json_value import JSONValue
