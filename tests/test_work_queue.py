@@ -6,7 +6,6 @@ from typing import Any
 
 import pytest
 
-from ice.utils import wq
 from ice.work_queue import WorkQueue
 
 logging.basicConfig(level=logging.DEBUG)
@@ -61,6 +60,15 @@ def test_if_workers_are_now_cancelled():
     asyncio.run(run())
 
 
+# one alternative to having the workqueue at the top level is to have it as a fixture. but what does that do for library users? i think it's better to have it at the top level so that it's easy to use.
+# the downside, though, is this error state. i think it's because the workers are cancelled, and then we try to access them again. i think we can fix this by making sure that we don't access them again. but i'm not sure how to do that.
+# TODO i think we can fix this by making sure that we don't access them again. but i'm not sure how to do that.
+# TODO i think we can fix this by making sure that we don't access them again. but i'm not sure how to do that.
+# TODO i think we can fix this by making sure that we don't access them again. but i'm not sure how to do that.
+
+wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
+
+
 @pytest.mark.anyio
 async def test_a():
     # TODO shrug we have to do this dance for mypy- probably can fix it
@@ -78,6 +86,8 @@ async def test_b():
     workers_cancelled = [
         w.cancelled() for w in wq.workers
     ]  # TODO This is the problematic state!
+    # (run this with
+    # pytest tests/test_work_queue.py -k "test_a or test_b")
     assert workers_cancelled
 
 

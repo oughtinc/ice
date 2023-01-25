@@ -3,23 +3,15 @@ import os
 import subprocess
 import threading as td
 import time
-
 from collections import defaultdict
-from collections.abc import Awaitable
-from collections.abc import Callable
-from collections.abc import Coroutine
-from collections.abc import Iterable
-from collections.abc import Sequence
+from collections.abc import Awaitable, Callable, Coroutine, Iterable, Sequence
 from enum import Enum
 from functools import cache
 from random import Random
-from typing import Any
-from typing import Generic
-from typing import TypeVar
+from typing import Any, Generic, TypeVar
 
 import anyio
 import tqdm
-
 from more_itertools import windowed
 from structlog.stdlib import get_logger
 from transformers import GPT2TokenizerFast
@@ -65,8 +57,19 @@ def deep_merge(base, nxt):
     return merge_strategy(merge_strategy, [], base, nxt)
 
 
-wq = WorkQueue(1000)  # TODO make this configurable
-# TODO shut down  wq when the program exits
+"""
+opt_wq = None
+
+
+def get_wq():
+    # TODO make this a singleton
+    global opt_wq
+    if not opt_wq:
+        opt_wq = WorkQueue(1000)  # TODO make this configurable
+    # TODO shut down  wq when the program exits
+    return opt_wq
+"""
+
 
 # TODO why is it important that these be covariant?
 InputType_co = TypeVar("InputType_co", covariant=True)
@@ -74,6 +77,7 @@ ReturnType_co = TypeVar("ReturnType_co", covariant=True)
 
 
 async def map_async(
+    wq: WorkQueue,
     input_list: Sequence[InputType_co],
     fn: Callable[[InputType_co], Coroutine[Any, Any, ReturnType_co]],
     max_concurrency: int | None = None,
@@ -90,6 +94,7 @@ async def map_async(
     # TODO i think the error is that [is_cancelled] is shared between all the tests but the event loop is not
     if not wq.is_running:
         wq.start()
+        # TODO why are we not getting the error here
     result_boxes: list[list[ReturnType_co]] = [[] for _ in input_list]
 
     if not semaphore:
@@ -106,7 +111,7 @@ async def map_async(
     ) -> None:
         async with semaphore:
             result = await wq.do(fn, input)
-        # TODO why is it written like this?
+        # TODO why is it written like this? luke said i could change it :)
         result_box.extend([result])
 
         if show_progress_bar:
@@ -123,6 +128,7 @@ async def map_async(
 
 
 async def filter_async(
+    wq: WorkQueue,
     iterable: Iterable[InputType_co],
     fn: Callable[[InputType_co], Coroutine[Any, Any, bool]],
     max_concurrency: int | None = None,
@@ -130,6 +136,7 @@ async def filter_async(
 ) -> list[InputType_co]:
     iterable_list = list(iterable)
     values = await map_async(
+        wq,
         iterable_list,
         fn,
         max_concurrency=max_concurrency,
@@ -179,6 +186,7 @@ AsyncComparator = Callable[[T, T], Awaitable[int]]
 
 
 async def _nsmallest_async(
+    wq: WorkQueue,
     n: int,
     items: list[T],
     cmp: AsyncComparator,
@@ -197,7 +205,7 @@ async def _nsmallest_async(
 
     # partitions[False] contains items < pivot, partitions[True] contains items >= pivot
     partitions = defaultdict(list)
-    keys = await map_async(items, get_key, semaphore=semaphore)
+    keys = await map_async(wq, items, get_key, semaphore=semaphore)
     for item, key in zip(items, keys):
         partitions[key].append(item)
 
@@ -207,22 +215,22 @@ async def _nsmallest_async(
         # that as the seed.
         new_seed = 2 * seed + int(key)
         return key, await _nsmallest_async(
-            n - delta, partitions[key], cmp, semaphore, offset + delta, new_seed
+            wq, n - delta, partitions[key], cmp, semaphore, offset + delta, new_seed
         )
 
     # TODO why do we not need [max_concurrency] inside the [map_async] call?
-    partitions = defaultdict(list, await map_async(list(partitions), recurse))
+    partitions = defaultdict(list, await map_async(wq, list(partitions), recurse))
     return (partitions[False] + [pivot] + partitions[True])[:n]
 
 
-async def nsmallest_async(
+async def nsmallest_async(wq: WorkQueue, 
     n: int,
     items: Iterable[T],
     cmp: AsyncComparator,
     max_concurrency: int | None = None,
 ) -> list[T]:
     semaphore = anyio.Semaphore(max_concurrency) if max_concurrency else None
-    return await _nsmallest_async(n, list(items), cmp, semaphore)
+    return await _nsmallest_async(wq, n, list(items), cmp, semaphore)
 
 
 def flatten(xs: Iterable[Iterable[T]]) -> list[T]:

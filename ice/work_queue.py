@@ -1,13 +1,10 @@
 import asyncio
 import logging
 import uuid
+from collections.abc import Callable, Coroutine
+from typing import Any, Dict, List, TypeVar
 
-from collections.abc import Callable
-from collections.abc import Coroutine
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import TypeVar
+import anyio
 
 
 class WorkQueue:
@@ -21,6 +18,8 @@ class WorkQueue:
         self.results: Dict[uuid.UUID, Any] = {}
         # TODO must we store the asyncio loop?
         self.is_running = False
+        # TODo what if we kept the loop around to help w/ gc...
+        self.loop = None
 
     def _generate_new_task_uuid(self) -> uuid.UUID:
         u = uuid.uuid4()
@@ -71,6 +70,7 @@ class WorkQueue:
             t.add_done_callback(callback)
             self.workers.append(t)
         self.is_running = True
+        self.loop = asyncio.get_running_loop()
 
     async def stop(self):
         # TODO is this really 'force stop'?
