@@ -78,10 +78,14 @@ async def test_a():
     assert [before, after] == [False, True]
     workers_not_cancelled = [not w.cancelled() for w in wq.workers]
     assert workers_not_cancelled
+    # TODO map of loop to workers
+    # TODO what about restarting the workers when they are cancelled?
 
 
 @pytest.mark.anyio
 async def test_b():
+    # was this
+    """
     assert wq.is_running
     workers_cancelled = [
         w.cancelled() for w in wq.workers
@@ -89,13 +93,24 @@ async def test_b():
     # (run this with
     # pytest tests/test_work_queue.py -k "test_a or test_b")
     assert workers_cancelled
+    """
+    before = wq.is_running
+    wq.start()
+    after = wq.is_running
+    assert [before, after] == [False, True]
+    workers_not_cancelled = [not w.cancelled() for w in wq.workers]
+    assert workers_not_cancelled
 
 
 async def main():
+    """
     queue.start()
     await run()
     await run()
     await queue.stop()
+    """
+    await test_a()
+    await test_b()
 
 
 if __name__ == "__main__":
