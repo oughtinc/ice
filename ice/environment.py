@@ -72,7 +72,7 @@ class CliEnvironment(EnvironmentInterface):
     def __init__(self):
         try:
             nest_asyncio.apply()  # Needed for questionary to work
-        except RuntimeError:
+        except Exception:
             log.warning("Nest_asyncio failed to apply.")
             pass
         self._console = Console()
