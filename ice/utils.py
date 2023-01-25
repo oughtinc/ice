@@ -24,6 +24,8 @@ from more_itertools import windowed
 from structlog.stdlib import get_logger
 from transformers import GPT2TokenizerFast
 
+from .work_queue import WorkQueue
+
 log = get_logger()
 
 
@@ -63,6 +65,9 @@ def deep_merge(base, nxt):
     return merge_strategy(merge_strategy, [], base, nxt)
 
 
+wq = WorkQueue(1000)  # TODO make this configurable
+# TODO shut down  wq when the program exits
+
 # TODO why is it important that these be covariant?
 InputType_co = TypeVar("InputType_co", covariant=True)
 ReturnType_co = TypeVar("ReturnType_co", covariant=True)
@@ -82,6 +87,9 @@ async def map_async(
 
     Inspired by http://bluebirdjs.com/docs/api/promise.map.html
     """
+    # TODO i think the error is that [is_cancelled] is shared between all the tests but the event loop is not
+    if not wq.is_running:
+        wq.start()
     result_boxes: list[list[ReturnType_co]] = [[] for _ in input_list]
 
     if not semaphore:
@@ -90,26 +98,14 @@ async def map_async(
     if show_progress_bar:
         progress_bar = tqdm.tqdm(total=len(input_list))
 
-    from .work_queue import WorkQueue
-
     # TODO what about unbounded work queues?
     # also assert that the input isn't negative
-    wq = WorkQueue(max_concurrency or len(input_list))
-    wq.start()
 
     async def box_result(
         input: Any, result_box: list[ReturnType_co], semaphore: anyio.Semaphore
     ) -> None:
         async with semaphore:
-            # TODO should we have our work queue take in stuff that produces coroutines instead?
-            def fn_wrapper(x):
-                coro = fn(x)
-                import asyncio
-
-                # TODO i think this will fail
-                return asyncio.create_task(coro)
-
-            result = await wq.do(fn_wrapper, input)
+            result = await wq.do(fn, input)
         # TODO why is it written like this?
         result_box.extend([result])
 
@@ -123,7 +119,6 @@ async def map_async(
     if show_progress_bar:
         progress_bar.close()
 
-    await wq.stop()  # TODO how to clean this up?
     return [result_box[0] for result_box in result_boxes]
 
 

@@ -3,6 +3,7 @@ import logging
 import uuid
 
 from collections.abc import Callable
+from collections.abc import Coroutine
 from typing import Any
 from typing import Dict
 from typing import List
@@ -19,6 +20,7 @@ class WorkQueue:
         self.workers: List[asyncio.Task] = []
         self.results: Dict[uuid.UUID, Any] = {}
         # TODO must we store the asyncio loop?
+        self.is_running = False
 
     def _generate_new_task_uuid(self) -> uuid.UUID:
         u = uuid.uuid4()
@@ -28,7 +30,7 @@ class WorkQueue:
 
     T = TypeVar("T")
 
-    async def do(self, f: Callable[[T], asyncio.Task], arg: T):
+    async def do(self, f: Callable[[T], Coroutine[Any, Any, Any]], arg: T):
         """returns when the task is done"""
         u = self._generate_new_task_uuid()
         cv = asyncio.Condition()
@@ -54,13 +56,27 @@ class WorkQueue:
             case e: raise e"""
 
     def start(self):
+        if self.is_running:
+            raise RuntimeError("already running")
+        self.workers = []  # TODO probably ehh
         for _ in range(self.max_concurrency):
-            self.workers.append(asyncio.create_task(self._work()))
+            t = asyncio.create_task(self._work())
+
+            def callback(x):
+                import traceback
+
+                traceback.print_stack()
+                logging.debug(f"worker done: {x}")
+
+            t.add_done_callback(callback)
+            self.workers.append(t)
+        self.is_running = True
 
     async def stop(self):
         # TODO is this really 'force stop'?
         for worker in self.workers:
             worker.cancel()
+        self.is_running = False
 
     async def _work(self):
         while True:
@@ -68,9 +84,8 @@ class WorkQueue:
             try:
                 task = f(arg)
                 logging.debug(f"about to await with {arg}")
-                await task
+                self.results[uuid] = await task
                 logging.debug(f"got result for {arg}")
-                self.results[uuid] = task.result()
             except Exception as e:
                 self.results[uuid] = e
             finally:
