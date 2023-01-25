@@ -1,4 +1,6 @@
 from collections.abc import Mapping
+from typing import Optional
+from typing import Union
 
 import httpx
 
@@ -104,8 +106,8 @@ def raise_if_too_long_error(prompt: object, response: Response) -> None:
     after=log_attempt_number,
 )
 async def _post(
-    endpoint: str, json: dict, timeout: float | None = None, cache_id: int = 0
-) -> dict | TooLongRequestError:
+    endpoint: str, json: dict, timeout: Optional[float] = None, cache_id: int = 0
+) -> Union[dict, TooLongRequestError]:
     """Send a POST request to the OpenAI API and return the JSON response."""
     cache_id  # unused
 
@@ -114,7 +116,7 @@ async def _post(
             f"{OPENAI_BASE_URL}/{endpoint}",
             json=json,
             headers=make_headers(),
-            timeout=timeout,
+            timeout=timeout or 60,
         )
         if response.status_code == 429:
             raise RateLimitError(response)
@@ -137,13 +139,13 @@ def get_davinci_equivalent_tokens(response: dict) -> int:
 @trace
 async def openai_complete(
     prompt: str,
-    stop: str | None = "\n",
+    stop: Optional[str] = "\n",
     top_p: float = 1,
     temperature: float = 0,
     model: str = "text-davinci-002",
     max_tokens: int = 256,
-    logprobs: int | None = None,
-    logit_bias: Mapping[str, int | float] | None = None,
+    logprobs: Optional[int] = None,
+    logit_bias: Optional[Mapping[str, Union[int, float]]] = None,
     n: int = 1,
     echo: bool = False,
     cache_id: int = 0,  # for repeated non-deterministic sampling using caching

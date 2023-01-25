@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 from structlog.stdlib import get_logger
 
@@ -136,7 +138,7 @@ Does model result E capture all important information from gold standard E?"""
 
 
 class ResultComparison(BaseModel):
-    missing_info: str | None = None
+    missing_info: Optional[str] = None
     is_complete: bool
     p_complete: float
 
@@ -144,9 +146,9 @@ class ResultComparison(BaseModel):
 class EvaluateResult(Recipe):
     async def run(
         self,
-        model_result: str | None = None,
-        gold_result: str | None = None,
-        question: str | None = None,
+        model_result: Optional[str] = None,
+        gold_result: Optional[str] = None,
+        question: Optional[str] = None,
     ) -> ResultComparison:
 
         if self.mode == "test":

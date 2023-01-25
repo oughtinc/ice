@@ -1,4 +1,5 @@
 from collections.abc import Mapping
+from typing import Optional
 
 from numerizer.consts import ALL_ORDINALS
 
@@ -26,8 +27,8 @@ class OrdinalWord(PositionalTransform):
     def __init__(
         self,
         capitalize=False,
-        finally_case: str | None = None,
-        special: Mapping[int, str] | None = None,
+        finally_case: Optional[str] = None,
+        special: Optional[Mapping[int, str]] = None,
     ):
         self.capitalize = capitalize
         self.finally_case = finally_case

@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import signal
 
 from collections.abc import Awaitable
@@ -64,12 +65,18 @@ async def stop():
     os.kill(os.getpid(), signal.SIGKILL)
 
 
-@app.get("/{_full_path:path}")
-async def catch_all(_full_path: str):
-    path = dist_dir / "index.html"
-    if not path.exists():
+@app.get("/{path:path}")
+async def catch_all(path: str):
+    # Never serve index.html for API requests or assets
+    if re.match(r"^(?:api|assets)(?:/.*)?$", path):
+        return PlainTextResponse("404 File Not Found", status_code=404)
+
+    index_path = dist_dir / "index.html"
+    if not index_path.exists():
         return PlainTextResponse(
             "ui/index.html not found. Run `npm run build` in the ui directory to create it, "
-            "or run `npm run dev` to run the dev server and access localhost:5173 instead."
+            "or run `npm run dev` to run the dev server and access localhost:5173 instead.",
+            status_code=500,
         )
-    return FileResponse(path)
+
+    return FileResponse(index_path)

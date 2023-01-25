@@ -43,7 +43,7 @@ class EnvironmentInterface(abc.ABC):
         *,
         format_markdown=False,
         wait_for_confirmation=False,
-        file: None | str = None,
+        file: Optional[str] = None,
     ) -> None:
         raise NotImplementedError
 
@@ -72,7 +72,7 @@ class CliEnvironment(EnvironmentInterface):
     def __init__(self):
         try:
             nest_asyncio.apply()  # Needed for questionary to work
-        except RuntimeError:
+        except Exception:
             log.warning("Nest_asyncio failed to apply.")
             pass
         self._console = Console()
@@ -86,7 +86,7 @@ class CliEnvironment(EnvironmentInterface):
         *,
         format_markdown: bool = False,
         wait_for_confirmation: bool = False,
-        file: str | None = None,
+        file: Optional[str] = None,
     ):
         if file:
             output = open(file, "a", encoding="utf-8")
@@ -140,7 +140,7 @@ class CliEnvironment(EnvironmentInterface):
         return cast(str, answer)
 
     async def select(
-        self, prompt: str, choices: list[str], default: str | None = None
+        self, prompt: str, choices: list[str], default: Optional[str] = None
     ) -> str:
         question = self._maybe_print_prompt(prompt)
         answer = questionary.select(question, choices=choices, default=default).ask()

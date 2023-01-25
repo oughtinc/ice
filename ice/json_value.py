@@ -2,11 +2,14 @@ import dataclasses
 
 from inspect import isfunction
 from typing import Any
+from typing import Union
 
 from fvalues import F
 
 
-JSONValue = str | int | float | bool | None | list["JSONValue"] | dict[str, "JSONValue"]
+JSONValue = Union[
+    str, int, float, bool, None, list["JSONValue"], dict[str, "JSONValue"]
+]
 
 
 def to_json_value(x: Any) -> JSONValue:

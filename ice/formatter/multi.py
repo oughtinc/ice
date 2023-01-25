@@ -5,9 +5,11 @@ from collections import Counter
 from collections.abc import Mapping
 from collections.abc import Sequence
 from typing import final
-from typing import TypeGuard
+from typing import Optional
+from typing import Union
 
 from structlog.stdlib import get_logger
+from typing_extensions import TypeGuard
 
 from ice.formatter.transform import _Transform
 from ice.formatter.transform.dependent import DependentTransform
@@ -33,21 +35,23 @@ class StopSentinel(str):
     """Stop the string here."""
 
 
-literal = str | int | float | StopSentinel
+literal = Union[str, int, float, StopSentinel]
 
-literal_or_transform = literal | _Transform
+literal_or_transform = Union[literal, _Transform]
 
 FormatValues = Sequence[Mapping[str, literal_or_transform]]
 
-_StdLibFormatStringParses = list[tuple[str, str | None, str | None, str | None]]
+_StdLibFormatStringParses = list[
+    tuple[str, Optional[str], Optional[str], Optional[str]]
+]
 
 
-def _is_partial(**fields: literal | _NotNeededSentinel):
+def _is_partial(**fields: Union[literal, _NotNeededSentinel]):
     return any((isinstance(value, StopSentinel) for value in fields.values()))
 
 
 def all_values_needed(
-    examples: Sequence[Mapping[str, literal_or_transform | _NotNeededSentinel]]
+    examples: Sequence[Mapping[str, Union[literal_or_transform, _NotNeededSentinel]]]
 ) -> TypeGuard[Sequence[Mapping[str, literal_or_transform]]]:
     return all(
         (
@@ -104,7 +108,7 @@ def _unparse(parses: _StdLibFormatStringParses) -> str:
 
 
 def _no_sentinels_remaining(
-    concrete_values: dict[str, literal | _NotNeededSentinel]
+    concrete_values: dict[str, Union[literal, _NotNeededSentinel]]
 ) -> TypeGuard[dict[str, literal]]:
     return all(
         (value is not _not_needed_sentinel for value in concrete_values.values())
@@ -114,7 +118,7 @@ def _no_sentinels_remaining(
 def _format_truncate(
     format_placeholder: str,
     /,
-    **concrete_values: literal | _NotNeededSentinel,
+    **concrete_values: Union[literal, _NotNeededSentinel],
 ) -> str:
     if not _is_partial(**concrete_values):
         return format_placeholder
@@ -142,14 +146,16 @@ def _format_truncate(
     return new_str
 
 
-def _has_stop(concrete_values: Mapping[str, literal | _NotNeededSentinel]) -> bool:
+def _has_stop(
+    concrete_values: Mapping[str, Union[literal, _NotNeededSentinel]]
+) -> bool:
     return any(isinstance(value, StopSentinel) for value in concrete_values.values())
 
 
 def _format_single(
     format_placeholder: str,
     /,
-    **concrete_values: literal | _NotNeededSentinel,
+    **concrete_values: Union[literal, _NotNeededSentinel],
 ) -> tuple[str, bool]:
     if not _has_stop(concrete_values):
         formatted = format_placeholder.format_map(concrete_values)
@@ -163,10 +169,10 @@ def _format_single(
 def _apply_transforms(
     cases: Sequence[Mapping[str, literal_or_transform]],
     total: int,
-) -> Sequence[Mapping[str, literal | _NotNeededSentinel]]:
-    ret_list: list[dict[str, literal | _NotNeededSentinel]] = []
+) -> Sequence[Mapping[str, Union[literal, _NotNeededSentinel]]]:
+    ret_list: list[dict[str, Union[literal, _NotNeededSentinel]]] = []
     for position, case in enumerate(cases):
-        ret_dict: dict[str, literal | _NotNeededSentinel] = {}
+        ret_dict: dict[str, Union[literal, _NotNeededSentinel]] = {}
         for k, v in case.items():
             if not isinstance(v, _Transform):
                 ret_dict[k] = v
@@ -212,7 +218,7 @@ def _format_multi(
     return ret_val
 
 
-def stop(value: str | int | float) -> StopSentinel:
+def stop(value: Union[str, int, float]) -> StopSentinel:
     """Stop here; truncate the rest of the format string."""
     return StopSentinel(value)
 
@@ -220,7 +226,7 @@ def stop(value: str | int | float) -> StopSentinel:
 def format_multi(
     format_str: str,
     cases: Sequence[Mapping[str, literal_or_transform]],
-    shared: Mapping[str, literal_or_transform] | None = None,
+    shared: Optional[Mapping[str, literal_or_transform]] = None,
     strip: bool = True,
 ) -> tuple[str, ...]:
     """

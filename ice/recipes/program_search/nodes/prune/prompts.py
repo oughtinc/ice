@@ -3,7 +3,9 @@ import math
 from collections.abc import Mapping
 from collections.abc import Sequence
 from typing import cast
+from typing import Optional
 from typing import TypedDict
+from typing import Union
 
 from ice.formatter.multi import format_multi
 from ice.formatter.multi import stop
@@ -37,7 +39,7 @@ Which excerpts answer the question, from most to least important: 2, 1, 7, 4""",
 Which excerpts answer the question, from most to least important: 2, 6""",
 ]
 
-EXAMPLES: list[dict[str, str | ValueTransform | StopSentinel]] = [
+EXAMPLES: list[dict[str, Union[str, ValueTransform, StopSentinel]]] = [
     dict(
         question="What was the effect size?",
         existing=numbered_list(
@@ -126,7 +128,7 @@ def make_pruning_prompt(
     *,
     question: str,
     existing: Sequence[str],
-    examples: list[RenderablePruningExample] | None = None,
+    examples: Optional[list[RenderablePruningExample]] = None,
 ) -> str:
     all_examples = (examples or EXAMPLES) + [
         dict(

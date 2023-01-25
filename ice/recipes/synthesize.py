@@ -1,3 +1,5 @@
+from typing import Optional
+
 from transformers import GPT2TokenizerFast
 
 from ice.recipe import recipe
@@ -81,7 +83,7 @@ Reference: {reference}
 Excerpt: {abstract}"""
 
 
-def _get_reference(authors: list[str], year: int | None) -> str:
+def _get_reference(authors: list[str], year: Optional[int]) -> str:
     if len(authors) == 0:
         return f"({year})"
     if len(authors) == 1:

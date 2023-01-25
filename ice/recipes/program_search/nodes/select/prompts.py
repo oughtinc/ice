@@ -1,6 +1,8 @@
 from collections.abc import Mapping
 from collections.abc import Sequence
+from typing import Optional
 from typing import TypedDict
+from typing import Union
 
 from ice.formatter.multi import format_multi
 from ice.formatter.multi import stop
@@ -11,7 +13,7 @@ from ice.recipes.program_search.nodes.select.dynamic import SelectionExample
 
 NONE_ANSWER = "None of the new excerpts are needed to answer the question."
 
-EXAMPLES: list[dict[str, str | ValueTransform | StopSentinel]] = [
+EXAMPLES: list[dict[str, Union[str, ValueTransform, StopSentinel]]] = [
     dict(
         question="What was the effect size?",
         existing=numbered_list(
@@ -96,8 +98,8 @@ Excerpt to add to the already chosen excerpts (if they can already answer the qu
 
 class RenderableSelectionExample(TypedDict):
     question: str
-    existing: ValueTransform | str
-    texts: ValueTransform | str
+    existing: Union[ValueTransform, str]
+    texts: Union[ValueTransform, str]
     selections: str
     NONE_ANSWER: str
 
@@ -164,7 +166,7 @@ def make_selection_prompt(
     question: str,
     existing: Sequence[str],
     texts: Sequence[str],
-    examples: list[RenderableSelectionExample] | None = None,
+    examples: Optional[list[RenderableSelectionExample]] = None,
 ) -> str:
     all_examples = (examples or EXAMPLES) + [
         dict(

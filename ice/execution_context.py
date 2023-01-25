@@ -7,7 +7,7 @@ from contextvars import ContextVar
 from typing import Optional
 from typing import TypedDict
 
-import ulid
+from ice.utils import make_id
 
 
 class ExecutionContext(TypedDict):
@@ -21,7 +21,7 @@ __execution_context = ContextVar[ExecutionContext]("execution_context")
 
 def new_context(*, document_id: Optional[str], task: str) -> None:
     context: ExecutionContext = {
-        "id": ulid.new().str,
+        "id": make_id(),
         "document_id": document_id,
         "task": task,
     }
