@@ -60,14 +60,12 @@ interface ClickableDownArrowProps {
   handleClick: () => void;
 }
 
-class ClickableDownArrow extends Component<ClickableDownArrowProps> {
-  override render() {
-    return (
-      <button>
-        <CaretDown onClick={this.props.handleClick} />
-      </button>
-    );
-  }
+function ClickableDownArrow(props: ClickableDownArrowProps) {
+  return (
+    <button onClick={props.handleClick}>
+      <CaretDown />
+    </button>
+  );
 }
 
 function isCollapsible(value: unknown): boolean {
