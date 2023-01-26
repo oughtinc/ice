@@ -1,4 +1,4 @@
-import { useToast } from "@chakra-ui/react";
+import { useToast, UseToastOptions } from "@chakra-ui/react";
 import { getFormattedName } from "/components/TracePage/CallName";
 import {
   FlattenedFStringPart,
@@ -7,7 +7,7 @@ import {
   RawFStringPart,
 } from "/components/TracePage/FString";
 import classNames from "classnames";
-import { Component, useMemo } from "react";
+import { Component, useMemo, useState } from "react";
 import { CaretDown } from "phosphor-react";
 
 type JsonChild =
@@ -31,38 +31,29 @@ interface ArrayRendererProps {
   values: unknown[];
 }
 
-interface ArrayRendererState {
-  expanded: boolean[];
-}
+function ArrayRenderer(props: ArrayRendererProps) {
+  const [expanded, setExpanded] = useState(props.values.map(() => true));
 
-class ArrayRenderer extends Component<ArrayRendererProps, ArrayRendererState> {
-  constructor(props: ArrayRendererProps) {
-    super(props);
-    this.state = {
-      expanded: this.props.values.map(() => true),
-    } as ArrayRendererState;
-  }
-
-  override render() {
-    return this.props.values.map((el, index) => (
-      <div key={index} className="mb-1">
-        <span className="text-gray-600">{`${index + 1}. `}</span>
-        {TypeIdentifiers[getStructuralType(el)]}
-        {isCollapsible(el) ? (
-          <ClickableDownArrow
-            handleClick={() => {
-              this.setState(state => {
-                const expanded = state.expanded.slice();
-                expanded[index] = !expanded[index];
-                return { expanded };
-              });
-            }}
-          />
-        ) : null}
-        {this.state.expanded[index] ? <DetailRenderer data={el} /> : null}
-      </div>
-    ));
-  }
+  return (
+    <div>
+      {props.values.map((el, index) => (
+        <div key={index} className="mb-1">
+          <span className="text-gray-600">{`${index + 1}. `}</span>
+          {TypeIdentifiers[getStructuralType(el)]}
+          {isCollapsible(el) ? (
+            <ClickableDownArrow
+              handleClick={() => {
+                const newExpanded = expanded.slice();
+                newExpanded[index] = !newExpanded[index];
+                setExpanded(newExpanded);
+              }}
+            />
+          ) : null}
+          {expanded[index] ? <DetailRenderer data={el} /> : null}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 interface ClickableDownArrowProps {
@@ -105,38 +96,33 @@ interface ObjectRendererState {
   isExpanded: IsExpandedMap;
 }
 
-class ObjectRenderer extends Component<ObjectRendererProps, ObjectRendererState> {
-  constructor(props: ObjectRendererProps) {
-    super(props);
-    const allExpanded = props.values.reduce((acc, [key, _]) => {
-      acc[key] = true;
-      return acc;
-    }, {} as IsExpandedMap);
-    this.state = {
-      isExpanded: allExpanded,
-    };
-  }
+function ObjectRenderer(props: ObjectRendererProps) {
+  const allExpanded = props.values.reduce((acc, [key, _]) => {
+    acc[key] = true;
+    return acc;
+  }, {} as IsExpandedMap);
+  const [isExpanded, setIsExpanded] = useState(allExpanded);
 
-  override render() {
-    return this.props.values.map(([key, value], index) => (
-      <div key={index} className="mb-1">
-        <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
-        {TypeIdentifiers[getStructuralType(value)]}
-        {isCollapsible(value) ? (
-          <ClickableDownArrow
-            handleClick={() =>
-              this.setState(() => {
-                return {
-                  isExpanded: { ...this.state.isExpanded, [key]: !this.state.isExpanded[key] },
-                };
-              })
-            }
-          />
-        ) : null}
-        {this.state.isExpanded[key] ? <DetailRenderer data={value} /> : null}
-      </div>
-    ));
-  }
+  return (
+    <div>
+      {props.values.map(([key, value], index) => (
+        <div key={index} className="mb-1">
+          <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
+          {TypeIdentifiers[getStructuralType(value)]}
+          {isCollapsible(value) ? (
+            <ClickableDownArrow
+              handleClick={() => {
+                const newExpanded = { ...isExpanded };
+                newExpanded[key] = !newExpanded[key];
+                setIsExpanded(newExpanded);
+              }}
+            />
+          ) : null}
+          {isExpanded[key] ? <DetailRenderer data={value} /> : null}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function buildViewForFString(data: { __fstring__: unknown }): JsonChild {
@@ -186,8 +172,7 @@ function renderForArrayOrObject(view: ArrayView | ObjectView, root?: boolean) {
   );
 }
 
-function renderForValue(view: ValueView) {
-  const toast = useToast();
+function renderForValue(view: ValueView, toast: (x: UseToastOptions | undefined) => void) {
   const value = `${view.value}`;
   return value ? (
     <span
@@ -205,6 +190,7 @@ function renderForValue(view: ValueView) {
 }
 
 export const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
+  const toast = useToast();
   const view: JsonChild = useMemo(() => {
     if (typeof data === "object" && data) {
       return buildViewForArrayOrObject(data);
@@ -215,5 +201,5 @@ export const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }
   if (view.type === "array" || view.type === "object") {
     return renderForArrayOrObject(view, root);
   }
-  return renderForValue(view);
+  return renderForValue(view, toast);
 };
