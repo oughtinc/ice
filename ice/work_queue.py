@@ -16,12 +16,9 @@ class WorkQueue:
     def __init__(self, max_concurrency: int):
         # TODO dunder these?
         self.max_concurrency = max_concurrency
-        # self.queue: asyncio.Queue = asyncio.Queue()  # TODO why not use a regular queue?
         self.workers: List[asyncio.Task] = []
         self.results: Dict[uuid.UUID, Any] = {}
-        # TODO must we store the asyncio loop?
         self.is_running = False
-        # TODo what if we kept the loop around to help w/ gc...
 
     def _generate_new_task_uuid(self) -> uuid.UUID:
         u = uuid.uuid4()
@@ -49,28 +46,16 @@ class WorkQueue:
             raise result
         return result
 
-    """
-        task_result = self.results[u]  # TODO dunder?
-        del self.results[u]
-        # TODO maybe better error handling here
-        # TODO check for cancelling
-        match task_result.exception():
-            case None: return task_result.result()
-            case e: raise e"""
-
     def start(self):
         if self.is_running:
             raise RuntimeError("already running")
-        # TODO use asyncio for this instead of anyio
+        # TODO use anyio for this instead of asyncio? :)
         self.queue: asyncio.Queue = asyncio.Queue()
         self.workers = []  # TODO probably ehh
         for _ in range(self.max_concurrency):
             t = asyncio.create_task(self._work())
 
             def callback(x):
-                # import traceback
-                # traceback.print_stack()
-                # logging.debug(f"worker done: {x}")
                 self.is_running = False
 
             t.add_done_callback(callback)
