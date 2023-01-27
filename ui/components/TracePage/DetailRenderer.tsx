@@ -101,7 +101,9 @@ function ObjectRenderer(props: ObjectRendererProps) {
   const [isExpanded, setIsExpanded] = useState(allExpanded);
 
   if (Object.keys(isExpanded).length !== props.values.length) {
-    setIsExpanded(allExpanded);
+    console.log('old isExpanded', isExpanded)
+    console.log('new isExpanded', allExpanded)
+    // setIsExpanded(allExpanded);
   }
 
   if (props.shouldLogView) console.log("ObjRenderer", props.values);
