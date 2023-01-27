@@ -34,6 +34,11 @@ log = get_logger()
 wq = WorkQueue(1000)  # TODO make this configurable
 
 
+def set_work_queue(new_wq):
+    global wq
+    wq = new_wq
+
+
 def make_id() -> str:
     """Return a lexicographically sortable unique ID."""
     if hasattr(ulid, "new"):

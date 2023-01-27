@@ -5,6 +5,7 @@ from typing import Type
 import nest_asyncio
 import pytest
 
+from ice import utils
 from ice.recipe import Recipe
 from ice.recipes import get_recipe_classes
 from main import main_cli
@@ -42,6 +43,22 @@ tests/test_main.py::test_no_paper_recipes[EvaluateResults]
 
 pytest -k "test_paper_recipes[RankParagraphs] or test_paper_recipes[FunnelSimple]" --collect-only
 """
+
+
+@pytest.fixture(scope="module")
+def anyio_backend():
+    return "asyncio"
+
+
+@pytest.fixture(autouse=True, scope="module")
+async def wq(anyio_backend):
+    from ice.work_queue import WorkQueue
+
+    MAX_CONCURRENCY = 10
+    wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
+    utils.set_work_queue(wq)
+    yield
+    await wq.stop()
 
 
 @pytest.mark.parametrize(

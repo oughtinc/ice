@@ -6,6 +6,7 @@ import pytest
 
 from faker import Faker
 
+from ice import utils
 from ice.paper import Paper
 from ice.recipe import FunctionBasedRecipe
 from ice.recipe import recipe
@@ -25,6 +26,22 @@ for path in primer_recipes_dir.glob("**/*.py"):
     import_module(f"ice.recipes.primer.{module_name}")
 
 paper = Paper.load(Path(root_dir / "papers" / "keenan-2018-tiny.txt"))
+
+
+@pytest.fixture(scope="module")
+def anyio_backend():
+    return "asyncio"
+
+
+@pytest.fixture(autouse=True, scope="module")
+async def wq(anyio_backend):
+    from ice.work_queue import WorkQueue
+
+    MAX_CONCURRENCY = 10
+    wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
+    utils.set_work_queue(wq)
+    yield
+    await wq.stop()
 
 
 @pytest.mark.parametrize("main", recipe.all_recipes)
