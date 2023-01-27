@@ -94,6 +94,8 @@ python -m ice.server start
 
 Then look at the trace IDs in `~/.ought-ice/traces` and visit the corresponding URLs in your browser. (E.g. `http://localhost:8935/traces/$TRACE_ID`.) I **strongly recommend** against opening all the traces in this directory automatically because the visual effect of rapidly opening so many tabs (with a white background?) mimics a strobelight, which could be [dangerous](https://www.pennmedicine.org/updates/blogs/neuroscience-blog/2019/august/surprising-epilepsy-seizure-triggers).
 
+Note that `pytest` can take a while to run :)
+
 ## Terminology
 
 - **Recipes** are decompositions of a task into subtasks.
