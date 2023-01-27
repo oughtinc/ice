@@ -100,25 +100,27 @@ function ObjectRenderer(props: ObjectRendererProps) {
   }, {} as IsExpandedMap);
   const [isExpanded, setIsExpanded] = useState(allExpanded);
 
-  if (props.shouldLogView) console.log('ObjRenderer', props.values)
+  if (props.shouldLogView) console.log("ObjRenderer", props.values);
   return (
     <div>
       {props.values.map(function ([key, value], index) {
-        if (props.shouldLogView) console.log('kv', key, value)
-        return <div key={index} className="mb-1">
-          <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
-          {TypeIdentifiers[getStructuralType(value)]}
-          {isCollapsible(value) ? (
-            <ClickableDownArrow
-              handleClick={() => {
-                const newExpanded = { ...isExpanded };
-                newExpanded[key] = !newExpanded[key];
-                setIsExpanded(newExpanded);
-              }}
-            />
-          ) : null}
-          {isExpanded[key] ? <DetailRenderer data={value} shouldLogView={false} /> : null}
-        </div>
+        if (props.shouldLogView) console.log("kv", key, value);
+        return (
+          <div key={index} className="mb-1">
+            <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
+            {TypeIdentifiers[getStructuralType(value)]}
+            {isCollapsible(value) ? (
+              <ClickableDownArrow
+                handleClick={() => {
+                  const newExpanded = { ...isExpanded };
+                  newExpanded[key] = !newExpanded[key];
+                  setIsExpanded(newExpanded);
+                }}
+              />
+            ) : null}
+            {isExpanded[key] ? <DetailRenderer data={value} shouldLogView={false} /> : null}
+          </div>
+        );
       })}
     </div>
   );
@@ -199,14 +201,21 @@ export const MetailRenderer = ({ data, root }: { data: unknown; root?: boolean }
     return { type: "value", value: data };
   }, [data]);
 
-
   if (view.type === "array" || view.type === "object") {
     return renderForArrayOrObject(view, root);
   }
   return renderForValue(view, toast);
 };
 
-export const DetailRenderer = ({ data, root, shouldLogView }: { data: unknown; root?: boolean, shouldLogView: boolean }) => {
+export const DetailRenderer = ({
+  data,
+  root,
+  shouldLogView,
+}: {
+  data: unknown;
+  root?: boolean;
+  shouldLogView: boolean;
+}) => {
   const toast = useToast();
   const view: JsonChild = useMemo(() => {
     if (typeof data === "object" && data) {
@@ -225,7 +234,9 @@ export const DetailRenderer = ({ data, root, shouldLogView }: { data: unknown; r
     return { type: "value", value: data };
   }, [data]);
 
-  if (shouldLogView) { console.log('view', view) }
+  if (shouldLogView) {
+    console.log("view", view);
+  }
   if (view.type === "array" || view.type === "object") {
     /*return (
       <div className={classNames("flex", root ? undefined : "ml-4")}>
