@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fvalues import F
 
 from ice.recipes.primer.debate.types import *
@@ -11,7 +13,7 @@ def initialize_debate(question: Message) -> Debate:
     ]
 
 
-def render_debate(debate: Debate, self_name: Name | None = None) -> str:
+def render_debate(debate: Debate, self_name: Optional[Name] = None) -> str:
     debate_text = ""
     for speaker, text in debate:
         if speaker == self_name:

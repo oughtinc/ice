@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from typing import Optional
 
 from ice.recipes.meta.eval_text_classification import BinaryClassificationMetrics
 from ice.recipes.meta.eval_text_classification import fuzzy_text_classification_metrics
@@ -9,7 +10,7 @@ async def eval_text_classification(
     candidates: Sequence[str],
     predictions: Sequence[bool],
     ground_truth: Sequence[str],
-    scores: Sequence[float] | None = None,
+    scores: Optional[Sequence[float]] = None,
 ) -> BinaryClassificationMetrics:
     return await fuzzy_text_classification_metrics(
         texts=candidates,

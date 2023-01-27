@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from fastapi import APIRouter
 from fastapi import Header
@@ -23,7 +24,7 @@ async def list_traces():
 
 
 @router.get("/{trace_id}/trace.jsonl")
-async def get_trace(trace_id: str, Range: str | None = Header(None)):
+async def get_trace(trace_id: str, Range: Optional[str] = Header(None)):
     """
     Return the contents of the trace file with the given trace_id.
     Uses the Range header to support partial content requests.
@@ -35,11 +36,11 @@ async def get_trace(trace_id: str, Range: str | None = Header(None)):
 
 
 @router.get("/{trace_id}/block_{block_id}.jsonl")
-async def get_block(trace_id: str, block_id: int, Range: str | None = Header(None)):
+async def get_block(trace_id: str, block_id: int, Range: Optional[str] = Header(None)):
     return get_file(traces_dir / trace_id / f"block_{block_id}.jsonl", Range)
 
 
-def get_file(path: Path, Range: str | None):
+def get_file(path: Path, Range: Optional[str]):
     if not path.exists():
         raise HTTPException(status_code=404, detail="File not found")
 

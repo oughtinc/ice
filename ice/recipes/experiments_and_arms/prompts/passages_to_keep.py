@@ -1,6 +1,8 @@
 from collections.abc import Sequence
 from itertools import chain
 from typing import cast
+from typing import Optional
+from typing import Union
 
 from structlog.stdlib import get_logger
 
@@ -23,7 +25,7 @@ def make_helpfulness_prompt(prefix: str, helpful_line: str, num_excerpts: int) -
 
 List the helpful excerpts here: {translation}""".strip()
 
-    helpfulness_cases: list[dict[str, int | str | StopSentinel]] = [
+    helpfulness_cases: list[dict[str, Union[int, str, StopSentinel]]] = [
         dict(
             num_excerpts=4,
             helpful_line="None of the excerpts were helpful",
@@ -75,7 +77,7 @@ async def _which_paras_were_helpful(
     return [num - 1 for num in extract_nums(completion)]
 
 
-def extract_helpful_line(reasoning: str) -> str | None:
+def extract_helpful_line(reasoning: str) -> Optional[str]:
     lines = reasoning.split("\n")
     helpful_lines = [
         line for line in lines if "were helpful in understanding" in line.lower()

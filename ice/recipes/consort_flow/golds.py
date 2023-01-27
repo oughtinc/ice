@@ -1,6 +1,7 @@
 import itertools
 
 from collections.abc import Sequence
+from typing import Optional
 
 from pydantic import BaseModel
 from tqdm import tqdm
@@ -25,7 +26,7 @@ from ice.settings import settings
 from ice.utils import map_async
 
 
-def get_consort_gs(document_id: str) -> GoldStandard[ConsortFlow] | None:
+def get_consort_gs(document_id: str) -> Optional[GoldStandard[ConsortFlow]]:
     return get_gold_standard(
         document_id=document_id,
         question_short_name="consort_flow",
@@ -105,7 +106,7 @@ def download_papers(
 async def gold_standard_examples_except(
     document_ids_to_exclude: Sequence[str],
     require_quotes: bool = True,
-    limit: int | None = None,
+    limit: Optional[int] = None,
     decontextualize: bool = False,
 ) -> Sequence[GoldStandardExample]:
     blocklist_ids = set(document_ids_to_exclude)
@@ -162,7 +163,7 @@ def narrow_examples(
 async def selection_examples_for_paper(
     paper: Paper,
     max_examples: int = 5,
-    limit_papers: int | None = None,
+    limit_papers: Optional[int] = None,
     decontextualize: bool = False,
 ) -> list[RenderableSelectionExample]:
     golds = await gold_standard_examples_except(

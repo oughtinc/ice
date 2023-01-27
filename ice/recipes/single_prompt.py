@@ -1,3 +1,5 @@
+from typing import Optional
+
 from ice.evaluation.evaluate_recipe_result import RecipeResult
 from ice.metrics.gold_standards import list_experiments
 from ice.paper import get_full_document_id
@@ -15,7 +17,7 @@ def create_recipe_result(
     experiment: str,
     answer: str,
     question_short_name: str,
-    default_answer_classification: str | None,
+    default_answer_classification: Optional[str],
 ) -> RecipeResult:
     return RecipeResult(
         document_id=paper_id,
@@ -36,7 +38,7 @@ class SinglePrompt(Recipe):
     max_tokens: int
     qa_prompt_template: str
     question_short_name: str
-    default_answer_classification: str | None
+    default_answer_classification: Optional[str]
 
     async def run(self, paper: Paper):
 

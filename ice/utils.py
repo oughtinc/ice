@@ -15,10 +15,13 @@ from functools import cache
 from random import Random
 from typing import Any
 from typing import Generic
+from typing import Optional
 from typing import TypeVar
+from typing import Union
 
 import anyio
 import tqdm
+import ulid
 
 from more_itertools import windowed
 from structlog.stdlib import get_logger
@@ -29,6 +32,15 @@ from .work_queue import WorkQueue
 log = get_logger()
 
 wq = WorkQueue(1000)  # TODO make this configurable
+
+
+def make_id() -> str:
+    """Return a lexicographically sortable unique ID."""
+    if hasattr(ulid, "new"):
+        # Use the ulid-py version if python-ulid has been clobbered.
+        return ulid.new().str
+    # Otherwise use the python-ulid version.
+    return str(ulid.ULID())
 
 
 def _merge(recurse, path: list, base: dict, nxt: dict) -> dict:
@@ -89,8 +101,8 @@ ReturnType_co = TypeVar("ReturnType_co", covariant=True)
 async def map_async(
     input_list: Sequence[InputType_co],
     fn: Callable[[InputType_co], Coroutine[Any, Any, ReturnType_co]],
-    max_concurrency: int | None = None,
-    semaphore: anyio.Semaphore | None = None,
+    max_concurrency: Optional[int] = None,
+    semaphore: Optional[anyio.Semaphore] = None,
     show_progress_bar: bool = False,
 ) -> list[ReturnType_co]:
     # TODO add more documentation
@@ -139,7 +151,7 @@ async def map_async(
 async def filter_async(
     iterable: Iterable[InputType_co],
     fn: Callable[[InputType_co], Coroutine[Any, Any, bool]],
-    max_concurrency: int | None = None,
+    max_concurrency: Optional[int] = None,
     show_progress_bar: bool = False,
 ) -> list[InputType_co]:
     iterable_list = list(iterable)
@@ -196,7 +208,7 @@ async def _nsmallest_async(
     n: int,
     items: list[T],
     cmp: AsyncComparator,
-    semaphore: anyio.Semaphore | None,
+    semaphore: Optional[anyio.Semaphore],
     offset: int = 0,
     seed: int = 1,
 ) -> list[T]:
@@ -233,7 +245,7 @@ async def nsmallest_async(
     n: int,
     items: Iterable[T],
     cmp: AsyncComparator,
-    max_concurrency: int | None = None,
+    max_concurrency: Optional[int] = None,
 ) -> list[T]:
     semaphore = anyio.Semaphore(max_concurrency) if max_concurrency else None
     return await _nsmallest_async(n, list(items), cmp, semaphore)
@@ -294,7 +306,7 @@ class DynamicBatcher(Generic[ArgT, ReturnT_co]):
         self.barrier = td.Barrier(self.batch_max_size + 1)
 
         self.samples: dict[int, ArgT] = {}
-        self.results: dict[int, Exception | ReturnT_co] = {}
+        self.results: dict[int, Union[Exception, ReturnT_co]] = {}
         td.Thread(target=self._batch_engine, daemon=True).start()
 
         self.sample_id_generator = itertools.count()

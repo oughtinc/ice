@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Generic
+from typing import Optional
 from typing import Protocol
 from typing import TypeVar
 
@@ -24,7 +25,7 @@ class PaperQaAnswer(Generic[AnswerType_contra]):
     answer: AnswerType_contra
     support_candidates: Sequence[str]
     support_labels: Sequence[bool]
-    support_scores: Sequence[float] | None = None
+    support_scores: Optional[Sequence[float]] = None
 
 
 @dataclass
@@ -58,7 +59,7 @@ class PaperQaMethod(Protocol[AnswerType_contra]):
         self,
         __paper: Paper,
         __question: str,
-        __gold_support: Sequence[str] | None = None,
+        __gold_support: Optional[Sequence[str]] = None,
     ) -> PaperQaAnswer[AnswerType_contra]:
         ...
 
@@ -79,6 +80,6 @@ class ClassificationEvalMethod(Protocol):
         candidates: Sequence[str],
         predictions: Sequence[bool],
         ground_truth: Sequence[str],
-        scores: Sequence[float] | None = None,
+        scores: Optional[Sequence[float]] = None,
     ) -> BinaryClassificationMetrics:
         ...

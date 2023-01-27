@@ -7,6 +7,7 @@ from typing import Any
 from typing import ClassVar
 from typing import Generic
 from typing import Literal
+from typing import Optional
 from typing import overload
 from typing import Type
 from typing import TypeVar
@@ -39,13 +40,13 @@ class GoldStandard(GenericModel, Generic[ParsedGoldStandardType]):
     question_short_name: str
     experiment: str
     answer: str
-    classifications: Sequence[str | None] = []
+    classifications: Sequence[Optional[str]] = []
     quotes: list[str]
-    split: str | None = None
-    answer_model: Type[ParsedGoldStandardType] | None = None
+    split: Optional[str] = None
+    answer_model: Optional[Type[ParsedGoldStandardType]] = None
 
     @cached_property
-    def parsed_answer(self) -> ParsedGoldStandardType | None:
+    def parsed_answer(self) -> Optional[ParsedGoldStandardType]:
         return (
             _parse_answer(self.answer, self.answer_model)
             if self.answer_model is not None
@@ -103,7 +104,7 @@ def add_classifications_column(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _standards_df_to_gold_standards(
-    df: pd.DataFrame, answer_model: Type[ParsedGoldStandardType] | None
+    df: pd.DataFrame, answer_model: Optional[Type[ParsedGoldStandardType]]
 ) -> list[GoldStandard[ParsedGoldStandardType]]:
     return [
         GoldStandard.parse_obj(record | dict(answer_model=answer_model))
@@ -112,7 +113,7 @@ def _standards_df_to_gold_standards(
 
 
 def list_experiments(
-    *, document_id: str | None = None, question_short_name: str | None = None
+    *, document_id: Optional[str] = None, question_short_name: Optional[str] = None
 ) -> list[str]:
     df = retrieve_gold_standards_df()
     df = select_column_values(
@@ -123,7 +124,7 @@ def list_experiments(
 
 
 def select_column_values(
-    df: pd.DataFrame, column_values: dict[str, str | None]
+    df: pd.DataFrame, column_values: dict[str, Optional[str]]
 ) -> pd.DataFrame:
     mask = pd.Series(True, index=df.index)
     for column, value in column_values.items():
@@ -179,9 +180,9 @@ def generate_papers_and_golds(
 @overload
 def get_gold_standards(
     *,
-    document_id: str | None = None,
-    question_short_name: str | None = None,
-    experiment: str | None = None,
+    document_id: Optional[str] = None,
+    question_short_name: Optional[str] = None,
+    experiment: Optional[str] = None,
     model_type: None = None,
 ) -> list[GoldStandard[Any]]:
     ...
@@ -191,19 +192,19 @@ def get_gold_standards(
 def get_gold_standards(
     *,
     model_type: Type[ParsedGoldStandardType],
-    document_id: str | None = None,
-    question_short_name: str | None = None,
-    experiment: str | None = None,
+    document_id: Optional[str] = None,
+    question_short_name: Optional[str] = None,
+    experiment: Optional[str] = None,
 ) -> list[GoldStandard[ParsedGoldStandardType]]:
     ...
 
 
 def get_gold_standards(
     *,
-    document_id: str | None = None,
-    question_short_name: str | None = None,
-    experiment: str | None = None,
-    model_type: Type[ParsedGoldStandardType] | None = None,
+    document_id: Optional[str] = None,
+    question_short_name: Optional[str] = None,
+    experiment: Optional[str] = None,
+    model_type: Optional[Type[ParsedGoldStandardType]] = None,
 ) -> list[GoldStandard[ParsedGoldStandardType]]:
     df = retrieve_gold_standards_df()
 
@@ -221,11 +222,11 @@ def get_gold_standards(
 @overload
 def get_gold_standard(
     *,
-    document_id: str | None = None,
-    question_short_name: str | None = None,
-    experiment: str | None = None,
+    document_id: Optional[str] = None,
+    question_short_name: Optional[str] = None,
+    experiment: Optional[str] = None,
     model_type: None = None,
-) -> GoldStandard[Any] | None:
+) -> Optional[GoldStandard[Any]]:
     ...
 
 
@@ -233,20 +234,20 @@ def get_gold_standard(
 def get_gold_standard(
     *,
     model_type: Type[ParsedGoldStandardType],
-    document_id: str | None = None,
-    question_short_name: str | None = None,
-    experiment: str | None = None,
-) -> GoldStandard[ParsedGoldStandardType] | None:
+    document_id: Optional[str] = None,
+    question_short_name: Optional[str] = None,
+    experiment: Optional[str] = None,
+) -> Optional[GoldStandard[ParsedGoldStandardType]]:
     ...
 
 
 def get_gold_standard(
     *,
-    document_id: str | None = None,
-    question_short_name: str | None = None,
-    experiment: str | None = None,
-    model_type: Type[ParsedGoldStandardType] | None = None,
-) -> GoldStandard[ParsedGoldStandardType] | None:
+    document_id: Optional[str] = None,
+    question_short_name: Optional[str] = None,
+    experiment: Optional[str] = None,
+    model_type: Optional[Type[ParsedGoldStandardType]] = None,
+) -> Optional[GoldStandard[ParsedGoldStandardType]]:
     gold_standards = get_gold_standards(
         document_id=document_id,
         question_short_name=question_short_name,

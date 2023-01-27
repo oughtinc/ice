@@ -4,6 +4,7 @@ from collections import Counter
 from collections.abc import Awaitable
 from collections.abc import Callable
 from typing import Literal
+from typing import Optional
 
 from pydantic import BaseModel
 from pydantic import BaseSettings
@@ -123,7 +124,7 @@ def paragraphs_to_numbered_list(paragraphs: list[str]) -> str:
 
 
 def even_shorter_intervention_generation_prompt(
-    paragraphs: list[str], intervention: str, final_reasoning: str | None = None
+    paragraphs: list[str], intervention: str, final_reasoning: Optional[str] = None
 ) -> str:
     paragraph_n = N_TO_STRING[len(paragraphs)]
     prefix = f"""From the textbook, "Critically Evaluating Interventional Studies," Chapter 3:
@@ -168,7 +169,7 @@ Here's all the information in this paper about adherence, attrition, and complia
 
 
 def shorter_intervention_generation_prompt(
-    paragraphs: list[str], intervention: str, final_reasoning: str | None = None
+    paragraphs: list[str], intervention: str, final_reasoning: Optional[str] = None
 ) -> str:
     paragraph_n = N_TO_STRING[len(paragraphs)]
     prefix = f"""From the textbook, "Critically Evaluating Interventional Studies," Chapter 3:
@@ -224,7 +225,7 @@ Here's all the information in this paper about adherence, attrition, and complia
 
 
 def intervention_generation_prompt(
-    paragraphs: list[str], intervention: str, final_reasoning: str | None = None
+    paragraphs: list[str], intervention: str, final_reasoning: Optional[str] = None
 ) -> str:
     paragraph_n = N_TO_STRING[len(paragraphs)]
     prefix = f"""From the textbook, "Critically Evaluating Interventional Studies," Chapter 3:
@@ -774,15 +775,14 @@ def make_multiple_adherence_prompts(
 @trace
 async def adherence_regex(sentence: str, level: int = 0) -> bool:
     """Simple regex for adherence-related English language patterns."""
-    match level:
-        case 0:
-            pattern = r"\b(adherence|Adherence|had to be excluded|were excluded|had to drop out|dropped out)\b"
-        case 1:
-            pattern = r"\b(withdrew|did not complete the)\b"
-        case 2:
-            pattern = r"\b(was omitted from|complied with)\b"
-        case _:
-            raise ValueError(f"Invalid level: { level }")
+    if level == 0:
+        pattern = r"\b(adherence|Adherence|had to be excluded|were excluded|had to drop out|dropped out)\b"
+    elif level == 1:
+        pattern = r"\b(withdrew|did not complete the)\b"
+    elif level == 2:
+        pattern = r"\b(was omitted from|complied with)\b"
+    else:
+        raise ValueError(f"Invalid level: { level }")
     answer = re.search(pattern, sentence) is not None
     return answer
 
@@ -1058,9 +1058,9 @@ AdherenceClassification = Literal["explicit", "implicit", "missing"]
 
 
 def classification_eq_adherence(
-    prediction: str | None,
-    gold: AdherenceClassification | None,
-) -> bool | None:
+    prediction: Optional[str],
+    gold: Optional[AdherenceClassification],
+) -> Optional[bool]:
     if gold is None or gold == "implicit":
         return None
     if gold not in ["explicit", "missing"]:

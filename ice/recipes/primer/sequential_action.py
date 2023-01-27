@@ -4,6 +4,7 @@ from abc import ABC
 from abc import abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Optional
 
 from fvalues import F
 
@@ -240,7 +241,7 @@ def get_best_action_index(action_choice_probs):
 async def gather_info(
     *,
     question: str,
-    log: Log | None = None,
+    log: Optional[Log] = None,
     max_actions: int = 3,
 ) -> Log:
     if log is None:

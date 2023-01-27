@@ -1,3 +1,5 @@
+from typing import Optional
+
 import httpx
 
 from structlog import get_logger
@@ -9,7 +11,7 @@ log = get_logger()
 
 
 def make_request_body(
-    query: str, num_papers: int = 4, page: int = 0, filters: dict | None = None
+    query: str, num_papers: int = 4, page: int = 0, filters: Optional[dict] = None
 ) -> dict:
     """
     Make the request body for the Elicit search endpoint.
@@ -39,8 +41,8 @@ async def elicit_search(
     num_papers: int = 4,
     page: int = 0,
     has_pdf_filter: bool = False,
-    backend: str | None = None,
-    filters: dict | None = None,
+    backend: Optional[str] = None,
+    filters: Optional[dict] = None,
 ):
     """
     Search Elicit for papers related to a question.

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 from typing import cast
+from typing import Optional
 
 from ice.json_value import JSONValue
 
@@ -13,7 +14,7 @@ class Summarizer:
     depth_limit: int = 4
     float_digits: int = 4
 
-    def summarize(self, x: JSONValue, depth_left: int | None = None):
+    def summarize(self, x: JSONValue, depth_left: Optional[int] = None):
         if depth_left is None:
             depth_left = self.depth_limit
         elif depth_left <= 0:

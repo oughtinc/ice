@@ -1,6 +1,7 @@
 import math
 
 from typing import Any
+from typing import Optional
 
 from structlog.stdlib import get_logger
 
@@ -59,9 +60,9 @@ class OpenAIAgent(Agent):
         *,
         prompt: str,
         choices: tuple[str, ...],
-        default: str | None = None,
+        default: Optional[str] = None,
         verbose: bool = False,
-    ) -> tuple[dict[str, float], str | None]:
+    ) -> tuple[dict[str, float], Optional[str]]:
         """Generate a classification from a list of choices given some context and a question."""
         if verbose:
             self._print_markdown(prompt)

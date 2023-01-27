@@ -1,6 +1,7 @@
 import re
 
 from collections.abc import Iterator
+from functools import cache
 from pathlib import Path
 from typing import Annotated
 from typing import Literal
@@ -24,20 +25,20 @@ PDF_PARSER_URL = "https://test.elicit.org/elicit-previews/james/oug-3083-support
 
 SectionType = Literal["abstract", "main", "back"]
 
-nltk.download("punkt", quiet=True)
+
+@cache
+def download_punkt():
+    nltk.download("punkt", quiet=False)
 
 
 def get_full_document_id(document_id: str) -> str:
-    match document_id:
-        case "abebe-2018-tiny.txt":
-            return "abebe-2018.pdf"
-        case "keenan-2018-tiny.txt":
-            return "keenan-2018.pdf"
-        case _:
-            return document_id
+    return {
+        "abebe-2018-tiny.txt": "abebe-2018.pdf",
+        "keenan-2018-tiny.txt": "keenan-2018.pdf",
+    }.get(document_id, document_id)
 
 
-def get_paper_paths(paper_dir: Path | None = None) -> list[Path]:
+def get_paper_paths(paper_dir: Optional[Path] = None) -> list[Path]:
     if paper_dir is None:
         script_path = Path(__file__).parent.parent
         paper_dir = script_path / "papers/"
@@ -55,6 +56,7 @@ def is_likely_section_title(text: str):
 
 
 def split_sentences(text: str) -> list[str]:
+    download_punkt()
     return sent_tokenize(text)
 
 
@@ -177,4 +179,5 @@ class Paper(BaseModel):
         return "\n\n".join(str(p) for p in self.paragraphs)
 
     def dict(self, *args, **kwargs):
-        return super().dict(*args, **(kwargs | {"exclude": {"paragraphs"}}))
+        kwargs["exclude"] = {"paragraphs"}
+        return super().dict(*args, **kwargs)
