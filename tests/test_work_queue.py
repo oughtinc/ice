@@ -1,53 +1,63 @@
 import asyncio
 import logging
 
-from collections.abc import Coroutine
-from typing import Any
-
 import pytest
 
 from ice.work_queue import WorkQueue
 
 logging.basicConfig(level=logging.DEBUG)
 
-MAX_CONCURRENCY = 2
-
-n_current_accessing = 0
-
-
-async def task(time_to_sleep: float):
-    global n_current_accessing
-    n_current_accessing += 1
-    assert n_current_accessing <= MAX_CONCURRENCY
-    # TODO also add another test that asserts that we raise an error if we try to access more than MAX_CONCURRENCY
-    result = await asyncio.sleep(time_to_sleep, result=time_to_sleep)
-    n_current_accessing -= 1
-    return result
+MAX_CONCURRENCY = 5
+TIME_TO_SLEEP = 0.01
 
 
-def f(time_to_sleep: float) -> Coroutine[Any, Any, Any]:
-    return task(time_to_sleep)
+class FakeResource:
+    def __init__(self, limit: int):
+        self._n_current_accessing = 0
+        self.limit = limit
+
+    async def access(self):
+        self._n_current_accessing += 1
+        assert self._n_current_accessing <= self.limit
+        result = await asyncio.sleep(TIME_TO_SLEEP, result=TIME_TO_SLEEP)
+        self._n_current_accessing -= 1
+        return result
 
 
-queue = WorkQueue(max_concurrency=MAX_CONCURRENCY)
+@pytest.mark.anyio
+async def test_that_work_queue_prevents_overaccess():
+    wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
+    wq.start()
+    fake_resource = FakeResource(limit=MAX_CONCURRENCY + 1)
+    n_tasks = 10 * MAX_CONCURRENCY
+    tasks = [wq.do(lambda _: fake_resource.access(), 1) for _ in range(n_tasks)]
+    results = await asyncio.gather(*tasks)
+    assert results == [TIME_TO_SLEEP] * n_tasks
+    await wq.stop()
 
 
-async def run():
-    enqueued = []
-    # no need to sleep too long; 0.1 is a scaling factor
-    # we have to convert to a list because we need to iterate over it twice
-    times = list(map(lambda x: 0.1 * x, range(MAX_CONCURRENCY * 2, 0, -1)))
-    for time_to_sleep in times:
-        enqueued += [queue.do(f, time_to_sleep)]
-    results = []
-    for x in asyncio.as_completed(enqueued):
-        results += [await x]
-    logging.debug(f"results: {results}")
-    logging.debug(f"times: {times}")
-    assert set(results) == set(times)
-    print(
-        f"are workers cancelled? {[w.cancelled() for _, w in queue._workers.items()]}"
-    )
+@pytest.mark.anyio
+async def test_that_work_queue_with_too_high_limit_raises():
+    wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
+    wq.start()
+    fake_resource = FakeResource(limit=MAX_CONCURRENCY - 1)
+    n_tasks = 10 * MAX_CONCURRENCY
+    try:
+        tasks = [wq.do(lambda _: fake_resource.access(), 1) for _ in range(n_tasks)]
+        await asyncio.gather(*tasks)
+        assert False, "should have raised an exception"
+    except Exception:
+        pass
+    await wq.stop()
+
+
+@pytest.mark.anyio
+async def test_that_tasks_can_return_exceptions_without_raising():
+    wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
+    wq.start()
+    result = await wq.do(lambda _: asyncio.sleep(0, RuntimeError("oops")), arg=1)
+    assert isinstance(result, RuntimeError)
+    await wq.stop()
 
 
 @pytest.fixture(scope="module")
@@ -60,28 +70,6 @@ async def wq(anyio_backend):
     wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
     yield wq
     await wq.stop()
-
-
-@pytest.mark.anyio
-async def test_a(wq):
-    # TODO shrug we have to do this dance for mypy- probably can fix it
-    before = wq._is_running
-    wq.start()
-    after = wq._is_running
-    assert [before, after] == [False, True]
-    workers_not_cancelled = [not w.cancelled() for _, w in wq._workers.items()]
-    assert workers_not_cancelled
-    # TODO what about restarting the workers when they are cancelled?
-
-
-@pytest.mark.anyio
-async def test_b(wq):
-    before = wq._is_running
-    after = wq._is_running
-    assert [before, after] == [True, True]
-    workers_not_cancelled = [not w.cancelled() for _, w in wq._workers.items()]
-    assert workers_not_cancelled
-    assert 5 == await wq.do(f=lambda x: asyncio.sleep(0, x), arg=5)
 
 
 @pytest.mark.anyio

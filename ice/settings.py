@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     OUGHT_ICE_AUTO_BROWSER: bool = True
     PAPER_DIR: Path = Path(__file__).parent.parent / "papers"
 
+    WORK_QUEUE_SIZE: int = 1000
+
     # note these attributes are read differently- see [__getattribute__]
     OPENAI_API_KEY: str = ""
     OUGHT_INFERENCE_API_KEY: str = ""

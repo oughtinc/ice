@@ -20,10 +20,12 @@ class WorkQueue:
     """An unbounded queue of async tasks. Has a maximum concurrency level."""
 
     def __init__(self, max_concurrency: int):
+        assert max_concurrency >= 0
         self._max_concurrency = max_concurrency
         self._workers: Dict[uuid.UUID, asyncio.Task] = {}
         self._results: Dict[uuid.UUID, TaskResult] = {}
         self._is_running = False
+        self._queue: asyncio.Queue
 
     def _generate_new_task_uuid(self) -> uuid.UUID:
         u = uuid.uuid4()
@@ -51,37 +53,34 @@ class WorkQueue:
     def _spawn_worker(self):
         t = asyncio.create_task(self._work())
         u = uuid.uuid4()
+        while u in self._workers:
+            u = uuid.uuid4()
         t.set_name(u)
 
         def callback(x):
             logging.error(f"worker died: {x}. restarting this worker")
             del self._workers[u]
-            self._spawn_worker()
+            if self._is_running:
+                self._spawn_worker()
 
         t.add_done_callback(callback)
-        # TODO assert new uuid
         self._workers[u] = t
 
     def start(self):
         if self._is_running:
             raise RuntimeError("already running")
-        # TODO should maybe declare this as a class variable
-        self._queue: asyncio.Queue = asyncio.Queue()
+        self._queue = asyncio.Queue()
 
         for _ in range(self._max_concurrency):
             self._spawn_worker()
 
-            # TODO add some error handling in a legit way
-
-            # TODO i didn't see any way to do what i want to do with anyio... in particular, spawning tasks and just letting them work
-
         self._is_running = True
 
     async def stop(self):
+        self._is_running = False
         for key in self._workers:
             self._workers[key].cancel()
         self._workers = {}
-        self._is_running = False
 
     async def _work(self):
         while True:

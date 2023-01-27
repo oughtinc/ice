@@ -27,11 +27,12 @@ from more_itertools import windowed
 from structlog.stdlib import get_logger
 from transformers import GPT2TokenizerFast
 
+from .settings import settings
 from .work_queue import WorkQueue
 
 log = get_logger()
 
-wq = WorkQueue(1000)  # TODO make this configurable
+wq = WorkQueue(settings.WORK_QUEUE_SIZE)
 
 
 def set_work_queue(new_wq):
@@ -84,21 +85,6 @@ def deep_merge(base, nxt):
     return merge_strategy(merge_strategy, [], base, nxt)
 
 
-"""
-opt_wq = None
-
-
-def get_wq():
-    # TODO make this a singleton
-    global opt_wq
-    if not opt_wq:
-        opt_wq = WorkQueue(1000)  # TODO make this configurable
-    # TODO shut down  wq when the program exits
-    return opt_wq
-"""
-
-
-# TODO why is it important that these be covariant?
 InputType_co = TypeVar("InputType_co", covariant=True)
 ReturnType_co = TypeVar("ReturnType_co", covariant=True)
 
@@ -110,17 +96,18 @@ async def map_async(
     semaphore: Optional[anyio.Semaphore] = None,
     show_progress_bar: bool = False,
 ) -> list[ReturnType_co]:
-    # TODO add more documentation
+    # TODO someday add more documentation
     """
     [max_concurrency] is the maximum number of concurrent calls to fn. It's often set
     inside the recipe.
 
-    Inspired by http://bluebirdjs.com/docs/api/promise.map.html
+    Inspired by http://bluebirdjs.com/docs/api/promise.map.html.
+
+    Internally, this function uses a [WorkQueue] to manage global concurrency. So,
+    the true number of concurrent calls to [fn] may be lower than [max_concurrency].
     """
-    # TODO i think the error is that [is_cancelled] is shared between all the tests but the event loop is not
     # if not wq.is_running:
     #    wq.start()
-    # TODO why are we not getting the error here
     result_boxes: list[list[ReturnType_co]] = [[] for _ in input_list]
 
     if not semaphore:
@@ -129,15 +116,11 @@ async def map_async(
     if show_progress_bar:
         progress_bar = tqdm.tqdm(total=len(input_list))
 
-    # TODO what about unbounded work queues?
-    # also assert that the input isn't negative
-
     async def box_result(
         input: Any, result_box: list[ReturnType_co], semaphore: anyio.Semaphore
     ) -> None:
         async with semaphore:
             result = await wq.do(fn, input)
-        # TODO why is it written like this? luke said i could change it :)
         result_box.extend([result])
 
         if show_progress_bar:
@@ -241,7 +224,6 @@ async def _nsmallest_async(
             n - delta, partitions[key], cmp, semaphore, offset + delta, new_seed
         )
 
-    # TODO why do we not need [max_concurrency] inside the [map_async] call?
     partitions = defaultdict(list, await map_async(list(partitions), recurse))
     return (partitions[False] + [pivot] + partitions[True])[:n]
 
