@@ -45,23 +45,9 @@ async def run():
     logging.debug(f"results: {results}")
     logging.debug(f"times: {times}")
     assert set(results) == set(times)
-    print(f"are workers cancelled? {[w.cancelled() for _, w in queue.workers.items()]}")
-
-
-def test_work_queue():
-    asyncio.run(run())
-
-
-def test_if_workers_are_now_cancelled():
-    # just call the exact same thing
-    asyncio.run(run())
-
-
-# one alternative to having the workqueue at the top level is to have it as a fixture. but what does that do for library users? i think it's better to have it at the top level so that it's easy to use.
-# the downside, though, is this error state. i think it's because the workers are cancelled, and then we try to access them again. i think we can fix this by making sure that we don't access them again. but i'm not sure how to do that.
-# TODO i think we can fix this by making sure that we don't access them again. but i'm not sure how to do that.
-
-# wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
+    print(
+        f"are workers cancelled? {[w.cancelled() for _, w in queue._workers.items()]}"
+    )
 
 
 @pytest.fixture(scope="module")
@@ -79,37 +65,41 @@ async def wq(anyio_backend):
 @pytest.mark.anyio
 async def test_a(wq):
     # TODO shrug we have to do this dance for mypy- probably can fix it
-    before = wq.is_running
+    before = wq._is_running
     wq.start()
-    after = wq.is_running
+    after = wq._is_running
     assert [before, after] == [False, True]
-    workers_not_cancelled = [not w.cancelled() for _, w in wq.workers.items()]
+    workers_not_cancelled = [not w.cancelled() for _, w in wq._workers.items()]
     assert workers_not_cancelled
-    # TODO map of loop to workers
     # TODO what about restarting the workers when they are cancelled?
 
 
 @pytest.mark.anyio
 async def test_b(wq):
-    # was this
-    """
-    assert wq.is_running
-    workers_cancelled = [
-        w.cancelled() for w in wq.workers
-    ]  # TODO This is the problematic state!
-    # (run this with
-    # pytest tests/test_work_queue.py -k "test_a or test_b")
-    assert workers_cancelled
-    """
-    before = wq.is_running
-    # wq.start()
-    after = wq.is_running
+    before = wq._is_running
+    after = wq._is_running
     assert [before, after] == [True, True]
-    workers_not_cancelled = [not w.cancelled() for _, w in wq.workers.items()]
+    workers_not_cancelled = [not w.cancelled() for _, w in wq._workers.items()]
     assert workers_not_cancelled
     assert 5 == await wq.do(f=lambda x: asyncio.sleep(0, x), arg=5)
 
 
-# TODO also add a test that lambdas that raise exceptions are handled properly (which is to say,
-# we can still handle more work... i think we can test this by raising more exceptions than we have
-# workers, and then checking that we can still handle more work)
+@pytest.mark.anyio
+async def test_can_handle_work_after_exceptions(wq):
+    async def f(should_raise):
+        if should_raise:
+            raise Exception("oops")
+        else:
+            return 5
+
+    for _ in range(MAX_CONCURRENCY * 10):
+        assert 5 == await wq.do(f=f, arg=False)
+    try:
+        await wq.do(f=f, arg=True)
+        assert False, "should have raised an exception"
+    except Exception:
+        pass
+
+    for _, w in wq._workers.items():
+        assert not w.cancelled()
+    assert 5 == await wq.do(f=f, arg=False)
