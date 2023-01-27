@@ -645,7 +645,7 @@ export const InputOutputContent = ({ args, records, result }: InputOutputContent
   const { getBlockValue } = useTreeContext();
   return (
     <>
-      <Json name="Inputs" shouldLogView={true} value={args && excludeMetadata(getBlockValue(args))} />
+      <Json name="Inputs" shouldLogView={true} value={excludeMetadata(getBlockValue(args))} />
       {!isEmpty(records) && (
         <Json
           shouldLogView={false}

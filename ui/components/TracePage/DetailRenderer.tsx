@@ -51,7 +51,7 @@ function ArrayRenderer(props: ArrayRendererProps) {
               }}
             />
           ) : null}
-          {expanded[index] ? <DetailRenderer data={el} shouldLogView={false} /> : null}
+          {expanded[index] ? <DetailRenderer data={el} /> : null}
         </div>
       ))}
     </div>
@@ -100,6 +100,10 @@ function ObjectRenderer(props: ObjectRendererProps) {
   }, {} as IsExpandedMap);
   const [isExpanded, setIsExpanded] = useState(allExpanded);
 
+  if (Object.keys(isExpanded).length !== props.values.length) {
+    setIsExpanded(allExpanded);
+  }
+
   if (props.shouldLogView) console.log("ObjRenderer", props.values);
   return (
     <div>
@@ -118,7 +122,7 @@ function ObjectRenderer(props: ObjectRendererProps) {
                 }}
               />
             ) : null}
-            {isExpanded[key] ? <DetailRenderer data={value} shouldLogView={false} /> : null}
+            {isExpanded[key] ? <DetailRenderer data={value} /> : null}
           </div>
         );
       })}
@@ -158,6 +162,79 @@ function renderForArrayOrObject(view: ArrayView | ObjectView, root?: boolean) {
   );
 }
 
+function TestToSeeIfThingsBreak({ index, el }: { index: number, el: unknown }) {
+  return (
+    <div key={index} className="mb-1">
+      <span className="text-gray-600">{`${index + 1}. `}</span>
+      {TypeIdentifiers[getStructuralType(el)]}
+      <DetailRenderer data={el} />
+    </div>
+  )
+}
+
+function XYZ({ view, root }: { view: ArrayView | ObjectView, root?: boolean }) {
+  // notes: this works fine without usestate; confirming it fails w/ it 
+  // (and only on input???)
+  // is the issue the conditional?
+
+  let keys = []
+  if (view.type === "object") {
+    keys.push(...view.values.map(([key, _]) => key))
+  } else {
+    keys.push(...view.values.map((_, index) => index + 1))
+  }
+  const allExpanded = keys.reduce((acc, key) => {
+    acc[key] = true;
+    return acc;
+  }, {} as IsExpandedMap);
+
+  // TODO oh lol...  (some lines are from copilot)
+  // the bug: the state is not being updated when the component is re-rendered
+  // the fix: use a reducer instead of useState
+  // the reason: useState is not a reducer, so it doesn't update the state when the component is re-rendered
+  // bug is that isExpanded doesn't contain the right keys the first time
+  // around, but it does after clicking 'source'
+
+  const [isExpanded, setIsExpanded] = useState(allExpanded);
+  console.log('isExpanded', isExpanded)
+
+  if (view.type === "object") {
+    if (Object.keys(isExpanded).length !== view.values.length) {
+      setIsExpanded(allExpanded);
+    }
+  }
+
+  return (
+    <div className={classNames("flex", root ? undefined : "ml-4")}>
+      <div>
+        {view.type === "array"
+          ? view.values.map((el, index) => (
+            <TestToSeeIfThingsBreak index={index} el={el} />
+          ))
+          :
+          view.values.map(function ([key, value], index) {
+            return (
+              <div key={index} className="mb-1">
+                <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
+                {TypeIdentifiers[getStructuralType(value)]}
+                {isCollapsible(value) ? (
+                  <ClickableDownArrow
+                    handleClick={() => {
+                      console.log('click me pl0x')
+                    }}
+                  />
+                ) : null}
+                {isExpanded[key] ? <DetailRenderer data={value} /> : null}
+              </div>
+            );
+          })
+        }
+        {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
+      </div>
+    </div>
+  );
+}
+
 function renderForValue(view: ValueView, toast: (x: UseToastOptions | undefined) => void) {
   const value = `${view.value}`;
   return value ? (
@@ -175,7 +252,7 @@ function renderForValue(view: ValueView, toast: (x: UseToastOptions | undefined)
   );
 }
 
-export const MetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
+export const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
   const toast = useToast();
   /*const view: JsonChild = useMemo(() => {
     if (typeof data === "object" && data) {
@@ -207,7 +284,7 @@ export const MetailRenderer = ({ data, root }: { data: unknown; root?: boolean }
   return renderForValue(view, toast);
 };
 
-export const DetailRenderer = ({
+export const MetailRenderer = ({
   data,
   root,
   shouldLogView,
@@ -217,50 +294,49 @@ export const DetailRenderer = ({
   shouldLogView: boolean;
 }) => {
   const toast = useToast();
-  const view: JsonChild = useMemo(() => {
-    if (typeof data === "object" && data) {
-      // Array or Object
-      if (Array.isArray(data)) return { type: "array", values: data };
-      if ("__fstring__" in data) {
-        const parts = data.__fstring__ as RawFStringPart[];
-        const flattenedParts = flattenFString(parts);
-        const value = flattenedParts
-          .map(part => (typeof part === "string" ? part : part.value))
-          .join("");
-        return { type: "value", value, fstring: flattenedParts };
+  const view: JsonChild = // useMemo(() => {
+    function () {
+      if (typeof data === "object" && data) {
+        // Array or Object
+        if (Array.isArray(data)) return { type: "array", values: data };
+        if ("__fstring__" in data) {
+          const parts = data.__fstring__ as RawFStringPart[];
+          const flattenedParts = flattenFString(parts);
+          const value = flattenedParts
+            .map(part => (typeof part === "string" ? part : part.value))
+            .join("");
+          return { type: "value", value, fstring: flattenedParts };
+        }
+        return { type: "object", values: Object.entries(data) };
       }
-      return { type: "object", values: Object.entries(data) };
-    }
-    return { type: "value", value: data };
-  }, [data]);
+      return { type: "value", value: data };
+    }()
 
   if (shouldLogView) {
     console.log("view", view);
   }
   if (view.type === "array" || view.type === "object") {
+    return <XYZ view={view} root={root} />
     /*return (
       <div className={classNames("flex", root ? undefined : "ml-4")}>
         <div>
           {view.type === "array"
             ? view.values.map((el, index) => (
-              <div key={index} className="mb-1">
-                <span className="text-gray-600">{`${index + 1}. `}</span>
-                {TypeIdentifiers[getStructuralType(el)]}
-                <DetailRenderer data={el} />
-              </div>
+              <TestToSeeIfThingsBreak index={index} el={el} />
             ))
-            : view.values.map(([key, value], index) => (
+            :
+            view.values.map(([key, value], index) => (
               <div key={index} className="mb-1">
                 <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
                 {TypeIdentifiers[getStructuralType(value)]}
-                <DetailRenderer data={value} />
+                <DetailRenderer data={value} shouldLogView={false} />
               </div>
             ))}
           {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
         </div>
       </div>
     );*/
-    return (
+    /*return (
       <div className={classNames("flex", root ? undefined : "ml-4")}>
         <div>
           {view.type === "array" ? (
@@ -272,7 +348,7 @@ export const DetailRenderer = ({
           {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
         </div>
       </div>
-    );
+    );*/
   }
   const value = `${view.value}`;
   return value ? (
