@@ -1,5 +1,4 @@
 import inspect
-
 from typing import Type
 
 import nest_asyncio
@@ -54,7 +53,7 @@ def anyio_backend():
 async def wq(anyio_backend):
     from ice.work_queue import WorkQueue
 
-    MAX_CONCURRENCY = 10
+    MAX_CONCURRENCY = 1000000
     wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
     utils.set_work_queue(wq)
     yield

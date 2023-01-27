@@ -3,13 +3,11 @@ from inspect import signature
 from pathlib import Path
 
 import pytest
-
 from faker import Faker
 
 from ice import utils
 from ice.paper import Paper
-from ice.recipe import FunctionBasedRecipe
-from ice.recipe import recipe
+from ice.recipe import FunctionBasedRecipe, recipe
 from ice.trace import enable_trace
 
 Faker.seed(0)
@@ -41,7 +39,7 @@ def anyio_backend():
 async def wq(anyio_backend):
     from ice.work_queue import WorkQueue
 
-    MAX_CONCURRENCY = 10
+    MAX_CONCURRENCY = 1
     wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
     utils.set_work_queue(wq)
     yield
@@ -53,6 +51,12 @@ async def wq(anyio_backend):
 async def test_all_primer_recipes(main: FunctionBasedRecipe):
     kwargs = {}
     for p in signature(main).parameters.values():
+        print(f"p={p.annotation}")
+        print(f"{Paper=}")
+        # print(f"{issubclass(Paper, p.annotation)=}")
+        print(f"{issubclass(p.annotation, str)=}")
+        print(f"{type(Paper)=}")
+        print(f"{issubclass(p.annotation, Paper)=}")
         if p.default is not p.empty:
             value = p.default
         elif issubclass(p.annotation, str):
