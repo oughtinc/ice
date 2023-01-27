@@ -454,9 +454,9 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
           isActive={selected}
           {...(isHighlighted(callInfo, highlightedFunction)
             ? {
-                borderColor: "yellow.500",
-                borderWidth: "5px",
-              }
+              borderColor: "yellow.500",
+              borderWidth: "5px",
+            }
             : {})}
         >
           <ArcherElement
@@ -464,10 +464,10 @@ const Call = ({ id, refreshArcherArrows }: { id: string; refreshArcherArrows: ()
             relations={
               expanded
                 ? childIds.map(childId => ({
-                    targetId: lineAnchorId(childId),
-                    targetAnchor: "left",
-                    sourceAnchor: "bottom",
-                  }))
+                  targetId: lineAnchorId(childId),
+                  targetAnchor: "left",
+                  sourceAnchor: "bottom",
+                }))
                 : []
             }
           >
@@ -543,14 +543,14 @@ const ResultComponent = ({ value }: { value: string[] }): JSX.Element => {
   );
 };
 
-const Json = ({ name, value }: { name: string; value: unknown }) => {
+const Json = ({ name, value, shouldLogView }: { name: string; value: unknown, shouldLogView: Boolean }) => {
   return (
     <div>
       <div className="mb-2 font-medium">{name}</div>
       {value === undefined ? (
         <Skeleton className="mt-4 h-4" />
       ) : (
-        <DetailRenderer data={value} root />
+        <DetailRenderer data={value} root shouldLogView />
       )}
     </div>
   );
@@ -609,11 +609,10 @@ type TabButtonProps = {
 
 const TabButton = ({ label, value, tab, setTab }: TabButtonProps) => (
   <button
-    className={`py-2 px-4 ${
-      tab === value
-        ? "text-blue-600 border-b-2 border-blue-600"
-        : "text-gray-600 hover:text-blue-600"
-    }`}
+    className={`py-2 px-4 ${tab === value
+      ? "text-blue-600 border-b-2 border-blue-600"
+      : "text-gray-600 hover:text-blue-600"
+      }`}
     onClick={() => setTab(value)}
   >
     {label}
@@ -646,16 +645,19 @@ export const InputOutputContent = ({ args, records, result }: InputOutputContent
   const { getBlockValue } = useTreeContext();
   return (
     <>
-      <Json name="Inputs" value={excludeMetadata(getBlockValue(args))} />
+      <Json name="Inputs" shouldLogView={true} value={args && excludeMetadata(getBlockValue(args))} />
       {!isEmpty(records) && (
         <Json
+          shouldLogView={false}
           name="Records"
           value={Object.values(records)
             .map(getBlockValue)
             .filter(v => v)}
         />
       )}
-      <Json name="Outputs" value={result && getBlockValue(result)} />
+      <Json name="Outputs"
+        shouldLogView={false}
+        value={result && getBlockValue(result)} />
     </>
   );
 };
@@ -746,27 +748,27 @@ const Trace = ({ traceId }: { traceId: string }) => {
     () =>
       (selectedId
         ? withVimBindings({
-            ArrowUp: () =>
-              maybeSetSelectedId(id => {
-                let lastDescendantOfPrior = getPrior(id);
-                if (!lastDescendantOfPrior) return getParent(id);
+          ArrowUp: () =>
+            maybeSetSelectedId(id => {
+              let lastDescendantOfPrior = getPrior(id);
+              if (!lastDescendantOfPrior) return getParent(id);
 
-                for (;;) {
-                  const lastChild = last(getExpandedChildren(lastDescendantOfPrior));
-                  if (!lastChild) return lastDescendantOfPrior;
-                  lastDescendantOfPrior = lastChild;
-                }
-              }),
-            ArrowDown: () => {
-              maybeSetSelectedId(id => getExpandedChildren(id)[0] || nextFrom(id));
-            },
-            ArrowLeft: () =>
-              getExpandedChildren(selectedId).length
-                ? setExpanded(selectedId, false)
-                : maybeSetSelectedId(getParent),
-            ArrowRight: () => getChildren(selectedId).length && setExpanded(selectedId, true),
-            Escape: () => maybeSetSelectedId(_ => rootId),
-          })
+              for (; ;) {
+                const lastChild = last(getExpandedChildren(lastDescendantOfPrior));
+                if (!lastChild) return lastDescendantOfPrior;
+                lastDescendantOfPrior = lastChild;
+              }
+            }),
+          ArrowDown: () => {
+            maybeSetSelectedId(id => getExpandedChildren(id)[0] || nextFrom(id));
+          },
+          ArrowLeft: () =>
+            getExpandedChildren(selectedId).length
+              ? setExpanded(selectedId, false)
+              : maybeSetSelectedId(getParent),
+          ArrowRight: () => getChildren(selectedId).length && setExpanded(selectedId, true),
+          Escape: () => maybeSetSelectedId(_ => rootId),
+        })
         : {}) as Bindings,
     [
       getChildren,

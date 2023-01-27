@@ -7,7 +7,7 @@ import {
   RawFStringPart,
 } from "/components/TracePage/FString";
 import classNames from "classnames";
-import { Component, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { CaretDown } from "phosphor-react";
 
 type JsonChild =
@@ -29,11 +29,13 @@ const TypeIdentifiers = {
 
 interface ArrayRendererProps {
   values: unknown[];
+  shouldLogView: boolean;
 }
 
 function ArrayRenderer(props: ArrayRendererProps) {
   const [expanded, setExpanded] = useState(props.values.map(() => true));
 
+  // if (props.shouldLogView) console.log('ArrayRenderer', props.values)
   return (
     <div>
       {props.values.map((el, index) => (
@@ -49,7 +51,7 @@ function ArrayRenderer(props: ArrayRendererProps) {
               }}
             />
           ) : null}
-          {expanded[index] ? <DetailRenderer data={el} /> : null}
+          {expanded[index] ? <DetailRenderer data={el} shouldLogView={false} /> : null}
         </div>
       ))}
     </div>
@@ -84,14 +86,11 @@ function isCollapsible(value: unknown): boolean {
 
 interface ObjectRendererProps {
   values: [string, unknown][];
+  shouldLogView: boolean;
 }
 
 interface IsExpandedMap {
   [key: string]: boolean;
-}
-
-interface ObjectRendererState {
-  isExpanded: IsExpandedMap;
 }
 
 function ObjectRenderer(props: ObjectRendererProps) {
@@ -101,10 +100,12 @@ function ObjectRenderer(props: ObjectRendererProps) {
   }, {} as IsExpandedMap);
   const [isExpanded, setIsExpanded] = useState(allExpanded);
 
+  if (props.shouldLogView) console.log('ObjRenderer', props.values)
   return (
     <div>
-      {props.values.map(([key, value], index) => (
-        <div key={index} className="mb-1">
+      {props.values.map(function ([key, value], index) {
+        if (props.shouldLogView) console.log('kv', key, value)
+        return <div key={index} className="mb-1">
           <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
           {TypeIdentifiers[getStructuralType(value)]}
           {isCollapsible(value) ? (
@@ -116,26 +117,11 @@ function ObjectRenderer(props: ObjectRendererProps) {
               }}
             />
           ) : null}
-          {isExpanded[key] ? <DetailRenderer data={value} /> : null}
+          {isExpanded[key] ? <DetailRenderer data={value} shouldLogView={false} /> : null}
         </div>
-      ))}
+      })}
     </div>
   );
-}
-
-function buildViewForFString(data: { __fstring__: unknown }): JsonChild {
-  const parts = data.__fstring__ as RawFStringPart[];
-  const flattenedParts = flattenFString(parts);
-  const value = flattenedParts.map(part => (typeof part === "string" ? part : part.value)).join("");
-  return { type: "value", value, fstring: flattenedParts };
-}
-
-function buildViewForArrayOrObject(data: object): JsonChild {
-  if (Array.isArray(data)) return { type: "array", values: data };
-  if ("__fstring__" in data) {
-    return buildViewForFString(data);
-  }
-  return { type: "object", values: Object.entries(data) };
 }
 
 interface ArrayView {
@@ -159,9 +145,9 @@ function renderForArrayOrObject(view: ArrayView | ObjectView, root?: boolean) {
     <div className={classNames("flex", root ? undefined : "ml-4")}>
       <div>
         {view.type === "array" ? (
-          <ArrayRenderer values={view.values} />
+          <ArrayRenderer values={view.values} shouldLogView={false} />
         ) : (
-          <ObjectRenderer values={view.values} />
+          <ObjectRenderer values={view.values} shouldLogView={false} />
         )}
 
         {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
@@ -187,17 +173,108 @@ function renderForValue(view: ValueView, toast: (x: UseToastOptions | undefined)
   );
 }
 
-export const DetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
+export const MetailRenderer = ({ data, root }: { data: unknown; root?: boolean }) => {
   const toast = useToast();
-  const view: JsonChild = useMemo(() => {
+  /*const view: JsonChild = useMemo(() => {
     if (typeof data === "object" && data) {
       return buildViewForArrayOrObject(data);
     }
     return { type: "value", value: data };
+  }, [data]);*/
+
+  const view: JsonChild = useMemo(() => {
+    if (typeof data === "object" && data) {
+      // Array or Object
+      if (Array.isArray(data)) return { type: "array", values: data };
+      if ("__fstring__" in data) {
+        const parts = data.__fstring__ as RawFStringPart[];
+        const flattenedParts = flattenFString(parts);
+        const value = flattenedParts
+          .map(part => (typeof part === "string" ? part : part.value))
+          .join("");
+        return { type: "value", value, fstring: flattenedParts };
+      }
+      return { type: "object", values: Object.entries(data) };
+    }
+    return { type: "value", value: data };
   }, [data]);
+
 
   if (view.type === "array" || view.type === "object") {
     return renderForArrayOrObject(view, root);
   }
   return renderForValue(view, toast);
+};
+
+export const DetailRenderer = ({ data, root, shouldLogView }: { data: unknown; root?: boolean, shouldLogView: boolean }) => {
+  const toast = useToast();
+  const view: JsonChild = useMemo(() => {
+    if (typeof data === "object" && data) {
+      // Array or Object
+      if (Array.isArray(data)) return { type: "array", values: data };
+      if ("__fstring__" in data) {
+        const parts = data.__fstring__ as RawFStringPart[];
+        const flattenedParts = flattenFString(parts);
+        const value = flattenedParts
+          .map(part => (typeof part === "string" ? part : part.value))
+          .join("");
+        return { type: "value", value, fstring: flattenedParts };
+      }
+      return { type: "object", values: Object.entries(data) };
+    }
+    return { type: "value", value: data };
+  }, [data]);
+
+  if (shouldLogView) { console.log('view', view) }
+  if (view.type === "array" || view.type === "object") {
+    /*return (
+      <div className={classNames("flex", root ? undefined : "ml-4")}>
+        <div>
+          {view.type === "array"
+            ? view.values.map((el, index) => (
+              <div key={index} className="mb-1">
+                <span className="text-gray-600">{`${index + 1}. `}</span>
+                {TypeIdentifiers[getStructuralType(el)]}
+                <DetailRenderer data={el} />
+              </div>
+            ))
+            : view.values.map(([key, value], index) => (
+              <div key={index} className="mb-1">
+                <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
+                {TypeIdentifiers[getStructuralType(value)]}
+                <DetailRenderer data={value} />
+              </div>
+            ))}
+          {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
+        </div>
+      </div>
+    );*/
+    return (
+      <div className={classNames("flex", root ? undefined : "ml-4")}>
+        <div>
+          {view.type === "array" ? (
+            <ArrayRenderer shouldLogView={shouldLogView} values={view.values} />
+          ) : (
+            <ObjectRenderer values={view.values} shouldLogView={shouldLogView} />
+          )}
+
+          {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
+        </div>
+      </div>
+    );
+  }
+  const value = `${view.value}`;
+  return value ? (
+    <span
+      className="inline whitespace-pre-wrap"
+      onClick={() => {
+        navigator.clipboard.writeText(value);
+        toast({ title: "Copied to clipboard", duration: 1000 });
+      }}
+    >
+      {view.fstring ? <FString parts={view.fstring} /> : value}
+    </span>
+  ) : (
+    <span className="text-gray-600">empty</span>
+  );
 };

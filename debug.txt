@@ -1,0 +1,45 @@
+debug data
+
+
+1. is it just the input that has this bug?
+
+
+bug: after clicking on any 'source' button, all the props are properly rendered
+
+yes, the props are the same
+
+this would jive with the usememo theory
+
+
+original props before clicking 'Source'
+
+{
+    "values": [
+        [
+            "prompt",
+            "Which of paragraphs A and B better answers the question \"What were the trial arms (subgroups of participants) of the experiment?\"?\n\nParagraph A: In this cluster-randomized trial, we assigned communities in Malawi, Niger, and Tanzania to four twice-yearly mass distributions of either oral azithromycin (approxi- mately 20 mg per kilogram of body weight) or placebo. Children 1 to 59 months of age were identified in twice-yearly censuses and were offered participation in the trial. Vital status was ..."
+        ],
+        [
+            "stop",
+            [
+                " ",
+                "\n"
+            ]
+        ],
+        "[\"verbose\", false]",
+        "[\"default\", \"\"]",
+        "[\"max_tokens\", 1]"
+    ]
+}
+
+props after clicking 'Source'
+
+{
+    "values": [
+        "[\"prompt\", \"Which of paragraphs A and B better answ…]",
+        "[\"stop\", Array(2)]",
+        "[\"verbose\", false]",
+        "[\"default\", \"\"]",
+        "[\"max_tokens\", 1]"
+    ]
+}
