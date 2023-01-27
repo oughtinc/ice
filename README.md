@@ -88,6 +88,7 @@ You can test that some canonical recipes work with the following. **Be careful!*
 
 ```
 rm -rf ~/.ought-ice/traces
+rm -rf ~/.ought-ice/cache
 pytest
 python -m ice.server start
 ```
