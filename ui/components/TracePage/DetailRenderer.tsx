@@ -164,26 +164,26 @@ function renderForArrayOrObject(view: ArrayView | ObjectView, root?: boolean) {
   );
 }
 
-function TestToSeeIfThingsBreak({ index, el }: { index: number, el: unknown }) {
+function TestToSeeIfThingsBreak({ index, el }: { index: number; el: unknown }) {
   return (
     <div key={index} className="mb-1">
       <span className="text-gray-600">{`${index + 1}. `}</span>
       {TypeIdentifiers[getStructuralType(el)]}
       <DetailRenderer data={el} />
     </div>
-  )
+  );
 }
 
-function XYZ({ view, root }: { view: ArrayView | ObjectView, root?: boolean }) {
-  // notes: this works fine without usestate; confirming it fails w/ it 
+function XYZ({ view, root }: { view: ArrayView | ObjectView; root?: boolean }) {
+  // notes: this works fine without usestate; confirming it fails w/ it
   // (and only on input???)
   // is the issue the conditional?
 
-  let keys = []
+  let keys = [];
   if (view.type === "object") {
-    keys.push(...view.values.map(([key, _]) => key))
+    keys.push(...view.values.map(([key, _]) => key));
   } else {
-    keys.push(...view.values.map((_, index) => index + 1))
+    keys.push(...view.values.map((_, index) => index + 1));
   }
   const allExpanded = keys.reduce((acc, key) => {
     acc[key] = true;
@@ -198,7 +198,7 @@ function XYZ({ view, root }: { view: ArrayView | ObjectView, root?: boolean }) {
   // around, but it does after clicking 'source'
 
   const [isExpanded, setIsExpanded] = useState(allExpanded);
-  console.log('isExpanded', isExpanded)
+  console.log("isExpanded", isExpanded);
 
   if (view.type === "object") {
     if (Object.keys(isExpanded).length !== view.values.length) {
@@ -210,27 +210,23 @@ function XYZ({ view, root }: { view: ArrayView | ObjectView, root?: boolean }) {
     <div className={classNames("flex", root ? undefined : "ml-4")}>
       <div>
         {view.type === "array"
-          ? view.values.map((el, index) => (
-            <TestToSeeIfThingsBreak index={index} el={el} />
-          ))
-          :
-          view.values.map(function ([key, value], index) {
-            return (
-              <div key={index} className="mb-1">
-                <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
-                {TypeIdentifiers[getStructuralType(value)]}
-                {isCollapsible(value) ? (
-                  <ClickableDownArrow
-                    handleClick={() => {
-                      console.log('click me pl0x')
-                    }}
-                  />
-                ) : null}
-                {isExpanded[key] ? <DetailRenderer data={value} /> : null}
-              </div>
-            );
-          })
-        }
+          ? view.values.map((el, index) => <TestToSeeIfThingsBreak index={index} el={el} />)
+          : view.values.map(function ([key, value], index) {
+              return (
+                <div key={index} className="mb-1">
+                  <span className="text-gray-600">{`${getFormattedName(key)}: `}</span>
+                  {TypeIdentifiers[getStructuralType(value)]}
+                  {isCollapsible(value) ? (
+                    <ClickableDownArrow
+                      handleClick={() => {
+                        console.log("click me pl0x");
+                      }}
+                    />
+                  ) : null}
+                  {isExpanded[key] ? <DetailRenderer data={value} /> : null}
+                </div>
+              );
+            })}
         {view.values.length === 0 ? <span className="text-gray-600">Empty</span> : null}
       </div>
     </div>
@@ -297,7 +293,7 @@ export const MetailRenderer = ({
 }) => {
   const toast = useToast();
   const view: JsonChild = // useMemo(() => {
-    function () {
+    (function () {
       if (typeof data === "object" && data) {
         // Array or Object
         if (Array.isArray(data)) return { type: "array", values: data };
@@ -312,13 +308,13 @@ export const MetailRenderer = ({
         return { type: "object", values: Object.entries(data) };
       }
       return { type: "value", value: data };
-    }()
+    })();
 
   if (shouldLogView) {
     console.log("view", view);
   }
   if (view.type === "array" || view.type === "object") {
-    return <XYZ view={view} root={root} />
+    return <XYZ view={view} root={root} />;
     /*return (
       <div className={classNames("flex", root ? undefined : "ml-4")}>
         <div>
