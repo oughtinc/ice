@@ -36,6 +36,7 @@ wq = WorkQueue(settings.WORK_QUEUE_SIZE)
 
 
 def set_work_queue(new_wq):
+    """Set the global work queue. Used by [map_async] to manage concurrency."""
     global wq
     wq = new_wq
 
@@ -104,7 +105,7 @@ async def map_async(
     Inspired by http://bluebirdjs.com/docs/api/promise.map.html.
 
     Internally, this function uses a [WorkQueue] to manage global concurrency. So,
-    the true number of concurrent calls to [fn] may be lower than [max_concurrency].
+    the true number of concurrent calls to [fn] may be lower than [max_concurrency]. The reason for this is to avoid limits such as those imposed by the OS on the number of open files.
     """
     if not wq.is_running:
         wq.start()

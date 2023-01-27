@@ -29,7 +29,6 @@ for path in primer_recipes_dir.glob("**/*.py"):
 paper = Paper.load(Path(root_dir / "papers" / "keenan-2018-tiny.txt"))
 
 # TODO someday: find a way to generalize the module-level fixtures to all tests (or at least document it)
-# TODO test the actual elicit server :)
 
 
 @pytest.fixture(scope="module")

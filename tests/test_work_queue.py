@@ -28,7 +28,7 @@ class FakeResource:
 async def test_that_work_queue_prevents_overaccess():
     wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
     wq.start()
-    fake_resource = FakeResource(limit=MAX_CONCURRENCY + 1)
+    fake_resource = FakeResource(limit=MAX_CONCURRENCY)
     n_tasks = 10 * MAX_CONCURRENCY
     tasks = [wq.do(lambda _: fake_resource.access(), 1) for _ in range(n_tasks)]
     results = await asyncio.gather(*tasks)

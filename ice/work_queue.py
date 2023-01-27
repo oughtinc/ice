@@ -12,7 +12,13 @@ from typing import TypeVar
 
 @dataclass
 class TaskResult:
+    """Used internally by WorkQueue."""
+
     value: Any
+
+    # If true, the value is an exception that should be raised.
+    # (It's not sufficient to just check if value is an exception, because
+    # the user might want to return an exception.)
     should_raise: bool
 
 
@@ -20,7 +26,7 @@ class WorkQueue:
     """An unbounded queue of async tasks. Has a maximum concurrency level."""
 
     def __init__(self, max_concurrency: int):
-        assert max_concurrency >= 0
+        assert max_concurrency > 0
         self._max_concurrency = max_concurrency
         self._workers: Dict[uuid.UUID, asyncio.Task] = {}
         self._results: Dict[uuid.UUID, TaskResult] = {}
@@ -33,10 +39,11 @@ class WorkQueue:
             u = uuid.uuid4()
         return u
 
+    # Used in [do].
     T = TypeVar("T")
 
     async def do(self, f: Callable[[T], Coroutine[Any, Any, Any]], arg: T):
-        """returns when the task is done"""
+        """Returns when the task is done."""
         if not self.is_running:
             self.start()
         u = self._generate_new_task_uuid()
@@ -51,6 +58,8 @@ class WorkQueue:
         return result.value
 
     def _spawn_worker(self):
+        """Spawns a worker and adds it to [self._workers]. If the worker dies,
+        it will be restarted if [self.is_running]."""
         t = asyncio.create_task(self._work())
         u = uuid.uuid4()
         while u in self._workers:

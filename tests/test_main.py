@@ -8,6 +8,7 @@ import pytest
 from ice import utils
 from ice.recipe import Recipe
 from ice.recipes import get_recipe_classes
+from ice.work_queue import WorkQueue
 from main import main_cli
 
 nest_asyncio.apply()
@@ -38,12 +39,6 @@ no_paper_recipe_classes = [
     if not do_not_test(recipe_class) and not takes_paper_arg(recipe_class)
 ]
 
-"""
-tests/test_main.py::test_no_paper_recipes[EvaluateResults]
-
-pytest -k "test_paper_recipes[RankParagraphs] or test_paper_recipes[FunnelSimple]" --collect-only
-"""
-
 
 @pytest.fixture(scope="module")
 def anyio_backend():
@@ -52,7 +47,6 @@ def anyio_backend():
 
 @pytest.fixture(autouse=True, scope="module")
 async def wq(anyio_backend):
-    from ice.work_queue import WorkQueue
 
     MAX_CONCURRENCY = 1000
     wq = WorkQueue(max_concurrency=MAX_CONCURRENCY)
