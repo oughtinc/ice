@@ -106,8 +106,8 @@ async def map_async(
     Internally, this function uses a [WorkQueue] to manage global concurrency. So,
     the true number of concurrent calls to [fn] may be lower than [max_concurrency].
     """
-    # if not wq.is_running:
-    #    wq.start()
+    if not wq.is_running:
+        wq.start()
     result_boxes: list[list[ReturnType_co]] = [[] for _ in input_list]
 
     if not semaphore:

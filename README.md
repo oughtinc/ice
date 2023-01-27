@@ -82,6 +82,18 @@ Also, since some tests are relatively slow, you might want to run the ever-usefu
 pytest -k test_json
 ```
 
+5. Manual testing
+
+You can test that some canonical recipes work with the following. **Be careful!** `rm -rf ~/.ought-ice/traces` will **delete all your traces**.
+
+```
+rm -rf ~/.ought-ice/traces
+pytest
+python -m ice.server start
+```
+
+Then look at the trace IDs in `~/.ought-ice/traces` and visit the corresponding URLs in your browser. (E.g. `http://localhost:8935/traces/$TRACE_ID`.) I **strongly recommend** against opening all the traces in this directory automatically because the visual effect of rapidly opening so many tabs (with a white background?) mimics a strobelight, which could be [dangerous](https://www.pennmedicine.org/updates/blogs/neuroscience-blog/2019/august/surprising-epilepsy-seizure-triggers).
+
 ## Terminology
 
 - **Recipes** are decompositions of a task into subtasks.

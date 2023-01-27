@@ -24,7 +24,7 @@ class WorkQueue:
         self._max_concurrency = max_concurrency
         self._workers: Dict[uuid.UUID, asyncio.Task] = {}
         self._results: Dict[uuid.UUID, TaskResult] = {}
-        self._is_running = False
+        self.is_running = False
         self._queue: asyncio.Queue
 
     def _generate_new_task_uuid(self) -> uuid.UUID:
@@ -37,7 +37,7 @@ class WorkQueue:
 
     async def do(self, f: Callable[[T], Coroutine[Any, Any, Any]], arg: T):
         """returns when the task is done"""
-        if not self._is_running:
+        if not self.is_running:
             self.start()
         u = self._generate_new_task_uuid()
         cv = asyncio.Condition()
@@ -60,24 +60,24 @@ class WorkQueue:
         def callback(x):
             logging.error(f"worker died: {x}. restarting this worker")
             del self._workers[u]
-            if self._is_running:
+            if self.is_running:
                 self._spawn_worker()
 
         t.add_done_callback(callback)
         self._workers[u] = t
 
     def start(self):
-        if self._is_running:
+        if self.is_running:
             raise RuntimeError("already running")
         self._queue = asyncio.Queue()
 
         for _ in range(self._max_concurrency):
             self._spawn_worker()
 
-        self._is_running = True
+        self.is_running = True
 
     async def stop(self):
-        self._is_running = False
+        self.is_running = False
         for key in self._workers:
             self._workers[key].cancel()
         self._workers = {}
