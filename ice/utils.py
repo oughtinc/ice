@@ -75,6 +75,12 @@ def deep_merge(base, nxt):
     return merge_strategy(merge_strategy, [], base, nxt)
 
 
+In = TypeVar("In", covariant=True)
+Out = TypeVar("Out", covariant=True)
+
+
+# the default is for these to be invariant, but that's too rigid. E.g., we want
+# to be able to pass an int to a function that expects a float. (See `map_async`)
 InputType_co = TypeVar("InputType_co", covariant=True)
 ReturnType_co = TypeVar("ReturnType_co", covariant=True)
 
