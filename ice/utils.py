@@ -87,6 +87,9 @@ async def map_async(
     semaphore: Optional[anyio.Semaphore] = None,
     show_progress_bar: bool = False,
 ) -> list[ReturnType_co]:
+    # TODO maybe/someday: `result_boxes` could be changed to have type
+    # `list[Optional[ReturnType_co]]` instead of `list[list[ReturnType_co]]`
+    # without any effect on behavior. it might be a bit clearer.
     result_boxes: list[list[ReturnType_co]] = [[] for _ in input_list]
 
     if not semaphore:
