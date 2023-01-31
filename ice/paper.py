@@ -28,7 +28,10 @@ SectionType = Literal["abstract", "main", "back"]
 
 @cache
 def download_punkt():
-    nltk.download("punkt", quiet=False)
+    try:
+        sent_tokenize("")
+    except LookupError:
+        nltk.download("punkt", quiet=False)
 
 
 def get_full_document_id(document_id: str) -> str:
