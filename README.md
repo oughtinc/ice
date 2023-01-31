@@ -44,7 +44,7 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
 
 1. Set required secrets in `~/.ought-ice/.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format.
 
-1. To learn more, go through [the Primer](https://primer.ought.org/).
+1. Run the Hello World recipe in [the Primer](https://primer.ought.org/) to see the trace rendered.
 
 ## Developing ICE
 
