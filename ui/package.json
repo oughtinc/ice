@@ -48,8 +48,7 @@
     "build": "vite build",
     "dev": "vite",
     "postinstall": "patch-package",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "storybook": "storybook dev -p 6006"
   },
   "version": "0.0.0"
 }
