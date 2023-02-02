@@ -1,6 +1,7 @@
 import dataclasses
 
 from inspect import isfunction
+from math import isnan
 from typing import Any
 from typing import Union
 
@@ -32,6 +33,8 @@ def to_json_value(x: Any) -> JSONValue:
         return to_json_value(dataclasses.asdict(x))
     if isfunction(x):
         return dict(class_name=x.__class__.__name__, name=x.__name__)
-    if isinstance(x, (int, float, str, bool, type(None))):
+    if isinstance(x, float):
+        return None if isnan(x) else x
+    if isinstance(x, (int, str, bool, type(None))):
         return x
     return repr(x)
