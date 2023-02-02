@@ -74,9 +74,9 @@ Note that you don't technically _need_ to run `pre-commit install`, but _not_ do
 
 We use [Storybook](https://storybook.js.org/) for UI tests. You can run them locally:
 
-   ```shell
-   npm --prefix ui run storybook
-   ```
+```shell
+npm --prefix ui run storybook
+```
 
 Note that `build-storybook` is only for CI and shouldn't be run locally.
 
