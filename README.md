@@ -70,6 +70,16 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
 
 Note that you don't technically _need_ to run `pre-commit install`, but _not_ doing so may cause your commits to fail CI. (Which can be noisy, including by generating commits that will e.g. fix formatting.)
 
+### Storybook
+
+We use [Storybook](https://storybook.js.org/) for UI tests. You can run them locally:
+
+   ```shell
+   npm --prefix ui run storybook
+   ```
+
+Note that `build-storybook` is only for CI and shouldn't be run locally.
+
 ## Terminology
 
 - **Recipes** are decompositions of a task into subtasks.
