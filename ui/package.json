@@ -23,7 +23,7 @@
     "@storybook/addon-essentials": "^7.0.0-beta.21",
     "@storybook/addon-interactions": "^7.0.0-beta.21",
     "@storybook/addon-links": "^7.0.0-beta.19",
-    "@storybook/react": "^7.0.0-beta.28",
+    "@storybook/react": "^7.0.0-beta.36",
     "@storybook/react-vite": "^7.0.0-beta.19",
     "@storybook/testing-library": "^0.0.13",
     "@types/node": "18.11.18",
