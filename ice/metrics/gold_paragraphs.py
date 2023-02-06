@@ -87,7 +87,6 @@ in {document_id}. Best recall was {best_recall:.2f}. Best paragraph was:
 
 
 def get_gold_paragraph_df(question_short_name: str):
-
     gold_standards = get_question_gold_standards(question_short_name)
 
     entries = []

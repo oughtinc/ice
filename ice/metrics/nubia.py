@@ -30,7 +30,6 @@ NUBIA_URL = urljoin(settings.OUGHT_INFERENCE_URL, "/nubia/")
 
 
 async def _single_nubia(sample: Sample) -> list[NubiaResponse]:
-
     samples = list(product(sample.left, sample.right))
 
     async with httpx.AsyncClient(
