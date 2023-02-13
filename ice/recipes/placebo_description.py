@@ -60,7 +60,6 @@ class PlaceboDescription(Recipe):
     async def placebo_for_experiment(
         self, paper: Paper, experiment: str, record=recorder
     ) -> str:
-
         # Generate the QA prompt
         qa_prompt = self.make_prompt(paper, experiment)
 
