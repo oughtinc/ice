@@ -18,11 +18,12 @@ import {
 } from "react";
 import { ArcherContainer, ArcherElement } from "react-archer";
 import { ArcherContainerHandle } from "react-archer/lib/ArcherContainer/ArcherContainer.types";
+import { useParams } from "react-router";
+import { useSearchParams } from "react-router-dom";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import Spinner from "./Spinner";
 import { recipes } from "/helpers/recipes";
 import * as COLORS from "/styles/colors.json";
-import { useParams } from "react-router";
 import { getHighlightedCalls, isHighlighted, Toolbar } from "/components/TracePage/Toolbar";
 import { CallFunction, CallName, getFormattedName } from "/components/TracePage/CallName";
 import { CallIconButton } from "./CallIconButton";
@@ -801,7 +802,7 @@ const Trace = ({ traceId }: { traceId: string }) => {
     highlightedFunction,
   } = useTreeContext();
   const { getParent, getChildren, getPrior, getNext } = useLinks();
-  // const params = useParams()
+  const [searchParams] = useSearchParams();
 
   const maybeSetSelectedId = useCallback(
     (update: (id: string) => string | undefined) => {
@@ -920,7 +921,11 @@ const Trace = ({ traceId }: { traceId: string }) => {
               </ArcherContainer>
             </div>
           </div>
-          <Allotment.Pane className="call-table" preferredSize={200}>
+          <Allotment.Pane
+            className="call-table"
+            preferredSize={200}
+            visible={searchParams.has("table")}
+          >
             <Table
               rows={highlightedCalls.map(({ fields = {} }) => fields)}
               rowIds={highlightedCalls.map(({ id }) => id)}
