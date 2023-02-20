@@ -65,7 +65,6 @@ def extract_numbers(text: str) -> list[str]:
 
 
 def classify_example():
-
     abstract = """In this study we will examine the impact of the use of ..."""
     paragraph = """[..] The adherence rate is 88.2%."""
     numbers = extract_numbers(paragraph)

@@ -73,14 +73,13 @@ class DialogState(BaseModel):
     async def multiple_choice(
         self, question: str, answers: list[str]
     ) -> tuple[dict[str, float], "DialogState"]:
-
         answer_prefix = longest_common_prefix(answers).rstrip()
         new_context = f"{self.context}\n\nQ: {question}\n\nA: {answer_prefix}"
         prediction = await self.agent.predict(context=new_context, default=" ")
 
         def lookup_prob(answer: str):
             scores = 0.0
-            for (token, prob) in prediction.items():
+            for token, prob in prediction.items():
                 if answer[len(answer_prefix) :].startswith(token):
                     scores += prob
             return scores
@@ -129,7 +128,6 @@ The paragraph: "{paragraph}"
 
 
 class PlaceboDialogs(Recipe):
-
     verbose = False
 
     msg = SimpleNamespace(
@@ -367,7 +365,6 @@ class PlaceboDialogs(Recipe):
         return {"answer": answer, "quotes": quotes, "component_answers": answers}
 
     async def analyze_experiment(self, paper: Paper, experiment: Experiment):
-
         paragraphs = [
             paragraph
             for paragraph in paper.paragraphs
