@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2023-02-21
+
+### Added
+
+- Secrets are now optional. Any secrets needed to run a recipe will be prompted for
+  and stored in `$OUGHT_ICE_DIR/.env`.
+- ICE now supports Python 3.9 and 3.11.
+
 ## [0.4.0] - 2022-12-27
 
 ### Added
