@@ -23,7 +23,7 @@ ICE is a Python library and trace visualizer for language model programs.
 
 ## Requirements
 
-ICE requires Python 3.10. If you only have newer or older version(s) of Python installed, we recommend using [pyenv](https://github.com/pyenv/pyenv) to install Python 3.10 and manage multiple Python versions.
+ICE requires Python 3.9, 3.10, or 3.11. If you don't have a supported version of Python installed, we recommend using [pyenv](https://github.com/pyenv/pyenv) to install a supported Python version and manage multiple Python versions.
 
 If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
 
@@ -32,7 +32,7 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
 1. As part of general good Python practice, consider first creating and activating a [virtual environment](https://docs.python.org/3/library/venv.html) to avoid installing ICE 'globally'. For example:
 
    ```shell
-   python3.10 -m venv venv
+   python -m venv venv
    source venv/bin/activate
    ```
 
@@ -51,7 +51,7 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
 1. If you want to make changes to ICE itself, clone the repository, then install it in editable mode:
 
    ```shell
-   python3.10 -m venv venv
+   python -m venv venv
    source venv/bin/activate
    pip install --upgrade pip
    pip install -e '.[dev]' --config-settings editable_mode=compat
