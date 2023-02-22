@@ -42,9 +42,9 @@ If you use Windows, you'll need to run ICE inside of [WSL](https://learn.microso
    pip install ought-ice
    ```
 
-1. Set required secrets in `~/.ought-ice/.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format.
-
 1. Run the Hello World recipe in [the Primer](https://primer.ought.org/) to see the trace rendered.
+
+1. Optionally, set secrets (like your OpenAI API key) in `~/.ought-ice/.env`. See [`.env.example`](https://github.com/oughtinc/ice/blob/main/.env.example) for the format. If these are not set, you'll be prompted for them when you run recipes that need them.
 
 ## Developing ICE
 
