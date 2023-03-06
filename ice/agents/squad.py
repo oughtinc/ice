@@ -6,7 +6,6 @@ from ice.agents.base import Agent
 
 class SquadAgent(Agent):
     def __init__(self, model_name: str = "z-uo/roberta-qasper"):
-
         self.nlp = pipeline(
             "question-answering", model=model_name, tokenizer=model_name
         )

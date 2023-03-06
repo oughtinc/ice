@@ -119,7 +119,7 @@ class OpenAIReasoningAgent(Agent):
         # Parse the responses and aggregate the answers and reasonings
         answers: Counter[str] = Counter()
         reasonings: list[str] = []
-        for (i, response_text) in enumerate(response_texts):
+        for i, response_text in enumerate(response_texts):
             # Check if the response contains the answer prefix
             if answer_prefix not in response_text:
                 # If not, request an explicit answer from the API
@@ -200,7 +200,6 @@ class OpenAIReasoningAgent(Agent):
     def _format_result(
         self, answers: Counter[str], reasonings: list[str]
     ) -> tuple[dict[str, float], str]:
-
         # Join the reasonings with counts
         joined_reasonings = self._join_texts_with_counts(reasonings)
 

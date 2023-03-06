@@ -41,7 +41,6 @@ class SinglePrompt(Recipe):
     default_answer_classification: Optional[str]
 
     async def run(self, paper: Paper):
-
         # Get the full paper text and truncate it
         full_paper_text = get_paper_text(paper)
         paper_text = truncate_by_tokens(full_paper_text, max_tokens=self.max_tokens)
