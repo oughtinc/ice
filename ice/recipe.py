@@ -1,7 +1,6 @@
 import asyncio
 import importlib
 import sys
-
 from abc import abstractmethod
 from collections.abc import Awaitable
 from collections.abc import Callable
@@ -19,7 +18,6 @@ from typing import Union
 
 import defopt
 import pandas as pd
-
 from merge_args import merge_args
 from pydantic import BaseSettings
 from structlog.stdlib import get_logger

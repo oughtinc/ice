@@ -1,5 +1,4 @@
 import inspect
-
 from typing import Type
 
 import nest_asyncio

@@ -1,5 +1,4 @@
 import pytest
-
 from structlog.testing import capture_logs
 
 from ice.formatter.multi import _parse

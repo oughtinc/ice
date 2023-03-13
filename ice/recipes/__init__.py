@@ -1,7 +1,5 @@
 from typing import Type
 
-from ice.recipe import Recipe
-
 from .adherence_keyword_baseline import AdherenceKeywordBaseline
 from .adherence_simple import AdherenceSimpleInstruct
 from .adherence_tfew_paragraph import AdherenceParagraphTfew
@@ -22,6 +20,7 @@ from .placebo_tree import PlaceboTree
 from .program_search.nodes.decontext.decontextualize import PaperDecontext
 from .rank_paragraphs import RankParagraphs
 from .subrecipe_example import ExampleMetaRecipe
+from ice.recipe import Recipe
 
 
 def get_recipe_classes() -> list[Type[Recipe]]:

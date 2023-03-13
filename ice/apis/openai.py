@@ -3,7 +3,6 @@ from typing import Optional
 from typing import Union
 
 import httpx
-
 from httpx import Response
 from httpx import TimeoutException
 from structlog.stdlib import get_logger

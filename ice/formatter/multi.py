@@ -1,6 +1,5 @@
 import enum
 import string
-
 from collections import Counter
 from collections.abc import Mapping
 from collections.abc import Sequence

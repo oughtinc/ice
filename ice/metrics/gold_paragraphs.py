@@ -2,12 +2,10 @@
 Make a dataframe that contains the paragraphs that contain the gold standard quotes.
 """
 import asyncio
-
 from pathlib import Path
 from typing import Optional
 
 import pandas as pd
-
 from structlog import get_logger
 
 from ice.cache import diskcache

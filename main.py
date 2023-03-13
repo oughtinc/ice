@@ -1,12 +1,10 @@
 #! /usr/bin/env python
 import asyncio
 import json
-
 from pathlib import Path
 from typing import Optional
 
 import defopt
-
 from structlog.stdlib import get_logger
 
 from ice import execution_context

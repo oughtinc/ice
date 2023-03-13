@@ -4,7 +4,6 @@ from math import factorial
 from typing import TypeVar
 
 import numpy as np
-
 from structlog.stdlib import get_logger
 from tqdm import tqdm
 

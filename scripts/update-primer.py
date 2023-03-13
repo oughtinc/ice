@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import argparse
 import re
-
 from pathlib import Path
 
 root_dir = Path(__file__).parent.parent.parent

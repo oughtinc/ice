@@ -1,5 +1,4 @@
 import math
-
 from collections.abc import Mapping
 from collections.abc import Sequence
 from typing import cast

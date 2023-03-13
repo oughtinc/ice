@@ -1,6 +1,5 @@
 import importlib.util
 import os.path
-
 from typing import Optional
 from typing import Type
 

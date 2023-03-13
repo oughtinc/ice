@@ -1,5 +1,4 @@
 import itertools
-
 from collections.abc import Sequence
 from typing import Optional
 

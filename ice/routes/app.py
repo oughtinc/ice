@@ -2,7 +2,6 @@ import logging
 import os
 import re
 import signal
-
 from collections.abc import Awaitable
 from collections.abc import Callable
 from pathlib import Path

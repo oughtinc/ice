@@ -1,5 +1,4 @@
 import math  # noqa: F401
-
 from abc import ABC
 from abc import abstractmethod
 from collections.abc import Sequence

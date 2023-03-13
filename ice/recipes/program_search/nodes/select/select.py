@@ -4,7 +4,6 @@ from typing import cast
 from typing import Optional
 
 import numpy as np
-
 from anyio import ExceptionGroup
 from structlog.stdlib import get_logger
 

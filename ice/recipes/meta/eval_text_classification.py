@@ -8,7 +8,6 @@ from typing import Union
 
 import matplotlib.pyplot as plt
 import numpy as np
-
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import PrecisionRecallDisplay
 from sklearn.metrics import roc_auc_score

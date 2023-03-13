@@ -1,7 +1,6 @@
 import hashlib
 import json
 import threading
-
 from abc import ABCMeta
 from asyncio import create_task
 from collections.abc import Callable
@@ -25,6 +24,7 @@ from typing import Union
 
 from structlog import get_logger
 
+from .logging import log_lock
 from ice.json_value import JSONValue
 from ice.json_value import to_json_value
 from ice.server import ensure_server_running
@@ -33,8 +33,6 @@ from ice.settings import OUGHT_ICE_DIR
 from ice.settings import server_url
 from ice.settings import settings
 from ice.utils import make_id
-
-from .logging import log_lock
 
 log = get_logger()
 

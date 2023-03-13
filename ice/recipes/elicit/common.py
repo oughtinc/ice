@@ -1,10 +1,8 @@
 import json
-
 from functools import reduce
 from pathlib import Path
 
 import httpx
-
 from dotenv import dotenv_values
 from tenacity import retry
 from tenacity import stop_after_attempt

@@ -15,10 +15,10 @@ repos:
     hooks:
       - id: prettier
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.5.0
+    rev: v3.9.0
     hooks:
       - id: reorder-python-imports
-        args: [--py39-plus, --separate-relative, --separate-from-import]
+        args: [--py39-plus]
   - repo: https://github.com/psf/black
     rev: 22.3.0
     hooks:

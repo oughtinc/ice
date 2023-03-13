@@ -3,7 +3,6 @@ from inspect import signature
 from pathlib import Path
 
 import pytest
-
 from faker import Faker
 
 from ice.paper import Paper

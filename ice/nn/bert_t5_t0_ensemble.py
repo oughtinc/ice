@@ -1,12 +1,10 @@
 import functools
 import re
 import time
-
 from enum import IntEnum
 from typing import Tuple
 
 import torch
-
 from structlog.stdlib import get_logger
 from transformers.models.auto.modeling_auto import AutoModelForSeq2SeqLM
 from transformers.models.auto.tokenization_auto import AutoTokenizer

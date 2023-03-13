@@ -1,5 +1,4 @@
 import re
-
 from collections.abc import Sequence
 from typing import Optional
 from typing import TypedDict

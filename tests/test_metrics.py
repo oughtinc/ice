@@ -1,5 +1,4 @@
 import numpy as np
-
 from pytest import mark
 
 from ice.metrics.base import reduce_scores_dict

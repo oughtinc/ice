@@ -3,7 +3,6 @@ import os
 import subprocess
 import threading as td
 import time
-
 from collections import defaultdict
 from collections.abc import Awaitable
 from collections.abc import Callable
@@ -22,7 +21,6 @@ from typing import Union
 import anyio
 import tqdm
 import ulid
-
 from more_itertools import windowed
 from structlog.stdlib import get_logger
 from transformers import GPT2TokenizerFast
