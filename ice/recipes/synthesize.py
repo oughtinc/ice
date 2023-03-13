@@ -95,7 +95,6 @@ def _get_reference(authors: list[str], year: Optional[int]) -> str:
 
 
 async def synthesize(question: str, abstracts: list[Abstract]) -> str:
-
     papers_str = "\n\n".join(
         [
             PAPER_FORMAT.format(
