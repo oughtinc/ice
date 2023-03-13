@@ -150,7 +150,6 @@ class EvaluateResult(Recipe):
         gold_result: Optional[str] = None,
         question: Optional[str] = None,
     ) -> ResultComparison:
-
         if self.mode == "test":
             model_results, gold_results, question = self.test_data()
             model_result = model_results[0]

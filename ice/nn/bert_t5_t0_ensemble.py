@@ -163,6 +163,7 @@ Possible answers: Yes the number {number} is about the {category} of the study?,
 
 # Credit: https://stackoverflow.com/questions/39936527/python-removing-references-from-a-scientific-paper
 
+
 # Remove citations
 def remove_citations(s: str) -> str:
     return re.sub(r"\s\([A-Z][a-z]+,\s[A-Z][a-z]?\.[^\)]*,\s\d{4}\)", "", s)

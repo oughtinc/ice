@@ -116,7 +116,7 @@ class OpenAIAgent(Agent):
 
         def lookup_prob(choice: str):
             scores = 0.0
-            for (token, prob) in prediction.items():
+            for token, prob in prediction.items():
                 if choice[len(choice_prefix) :].startswith(token):
                     scores += prob
             return scores

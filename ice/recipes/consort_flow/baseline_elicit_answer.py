@@ -24,7 +24,6 @@ async def answer_like_elicit_qa(
     question: str,
     passage: str,
 ) -> str:
-
     prompt = elicit_qa_prompt(
         qa_question=question,
         excerpt=passage,
@@ -68,7 +67,6 @@ def elicit_qa_prompt(
     qa_question: str,
     excerpt: str,
 ) -> str:
-
     full_answer_prefix = "Answer:"
 
     return f"""Answer the question "{qa_question}" based on the excerpt from a research paper. \

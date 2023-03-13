@@ -57,7 +57,7 @@ class Rouge(Metric):
             )
             return RougeResult.parse_obj(result_dict)
 
-        return [await (_compute_single(s)) for s in sample]
+        return [await _compute_single(s) for s in sample]
 
 
 @diskcache()

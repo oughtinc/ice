@@ -259,7 +259,6 @@ async def sequential_action(
     log: list[str] = []
 
     for actions_left in range(max_actions, 0, -1):
-
         sufficient_info = await is_info_sufficient(question, log)
         if sufficient_info:
             break

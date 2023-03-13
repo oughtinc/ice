@@ -73,7 +73,6 @@ class ApprovalAgent(Agent):
         return score
 
     async def _check(self, prompt: str, candidate: str):
-
         approval_prompt = f"""Evaluate whether the following output is correct.
 
 Input:

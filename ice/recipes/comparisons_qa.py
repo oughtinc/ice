@@ -47,7 +47,6 @@ class ComparisonsQA(Recipe):
         num_paragraphs: int = 3,
         answer_prefix: str = DEFAULT_ANSWER_PREFIX,
     ):
-
         rank_paragraphs = RankParagraphs(mode=self.mode)
 
         top_paragraphs = await rank_paragraphs.run(
