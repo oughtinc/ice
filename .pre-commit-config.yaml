@@ -33,3 +33,5 @@ repos:
       - id: mypy
         additional_dependencies: [numpy, httpx, pytest, structlog, types-PyYAML]
         args: [--config-file, mypy.ini]
+ci:
+  autoupdate_schedule: quarterly
