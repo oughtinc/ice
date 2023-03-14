@@ -1,5 +1,4 @@
 import dataclasses
-
 from inspect import isfunction
 from math import isnan
 from typing import Any

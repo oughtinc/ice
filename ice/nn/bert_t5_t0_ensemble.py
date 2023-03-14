@@ -1,12 +1,10 @@
 import functools
 import re
 import time
-
 from enum import IntEnum
 from typing import Tuple
 
 import torch
-
 from structlog.stdlib import get_logger
 from transformers.models.auto.modeling_auto import AutoModelForSeq2SeqLM
 from transformers.models.auto.tokenization_auto import AutoTokenizer
@@ -164,6 +162,7 @@ Possible answers: Yes the number {number} is about the {category} of the study?,
 
 
 # Credit: https://stackoverflow.com/questions/39936527/python-removing-references-from-a-scientific-paper
+
 
 # Remove citations
 def remove_citations(s: str) -> str:

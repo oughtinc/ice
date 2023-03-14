@@ -1,5 +1,4 @@
 import re
-
 from collections import Counter
 from collections.abc import Awaitable
 from collections.abc import Callable
@@ -12,6 +11,8 @@ from structlog.stdlib import get_logger
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.models.gpt2.tokenization_gpt2_fast import GPT2TokenizerFast
 
+from ..trace import recorder
+from ..trace import trace
 from ice.apis.openai import openai_complete
 from ice.evaluation.evaluate_recipe_result import RecipeResult
 from ice.metrics.gold_standards import list_experiments
@@ -22,9 +23,6 @@ from ice.recipe import Recipe
 from ice.utils import filter_async
 from ice.utils import map_async
 from ice.utils import max_by_value
-
-from ..trace import recorder
-from ..trace import trace
 
 
 gpt2_tokenizer: GPT2TokenizerFast = AutoTokenizer.from_pretrained("gpt2")

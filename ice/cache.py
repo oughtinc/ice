@@ -4,7 +4,6 @@ Decorator for caching function results to disk
 import asyncio
 import functools
 import inspect
-
 from pathlib import Path
 
 from ice.settings import CACHE_DIR

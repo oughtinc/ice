@@ -1,5 +1,4 @@
 import math
-
 from functools import partial
 
 from structlog.stdlib import get_logger

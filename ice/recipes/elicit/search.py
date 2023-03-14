@@ -1,7 +1,6 @@
 from typing import Optional
 
 import httpx
-
 from structlog import get_logger
 
 from ice.recipe import recipe

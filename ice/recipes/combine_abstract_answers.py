@@ -4,7 +4,6 @@ from ice.recipes.abstract_qa import DEFAULT_ABSTRACTS
 
 
 def make_prompt(question: str, abstracts: list[Abstract], answers: list[str]) -> str:
-
     abstract_answers_str = "\n\n".join(
         [
             f"Title B{i}: {abstract.title}\nAbstract B{i}: {abstract.text}\nAnswer B{i}: {answer}"

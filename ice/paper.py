@@ -1,5 +1,4 @@
 import re
-
 from collections.abc import Iterator
 from functools import cache
 from pathlib import Path
@@ -9,7 +8,6 @@ from typing import Optional
 
 import nltk
 import requests
-
 from nltk.tokenize import sent_tokenize
 from pydantic import BaseModel
 from pydantic import Field

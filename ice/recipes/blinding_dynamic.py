@@ -22,7 +22,6 @@ Papers that explicitly mention blinding of personnel:
 - vittengl-2009.pdf
 """
 import itertools
-
 from typing import Any
 from typing import Literal
 from typing import Optional
@@ -30,7 +29,6 @@ from typing import Union
 
 import rich
 import tqdm
-
 from pydantic import BaseModel
 from rich.panel import Panel
 from thefuzz import fuzz

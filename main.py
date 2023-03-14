@@ -1,12 +1,10 @@
 #! /usr/bin/env python
 import asyncio
 import json
-
 from pathlib import Path
 from typing import Optional
 
 import defopt
-
 from structlog.stdlib import get_logger
 
 from ice import execution_context
@@ -195,8 +193,7 @@ async def print_results(
     """
     results_json: list[dict] = []
 
-    for (document_id, final_result) in results_by_doc.items():
-
+    for document_id, final_result in results_by_doc.items():
         if json_out is not None:
             results_json.extend(recipe.to_json(final_result))
 

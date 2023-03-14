@@ -1,7 +1,6 @@
 from urllib.parse import urljoin
 
 import httpx
-
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_random_exponential

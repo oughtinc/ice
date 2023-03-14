@@ -1,5 +1,4 @@
 import typing as t
-
 from typing import Optional
 from typing import Union
 

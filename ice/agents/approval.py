@@ -1,5 +1,4 @@
 import shelve
-
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
@@ -74,7 +73,6 @@ class ApprovalAgent(Agent):
         return score
 
     async def _check(self, prompt: str, candidate: str):
-
         approval_prompt = f"""Evaluate whether the following output is correct.
 
 Input:

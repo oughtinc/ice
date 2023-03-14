@@ -1,12 +1,10 @@
 import re
-
 from collections.abc import Callable
 from dataclasses import dataclass
 from time import perf_counter
 
 import torch
 import torch.nn.functional as F
-
 from structlog.stdlib import get_logger
 from torch import nn
 from transformers.models.auto.modeling_auto import AutoModelForSeq2SeqLM

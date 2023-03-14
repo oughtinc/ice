@@ -13,7 +13,6 @@ from typing import Type
 from typing import TypeVar
 
 import pandas as pd
-
 from pydantic import BaseModel
 from pydantic.generics import GenericModel
 from structlog.stdlib import get_logger

@@ -1,6 +1,5 @@
 import json
 import re
-
 from collections.abc import Sequence
 from itertools import islice
 from typing import Optional

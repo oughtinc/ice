@@ -1,5 +1,4 @@
 import re
-
 from collections.abc import Sequence
 
 from ice.formatter.multi import format_multi

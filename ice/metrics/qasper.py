@@ -1,7 +1,6 @@
 # Taken from https://github.com/allenai/qasper-led-baseline/blob/main/scripts/evaluator.py
 import re
 import string
-
 from collections import Counter
 
 
