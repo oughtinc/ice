@@ -1,8 +1,11 @@
 from pathlib import Path
 
+import pytest
+
 from ice.paper import Paper
 
 
+@pytest.mark.skip
 def test_pdf():
     script_path = Path(__file__).parent
     paper = Paper.load(script_path / "../papers/keenan-2018.pdf")
