@@ -1,10 +1,10 @@
 import hashlib
+import inspect
 import json
 import opcode
 import sys
 import threading
 import types
-import inspect
 
 from abc import ABCMeta
 from contextvars import ContextVar
