@@ -4,7 +4,9 @@ import { Link } from "react-router-dom";
 export default function TraceListPage() {
   const [traces, setTraces] = useState<string[]>([]);
   useEffect(() => {
-    fetch("/api/traces/")
+    const prefix = localStorage.getItem("OughtIcePrefix") || "";
+    const tracesUrl = prefix ? prefix + "api/traces/" : "/api/traces/";
+    fetch(tracesUrl)
       .then(res => res.json())
       .then(setTraces);
   }, []);

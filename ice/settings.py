@@ -26,7 +26,8 @@ class Settings(BaseSettings):
     )
     GS_QUOTE_FOUND_THRESHOLD: float = 0.75
     OUGHT_ICE_HOST: str = "0.0.0.0"
-    OUGHT_ICE_PORT: int = 8935
+    OUGHT_ICE_PORT: int = int(environ.get("OUGHT_ICE_PORT", "8935"))
+    OUGHT_ICE_API_PREFIX: str = environ.get("OUGHT_ICE_API_PREFIX", "")
     OUGHT_ICE_AUTO_SERVER: bool = True
     OUGHT_ICE_AUTO_BROWSER: bool = True
     PAPER_DIR: Path = Path(__file__).parent.parent / "papers"

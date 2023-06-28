@@ -143,7 +143,12 @@ const applyUpdates = (calls: Calls, updates: Record<string, unknown>) =>
   });
 
 const urlPrefix = (traceId: string) => {
-  const base = recipes[traceId] ? "https://oughtinc.github.io/static" : "/api";
+  const prefix = localStorage.getItem("OughtIcePrefix") || "";
+  const base = recipes[traceId]
+    ? "https://oughtinc.github.io/static"
+    : prefix
+    ? prefix + "api"
+    : "/api";
   return `${base}/traces/${traceId}`;
 };
 

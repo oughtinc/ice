@@ -15,6 +15,7 @@ from starlette.responses import FileResponse
 from starlette.responses import PlainTextResponse
 
 from ice.routes import traces
+from ice.settings import settings
 from ice.trace import traces_dir
 
 logger = logging.getLogger(__name__)
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 dist_dir = Path(__file__).parent / "ui"
 
 
-app = FastAPI()
+app = FastAPI(root_path=settings.OUGHT_ICE_API_PREFIX)
 
 
 # Add cache-control: no-transform header to all responses
@@ -68,7 +69,7 @@ async def stop():
 async def catch_all(path: str):
     # Never serve index.html for API requests or assets
     if re.match(r"^(?:api|assets)(?:/.*)?$", path):
-        return PlainTextResponse("404 File Not Found", status_code=404)
+        return PlainTextResponse(f"404 File Not Found at {path}", status_code=404)
 
     index_path = dist_dir / "index.html"
     if not index_path.exists():
