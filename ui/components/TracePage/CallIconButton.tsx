@@ -31,8 +31,8 @@ export const CallIconButton = forwardRef(
       variant="outline"
     >
       <span
-        className={`h-4 
-        ${isModelCall || childCount == 0 ? "mx-1" : "mr-1 "} 
+        className={`h-4
+        ${isModelCall || childCount == 0 ? "mx-1" : "mr-1 "}
         ${childCount == 0 ? "relative bottom-0.5" : ""}`}
       >
         {isModelCall ? <ChatCenteredDots /> : childCount || "𝑓"}
