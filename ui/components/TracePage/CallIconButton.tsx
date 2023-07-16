@@ -17,7 +17,7 @@ export const CallIconButton = forwardRef(
     ref,
   ) => (
     <Button
-      className="rounded-full p-1 h-fit mr-2 !shadow-none hover:bg-slate-200 w-12"
+      className="rounded-full p-1 h-fit mr-2 !shadow-none hover:bg-slate-200 w-fit"
       isActive={expanded}
       {...(isModelCall || !childCount
         ? {}
@@ -30,7 +30,13 @@ export const CallIconButton = forwardRef(
       size="md"
       variant="outline"
     >
-      <span className="mr-1">{isModelCall ? <ChatCenteredDots /> : childCount || "𝑓"}</span>
+      <span
+        className={`h-4 
+        ${isModelCall || childCount == 0 ? "mx-1" : "mr-1 "} 
+        ${childCount == 0 ? "relative bottom-0.5" : ""}`}
+      >
+        {isModelCall ? <ChatCenteredDots /> : childCount || "𝑓"}
+      </span>
     </Button>
   ),
 );
