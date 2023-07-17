@@ -16,8 +16,6 @@ import pandas as pd
 from pydantic import BaseModel
 from pydantic.generics import GenericModel
 from structlog.stdlib import get_logger
-from yaml import CLoader as Loader
-from yaml import load
 
 from ice.paper import Paper
 from ice.settings import settings
@@ -60,6 +58,9 @@ class GoldStandard(GenericModel, Generic[ParsedGoldStandardType]):
 def _parse_answer(
     _answer: str, model: Type[ParsedGoldStandardType]
 ) -> ParsedGoldStandardType:
+    from yaml import CLoader as Loader
+    from yaml import load
+
     data = load(_answer, Loader=Loader)
     return model.parse_obj(data)
 
