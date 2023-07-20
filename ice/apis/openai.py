@@ -131,7 +131,7 @@ async def _post(
 # TODO: support more model types for conversion
 
 
-def get_davinci_equivalent_tokens(response: dict) -> int:
+def extract_total_tokens(response: dict) -> int:
     return response.get("usage", {}).get("total_tokens", 0)
 
 
@@ -166,5 +166,36 @@ async def openai_complete(
     response = await _post("completions", json=params, cache_id=cache_id)
     if isinstance(response, TooLongRequestError):
         raise response
-    add_fields(davinci_equivalent_tokens=get_davinci_equivalent_tokens(response))
+    add_fields(davinci_equivalent_tokens=extract_total_tokens(response))
+    return response
+
+
+@trace
+async def openai_chatcomplete(
+    messages: list[dict[str, str]],
+    stop: Optional[str] = "\n",
+    top_p: float = 1,
+    temperature: float = 0,
+    model: str = "gpt-3.5-turbo",
+    max_tokens: int = 256,
+    logit_bias: Optional[Mapping[str, Union[int, float]]] = None,
+    n: int = 1,
+    cache_id: int = 0,  # for repeated non-deterministic sampling using caching
+) -> dict:
+    """Send a completion request to the OpenAI API and return the JSON response."""
+    params = {
+        "messages": messages,
+        "stop": stop,
+        "top_p": top_p,
+        "temperature": temperature,
+        "model": model,
+        "max_tokens": max_tokens,
+        "n": n,
+    }
+    if logit_bias:
+        params["logit_bias"] = logit_bias  # type: ignore[assignment]
+    response = await _post("chat/completions", json=params, cache_id=cache_id)
+    if isinstance(response, TooLongRequestError):
+        raise response
+    add_fields(total_tokens=extract_total_tokens(response))
     return response

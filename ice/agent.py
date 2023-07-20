@@ -8,6 +8,7 @@ from ice.agents.cached import CachedAgent
 from ice.agents.fake import FakeAgent
 from ice.agents.human import HumanAgent
 from ice.agents.openai import OpenAIAgent
+from ice.agents.openai import OpenAIChatCompletionAgent
 from ice.agents.openai_reasoning import OpenAIReasoningAgent
 from ice.agents.ought_inference import OughtInferenceAgent
 from ice.agents.squad import SquadAgent
@@ -24,6 +25,8 @@ except ImportError:
 
 
 MACHINE_AGENTS = {
+    "chatgpt": lambda: OpenAIChatCompletionAgent(model="gpt-3.5-turbo"),
+    "gpt-4": lambda: OpenAIChatCompletionAgent(model="gpt-4"),
     "instruct": lambda: OpenAIAgent(),
     "instruct-reasoning": lambda: OpenAIReasoningAgent(),
     "instruct-reasoning-crowd": lambda: OpenAIReasoningAgent(num_workers=8),

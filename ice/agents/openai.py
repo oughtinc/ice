@@ -6,6 +6,7 @@ from structlog.stdlib import get_logger
 
 from ice.agents.base import Agent
 from ice.agents.base import Stop
+from ice.apis.openai import openai_chatcomplete
 from ice.apis.openai import openai_complete
 from ice.environment import env
 from ice.utils import longest_common_prefix
@@ -135,6 +136,93 @@ class OpenAIAgent(Agent):
             else abs_probs
         )
         return rel_probs
+
+    def _print_markdown(self, obj: Any):
+        """Print the text with markdown formatting."""
+        env().print(obj, format_markdown=True)
+
+
+class OpenAIChatCompletionAgent(Agent):
+    """An agent that uses the OpenAI ChatCompletion API to generate completions."""
+
+    def __init__(
+        self,
+        model: str = "gpt-3.5-turbo",
+        temperature: float = 0.0,
+        top_p: float = 1.0,
+    ):
+        self.model = model
+        self.temperature = temperature
+        self.top_p = top_p
+
+    async def complete(
+        self,
+        *,
+        prompt: str,
+        stop: Stop = None,
+        verbose: bool = False,
+        default: str = "",
+        max_tokens: int = 256,
+    ) -> str:
+        """Generate an answer to a question given some context."""
+        if verbose:
+            self._print_markdown(prompt)
+        response = await self._complete(prompt, stop=stop, max_tokens=max_tokens)
+        completion = self._extract_completion(response)
+        if verbose:
+            self._print_markdown(completion)
+        return completion
+
+    async def classify(
+        self,
+        *,
+        prompt: str,
+        choices: tuple[str, ...],
+        default: Optional[str] = None,
+        verbose: bool = False,
+    ) -> tuple[dict[str, float], Optional[str]]:
+        raise NotImplementedError(
+            "OpenAI ChatCompletion has no option to score a classification."
+        )
+
+    async def relevance(
+        self,
+        *,
+        context: str,
+        question: str,
+        verbose: bool = False,
+        default: Optional[float] = None,
+    ) -> float:
+        raise NotImplementedError(
+            "OpenAI ChatCompletion has no option to return a relevance score."
+        )
+
+    async def predict(
+        self, *, context: str, default: str = "", verbose: bool = False
+    ) -> dict[str, float]:
+        raise NotImplementedError(
+            "OpenAI ChatCompletion does not support getting probabilities."
+        )
+
+    async def _complete(self, prompt, **kwargs) -> dict:
+        """Send a completion request to the OpenAI API with the given prompt and parameters."""
+        kwargs.update(
+            {
+                "model": self.model,
+                "temperature": self.temperature,
+                "top_p": self.top_p,
+                "n": 1,
+            }
+        )
+        messages = [{"role": "user", "content": prompt}]
+        response = await openai_chatcomplete(messages, **kwargs)
+        if "choices" not in response:
+            raise ValueError(f"No choices in response: {response}")
+        return response
+
+    def _extract_completion(self, response: dict) -> str:
+        """Extract the answer text from the completion response."""
+        return response["choices"][0]["message"]["content"].strip()
 
     def _print_markdown(self, obj: Any):
         """Print the text with markdown formatting."""
