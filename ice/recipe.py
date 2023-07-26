@@ -1,5 +1,5 @@
 import asyncio
-import importlib
+import importlib.util
 import sys
 from abc import abstractmethod
 from collections.abc import Awaitable
