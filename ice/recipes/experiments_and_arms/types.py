@@ -12,7 +12,6 @@ from typing import Union
 from pydantic import BaseModel
 from pydantic import root_validator
 from pydantic import validator
-from pydantic.generics import GenericModel
 
 from ice.metrics.gold_standards import ParsedGoldStandardBase
 
@@ -77,7 +76,7 @@ class ExperimentsArms(ParsedGoldStandardBase):
 ReasoningStage = Literal["reasoning", "helpfulness", "answer"]
 
 
-class PassageWithReasoning(GenericModel, Generic[T]):
+class PassageWithReasoning(BaseModel, Generic[T]):
     passage: Sequence[str]
     reasoning: str
     helpfulness: Optional[str] = None

@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from typing import Generic
 from typing import Optional
 
-from pydantic.generics import GenericModel
+from pydantic import BaseModel
 
 from ice.recipes.program_search.utils.find_examples import mark_gs
 from ice.recipes.program_search.utils.find_examples import rouge_distractor_scores
@@ -10,7 +10,7 @@ from ice.recipes.program_search.utils.find_examples import SelectionT_co
 from ice.utils import window_dropping
 
 
-class SelectionExample(GenericModel, Generic[SelectionT_co]):
+class SelectionExample(BaseModel, Generic[SelectionT_co]):
     selection: Sequence[SelectionT_co]
     existing: Sequence[str]
     positive_idxs: Sequence[int]

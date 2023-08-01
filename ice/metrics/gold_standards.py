@@ -14,7 +14,6 @@ from typing import TypeVar
 
 import pandas as pd
 from pydantic import BaseModel
-from pydantic.generics import GenericModel
 from structlog.stdlib import get_logger
 
 from ice.paper import Paper
@@ -32,7 +31,7 @@ ParsedGoldStandardType = TypeVar("ParsedGoldStandardType", bound=ParsedGoldStand
 GoldStandardSplit = Literal["test", "validation", "iterate"]
 
 
-class GoldStandard(GenericModel, Generic[ParsedGoldStandardType]):
+class GoldStandard(BaseModel, Generic[ParsedGoldStandardType]):
     document_id: str
     question_short_name: str
     experiment: str
@@ -51,8 +50,7 @@ class GoldStandard(GenericModel, Generic[ParsedGoldStandardType]):
         )
 
     class Config:
-        keep_untouched = (cached_property,)
-        fields = dict(answer_model=dict(exclude=True))
+        ignored_types = (cached_property,)
 
 
 def _parse_answer(

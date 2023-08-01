@@ -6,7 +6,7 @@ from typing import Literal
 from typing import Optional
 
 from pydantic import BaseModel
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from structlog.stdlib import get_logger
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.models.gpt2.tokenization_gpt2_fast import GPT2TokenizerFast

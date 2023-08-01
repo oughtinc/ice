@@ -3,7 +3,6 @@ from typing import Optional
 from typing import Union
 
 from pydantic import BaseModel
-from pydantic.generics import GenericModel
 
 from ice.paper import Paper
 
@@ -75,7 +74,7 @@ class Trace(BaseModel):
 T = t.TypeVar("T")
 
 
-class Beam(GenericModel, t.Generic[T]):
+class Beam(BaseModel, t.Generic[T]):
     ...
 
 
