@@ -199,3 +199,21 @@ async def openai_chatcomplete(
         raise response
     add_fields(total_tokens=extract_total_tokens(response))
     return response
+
+
+@trace
+async def openai_embedding(
+    input: Union[str, list[str]],
+    model: str = "text-embedding-ada-002",
+    cache_id: int = 0,  # for repeated non-deterministic sampling using caching
+) -> dict:
+    """Send an embedding request to the OpenAI API and return the JSON response."""
+    params = {
+        "input": input,
+        "model": model,
+    }
+    response = await _post("embeddings", json=params, cache_id=cache_id)
+    if isinstance(response, TooLongRequestError):
+        raise response
+    add_fields(total_tokens=extract_total_tokens(response))
+    return response
