@@ -1,6 +1,9 @@
+# ice/agent.py
 from functools import cache
 from typing import Optional
 
+from ice.agents.anthropic import ClaudeAgent
+from ice.agents.anthropic import ClaudeChatAgent
 from ice.agents.approval import ApprovalAgent
 from ice.agents.augmented import AugmentedAgent
 from ice.agents.base import Agent as Agent  # Explicit re-export
@@ -28,6 +31,8 @@ except ImportError:
 MACHINE_AGENTS = {
     "chatgpt": lambda: OpenAIChatCompletionAgent(model="gpt-3.5-turbo"),
     "gpt-4": lambda: OpenAIChatCompletionAgent(model="gpt-4"),
+    "claude": lambda: ClaudeAgent(),
+    "claude-chat": lambda: ClaudeChatAgent(),
     "embedding-ada": lambda: OpenAIEmbeddingAgent(model="text-embedding-ada-002"),
     "instruct": lambda: OpenAIAgent(),
     "instruct-reasoning": lambda: OpenAIReasoningAgent(),
