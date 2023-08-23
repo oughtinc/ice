@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     OUGHT_INFERENCE_API_KEY: str = ""
     ELICIT_AUTH_TOKEN: str = ""
+    ANTHROPIC_API_KEY: str = ""
 
     def __get_and_store(self, setting_name: str, prompt: Optional[str] = None) -> str:
         # We use [__getattribute__] to read these attributes, so that we can
@@ -59,6 +60,7 @@ class Settings(BaseSettings):
             OUGHT_INFERENCE_API_KEY=None,
             ELICIT_AUTH_TOKEN="Enter Elicit Auth Token (you can find it by checking idToken in cookies for Elicit. "
             "The cookie should NOT start with Bearer; it should just be a string of letters and numbers): ",
+            ANTHROPIC_API_KEY="Enter Anthropic API key: ",
         )
         if name in prompts and not result:
             return self.__get_and_store(name, prompts[name])
