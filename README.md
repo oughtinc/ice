@@ -9,6 +9,12 @@ ICE is a Python library and trace visualizer for language model programs.
   Execution trace visualized in ICE
 </p>
 
+## Datasets
+
+[Ethics](https://github.com/LLM-Ethics/EthicsSuite)
+
+[Moral Choice](https://t.co/FfQyLGGwiq)
+
 ## Features
 
 - Run language model recipes in different modes: humans, human+LM, LM
