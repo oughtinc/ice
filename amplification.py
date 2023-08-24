@@ -1,7 +1,6 @@
 from ice.recipe import recipe
-from ice.recipe.primer.subquestions import ask_subquestions
+from ice.recipes.primer.subquestions import ask_subquestions
 from ice.utils import map_async
-from functools import partial
 
 Question = str
 Answer = str
@@ -33,7 +32,7 @@ async def answer(question: str, subs: Subs = [], engine: str="chatgpt") -> str:
     answer = await recipe.agent(agent_name=engine).complete(prompt=prompt, stop='"')
     return answer
 
-async def answer_by_amplification(question: str, context: str, engine: str="chatgpt"):
+async def answer_by_amplification(question: str, engine: str="chatgpt"):
     subs = await get_subs(question)
     response = await answer(question, subs=subs, engine=engine)
     subs = [{"Q" :q, "A": a} for (q, a) in subs]
