@@ -1,3 +1,6 @@
+from typing import List
+from typing import Union
+
 from anthropic import Anthropic
 
 from ice.agents.base import Agent
@@ -16,7 +19,7 @@ class ClaudeAgent(Agent):
         self,
         *,
         prompt: str,
-        stop: str | list[str] | None = None,
+        stop: Union[str, List[str], None] = None,
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256
@@ -43,7 +46,7 @@ class ClaudeChatAgent(Agent):
         self,
         *,
         prompt: str,
-        stop: str | list[str] | None = None,
+        stop: Union[str, List[str], None] = None,
         verbose: bool = False,
         default: str = "",
         max_tokens: int = 256
