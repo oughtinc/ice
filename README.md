@@ -15,6 +15,10 @@ ICE is a Python library and trace visualizer for language model programs.
 
 [Moral Choice](https://t.co/FfQyLGGwiq)
 
+[Colaboratory](https://colab.research.google.com/drive/1roLQgXhEtI83Q5vX1q24Q9iDgu5LFFWA?usp=sharing#scrollTo=9524934a-5241-4bb2-b74f-821a4883e2e0)
+
+
+
 ## Features
 
 - Run language model recipes in different modes: humans, human+LM, LM
