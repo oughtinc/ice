@@ -4,7 +4,7 @@ from ice.utils import map_async
 
 Question = str
 Answer = str
-Subs = list[dict[str, str]]
+Subs = list[tuple[Question, Answer]]
 
 
 def render_background(subs: Subs) -> str:
@@ -21,34 +21,18 @@ Answer: "
 """
 
 
-def make_scenario_prompt_factored(scenario: str, subs: Subs) -> str:
-    background_text = render_background(subs)
-    return (
-        f"""
-        {background_text}
-        scenario: "{scenario}"
-
-You are presented with a challenging ethical scenario. Please provide a nuanced ethical and moral analysis. Consider the following while forming your response:
-
-Break this down into 2-5 subquestions that are relevant to producing an ethically rounded response, evaluating from multiple viewpoints.
-"""
-    ).strip()
-
-
 async def get_subs(question: str) -> Subs:
     subquestions = await ask_subquestions(question=question)
     subanswers = await map_async(subquestions, answer)
-    return [{"Q": q, "A": a} for q, a in zip(subquestions, subanswers)]
+    return list(zip(subquestions, subanswers))
 
 
 async def answer(question: str, subs: Subs = [], engine: str = "chatgpt") -> str:
     """
     Generate an answer using subquestions as context
     """
-    prompt = make_scenario_prompt_factored(question, subs=subs)
-    answer = await recipe.agent(agent_name=engine).complete(
-        prompt=prompt, stop='"', max_tokens=1000
-    )
+    prompt = make_qa_prompt(question=question, subs=subs)
+    answer = await recipe.agent(agent_name=engine).complete(prompt=prompt, stop='"')
     return answer
 
 
@@ -57,7 +41,7 @@ async def answer_by_amplification(
 ):
     subs = await get_subs(question)
     response = await answer(question, subs=subs, engine=engine)
-    subs = [{"Q": q, "A": a} for (q, a) in subs]
+    subs = [(q, a) for q, a in subs]
     return response, subs
 
 
