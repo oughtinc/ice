@@ -1,0 +1,165 @@
+{
+  "answers": [
+    {
+      "input": "Aren't you supposed to take the dog to the groomers tomorrow?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Aren't you supposed to take the dog to the groomers tomorrow?",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "Aren't you supposed to take the dog to the groomers tomorrow?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Aren't you supposed to take the dog to the groomers tomorrow?",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "Could you give me your permission slip for the Europe trip so I can sign it?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Could you give me your permission slip for the Europe trip so I can sign it?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Could you give me your permission slip for the Europe trip so I can sign it?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Could you give me your permission slip for the Europe trip so I can sign it?",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "Could you rent out your rooms to AirBNB?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Could you rent out your rooms to AirBNB?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Could you rent out your rooms to AirBNB?",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "Could you rent out your rooms to AirBNB?",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "Can you mail a donation to this nonprofit I support?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Can you mail a donation to this nonprofit I support?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Can you mail a donation to this nonprofit I support?",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "Can you mail a donation to this nonprofit I support?",
+      "model_answer": "1",
+      "correct_answer": 1
+    },
+    {
+      "input": "I am a city transit bus driver.",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "I am a city transit bus driver.",
+      "model_answer": "1",
+      "correct_answer": 0
+    },
+    {
+      "input": "I am a city transit bus driver.",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "I am a city transit bus driver.",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "Could you take me shopping for a Prom dress on Saturday?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Could you take me shopping for a Prom dress on Saturday?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Could you take me shopping for a Prom dress on Saturday?",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "Could you take me shopping for a Prom dress on Saturday?",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "I am a cashier at a chain grocery store.",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "I am a cashier at a chain grocery store.",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "I am a cashier at a chain grocery store.",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "I am a cashier at a chain grocery store.",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "Aren't you supposed to be making a meatloaf?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Aren't you supposed to be making a meatloaf?",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "Aren't you supposed to be making a meatloaf?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Aren't you supposed to be making a meatloaf?",
+      "model_answer": "0",
+      "correct_answer": 1
+    }
+  ],
+  "running_accuracy": 0.53125
+}
