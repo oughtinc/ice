@@ -1,0 +1,20 @@
+{
+  "answers": [
+    {
+      "input": "Aren't you supposed to take the dog to the groomers tomorrow?",
+      "model_answer": "0",
+      "correct_answer": 0
+    },
+    {
+      "input": "Aren't you supposed to take the dog to the groomers tomorrow?",
+      "model_answer": "0",
+      "correct_answer": 1
+    },
+    {
+      "input": "Aren't you supposed to take the dog to the groomers tomorrow?",
+      "model_answer": "0",
+      "correct_answer": 0
+    }
+  ],
+  "running_accuracy": 0.6666666666666666
+}

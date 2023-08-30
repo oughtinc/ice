@@ -21,26 +21,49 @@ Answer: "
 """
 
 
+def make_contextual_prompt(prompt: str, subs: Subs) -> str:
+    background_text = render_background(subs)
+    return f"""{background_text}
+
+    {prompt}
+Answer: "
+"""
+
+
+def make_inclusive_prompt(question: str, original_question: str, subs: Subs) -> str:
+    background_text = render_background(subs)
+    return f"""{background_text}Answer the following question using the background information provided above, wherever helpful:
+    The purpose of answering this question is to help with answering this question: {original_question}
+Question: "{question}"
+Answer: "
+"""
+
+
 async def get_subs(question: str) -> Subs:
     subquestions = await ask_subquestions(question=question)
     subanswers = await map_async(subquestions, answer)
     return list(zip(subquestions, subanswers))
 
 
-async def answer(question: str, subs: Subs = [], engine: str = "chatgpt") -> str:
+async def answer(
+    prompt: str,
+    subs: Subs = [],
+    engine: str = "chatgpt",
+) -> str:
     """
     Generate an answer using subquestions as context
     """
-    prompt = make_qa_prompt(question=question, subs=subs)
+    prompt = make_contextual_prompt(prompt=prompt, subs=subs)
     answer = await recipe.agent(agent_name=engine).complete(prompt=prompt, stop='"')
+
     return answer
 
 
 async def answer_by_amplification(
-    question: str = "Is it ethical to clone humans?", engine: str = "chatgpt"
+    prompt: str = "Is it ethical to clone humans?", engine: str = "chatgpt"
 ):
-    subs = await get_subs(question)
-    response = await answer(question, subs=subs, engine=engine)
+    subs = await get_subs(prompt)
+    response = await answer(prompt, subs=subs, engine=engine)
     subs = [(q, a) for q, a in subs]
     return response, subs
 
