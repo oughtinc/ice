@@ -1,6 +1,7 @@
 from ice.recipe import recipe
 from ice.recipes.primer.subquestions import ask_subquestions
 from ice.utils import map_async
+from functools import partial
 
 Question = str
 Answer = str
@@ -12,14 +13,28 @@ def render_background(subs: Subs) -> str:
     return f"Here is relevant background information \n\n{subs_text}\n\n"
 
 
-def make_qa_prompt(question: str, subs: Subs) -> str:
-    background_text = render_background(subs)
-    return f"""{background_text}Answer the following question using the background information provided above, wherever helpful:
+# def make_qa_prompt(question: str, subs: Subs) -> str:
+#     background_text = render_background(subs)
+#     return f"""{background_text}Answer the following question using the background information provided above, wherever helpful:
 
-Question: "{question}"
+# Question: "{question}"
+# Answer: "
+# """
+def make_qa_prompt(question: str, subquestion: str) -> str:
+    return F(
+        f"""You are provided with an original question: {question}
+        Based on this question, answer the following question:
+
+Question: "{subquestion}"
 Answer: "
 """
+    ).strip()
 
+
+async def sub_answer(question: str = "What is the effect of creatine on cognition?", subquestion: str = "What is creatine?", engine: str = "chatgpt") -> str:
+    prompt = make_qa_prompt(question, subquestion)
+    answer = await recipe.agent(agent_name=engine).complete(prompt=prompt, stop='"')
+    return answer
 
 def make_contextual_prompt(prompt: str, subs: Subs) -> str:
     background_text = render_background(subs)
@@ -39,11 +54,18 @@ Answer: "
 """
 
 
-async def get_subs(question: str) -> Subs:
-    subquestions = await ask_subquestions(question=question)
-    subanswers = await map_async(subquestions, answer)
-    return list(zip(subquestions, subanswers))
+# async def get_subs(question: str) -> Subs:
+#     subquestions = await ask_subquestions(question=question)
+#     subanswers = await map_async(subquestions, answer)
+#     return list(zip(subquestions, subanswers))
 
+async def get_subs(
+    question: str = "What is the effect of creatine on cognition?",
+):
+    subquestions = await ask_subquestions(question=question)
+    subs_answer = partial(sub_answer, question=question)
+    subanswers = await map_async(subquestions, subs_answer)
+    return list(zip(subquestions, subanswers))
 
 async def answer(
     prompt: str,
