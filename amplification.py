@@ -2,6 +2,7 @@ from ice.recipe import recipe
 from ice.recipes.primer.subquestions import ask_subquestions
 from ice.utils import map_async
 from functools import partial
+from fvalues import F
 
 Question = str
 Answer = str
@@ -31,7 +32,7 @@ Answer: "
     ).strip()
 
 
-async def sub_answer(question: str = "What is the effect of creatine on cognition?", subquestion: str = "What is creatine?", engine: str = "chatgpt") -> str:
+async def sub_answer(subquestion: str, question: str, engine: str = "chatgpt") -> str:
     prompt = make_qa_prompt(question, subquestion)
     answer = await recipe.agent(agent_name=engine).complete(prompt=prompt, stop='"')
     return answer
@@ -60,11 +61,11 @@ Answer: "
 #     return list(zip(subquestions, subanswers))
 
 async def get_subs(
-    question: str = "What is the effect of creatine on cognition?",
+    question: str = "What is the effect of creatine on cognition?", engine="chatgpt"
 ):
     subquestions = await ask_subquestions(question=question)
-    subs_answer = partial(sub_answer, question=question)
-    subanswers = await map_async(subquestions, subs_answer)
+    subs_answer_fn = partial(sub_answer, question=question, engine=engine)
+    subanswers = await map_async(subquestions, subs_answer_fn)
     return list(zip(subquestions, subanswers))
 
 async def answer(
@@ -84,7 +85,7 @@ async def answer(
 async def answer_by_amplification(
     prompt: str = "Is it ethical to clone humans?", engine: str = "chatgpt"
 ):
-    subs = await get_subs(prompt)
+    subs = await get_subs(prompt, engine=engine)
     response = await answer(prompt, subs=subs, engine=engine)
     subs = [(q, a) for q, a in subs]
     return response, subs
