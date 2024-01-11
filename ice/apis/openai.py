@@ -194,7 +194,7 @@ async def openai_chatcomplete(
         "max_tokens": max_tokens,
         "n": n,
         "logprobs": logprobs,
-        "top_logprobs": top_logprobs
+        "top_logprobs": top_logprobs,
     }
     if logit_bias:
         params["logit_bias"] = logit_bias  # type: ignore[assignment]

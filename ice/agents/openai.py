@@ -144,6 +144,7 @@ class OpenAIAgent(Agent):
         """Print the text with markdown formatting."""
         env().print(obj, format_markdown=True)
 
+
 class OpenAIChatCompletionAgent(Agent):
     """An agent that uses the OpenAI ChatCompletion API to generate completions."""
 
@@ -153,12 +154,12 @@ class OpenAIChatCompletionAgent(Agent):
         temperature: float = 0.0,
         top_p: float = 1.0,
         logprobs: bool = False,
-        top_logprobs: int = None
+        top_logprobs: int = None,
     ):
         self.model = model
         self.temperature = temperature
         self.top_p = top_p
-        self.logprobs = logprobs,
+        self.logprobs = (logprobs,)
         self.top_logprobs = top_logprobs
 
     async def complete(
@@ -178,12 +179,14 @@ class OpenAIChatCompletionAgent(Agent):
         if verbose:
             self._print_markdown(completion)
         return completion
-    
+
     async def predict(self, *, context, default="", verbose=False) -> dict[str, float]:
         """Generate a probability distribution over the next token given some context."""
         if verbose:
             self._print_markdown(context)
-        response = await self._complete(context, top_logprobs=5, logprobs=True, max_tokens=1)
+        response = await self._complete(
+            context, top_logprobs=5, logprobs=True, max_tokens=1
+        )
         prediction = self._extract_prediction(response)
         if verbose:
             self._print_markdown(prediction)
@@ -248,11 +251,16 @@ class OpenAIChatCompletionAgent(Agent):
                 "top_p": self.top_p,
                 "n": 1,
                 "logprobs": self.logprobs,
-                "top_logprobs": self.top_logprobs
+                "top_logprobs": self.top_logprobs,
             }
         )
-        messages = [{"role": "system", "content": "You are a helpful assistant. Your answers follow instructions and remain grounded in the context."},
-                    {"role": "user", "content": prompt}]
+        messages = [
+            {
+                "role": "system",
+                "content": "You are a helpful assistant. Your answers follow instructions and remain grounded in the context.",
+            },
+            {"role": "user", "content": prompt},
+        ]
         response = await openai_chatcomplete(messages, **kwargs)
         if "choices" not in response:
             raise ValueError(f"No choices in response: {response}")
@@ -297,6 +305,7 @@ class OpenAIChatCompletionAgent(Agent):
     def _print_markdown(self, obj: Any):
         """Print the text with markdown formatting."""
         env().print(obj, format_markdown=True)
+
 
 class OpenAIEmbeddingAgent(Agent):
     """An agent that uses the OpenAI API to generate a relevance score by cosine similarity between two text embeddings."""
