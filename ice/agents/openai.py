@@ -266,7 +266,7 @@ class OpenAIChatCompletionAgent(Agent):
     def _extract_prediction(self, response: dict) -> dict[str, float]:
         """Extract the prediction dictionary from the completion response."""
         answer = response["choices"][0]["logprobs"]["content"][0]["top_logprobs"]
-        return {a['token']: math.exp(a['logprob']) for a in answer}
+        return {a["token"]: math.exp(a["logprob"]) for a in answer}
 
     def _compute_relative_probs(
         self, choices: tuple[str, ...], choice_prefix: str, prediction: dict[str, float]
