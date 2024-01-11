@@ -235,13 +235,6 @@ class OpenAIChatCompletionAgent(Agent):
             "OpenAI ChatCompletion has no option to return a relevance score."
         )
 
-    # async def predict(
-    #     self, *, context: str, default: str = "", verbose: bool = False
-    # ) -> dict[str, float]:
-    #     raise NotImplementedError(
-    #         "OpenAI ChatCompletion does not support getting probabilities."
-    #     )
-
     async def _complete(self, prompt, **kwargs) -> dict:
         """Send a completion request to the OpenAI API with the given prompt and parameters."""
         kwargs.update(
@@ -272,8 +265,8 @@ class OpenAIChatCompletionAgent(Agent):
 
     def _extract_prediction(self, response: dict) -> dict[str, float]:
         """Extract the prediction dictionary from the completion response."""
-        answer = response["choices"][0]["logprobs"]["top_logprobs"][0]
-        return {k: math.exp(p) for (k, p) in answer.items()}
+        answer = response["choices"][0]["logprobs"]["content"][0]["top_logprobs"]
+        return {a['token']: math.exp(a['logprob']) for a in answer}
 
     def _compute_relative_probs(
         self, choices: tuple[str, ...], choice_prefix: str, prediction: dict[str, float]
