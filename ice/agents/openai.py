@@ -159,7 +159,7 @@ class OpenAIChatCompletionAgent(Agent):
         self.model = model
         self.temperature = temperature
         self.top_p = top_p
-        self.logprobs = (logprobs,)
+        self.logprobs = logprobs
         self.top_logprobs = top_logprobs
 
     async def complete(
