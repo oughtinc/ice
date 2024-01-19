@@ -5,7 +5,7 @@ from typing import Any
 from typing import Optional
 from typing import TYPE_CHECKING
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from structlog import get_logger
 
 from .logging import log_lock
