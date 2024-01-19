@@ -19,7 +19,7 @@ from typing import Union
 import defopt
 import pandas as pd
 from merge_args import merge_args
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from structlog.stdlib import get_logger
 from typing_extensions import TypeGuard
 
