@@ -141,7 +141,7 @@ async def openai_complete(
     stop: Optional[str] = "\n",
     top_p: float = 1,
     temperature: float = 0,
-    model: str = "text-davinci-002",
+    model: str = "gpt-3.5-turbo-instruct",
     max_tokens: int = 256,
     logprobs: Optional[int] = None,
     logit_bias: Optional[Mapping[str, Union[int, float]]] = None,
