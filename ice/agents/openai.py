@@ -22,7 +22,7 @@ class OpenAIAgent(Agent):
 
     def __init__(
         self,
-        model: str = "text-davinci-002",
+        model: str = "gpt-3.5-turbo-instruct",
         temperature: float = 0.0,
         top_p: float = 1.0,
     ):
