@@ -176,8 +176,10 @@ async def openai_chatcomplete(
     stop: Optional[str] = "\n",
     top_p: float = 1,
     temperature: float = 0,
-    model: str = "gpt-3.5-turbo",
+    model: str = "gpt-3.5-turbo-16k",
     max_tokens: int = 256,
+    logprobs: bool = False,
+    top_logprobs: Optional[int] = None,
     logit_bias: Optional[Mapping[str, Union[int, float]]] = None,
     n: int = 1,
     cache_id: int = 0,  # for repeated non-deterministic sampling using caching
@@ -191,6 +193,8 @@ async def openai_chatcomplete(
         "model": model,
         "max_tokens": max_tokens,
         "n": n,
+        "logprobs": logprobs,
+        "top_logprobs": top_logprobs,
     }
     if logit_bias:
         params["logit_bias"] = logit_bias  # type: ignore[assignment]
