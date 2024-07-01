@@ -77,9 +77,9 @@ async def rouge_distractor_scores(
     scores = await rouge_texts(hypotheses=hypotheses, references=references)
     return {
         text: (
-            lambda s: s.rouge_l.r
-            if s.rouge_l.r < lcs_threshold and s.rouge_3.r == 0
-            else 0
+            lambda s: (
+                s.rouge_l.r if s.rouge_l.r < lcs_threshold and s.rouge_3.r == 0 else 0
+            )
         )(score)
         for text, score in scores.items()
     }

@@ -54,9 +54,11 @@ class PlaceboKeywordBaseline(Recipe):
                     result=f"{placebo_answer.classification}: {placebo_answer.sentence}",
                     answer=f"{placebo_answer.classification}: {placebo_answer.sentence}",
                     classifications=[
-                        "Placebo"
-                        if placebo_answer.classification == "Placebo"
-                        else "No placebo or placebo not mentioned",
+                        (
+                            "Placebo"
+                            if placebo_answer.classification == "Placebo"
+                            else "No placebo or placebo not mentioned"
+                        ),
                         placebo_answer.classification,
                     ],
                     excerpts=[placebo_answer.sentence],

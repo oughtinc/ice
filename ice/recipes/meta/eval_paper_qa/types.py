@@ -60,8 +60,7 @@ class PaperQaMethod(Protocol[AnswerType_contra]):
         __paper: Paper,
         __question: str,
         __gold_support: Optional[Sequence[str]] = None,
-    ) -> PaperQaAnswer[AnswerType_contra]:
-        ...
+    ) -> PaperQaAnswer[AnswerType_contra]: ...
 
 
 class AnswerEvalMethod(Protocol[AnswerType_contra]):
@@ -70,8 +69,7 @@ class AnswerEvalMethod(Protocol[AnswerType_contra]):
         question: str,
         ground_truth: AnswerType_contra,
         prediction: AnswerType_contra,
-    ) -> tuple[bool, str]:
-        ...
+    ) -> tuple[bool, str]: ...
 
 
 class ClassificationEvalMethod(Protocol):
@@ -81,5 +79,4 @@ class ClassificationEvalMethod(Protocol):
         predictions: Sequence[bool],
         ground_truth: Sequence[str],
         scores: Optional[Sequence[float]] = None,
-    ) -> BinaryClassificationMetrics:
-        ...
+    ) -> BinaryClassificationMetrics: ...

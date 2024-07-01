@@ -1,6 +1,7 @@
 """
 Make a dataframe that contains the paragraphs that contain the gold standard quotes.
 """
+
 import asyncio
 from pathlib import Path
 from typing import Optional
