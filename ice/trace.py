@@ -309,8 +309,7 @@ class TracedABCMeta(ABCMeta):
         )
 
 
-class TracedABC(metaclass=TracedABCMeta):
-    ...
+class TracedABC(metaclass=TracedABCMeta): ...
 
 
 # TODO this and the functions it calls needs to be replaced with a better system

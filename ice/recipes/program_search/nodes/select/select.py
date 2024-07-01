@@ -305,9 +305,11 @@ async def select_using_elicit_prompt_few_shot(
 
     if include_negative:
         demonstrations_or_none = [
-            (await elicit_negative_few_shot_example(example, max_examples=1))
-            if idx % 3 == 0  # more positive than negative examples
-            else (await positive_few_shot_example(example, max_examples=1))
+            (
+                (await elicit_negative_few_shot_example(example, max_examples=1))
+                if idx % 3 == 0  # more positive than negative examples
+                else (await positive_few_shot_example(example, max_examples=1))
+            )
             for idx, example in enumerate(examples)
         ]
     else:

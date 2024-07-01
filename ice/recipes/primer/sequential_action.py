@@ -82,16 +82,13 @@ async def answer_directly(question: str, log: Log) -> str:
 class Action(ABC):
     @classmethod
     @abstractmethod
-    async def propose(cls, question: str, log: Log, max_actions: int) -> "Action":
-        ...
+    async def propose(cls, question: str, log: Log, max_actions: int) -> "Action": ...
 
     @abstractmethod
-    def run(self):
-        ...
+    def run(self): ...
 
     @abstractmethod
-    def make_log_entry(self, result: str) -> str:
-        ...
+    def make_log_entry(self, result: str) -> str: ...
 
 
 @dataclass

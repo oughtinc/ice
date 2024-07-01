@@ -21,6 +21,7 @@ Papers that explicitly mention blinding of personnel:
 - routledge-2006.pdf
 - vittengl-2009.pdf
 """
+
 import itertools
 from typing import Any
 from typing import Literal
@@ -344,9 +345,9 @@ class BlindingDynamic(Recipe):
         results_by_intervention: dict[str, dict[Group, dict[str, Any]]] = {}
         interventions = await self.interventions(paper)
         for intervention in interventions:
-            results_by_intervention[
-                intervention
-            ] = await self.blinding_for_intervention(paper, intervention)
+            results_by_intervention[intervention] = (
+                await self.blinding_for_intervention(paper, intervention)
+            )
 
         recipe_results: list[RecipeResult] = []
         for intervention in interventions:
