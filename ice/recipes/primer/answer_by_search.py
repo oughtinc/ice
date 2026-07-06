@@ -5,26 +5,22 @@ from ice.recipe import recipe
 
 
 def make_search_result_prompt(context: str, query: str, question: str) -> str:
-    return F(
-        f"""
+    return F(f"""
 Search results from Google for the query "{query}": "{context}"
 
 Answer the following question, using the search results if helpful:
 
 Question: "{question}"
 Answer: "
-"""
-    ).strip()
+""").strip()
 
 
 def make_search_query_prompt(question: str) -> str:
-    return F(
-        f"""
+    return F(f"""
 You're trying to answer the question {question}. You get to type in a search query to Google, and then you'll be shown the results. What query do you want to search for?
 
 Query: "
-"""
-    ).strip('" ')
+""").strip('" ')
 
 
 async def search(query: str) -> dict:

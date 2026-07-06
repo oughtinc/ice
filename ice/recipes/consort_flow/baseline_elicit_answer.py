@@ -7,7 +7,6 @@ from structlog import get_logger
 from ice.apis.openai import openai_complete
 from ice.recipes.program_search.nodes.answer.types import Demonstration
 
-
 log = get_logger()
 
 

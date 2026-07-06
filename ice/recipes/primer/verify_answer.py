@@ -4,14 +4,12 @@ from ice.recipe import recipe
 
 
 def make_verification_prompt(question: str, answer: str) -> str:
-    return F(
-        f"""Consider this question: "{question}"
+    return F(f"""Consider this question: "{question}"
 
 Potential answer: "{answer}"
 
 Q: Is the potential answer above correct? Say "A: Yes" or "A: No".
-A:"""
-    )
+A:""")
 
 
 async def verify_answer(question: str, answer: str) -> float:

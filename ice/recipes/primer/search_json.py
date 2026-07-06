@@ -5,16 +5,14 @@ from ice.recipe import recipe
 
 
 def make_qa_prompt(context: str, question: str) -> str:
-    return F(
-        f"""
+    return F(f"""
 Background text: "{context}"
 
 Answer the following question about the background text above:
 
 Question: "{question}"
 Answer: "
-"""
-    ).strip()
+""").strip()
 
 
 async def search(query: str = "Who is the president of the United States?") -> dict:

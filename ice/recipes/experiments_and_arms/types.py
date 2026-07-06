@@ -16,7 +16,6 @@ from pydantic.generics import GenericModel
 
 from ice.metrics.gold_standards import ParsedGoldStandardBase
 
-
 T = TypeVar("T")
 
 Stage = NewType("Stage", str)

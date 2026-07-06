@@ -43,9 +43,11 @@ async def rank_passages_selector(
     )  # really small non-infinite number
     closest = min(
         samples,
-        key=lambda sample: abs(sample.final_answer - mean_score)
-        if sample.final_answer
-        else float("inf"),
+        key=lambda sample: (
+            abs(sample.final_answer - mean_score)
+            if sample.final_answer
+            else float("inf")
+        ),
     )
     return PassageWithReasoning(
         passage=closest.passage,
@@ -154,9 +156,9 @@ async def rate_helpfulness_with_reasoning(
 
         sorted_answers = sorted(
             answers,
-            key=lambda prs: prs.final_answer
-            if prs.final_answer is not None
-            else float("-inf"),
+            key=lambda prs: (
+                prs.final_answer if prs.final_answer is not None else float("-inf")
+            ),
             reverse=True,
         )
         return sorted_answers

@@ -83,12 +83,16 @@ def decontext_prompt(
     if questions:
         last_example["questions"] = numbered_list(questions)
     examples = format_multi(
-        QUESTION_GUIDED_EXAMPLE_TEMPLATE
-        if questions
-        else QUESTION_FREE_EXAMPLE_TEMPLATE,
-        QUESTION_GUIDED_EXAMPLES + [last_example]
-        if questions
-        else QUESTION_FREE_EXAMPLES + [last_example],
+        (
+            QUESTION_GUIDED_EXAMPLE_TEMPLATE
+            if questions
+            else QUESTION_FREE_EXAMPLE_TEMPLATE
+        ),
+        (
+            QUESTION_GUIDED_EXAMPLES + [last_example]
+            if questions
+            else QUESTION_FREE_EXAMPLES + [last_example]
+        ),
     )
     return "\n\n".join(
         (

@@ -50,7 +50,7 @@ def _is_partial(**fields: Union[literal, _NotNeededSentinel]):
 
 
 def all_values_needed(
-    examples: Sequence[Mapping[str, Union[literal_or_transform, _NotNeededSentinel]]]
+    examples: Sequence[Mapping[str, Union[literal_or_transform, _NotNeededSentinel]]],
 ) -> TypeGuard[Sequence[Mapping[str, literal_or_transform]]]:
     return all(
         (
@@ -107,7 +107,7 @@ def _unparse(parses: _StdLibFormatStringParses) -> str:
 
 
 def _no_sentinels_remaining(
-    concrete_values: dict[str, Union[literal, _NotNeededSentinel]]
+    concrete_values: dict[str, Union[literal, _NotNeededSentinel]],
 ) -> TypeGuard[dict[str, literal]]:
     return all(
         (value is not _not_needed_sentinel for value in concrete_values.values())
@@ -146,7 +146,7 @@ def _format_truncate(
 
 
 def _has_stop(
-    concrete_values: Mapping[str, Union[literal, _NotNeededSentinel]]
+    concrete_values: Mapping[str, Union[literal, _NotNeededSentinel]],
 ) -> bool:
     return any(isinstance(value, StopSentinel) for value in concrete_values.values())
 

@@ -1,6 +1,7 @@
 """
 Make a dataframe that contains the paragraphs that contain the gold standard quotes.
 """
+
 import asyncio
 from pathlib import Path
 from typing import Optional
@@ -72,15 +73,13 @@ def get_containing_paragraph(
         # Explanations:
         # - Quote is split across two paragraphs
         # - Document paragraphs don't include quote
-        log.warning(
-            f"""Couldn't find gold standard paragraph for quote
+        log.warning(f"""Couldn't find gold standard paragraph for quote
 
 > {quote}
 
 in {document_id}. Best recall was {best_recall:.2f}. Best paragraph was:
 
-> {best_recall_paragraph}"""
-        )
+> {best_recall_paragraph}""")
     return best_recall_paragraph
 
 

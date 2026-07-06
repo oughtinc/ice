@@ -66,7 +66,7 @@ class AugmentedAgent(Agent):
         default: Optional[str] = None,
         verbose: bool = False,
     ) -> tuple[dict[str, float], Optional[str]]:
-        (machine_probs, explanation) = await self.machine.classify(
+        machine_probs, explanation = await self.machine.classify(
             prompt=prompt,
             choices=choices,
             default=default,
