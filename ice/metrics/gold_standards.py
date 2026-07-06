@@ -184,8 +184,7 @@ def get_gold_standards(
     question_short_name: Optional[str] = None,
     experiment: Optional[str] = None,
     model_type: None = None,
-) -> list[GoldStandard[Any]]:
-    ...
+) -> list[GoldStandard[Any]]: ...
 
 
 @overload
@@ -195,8 +194,7 @@ def get_gold_standards(
     document_id: Optional[str] = None,
     question_short_name: Optional[str] = None,
     experiment: Optional[str] = None,
-) -> list[GoldStandard[ParsedGoldStandardType]]:
-    ...
+) -> list[GoldStandard[ParsedGoldStandardType]]: ...
 
 
 def get_gold_standards(
@@ -226,8 +224,7 @@ def get_gold_standard(
     question_short_name: Optional[str] = None,
     experiment: Optional[str] = None,
     model_type: None = None,
-) -> Optional[GoldStandard[Any]]:
-    ...
+) -> Optional[GoldStandard[Any]]: ...
 
 
 @overload
@@ -237,8 +234,7 @@ def get_gold_standard(
     document_id: Optional[str] = None,
     question_short_name: Optional[str] = None,
     experiment: Optional[str] = None,
-) -> Optional[GoldStandard[ParsedGoldStandardType]]:
-    ...
+) -> Optional[GoldStandard[ParsedGoldStandardType]]: ...
 
 
 def get_gold_standard(

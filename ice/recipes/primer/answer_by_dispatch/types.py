@@ -7,8 +7,7 @@ from ice.recipes.primer.answer_by_search import answer_by_search
 
 
 class QuestionRecipe(Protocol):
-    async def __call__(self, question: str) -> str:
-        ...
+    async def __call__(self, question: str) -> str: ...
 
 
 @dataclass

@@ -382,9 +382,9 @@ class EvaluationReport(BaseModel):
                 classification_summary.proportion_correct
             )
 
-            row[
-                f"Classification {i+1} # evaluated"
-            ] = classification_summary.num_evaluated
+            row[f"Classification {i+1} # evaluated"] = (
+                classification_summary.num_evaluated
+            )
 
         df = pd.DataFrame([row])
         df.to_csv(
@@ -408,9 +408,9 @@ class EvaluationReport(BaseModel):
                 "ice_commit": latest_commit_hash(),
                 "document_id": result.document_id,
                 "split": result.gold_standard.split if result.gold_standard else None,
-                "experiment": result.gold_standard.experiment
-                if result.gold_standard
-                else None,
+                "experiment": (
+                    result.gold_standard.experiment if result.gold_standard else None
+                ),
                 "total_gs_quotes": len(
                     result.evaluated_excerpts.gold_standards_in_excerpts_results
                 ),
@@ -420,9 +420,9 @@ class EvaluationReport(BaseModel):
                 "excerpts": result.evaluated_excerpts.excerpts,
                 "gs_quotes": result.evaluated_excerpts.gold_standards_str(),
                 "answer": result.answer,
-                "gs_answer": result.gold_standard.answer
-                if result.gold_standard
-                else None,
+                "gs_answer": (
+                    result.gold_standard.answer if result.gold_standard else None
+                ),
                 "answer_rating": result.answer_rating,
                 "failure_modes": result.failure_modes,
             }

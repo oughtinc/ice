@@ -8,7 +8,6 @@ from ice.recipe import Recipe
 from ice.recipes import get_recipe_classes
 from main import main_cli
 
-
 nest_asyncio.apply()
 
 

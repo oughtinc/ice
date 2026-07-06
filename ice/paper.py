@@ -93,9 +93,9 @@ def parse_txt(file: Path) -> list[dict]:
                                 "number": section_title_number(current_section),
                             }
                         ],
-                        "sectionType": "abstract"
-                        if current_section == "Abstract"
-                        else "main",
+                        "sectionType": (
+                            "abstract" if current_section == "Abstract" else "main"
+                        ),
                     }
                 )
     return body

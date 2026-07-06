@@ -5,16 +5,14 @@ from ice.recipe import recipe
 
 
 def make_search_result_prompt(context: str, question: str) -> str:
-    return F(
-        f"""
+    return F(f"""
 Search results from Google: "{context}"
 
 Answer the following question, using the search results if helpful:
 
 Question: "{question}"
 Answer: "
-"""
-    ).strip()
+""").strip()
 
 
 async def search(query: str) -> dict:

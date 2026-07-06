@@ -54,9 +54,11 @@ def paper_to_allocation_gold_standards(
         (
             f"The {exp.name} experiment included {len(exp.arms or [])} arms: {', '.join((arm.name for arm in exp.arms or []))}. How many participants were initially allocated to the {arm.name} arm of the {exp.name} experiment?",
             texts,
-            arm.allocated.quotes
-            if arm.allocated and isinstance(arm.allocated, SampleSize)
-            else [],
+            (
+                arm.allocated.quotes
+                if arm.allocated and isinstance(arm.allocated, SampleSize)
+                else []
+            ),
         )
         for exp in gs.parsed_answer.experiments
         for arm in (exp.arms or [])

@@ -197,9 +197,11 @@ async def preselected_few_shot_qa_baseline(
         Demonstration(
             question=g.question,
             texts=g.gold_support,
-            answer=g.gold_answer
-            if isinstance(g.gold_answer, str)
-            else numbered_list(g.gold_answer).transform(),
+            answer=(
+                g.gold_answer
+                if isinstance(g.gold_answer, str)
+                else numbered_list(g.gold_answer).transform()
+            ),
         )
         for g in demonstration_examples
     ]

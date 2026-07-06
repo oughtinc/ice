@@ -20,7 +20,6 @@ from ice.trace import enable_trace
 from ice.trace import trace
 from ice.utils import map_async
 
-
 log = get_logger()
 
 
