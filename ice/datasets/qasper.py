@@ -13,7 +13,6 @@ from ice.paper import Paragraph
 from ice.paper import split_sentences
 from ice.recipes.meta.eval_paper_qa.types import PaperQaGoldStandard
 
-
 TRAIN_PATH = "/code/datasets/qasper-train-v0.3.json"
 
 VAL_PATH = "/code/datasets/qasper-dev-v0.3.json"

@@ -6,7 +6,6 @@ from typing import Union
 
 from fvalues import F
 
-
 JSONValue = Union[
     str, int, float, bool, None, list["JSONValue"], dict[str, "JSONValue"]
 ]

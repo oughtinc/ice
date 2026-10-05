@@ -7,12 +7,10 @@ from ice.utils import map_async
 
 
 def make_prompt(paragraph: Paragraph, question: str) -> str:
-    return F(
-        f"""Here is a paragraph from a research paper: "{paragraph}"
+    return F(f"""Here is a paragraph from a research paper: "{paragraph}"
 
 Question: Does this paragraph answer the question '{question}'? Say Yes or No.
-Answer:"""
-    )
+Answer:""")
 
 
 async def classify_paragraph(paragraph: Paragraph, question: str) -> float:

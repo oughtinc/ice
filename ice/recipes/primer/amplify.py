@@ -4,7 +4,6 @@ from ice.recipe import recipe
 from ice.recipes.primer.subquestions import ask_subquestions
 from ice.utils import map_async
 
-
 Question = str
 Answer = str
 Subs = list[tuple[Question, Answer]]

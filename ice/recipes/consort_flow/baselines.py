@@ -342,9 +342,11 @@ async def _all_options(
         except TooLongRequestError:
             selections = remove_lowest_perplexity(selections)
     return PaperQaAnswer(
-        answer=["The question is not answered in the text."]
-        if do_return_list
-        else "The question is not answered in the text.",
+        answer=(
+            ["The question is not answered in the text."]
+            if do_return_list
+            else "The question is not answered in the text."
+        ),
         support_candidates=texts,
         support_labels=[False for text in texts],
         support_scores=[t[1] for t in texts_with_perplexities],

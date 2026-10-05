@@ -21,8 +21,7 @@ try:
 except ImportError:
 
     class Tfew(Agent):
-        def __init__(self, *args, **kwargs):
-            ...
+        def __init__(self, *args, **kwargs): ...
 
 
 MACHINE_AGENTS = {

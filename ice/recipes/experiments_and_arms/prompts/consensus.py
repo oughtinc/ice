@@ -2,7 +2,6 @@ from collections.abc import Sequence
 
 from structlog.stdlib import get_logger
 
-
 log = get_logger()
 
 

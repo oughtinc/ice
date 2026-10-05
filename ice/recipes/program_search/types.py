@@ -75,8 +75,7 @@ class Trace(BaseModel):
 T = t.TypeVar("T")
 
 
-class Beam(GenericModel, t.Generic[T]):
-    ...
+class Beam(GenericModel, t.Generic[T]): ...
 
 
 def remove_lowest_perplexity(results: t.Sequence[tuple[str, float]]):

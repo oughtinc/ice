@@ -4,14 +4,12 @@ from ice.recipe import recipe
 
 
 def make_computation_choice_prompt(question: str) -> str:
-    return F(
-        f"""You've been asked to answer the question "{question}".
+    return F(f"""You've been asked to answer the question "{question}".
 
 You have access to a Python interpreter.
 
 Enter an expression that will help you answer the question.
->>>"""
-    )
+>>>""")
 
 
 def eval_python(expression: str) -> str:

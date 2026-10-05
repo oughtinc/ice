@@ -114,9 +114,11 @@ def render_selection_example(
         question=question,
         existing=numbered_list(example.existing) if example.existing else NO_EXISTING,
         texts=numbered_list([str(text) for text in example.selection]),
-        selections=NONE_ANSWER
-        if not example.positive_idxs
-        else str(example.positive_idxs[0] + 1),
+        selections=(
+            NONE_ANSWER
+            if not example.positive_idxs
+            else str(example.positive_idxs[0] + 1)
+        ),
         NONE_ANSWER=NONE_ANSWER,
     )
 

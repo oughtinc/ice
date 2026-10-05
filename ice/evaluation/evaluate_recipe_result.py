@@ -138,9 +138,7 @@ class EvaluatedClassification(BaseModel):
         correctness = (
             "Correct"
             if self.is_correct == True
-            else "Incorrect"
-            if self.is_correct == False
-            else "Not evaluated"
+            else "Incorrect" if self.is_correct == False else "Not evaluated"
         )
         return f"""{correctness}.
     - Predicted: {self.predicted}
@@ -196,13 +194,17 @@ class EvaluatedRecipeResult(RecipeResult):
 
         for i in range(0, max(len(recipe_classifications), len(gold_classifications))):
             evaluated_classification = EvaluatedClassification(
-                predicted=recipe_classifications[i]
-                if i < len(recipe_classifications)
-                else None,
+                predicted=(
+                    recipe_classifications[i]
+                    if i < len(recipe_classifications)
+                    else None
+                ),
                 gold=gold_classifications[i] if i < len(gold_classifications) else None,
-                classification_eq=self.classification_eq[i]
-                if i < len(self.classification_eq)
-                else None,
+                classification_eq=(
+                    self.classification_eq[i]
+                    if i < len(self.classification_eq)
+                    else None
+                ),
             )
 
             evaluated_classifications.append(evaluated_classification)
