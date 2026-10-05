@@ -13,7 +13,6 @@ from ice.recipes.experiments_and_arms.prompts.utils import get_part
 from ice.recipes.experiments_and_arms.prompts.utils import start_last_example
 from ice.recipes.experiments_and_arms.types import MultipartReasoningPrompt
 
-
 CAN_WE_NAME_ARMS_EXAMPLES: list[
     dict[str, Union[ValueTransform[Sequence[str]], str, int]]
 ] = [

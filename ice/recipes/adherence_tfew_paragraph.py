@@ -24,7 +24,6 @@ from ice.utils import filter_async
 from ice.utils import map_async
 from ice.utils import max_by_value
 
-
 gpt2_tokenizer: GPT2TokenizerFast = AutoTokenizer.from_pretrained("gpt2")
 
 

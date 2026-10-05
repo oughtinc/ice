@@ -9,7 +9,6 @@ from numerizer.consts import DIRECT_SINGLE_NUMS
 
 from ice.formatter.transform import _Transform
 
-
 T_contra = TypeVar("T_contra", contravariant=True)
 
 

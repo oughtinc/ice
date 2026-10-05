@@ -156,13 +156,15 @@ async def name_experiments(
     assert experiment_names.final_answer is not None
     return (
         gs_names,
-        [
-            strip_enumeration_prefix(exp_name)
-            for exp_name in standardized_answer.split("\n")
-            if exp_name.strip()
-        ]
-        if standardized_answer
-        else [],
+        (
+            [
+                strip_enumeration_prefix(exp_name)
+                for exp_name in standardized_answer.split("\n")
+                if exp_name.strip()
+            ]
+            if standardized_answer
+            else []
+        ),
         paragraphs_to_keep,
         [str(p) for p in paragraphs],
     )

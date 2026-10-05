@@ -35,13 +35,17 @@ async def summarize_experiment_evals(results_file: str):
                     row.get("classification_1"),
                     row.get("classification_2"),
                 ],
-                answer_rating=None
-                if pd.isna(row.get("answer_rating"))
-                else int(row.get("answer_rating")),
+                answer_rating=(
+                    None
+                    if pd.isna(row.get("answer_rating"))
+                    else int(row.get("answer_rating"))
+                ),
                 elicit_commit=row.get("elicit_commit"),
-                failure_modes=None
-                if pd.isna(row.get("failure_modes"))
-                else row.failure_modes.split(","),
+                failure_modes=(
+                    None
+                    if pd.isna(row.get("failure_modes"))
+                    else row.failure_modes.split(",")
+                ),
             )
             for _, row in recipe_df.iterrows()
         ]

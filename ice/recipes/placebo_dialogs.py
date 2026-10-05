@@ -402,9 +402,11 @@ class PlaceboDialogs(Recipe):
                     experiment=experiment,
                     classifications=[
                         aggregate_used["answer"],
-                        "Placebo"
-                        if has_placebo_info
-                        else "No placebo or placebo not mentioned",
+                        (
+                            "Placebo"
+                            if has_placebo_info
+                            else "No placebo or placebo not mentioned"
+                        ),
                     ],
                     answer=placebo_result,
                     result=placebo_result,
